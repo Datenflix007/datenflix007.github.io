@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AlltagsLabor</title>
+    <link rel="icon" type="image/x-icon" href="icon.png">
+    <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      }
+    };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        #header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: #2c2c2c; /* Anthrazit */
+            color: white;
+            display: flex;
+            align-items: center;
+            padding: 10px 30px; /* Abstand von 30px */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+        }
+
+        #header img {
+            height: 40px;
+            margin-right: 30px; /* Abstand zwischen Icon und Titel */
+        }
+
+        #header p {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-right: 20px; /* Abstand zwischen Titel und Suchleiste */
+        }
+
+        #header input[type="text"] {
+            flex-grow: 1;
+            max-width: 400px;
+            padding: 5px;
+            margin-right: 10px; /* Abstand zwischen Suchleiste und Buttons */
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+
+        #header button {
+            padding: 5px 10px;
+            background-color: #555;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 3px;
+            margin-right: 10px; /* Abstand zwischen den Buttons */
+        }
+
+        #header button:last-child {
+            margin-right: 0; /* Kein Abstand nach dem letzten Button */
+        }
+
+        #header button:hover {
+            background-color: #777;
+        }
+
+        #mainContent {
+            display: flex;
+            flex-direction: row;
+        }
+        #experimentList {
+            flex: 2;
+            margin-top: 70px;
+            padding: 20px;
+        }
+        #experimentPreview {
+            flex: none;
+            width: 33vw;
+            min-width: 320px;
+            max-width: 480px;
+            margin-top: 70px;
+            padding: 20px;
+            border-left: 1px solid #eee;
+            background: linear-gradient(135deg, #f7fafc93 80%, #e3e6ee8b 100%);
+            background-color: #f7fafc45; /* Heller Hintergrund */
+            display: none;
+            position: fixed;
+            top: 0px;
+            right: 0;
+            height: calc(100vh - 70px);
+            overflow: hidden; /* Wichtig für das Wasserzeichen */
+            font-size: 0.8rem; /* Schriftgröße kleiner */
+            box-shadow: -2px 0 12px 0 rgba(60,60,100,0.07);
+            z-index: 1001;
+            border-radius: 0 0 0 18px;
+        }
+        #experimentPreview h3 {
+            font-size: 1.1rem;
+            margin-top: 0.2em;
+            margin-bottom: 0.5em;
+        }
+        #experimentPreview p, #experimentPreview ol, #experimentPreview li {
+            font-size: 0.95em;
+        }
+        /* Vorschau-Wasserzeichen */
+        #experimentPreview .preview-watermark {
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-25deg);
+            font-size: 3.5rem;
+            color: #b3b3c7;
+            opacity: 0.3;
+            font-weight: bold;
+            pointer-events: none;
+            user-select: none;
+            z-index: 10;
+            letter-spacing: 0.15em;
+            white-space: nowrap;
+            text-align: center;
+            width: 120%;
+        }
+        #experimentPreview-content {
+            position: relative;
+            z-index: 3;
+        }
+        #experimentDetails {
+            margin-top: 70px; /* Platz für den fixierten Header */
+            padding: 20px;
+            width: 80vw;
+            margin-left: 10%;
+            margin-right: 15%;
+            box-sizing: border-box;
+        }
+
+        #experimentDetails { display: none; }
+        .experiment-item { cursor: pointer; }
+        .experiment-item:hover .short-description { display: block; }
+        .short-description { display: none; font-style: italic; color: gray; }
+        img { max-width: 100%; height: auto; }
+        #experimentList {
+            margin-top: 70px;
+            min-height: 60vh;
+        }
+        .experiment {
+            margin-bottom: 10px;
+        }
+        #clearSearchButton {
+            margin-left: 10px;
+        }
+        .aufgabe-box {
+            background: #e3f0ff;
+            border-left: 6px solid #2196f3;
+            color: #174a6c;
+            padding: 12px 18px;
+            margin: 12px 0;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+        .merksatz-box {
+            background: #fff4e3;
+            border-left: 6px solid #ff9800;
+            color: #a65a00;
+            padding: 12px 18px;
+            margin: 12px 0;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+        /* Erweiterte Suche */
+        #advancedSearchMenu {
+            display: none;
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 300px;
+            max-width: 80%;
+            height: 100%;
+            background-color: white;
+            box-shadow: -2px 0 10px rgba(0, 0, 0, 0.3);
+            z-index: 1002;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        #advancedSearchMenu h3 {
+            margin-top: 0;
+            margin-bottom: 1em;
+            font-size: 1.2rem;
+        }
+        #advancedSearchMenu label {
+            font-weight: bold;
+            margin-top: 1em;
+            display: block;
+        }
+        #advancedSearchMenu select {
+            width: 100%;
+            padding: 8px;
+            margin-top: 0.5em;
+            margin-bottom: 1em;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        #advancedSearchMenu button {
+            padding: 10px;
+            background-color: #2196f3;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+            width: 100%;
+        }
+        #advancedSearchMenu button:hover {
+            background-color: #1976d2;
+        }
+        .close-btn {
+            background: none;
+            border: none;
+            color: #333;
+            font-size: 1.5rem;
+            cursor: pointer;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+        #impressumContainer {
+    min-height: 50vh;
+    background-color: #2c2c2c;
+    color: white;
+    padding: 20px;
+    box-sizing: border-box;
+}
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+        @media print {
+            audio,
+            #htmlExportButton,
+            #printButton,
+            #pdfExportButton {
+                display: none !important;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <div id="header">
+        <img src="icon.png" alt="Logo" onclick="showExperimentList()" style="cursor: pointer;">
+        <p onclick="showExperimentList()" style="cursor: pointer;">AlltagsLabor</p>
+        <input type="text" id="searchBar" placeholder="Suchbegriff eingeben">
+        <button id="searchButton">SUCHEN</button>
+        <button id="clearSearchButton" style="display:none;">LÖSCHEN</button>
+        <button id="advancedSearchButton">Erweiterte Suche</button>
+        
+    </div>
+
+    <div id="noResultsMessage" style="color: red; display: none; margin-top: 10px;"></div>
+    <div id="mainContent">
+        <div id="experimentList">
+            <!-- Experimente werden hier angezeigt -->
+        </div>
+        <div id="experimentPreview"></div>
+    </div>
+    <div id="experimentDetails">
+        <button id="backButton">⬅ Zurück</button>
+        <div id="experimentContent"></div>
+        <!-- Export-Buttons am Ende der Einzelansicht -->
+        <div style="margin-top: 2em;">
+            <!--<button id="htmlExportButton">HTML-Export</button>-->
+            <button id="printButton">Drucken</button>
+            <button id="pdfExportButton">PDF-Export</button>
+        </div>
+    </div>
+
+
+    <div id="impressumContainer" style="background-color: #2c2c2c; color: white; padding: 20px; margin-top: 80px;">
+    <h3>Impressum</h3>
+    <div id="impressumContent">Lade Impressum...</div>
+</div>
+
+<script>
+    fetch('dataEditor/impressum.txt')
+        .then(response => {
+            if (!response.ok) throw new Error(`HTTP-Fehler: ${response.status}`);
+            return response.text();
+        })
+        .then(text => {
+            document.getElementById('impressumContent').innerText = text;
+        })
+        .catch(error => {
+            document.getElementById('impressumContent').innerText = 'Fehler beim Laden des Impressums.';
+            console.error('Fehler beim Laden von impressum.txt:', error);
+        });
+</script>
+
+    <!-- Direkt nach dem #experimentPreview-Div -->
+    <div id="advancedSearchMenu">
+        <button class="close-btn" id="closeAdvancedSearch">&times;</button>
+        <h3>Erweiterte Suche</h3>
+        <label for="schoolTypeSelect">Schulform</label>
+        <select id="schoolTypeSelect">
+            <option value="">Alle</option>
+        </select>
+        <label for="subjectSelect">Fach</label>
+        <select id="subjectSelect">
+            <option value="">Alle</option>
+        </select>
+        <label for="gradeSelect">Klassenstufe</label>
+        <select id="gradeSelect">
+            <option value="">Alle</option>
+        </select>
+        <button id="applyAdvancedSearch" style="margin-top:10px;">Anwenden</button>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            let experiments = [];
+
+            // Lade Experimente aus dataEditor
+            fetch('dataEditor/_experiments.json')
+                .then(response => response.json())
+                .then(data => {
+                    experiments = data;
+                    renderExperiments(experiments);
+                })
+                .catch(error => console.error("Fehler beim Laden der JSON-Datei:", error));
+
+            // Funktion für die Suche
+            const searchButton = document.getElementById('searchButton');
+            const clearSearchButton = document.getElementById('clearSearchButton');
+            const searchBar = document.getElementById('searchBar');
+            const experimentList = document.getElementById('experimentList');
+            const noResultsMessage = document.getElementById('noResultsMessage');
+            const experimentPreview = document.getElementById('experimentPreview');
+            const advancedSearchButton = document.getElementById('advancedSearchButton');
+            const advancedSearchMenu = document.getElementById('advancedSearchMenu');
+            const closeAdvancedSearch = document.getElementById('closeAdvancedSearch');
+            const schoolTypeSelect = document.getElementById('schoolTypeSelect');
+            const subjectSelect = document.getElementById('subjectSelect');
+            const gradeSelect = document.getElementById('gradeSelect');
+            const applyAdvancedSearch = document.getElementById('applyAdvancedSearch');
+
+            // Hilfsfunktion: Dropdowns befüllen
+            function fillAdvancedSearchDropdowns(experiments) {
+                const schoolTypes = [...new Set(experiments.map(e => e.schoolType).filter(Boolean))];
+                const subjects = [...new Set(experiments.map(e => e.subject).filter(Boolean))];
+                const grades = [...new Set(experiments.map(e => e.gradeLevel).filter(Boolean))];
+
+                schoolTypeSelect.innerHTML = '<option value="">Alle</option>' + schoolTypes.map(s => `<option value="${s}">${s}</option>`).join('');
+                subjectSelect.innerHTML = '<option value="">Alle</option>' + subjects.map(s => `<option value="${s}">${s}</option>`).join('');
+                gradeSelect.innerHTML = '<option value="">Alle</option>' + grades.map(s => `<option value="${s}">${s}</option>`).join('');
+            }
+
+            searchButton.addEventListener('click', () => {
+                console.log("Der SUCHEN-Button wurde gedrückt."); // Konsolenausgabe
+
+                const query = searchBar.value.trim().toLowerCase();
+                const noResultsMessage = document.getElementById('noResultsMessage');
+
+                // Detailansicht ausblenden und Experimentliste anzeigen
+                document.getElementById('experimentDetails').style.display = 'none';
+                document.getElementById('experimentList').style.display = 'block';
+
+                if (query === "") {
+                    console.log("Suchleiste ist leer. Alle Experimente werden angezeigt.");
+                    renderExperiments(experiments);
+                    clearSearchButton.style.display = 'none'; // Button ausblenden
+                    noResultsMessage.style.display = 'none'; // Nachricht ausblenden
+                } else {
+                    console.log(`Suche nach: "${query}"`);
+                    const filteredExperiments = experiments.filter(exp => {
+                        return (
+                            (exp.title && exp.title.toLowerCase().includes(query)) || // Titel durchsuchen
+                            (exp.shortDescription && exp.shortDescription.toLowerCase().includes(query)) || // Beschreibung durchsuchen
+                            (Array.isArray(exp.steps) && exp.steps.some(step => step.content && step.content.toLowerCase().includes(query))) // Schritte durchsuchen
+                        );
+                    });
+
+                    if (filteredExperiments.length > 0) {
+                        console.log(`${filteredExperiments.length} Experimente gefunden.`);
+                        noResultsMessage.style.display = 'none'; // Nachricht ausblenden
+                    } else {
+                        console.log("Keine Experimente gefunden.");
+                        noResultsMessage.textContent = "Keine Experimente gefunden.";
+                        noResultsMessage.style.display = 'block'; // Nachricht anzeigen
+                    }
+                    renderExperiments(filteredExperiments);
+                    addClearSearchButton(); // "Suche löschen"-Button anzeigen
+                }
+            });
+
+            clearSearchButton.addEventListener('click', () => {
+                searchBar.value = ""; // Suchleiste leeren
+                renderExperiments(experiments); // Alle Experimente anzeigen
+                clearSearchButton.style.display = 'none'; // "Suche löschen"-Button ausblenden
+                noResultsMessage.style.display = 'none'; // Keine Ergebnisse Nachricht ausblenden
+            });
+
+            function renderExperiments(filteredExperiments) {
+                experimentList.innerHTML = ""; // Liste leeren
+                filteredExperiments.forEach((experiment) => {
+                    const listItem = document.createElement('div');
+                    listItem.className = 'experiment-item';
+                    listItem.innerHTML = `
+                        <strong>${experiment.title || "Titel nicht verfügbar"}</strong>
+                        <br />
+                        <div class="short-description">${experiment.shortDescription || "Keine Kurzbeschreibung verfügbar"}</div>
+                        <br />
+                        `;
+                    listItem.addEventListener('click', () => showExperiment(experiment)); // Experiment direkt übergeben
+
+                    // Vorschau beim Hover
+                    listItem.addEventListener('mouseenter', () => showPreview(experiment));
+                    listItem.addEventListener('mouseleave', () => hidePreview());
+
+                    experimentList.appendChild(listItem);
+                });
+            }
+
+            function showExperiment(experiment) {
+                const detailsContainer = document.getElementById('experimentDetails');
+                const listContainer = document.getElementById('experimentList');
+                const contentContainer = document.getElementById('experimentContent');
+
+                listContainer.style.display = 'none';
+                detailsContainer.style.display = 'block';
+
+                contentContainer.innerHTML = `
+                    <h2>${experiment.title || "Titel nicht verfügbar"}</h2>
+                    <table style="background-color: #dedede; width: 100%;">
+                        <tr>
+                            <td><strong>Fach:</strong></td>
+                            <td>${experiment.subject || "Nicht angegeben"}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Klassenstufe:</strong></td>
+                            <td>${experiment.gradeLevel || "Nicht angegeben"}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Kurzbeschreibung:</strong></td>
+                            <td>${experiment.shortDescription || "Keine Kurzbeschreibung verfügbar"}</td>
+                        </tr>
+                    </table>
+                    <div style="margin-top: 1.5em;">
+                      ${
+                        Array.isArray(experiment.steps)
+                          ? experiment.steps.map(step => {
+                              if (step.type === 'text') return `<div style="margin-bottom:1em;"><span>${step.content || "Inhalt nicht verfügbar"}</span></div>`;
+                              if (step.type === 'image') {
+                                return `<div style="margin-bottom:1em;">
+                                <img src="${step.content || "#"}" alt="${experiment.title || "Bild"}"><br>
+                                <span style="font-size:0.9em;color:#888;">${step.description ? step.description : ""}</span>
+                            </div>`;
+                              }
+                              if (step.type === 'link') return `<div style="margin-bottom:1em;"><a href="${step.content || "#"}" target="_blank">${step.content || "Link nicht verfügbar"}</a></div>`;
+                              if (step.type === 'aufgabe') return `<div class="aufgabe-box"><span style="font-weight:bold;color:#1565c0;">Aufgabe:</span><br/> <span>${step.content || "Aufgabe"}</span></div>`;
+                              if (step.type === 'merksatz') return `<div class="merksatz-box"><span style="font-weight:bold;color:#e65100;">Merksatz:</span><br/> <span>${step.content || "Merksatz"}</span></div>`;
+                              if (step.type === 'audio') {
+                                return `<div style="margin-bottom:1em;">
+                                    <audio controls onerror="this.parentElement.innerHTML='<em>Audio konnte nicht geladen werden.</em>';">
+                                        <source src="${step.content || '#'}" type="audio/mpeg">
+                                        Dein Browser unterstützt das Audio-Element nicht.
+                                    </audio><br>
+                                    <span style="font-size:0.9em;color:#888;">${step.description || ""}</span>
+                                </div>`;
+                            }
+
+
+                            }).join('')
+                          : "<div>Keine Schritte verfügbar</div>"
+                      }
+                    </div>
+                `;
+                setTimeout(() => {
+                    if (window.MathJax && window.MathJax.typesetPromise) {
+                        MathJax.typesetPromise([contentContainer]);
+                    }
+                }, 0);
+            }
+
+            function showPreview(experiment) {
+                experimentPreview.style.display = 'block';
+                experimentPreview.innerHTML = `
+                    <div class="preview-watermark">VORSCHAU</div>
+                    <div id="experimentPreview-content">
+                        <h3>${experiment.title || "Titel nicht verfügbar"}</h3>
+                        <p><strong>Fach:</strong> ${experiment.subject || "Nicht angegeben"}</p>
+                        <p><strong>Klassenstufe:</strong> ${experiment.gradeLevel || "Nicht angegeben"}</p>
+                        <p>${experiment.shortDescription || ""}</p>
+                        <div>
+                            ${
+                                Array.isArray(experiment.steps)
+                                    ? experiment.steps
+                                        .filter(step => step.type === 'text' || step.type === 'image' || step.type === 'link' || step.type === 'aufgabe' || step.type === 'merksatz')
+                                        .slice(0, 2)
+                                        .map(step => {
+                                            if (step.type === 'text') return `<div style="margin-bottom:1em;"><span>${step.content || ""}</span></div>`;
+                                            if (step.type === 'image') return `<div style="margin-bottom:1em;">
+                                            <img src="${step.content || "#"}" alt="Bild" style="max-width:100%;max-height:120px;"><br>
+                                            <span style="font-size:0.85em;color:#888;">${step.description ? step.description : ""}</span>
+                                        </div>`;
+                                            if (step.type === 'link') return `<div style="margin-bottom:1em;"><a href="${step.content || "#"}" target="_blank">${step.content || "Link"}</a></div>`;
+                                            if (step.type === 'aufgabe') return `<div class="aufgabe-box"><span style="font-weight:bold;color:#1565c0;">Aufgabe:</span><br/> <span>${step.content || "Aufgabe"}</span></div>`;
+                                            if (step.type === 'merksatz') return `<div class="merksatz-box"><span style="font-weight:bold;color:#e65100;">Merksatz:</span><br/> <span>${step.content || "Merksatz"}</span></div>`;
+                                            if (step.type === 'audio') {
+                                                return `<div style="margin-bottom:1em;">
+                                                    <audio controls onerror="this.parentElement.innerHTML='<em>Audio konnte nicht geladen werden.</em>';">
+                                                        <source src="${step.content || '#'}" type="audio/mpeg">
+                                                        Dein Browser unterstützt das Audio-Element nicht.
+                                                    </audio><br>
+                                                    <span style="font-size:0.9em;color:#888;">${step.description || ""}</span>
+                                                </div>`;
+                                            }
+
+
+                                        }).join('')
+                                    : ""
+                            }
+                        </div>
+                    </div>
+                `;
+                setTimeout(() => {
+                    if (window.MathJax && window.MathJax.typesetPromise) {
+                        MathJax.typesetPromise([experimentPreview]);
+                    }
+                }, 0);
+            }
+
+            function hidePreview() {
+                experimentPreview.style.display = 'none';
+                experimentPreview.innerHTML = '';
+            }
+
+            document.getElementById('backButton').addEventListener('click', () => {
+                document.getElementById('experimentList').style.display = 'block';
+                document.getElementById('experimentDetails').style.display = 'none';
+            });
+
+            function addClearSearchButton() {
+                clearSearchButton.style.display = 'inline-block'; // Button sichtbar machen
+            }
+
+            clearSearchButton.addEventListener('click', () => {
+                searchBar.value = ""; // Suchleiste leeren
+                renderExperiments(experiments); // Gesamte Experimentliste anzeigen
+                clearSearchButton.style.display = 'none'; // Button ausblenden
+                document.getElementById('noResultsMessage').style.display = 'none'; // Nachricht ausblenden
+            });
+
+            // Erweiterte Suche
+            advancedSearchButton.addEventListener('click', () => {
+                fillAdvancedSearchDropdowns(experiments);
+                advancedSearchMenu.style.display = 'block';
+            });
+
+            closeAdvancedSearch.addEventListener('click', () => {
+                advancedSearchMenu.style.display = 'none';
+            });
+
+            // Erweiterte Suche anwenden
+            applyAdvancedSearch.addEventListener('click', () => {
+                const selectedSchoolType = schoolTypeSelect.value;
+                const selectedSubject = subjectSelect.value;
+                const selectedGradeLevel = gradeSelect.value;
+
+                const filteredExperiments = experiments.filter(exp => {
+                    const matchesSchoolType = selectedSchoolType === "" || (exp.schoolType && exp.schoolType === selectedSchoolType);
+                    const matchesSubject = selectedSubject === "" || (exp.subject && exp.subject === selectedSubject);
+                    const matchesGradeLevel = selectedGradeLevel === "" || (exp.gradeLevel && exp.gradeLevel === selectedGradeLevel);
+
+                    return matchesSchoolType && matchesSubject && matchesGradeLevel;
+                });
+
+                renderExperiments(filteredExperiments);
+                advancedSearchMenu.style.display = 'none'; // Menü nach der Suche schließen
+            });
+
+            document.getElementById('refreshButton').addEventListener('click', () => {
+                fetch('http://localhost:3001/api/update', { method: 'POST' })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert("Daten wurden erfolgreich aktualisiert!");
+                            location.reload(); // Seite neu laden, um neue Daten zu sehen
+                        } else {
+                            alert("Fehler beim Aktualisieren: " + data.error);
+                        }
+                    })
+                    .catch(err => {
+                        alert("Verbindung zum Update-Server fehlgeschlagen.");
+                    });
+            });
+
+            // HTML-Export
+            
+
+document.getElementById('htmlExportButton').addEventListener('click', function () {
+        const details = document.getElementById('experimentContent').cloneNode(true);
+        const exportHeader = document.getElementById('header').cloneNode(true);
+
+        const embedImage = img => {
+            return fetch(img.src, { mode: 'cors' })
+                .then(res => res.blob())
+                .then(blob => new Promise(resolve => {
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                        img.src = reader.result;
+                        resolve();
+                    };
+                    reader.readAsDataURL(blob);
+                })).catch(() => { img.remove(); return Promise.resolve(); });
+        };
+
+        
+        const imagePromises = Array.from(details.querySelectorAll('img')).map(embedImage);
+        
+
+        Promise.all([...imagePromises, ]).then(() => {
+            const htmlContent = `<!DOCTYPE html>
+<html lang="de">
+<head><meta charset="UTF-8"><title>Export</title><style>
+body { font-family: Arial, sans-serif; margin: 0; }
+#header { background: #2c2c2c; color: white; padding: 10px 30px; display: flex; align-items: center; }
+#header img { height: 1.5em; margin-right: 16px; }
+#header p { margin: 0; font-size: 1.5rem; font-weight: bold; }
+img { max-width: 100%; height: auto; }
+audio { max-width: 100%; }
+.aufgabe-box {
+    background: #e3f0ff;
+    border-left: 6px solid #2196f3;
+    color: #174a6c;
+    padding: 12px 18px;
+    margin: 12px 0;
+    border-radius: 8px;
+    font-weight: bold;
+}
+.merksatz-box {
+    background: #fff4e3;
+    border-left: 6px solid #ff9800;
+    color: #a65a00;
+    padding: 12px 18px;
+    margin: 12px 0;
+    border-radius: 8px;
+    font-weight: bold;
+}
+</style></head><body>
+${exportHeader.outerHTML}
+<div style="margin-top:70px;padding:20px;">${details.innerHTML}</div>
+</body></html>`;
+
+            const blob = new Blob([htmlContent], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'experiment_export.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+    });
+
+
+
+
+
+            // PDF-Export
+            document.getElementById('pdfExportButton').addEventListener('click', function () {
+                const toHide = [
+                    document.getElementById('searchBar'),
+                    document.getElementById('searchButton'),
+                    document.getElementById('clearSearchButton'),
+                    document.getElementById('advancedSearchButton'),
+                    document.getElementById('refreshButton'),
+                    document.getElementById('backButton'),
+                    document.getElementById('htmlExportButton'),
+                    document.getElementById('printButton'),
+                    document.getElementById('pdfExportButton')
+                ];
+                toHide.forEach(el => { if (el) el.style.display = 'none'; });
+
+                // Content klonen
+                const details = document.getElementById('experimentContent').cloneNode(true);
+
+                // Logo als Data-URL einbetten
+                const logoSrc = document.querySelector('#header img').src;
+                const logoImg = document.createElement('img');
+                const logoImage = new Image();
+                logoImage.crossOrigin = 'anonymous';
+                logoImage.onload = function () {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = logoImage.naturalWidth;
+                    canvas.height = logoImage.naturalHeight;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(logoImage, 0, 0);
+                    logoImg.src = canvas.toDataURL('image/png');
+                    logoImg.alt = 'Logo';
+                    logoImg.style.height = '32pt';
+                    logoImg.style.width = 'auto';
+                    logoImg.style.marginRight = '24pt';
+
+                    // 1. Header: GANZE BREITE
+                    const pdfHeader = document.createElement('div');
+                    pdfHeader.style.background = '#2c2c2c';
+                    pdfHeader.style.color = 'white';
+                    pdfHeader.style.width = '595.28pt'; // volle A4-Breite
+                    pdfHeader.style.padding = '18pt 0 18pt 0';
+                    pdfHeader.style.display = 'flex';
+                    pdfHeader.style.alignItems = 'center';
+                    pdfHeader.style.fontSize = '22pt';
+                    pdfHeader.style.fontWeight = 'bold';
+                    pdfHeader.style.boxSizing = 'border-box';
+                    pdfHeader.style.textAlign = 'left';
+                    pdfHeader.style.justifyContent = 'flex-start';
+                    pdfHeader.style.position = 'relative';
+
+                    // Innencontainer für Logo + Schriftzug, damit sie nicht am Rand kleben
+                    const innerHeader = document.createElement('div');
+                    innerHeader.style.display = 'flex';
+                    innerHeader.style.alignItems = 'center';
+                    innerHeader.style.marginLeft = '5%';
+                    innerHeader.appendChild(logoImg);
+
+                    const titleElem = document.createElement('span');
+                    titleElem.textContent = 'AlltagsLabor';
+                    titleElem.style.margin = '0';
+                    titleElem.style.fontSize = '22pt';
+                    titleElem.style.fontWeight = 'bold';
+                    titleElem.style.color = 'white';
+                    innerHeader.appendChild(titleElem);
+
+                    pdfHeader.appendChild(innerHeader);
+
+                    // 2. Container für PDF-Inhalt (Header GANZ, Content schmal)
+                    const tempContainer = document.createElement('div');
+                    tempContainer.style.background = 'white';
+                    tempContainer.style.width = '595.28pt'; // volle A4-Breite
+                    tempContainer.style.minHeight = '842pt';
+                    tempContainer.style.boxSizing = 'border-box';
+                    tempContainer.style.position = 'fixed';
+                    tempContainer.style.left = '-9999px';
+                    tempContainer.style.top = '0';
+
+                    // Content-Wrapper mit schmaler Breite und Padding
+                    const contentWrapper = document.createElement('div');
+                    contentWrapper.style.width = '535pt'; // ca. 90% von 595.28pt (A4)
+                    contentWrapper.style.margin = '0 auto';
+                    contentWrapper.style.boxSizing = 'border-box';
+                    contentWrapper.style.paddingLeft = '5%';
+                    contentWrapper.style.paddingRight = '5%';
+                    contentWrapper.appendChild(details);
+
+                    tempContainer.appendChild(pdfHeader);
+                    tempContainer.appendChild(contentWrapper);
+
+                    document.body.appendChild(tempContainer);
+
+                    // MathJax warten, dann Screenshot machen
+                    const renderAndExport = () => {
+                        html2canvas(tempContainer, { scale: 2, backgroundColor: "#fff", useCORS: true }).then(canvas => {
+                            const imgData = canvas.toDataURL('image/png');
+                            const pdf = new window.jspdf.jsPDF({
+                                orientation: 'portrait',
+                                unit: 'pt',
+                                format: 'a4'
+                            });
+
+                            const pageWidth = pdf.internal.pageSize.getWidth();
+                            const pageHeight = pdf.internal.pageSize.getHeight();
+                            const imgWidth = pageWidth;
+                            const imgHeight = canvas.height * imgWidth / canvas.width;
+
+                            let position = 0;
+                            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+
+                            // Falls Inhalt länger als eine Seite ist, weitere Seiten hinzufügen
+                            let remainingHeight = imgHeight - pageHeight;
+                            while (remainingHeight > 0) {
+                                position = position - pageHeight;
+                                pdf.addPage();
+                                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                                remainingHeight -= pageHeight;
+                            }
+
+                            pdf.save('einzelansicht.pdf');
+                            // Nach PDF-Export alles wieder einblenden und temporären Container entfernen
+                            toHide.forEach(el => { if (el) el.style.display = ''; });
+                            document.body.removeChild(tempContainer);
+                        });
+                    };
+
+                    if (window.MathJax && window.MathJax.typesetPromise) {
+                        MathJax.typesetPromise([tempContainer]).then(renderAndExport);
+                    } else {
+                        renderAndExport();
+                    }
+                };
+                logoImage.src = logoSrc;
+            });
+
+            // Erweiterte Suche - Schulform, Fach und Klassenstufe Optionen hinzufügen
+            const allExperiments = experiments; // Alle Experimente für die erweiterte Suche behalten
+            fillAdvancedSearchDropdowns(allExperiments);
+        });
+    </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    // ...existing code...
+
+    document.getElementById('printButton').addEventListener('click', function () {
+        // Header-Buttons, Suchleiste und Zurück-Button temporär ausblenden
+        const toHide = [
+            document.getElementById('searchBar'),
+            document.getElementById('searchButton'),
+            document.getElementById('clearSearchButton'),
+            document.getElementById('advancedSearchButton'),
+            document.getElementById('refreshButton'),
+            document.getElementById('backButton') // Zurück-Button
+        ];
+        toHide.forEach(el => { if (el) el.style.display = 'none'; });
+
+        window.print();
+
+        setTimeout(() => {
+            toHide.forEach(el => { if (el) el.style.display = ''; });
+        }, 500);
+    });
+
+    document.getElementById('pdfExportButton').addEventListener('click', function () {
+        const toHide = [
+            document.getElementById('searchBar'),
+            document.getElementById('searchButton'),
+            document.getElementById('clearSearchButton'),
+            document.getElementById('advancedSearchButton'),
+            document.getElementById('refreshButton'),
+            document.getElementById('backButton'),
+            document.getElementById('htmlExportButton'),
+            document.getElementById('printButton'),
+            document.getElementById('pdfExportButton')
+        ];
+        toHide.forEach(el => { if (el) el.style.display = 'none'; });
+
+        // Content klonen
+        const details = document.getElementById('experimentContent').cloneNode(true);
+
+        // Logo als Data-URL einbetten
+        const logoSrc = document.querySelector('#header img').src;
+        const logoImg = document.createElement('img');
+        const logoImage = new Image();
+        logoImage.crossOrigin = 'anonymous';
+        logoImage.onload = function () {
+            const canvas = document.createElement('canvas');
+            canvas.width = logoImage.naturalWidth;
+            canvas.height = logoImage.naturalHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(logoImage, 0, 0);
+            logoImg.src = canvas.toDataURL('image/png');
+            logoImg.alt = 'Logo';
+            logoImg.style.height = '32pt';
+            logoImg.style.width = 'auto';
+            logoImg.style.marginRight = '24pt';
+
+            // 1. Header: GANZE BREITE
+            const pdfHeader = document.createElement('div');
+            pdfHeader.style.background = '#2c2c2c';
+            pdfHeader.style.color = 'white';
+            pdfHeader.style.width = '595.28pt'; // volle A4-Breite
+            pdfHeader.style.padding = '18pt 0 18pt 0';
+            pdfHeader.style.display = 'flex';
+            pdfHeader.style.alignItems = 'center';
+            pdfHeader.style.fontSize = '22pt';
+            pdfHeader.style.fontWeight = 'bold';
+            pdfHeader.style.boxSizing = 'border-box';
+            pdfHeader.style.textAlign = 'left';
+            pdfHeader.style.justifyContent = 'flex-start';
+            pdfHeader.style.position = 'relative';
+
+            // Innencontainer für Logo + Schriftzug, damit sie nicht am Rand kleben
+            const innerHeader = document.createElement('div');
+            innerHeader.style.display = 'flex';
+            innerHeader.style.alignItems = 'center';
+            innerHeader.style.marginLeft = '5%';
+            innerHeader.appendChild(logoImg);
+
+            const titleElem = document.createElement('span');
+            titleElem.textContent = 'AlltagsLabor';
+            titleElem.style.margin = '0';
+            titleElem.style.fontSize = '22pt';
+            titleElem.style.fontWeight = 'bold';
+            titleElem.style.color = 'white';
+            innerHeader.appendChild(titleElem);
+
+            pdfHeader.appendChild(innerHeader);
+
+            // 2. Container für PDF-Inhalt (Header GANZ, Content schmal)
+            const tempContainer = document.createElement('div');
+            tempContainer.style.background = 'white';
+            tempContainer.style.width = '595.28pt'; // volle A4-Breite
+            tempContainer.style.minHeight = '842pt';
+            tempContainer.style.boxSizing = 'border-box';
+            tempContainer.style.position = 'fixed';
+            tempContainer.style.left = '-9999px';
+            tempContainer.style.top = '0';
+
+            // Content-Wrapper mit schmaler Breite und Padding
+            const contentWrapper = document.createElement('div');
+            contentWrapper.style.width = '535pt'; // ca. 90% von 595.28pt (A4)
+            contentWrapper.style.margin = '0 auto';
+            contentWrapper.style.boxSizing = 'border-box';
+            contentWrapper.style.paddingLeft = '5%';
+            contentWrapper.style.paddingRight = '5%';
+            contentWrapper.appendChild(details);
+
+            tempContainer.appendChild(pdfHeader);
+            tempContainer.appendChild(contentWrapper);
+
+            document.body.appendChild(tempContainer);
+
+            // MathJax warten, dann Screenshot machen
+            const renderAndExport = () => {
+                html2canvas(tempContainer, { scale: 2, backgroundColor: "#fff", useCORS: true }).then(canvas => {
+                    const imgData = canvas.toDataURL('image/png');
+                    const pdf = new window.jspdf.jsPDF({
+                        orientation: 'portrait',
+                        unit: 'pt',
+                        format: 'a4'
+                    });
+
+                    const pageWidth = pdf.internal.pageSize.getWidth();
+                    const pageHeight = pdf.internal.pageSize.getHeight();
+                    const imgWidth = pageWidth;
+                    const imgHeight = canvas.height * imgWidth / canvas.width;
+
+                    let position = 0;
+                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+
+                    // Falls Inhalt länger als eine Seite ist, weitere Seiten hinzufügen
+                    let remainingHeight = imgHeight - pageHeight;
+                    while (remainingHeight > 0) {
+                        position = position - pageHeight;
+                        pdf.addPage();
+                        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                        remainingHeight -= pageHeight;
+                    }
+
+                    pdf.save('einzelansicht.pdf');
+                    // Nach PDF-Export alles wieder einblenden und temporären Container entfernen
+                    toHide.forEach(el => { if (el) el.style.display = ''; });
+                    document.body.removeChild(tempContainer);
+                });
+            };
+
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                MathJax.typesetPromise([tempContainer]).then(renderAndExport);
+            } else {
+                renderAndExport();
+            }
+        };
+        logoImage.src = logoSrc;
+    });
+
+    // Erweiterte Suche - Schulform, Fach und Klassenstufe Optionen hinzufügen
+    const allExperiments = experiments; // Alle Experimente für die erweiterte Suche behalten
+    fillAdvancedSearchDropdowns(allExperiments);
+});
+</script>
+
+</body>
+</html>
