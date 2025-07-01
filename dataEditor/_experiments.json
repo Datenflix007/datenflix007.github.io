@@ -1,6 +1,6 @@
 [
     {
-        "title": "Warum quietscht die Straßenbahn?",
+        "title": "_Beispiel: Warum quietscht die Straßenbahn?",
         "shortDescription": "Was quietscht denn da bei Tag und Nacht? Es ist die Straßenbahn, die das macht. ",
         "subject": "Physik",
         "gradeLevel": "7",
@@ -26,7 +26,7 @@
         "schoolType": "Gymnasium"
     },
     {
-        "title": "Beispiel mit LaTeX",
+        "title": "_Beispiel: LaTeX-Code",
         "shortDescription": "Ein Experiment mit einer Formel.",
         "subject": "Mathematik",
         "gradeLevel": "8",
@@ -556,592 +556,165 @@
         "schoolType": "Gemeinschaftsschule"
     },
     {
-        "title": "Wärmelehre Experimente",
-        "shortDescription": "<p><b>\"In der Wärmelehre geht es heiß her!\"</b><br>\nHier geht es darum, wie warm oder kalt Dinge sind.<br>\nUnd was passiert, wenn Dinge warm werden oder abkühlen.<br>\nAuf dieser Seite findest du einfache Experimente.<br>\nDu kannst sie ganz leicht in der Schule nachmachen.<br>\nWir erklären dir auch:</p>\n\n<ul>\n  <li>Was dabei in der Physik passiert.</li>\n  <li>Wo du das im Alltag erleben kannst.</li>\n</ul>\n\n<p><b>\"Viel Spaß beim Forschen und Ausprobieren! Wünscht euch das AlltagsLabor.\"</b></p>",
+        "title": "Mechanik Theorie",
+        "shortDescription": "<p>Hier findet ihr die grundlegende Theorie zur Mechanik, die die Bewegung von Körpern und die Kräfte, die auf sie wirken, einfach und verständlich beschreibt. Dieses Wissen hilft euch, die Experimente zur Bewegung und zum Gleichgewicht besser zu verstehen.</p>\n\n<p><b>Viel Spaß beim Wissensentdecken wünscht das Alltagslabor!</b></p>",
         "subject": "Physik",
         "gradeLevel": "7",
         "steps": [
             {
                 "type": "text",
-                "content": "<p><b><u>1.1 Temperatur fühlen – Täuscht uns unser Gefühl?</u></b></p>\n\n<p><b>Was du brauchst:</b><br>\n • 3 Schüsseln oder Wannen<br>\n • Warmes Wasser (ca. 40 °C)<br>\n • Kaltes Wasser mit Eiswürfeln (ca. 0 °C)<br>\n • Lauwarmes Wasser (ca. 20 °C)<br>\n • Deine beiden Hände<br>\nTipp: Markiere die Schüsseln farbig, z. B. rot für warm, blau für kalt, und neutral für lauwarm.</p>\n\n<p><b>So geht’s:</b><br>\nFülle die rote Schüssel mit warmem Wasser (nicht zu heiß – ca. 40 °C).<br>\nFülle die blaue Schüssel mit kaltem Wasser (am besten mit Eiswürfeln – ca. 0 °C).<br>\nFülle die mittlere Wanne mit lauwarmem Wasser (etwa 20 °C).<br>\nStecke deine linke Hand in die rote (warme) Schüssel und die rechte Hand in die blaue (kalte) Schüssel.<br>\nWarte ca. 1 Minute.<br>\nJetzt tauche beide Hände gleichzeitig in das lauwarme Wasser.</p>"
-            },
-            {
-                "type": "aufgabe",
-                "content": "<p><i>Was fühlst du?<br>\n • Spürt jede Hand die gleiche Temperatur?<br>\n • Welche Hand fühlt das Wasser eher warm? Welche eher kalt?<br>\n • Wie kann das sein – obwohl es das gleiche Wasser ist?</i></p>"
+                "content": "<h2>Grundlagentheorie zur Mechanik</h2>\n\n<h3>Was ist Mechanik?</h3>\n<p>Die Mechanik ist ein Teilbereich der Physik, der sich mit Bewegungen von Körpern sowie mit den Kräften beschäftigt, die diese Bewegungen verursachen oder verändern. Sie wird in drei Hauptbereiche unterteilt: Kinematik (Bewegung), Dynamik (Kraftwirkungen) und Statik (Gleichgewicht).</p>"
             },
             {
                 "type": "merksatz",
-                "content": "<p><b>Erklärung:</b><br>\nDeine Haut passt sich an die Temperatur an.<br>\n • Die Hand im kalten Wasser ist daran gewöhnt, dass es richtig kalt ist.<br>\n • Die Hand im warmen Wasser ist an Wärme gewöhnt.<br>\nWenn beide Hände jetzt ins gleiche lauwarme Wasser kommen:<br>\n • Die „kalte“ Hand findet es plötzlich warm.<br>\n • Die „warme“ Hand findet es plötzlich kalt.<br><br>\nDas zeigt:<br>\nUnser Wärmegefühl ist nicht objektiv, sondern hängt davon ab, was wir vorher gespürt haben.</p>"
+                "content": "<h3>Wichtige Begriffe</h3>\n<ul>\n  <li><b>Bewegung:</b> Änderung der Position eines Körpers im Raum.</li>\n  <li><b>Geschwindigkeit:</b> Maß dafür, wie schnell sich ein Körper bewegt.</li>\n  <li><b>Beschleunigung:</b> Änderung der Geschwindigkeit eines Körpers pro Zeit.</li>\n  <li><b>Kraft:</b> Einwirkung, die einen Körper verformen oder beschleunigen kann.</li>\n  <li><b>Arbeit:</b> Energieaufwand, um einen Körper mit Kraft über eine Strecke zu bewegen.</li>\n  <li><b>Leistung:</b> Arbeit pro Zeit.</li>\n  <li><b>Energie:</b> Fähigkeit, Arbeit zu verrichten oder Wärme abzugeben.</li>\n  <li><b>Impuls:</b> Maß für die Bewegungsmenge eines Körpers.</li>\n</ul>"
             },
             {
                 "type": "text",
-                "content": "<p><b>Was hat das mit dem Alltag zu tun?</b><br>\n • Wenn du im Winter draußen warst und dann ins Haus kommst, fühlt sich alles plötzlich heiß an – sogar lauwarmes Wasser beim Händewaschen.<br>\n • Oder umgekehrt: An einem heißen Sommertag kommt dir lauwarmes Wasser eher kalt vor.</p>"
-            },
-            {
-                "type": "text",
-                "content": "<br></br>"
-            },
-            {
-                "type": "text",
-                "content": "<p><b><u>1.2 Wie funktioniert ein Thermometer?</u></b></p>\n\n<p><b>Was du brauchst:</b><br>\n • 1 große durchsichtige PET-Flasche (leer & sauber)<br>\n • 1 Gummistopfen mit einem Loch (z. B. aus dem Laborbedarf oder selbst gebastelt mit Knete)<br>\n • 1 Glasrohr oder Strohhalm (mindestens 40 cm lang)<br>\n • Tinte oder Lebensmittelfarbe<br>\n • Klebeband<br>\n • Filzstift zum Markieren<br>\n • 1 Thermometer zum Messen der Temperatur</p>\n\n<p><b>So geht’s:</b><br>\nFülle die Flasche fast ganz mit Wasser. Gib ein paar Tropfen Tinte dazu, damit man den Wasserstand im Röhrchen gut sehen kann.<br>\nStelle die Flasche für mindestens 30 Minuten in den Kühlschrank (damit das Wasser kalt wird – ca. 6 °C).<br>\nMiss jetzt die Temperatur des Wassers mit dem Thermometer.<br>\nStecke das Glasrohr oder den Strohhalm durch das Loch im Gummistopfen.<br>\nSetze den Gummistopfen auf die Flasche, sodass das Röhrchen etwa 5 cm ins Wasser ragt. Dichte alles gut ab mit Klebeband, damit keine Luft entweicht.<br>\nMarkiere den Wasserstand im Röhrchen mit einem Filzstift.<br>\nStelle die Flasche an einen warmen Ort im Raum (Zimmertemperatur, ca. 22 °C).<br>\nWarte etwa einen Tag. Dann miss wieder die Temperatur und markiere erneut den Wasserstand.<br>\nOptional: Stelle die Flasche in ein Becken mit warmem Wasser (z. B. 35–40 °C). Miss wieder die Temperatur und markiere den Wasserstand nach ca. 15 Minuten.</p>"
-            },
-            {
-                "type": "aufgabe",
-                "content": "<p><i>Was fällt auf?<br>\n • Ist der Wasserstand im Röhrchen gestiegen oder gesunken?<br>\n • Was passiert mit dem Wasser, wenn es wärmer wird?</i></p>"
+                "content": "<h3>Grundlagen und Gesetze</h3>\n\n<h4>1. Gleichförmige Bewegung</h4>\n<p>Bei einer gleichförmigen Bewegung bleibt die Geschwindigkeit konstant.</p>"
             },
             {
                 "type": "merksatz",
-                "content": "<p><b>Erklärung:</b><br>\nWenn Wasser wärmer wird, nimmt es mehr Platz ein – es dehnt sich aus.<br>\nIn der Flasche braucht das Wasser also mehr Raum – darum steigt der Wasserstand im Röhrchen.<br><br>\nSo funktioniert auch ein echtes Flüssigkeitsthermometer:<br>\nJe wärmer die Umgebung, desto mehr dehnt sich die Flüssigkeit aus und steigt im Röhrchen nach oben.</p>"
-            },
-            {
-                "type": "text",
-                "content": "<p><b>Was hat das mit dem Alltag zu tun?</b><br>\n • Genau so messen Thermometer die Temperatur – zum Beispiel Fieberthermometer oder alte Flüssigkeitsthermometer im Garten.</p>"
-            },
-            {
-                "type": "text",
-                "content": "<br></br>"
-            },
-            {
-                "type": "text",
-                "content": "<p><b><u>1.3 Von Wärme zu Bewegung: Wie funktioniert eine Dampfturbine?</u></b></p>\n\n<p><b>Was du brauchst:</b><br>\n • 1 kleiner Topf<br>\n • Wasser<br>\n • 1 Herdplatte (oder Campingkocher – bitte mit Aufsicht!)<br>\n • 1 Korkscheibe oder Topfdeckel mit kleinem Loch<br>\n • 1 kleine Windmühle (leicht, aus Papier oder Kunststoff – z. B. Spielzeug)<br>\n • Topfuntersetzer<br>\n Tipp: Die Korkplatte muss gut auf den Topf passen und möglichst dicht abschließen, damit der Dampf nur durch das kleine Loch entweichen kann.</p>\n\n<p><b>So geht’s:</b><br>\nFülle den Topf zur Hälfte mit Wasser.<br>\nVerschließe ihn mit dem Deckel oder der Korkscheibe, in dem sich ein kleines Loch befindet.<br>\nErhitze den Topf auf der Herdplatte – warte, bis das Wasser anfängt zu kochen.<br>\nHalte die Windmühle direkt über das Loch (Achtung: heißer Dampf! Nur mit Aufsicht oder Zange halten).<br>\nBeobachte, was passiert.</p>"
-            },
-            {
-                "type": "aufgabe",
-                "content": "<p><i>Was stellst du fest?<br>\n • Was passiert mit der Windmühle?<br>\n • Woher kommt die Bewegung?<br>\n • Wie hängt das mit der Hitze zusammen?</i></p>"
+                "content": "<p><b>Formel:</b><br>\nv = s / t<br>\nv: Geschwindigkeit [m/s], s: Strecke [m], t: Zeit [s]</p>"
             },
             {
                 "type": "merksatz",
-                "content": "<p><b>Erklärung:</b><br>\n • Das Wasser wird erhitzt → es beginnt zu sieden.<br>\n • Dabei entsteht Wasserdampf, der viel mehr Platz braucht als flüssiges Wasser.<br>\n • Der Dampf entweicht mit Druck durch das kleine Loch.<br>\n • Dieser Druck trifft auf die Windmühle – und bringt sie zum Drehen.<br><br>\nDas ist ein Modell für eine Dampfturbine.</p>"
+                "content": "<p><b>Merksatz:</b> Je länger der Weg in kurzer Zeit, desto größer die Geschwindigkeit.</p>"
             },
             {
                 "type": "text",
-                "content": "<p><b>Was hat das mit dem Alltag zu tun?</b><br>\n • In einem Kraftwerk passiert genau das:<br>\n → Wasser wird durch Kohle, Gas, Biomasse oder Kernenergie erhitzt.<br>\n → Der entstehende Dampf wird mit hohem Druck auf eine Turbine geleitet.<br>\n → Die Turbine dreht sich – wie bei dir die Windmühle.<br>\n → Diese Drehung treibt einen Generator an, der daraus Strom erzeugt.<br>\n • Auch in einer alten Dampflok wurde Wasserdampf benutzt – dort wurde der Dampf in Zylinder geleitet, um die Räder zu bewegen.</p>"
-            },
-            {
-                "type": "text",
-                "content": "<br></br>"
-            },
-            {
-                "type": "text",
-                "content": "<p><b><u>1.4 Wie pustet sich ein Ballon von selbst auf?</u></b></p>\n\n<p><b>Was du brauchst:</b><br>\n • 1 kleine leere Wasserflasche (z. B. 0,5 l)<br>\n • 1 Ballon<br>\n • 1 große Schüssel<br>\n • Warmes Wasser (nicht kochend – ca. 50–60 °C)</p>\n\n<p><b>So geht’s:</b><br>\nStülpe den Ballon über die Öffnung der leeren Flasche.<br>\nStelle die Flasche mit dem Ballon in eine Schüssel mit warmem Wasser.<br>\nBeobachte, was mit dem Ballon passiert.</p>"
-            },
-            {
-                "type": "aufgabe",
-                "content": "<p><i>Was beobachtest du?<br>\n • Füllt sich der Ballon?<br>\n • Woran könnte das liegen?<br>\n • Wurde Luft hinzugefügt?</i></p>"
+                "content": "<h4>2. Beschleunigte Bewegung</h4>\n<p>Wenn sich die Geschwindigkeit eines Körpers ändert, spricht man von beschleunigter Bewegung.</p>"
             },
             {
                 "type": "merksatz",
-                "content": "<p><b>Erklärung:</b><br>\n • In der Flasche ist Luft eingeschlossen.<br>\n • Durch das warme Wasser wird die Luft in der Flasche erwärmt.<br>\n • Warme Luft dehnt sich aus – sie braucht mehr Platz.<br>\n • Da die Flasche geschlossen ist, drückt die Luft in den Ballon.<br>\n • Der Ballon bläht sich ein wenig auf, ganz ohne Pusten!<br><br>\nDie Luftmenge bleibt gleich – sie wird nur größer durch Wärme.</p>"
-            },
-            {
-                "type": "text",
-                "content": "<p><b>Was hat das mit dem Alltag zu tun?</b><br>\n • So funktioniert ein Heißluftballon:<br>\n → In die Ballonhülle wird heiße Luft geblasen.<br>\n → Diese ist leichter als kalte Luft – deshalb steigt der Ballon auf.<br>\n • Aerosoldosen (z. B. Deo, Haarspray) dürfen nicht in der Sonne liegen!<br>\n → Die Gase darin dehnen sich bei Hitze aus.<br>\n → Wenn zu viel Druck entsteht, kann die Dose platzen!<br>\n • Auch Autoreifen haben im Sommer höheren Luftdruck – weil sich die Luft ausdehnt.</p>"
-            },
-            {
-                "type": "text",
-                "content": "<br></br>"
-            },
-            {
-                "type": "text",
-                "content": "<p><b><u>2.1.1 Warum schwimmt Eis? Die Dichte von Wasser</u></b></p>\n\n<p><b>Was du brauchst:</b><br>\n • 1 durchsichtige Schüssel<br>\n • Klares Wasser<br>\n • 1 großer Eiswürfel oder Eisblock</p>\n\n<p><b>So geht’s:</b><br>\nFülle die Schüssel etwa halbvoll mit Wasser.<br>\nGib den Eiswürfel vorsichtig hinein.<br>\nFülle die Schüssel komplett auf, bis das Wasser bis zum Rand reicht.<br>\nBeobachte, was passiert, wenn das Eis schmilzt.</p>"
-            },
-            {
-                "type": "aufgabe",
-                "content": "<p><i>Was fällt dir auf?<br>\n • Schwimmt der Eiswürfel oben?<br>\n • Läuft Wasser über, wenn der Eiswürfel schmilzt?<br>\n • Warum bleibt der Eiswürfel an der Oberfläche?</i></p>"
+                "content": "<p><b>Formel:</b><br>\na = Δv / t<br>\na: Beschleunigung [m/s²], Δv: Geschwindigkeitsänderung, t: Zeit [s]</p>"
             },
             {
                 "type": "merksatz",
-                "content": "<p><b>Erklärung:</b><br>\n • Wasser hat eine besondere Eigenschaft:<br>\n   Beim Gefrieren dehnt es sich aus – es wird weniger dicht als flüssiges Wasser.<br>\n • Deshalb hat Eis eine geringere Dichte als Wasser → es schwimmt oben.<br>\n • Wenn das Eis schmilzt, verändert sich nur seine Form – das geschmolzene Wasser hat das gleiche Volumen wie zuvor der eingetauchte Teil des Eises → kein Wasser läuft über.</p>"
+                "content": "<p><b>Merksatz:</b> Beschleunigung ist die Geschwindigkeit pro Zeitänderung.</p>"
             },
             {
                 "type": "text",
-                "content": "<p><b>Was hat das mit dem Alltag zu tun?</b><br>\n • Seen frieren von oben nach unten:<br>\n   → Eis schwimmt oben und bildet eine Isolationsschicht.<br>\n   → Unten bleibt das Wasser flüssig und „warm“ (4 °C) – das sichert das Überleben von Fischen im Winter.<br>\n • Getränke mit Eis bleiben oben schön kühl, weil das Eis an der Oberfläche schwimmt.</p>\n\n<p><b>Extra-Info für Fortgeschrittene:</b><br>\nDie größte Dichte hat Wasser bei 4 °C, kälter als das, sinkt es nicht weiter ab, sondern steigt wieder auf, wenn es gefriert.</p>"
-            },
-            {
-                "type": "text",
-                "content": "<br></br>"
-            },
-            {
-                "type": "text",
-                "content": "<p><b><u>2.1.2 Trotz Hitze bleibt's kalt: Warum das Eis nicht wärmer wird</u></b></p>\n\n<p><b>Was du brauchst:</b><br>\n • 1 Kochtopf<br>\n • Wasser<br>\n • Eiswürfel<br>\n • 1 Thermometer (z. B. Küchenthermometer)<br>\n • 1 Herdplatte</p>\n\n<p><b>So geht’s:</b><br>\nFülle den Kochtopf mit etwas Wasser.<br>\nGib ein paar Eiswürfel dazu.<br>\nStelle den Topf auf die Herdplatte und schalte sie ein.<br>\nHalte das Thermometer ins Wasser und rühre regelmäßig um.<br>\nBeobachte die Temperatur, solange noch Eis im Topf ist.</p>"
-            },
-            {
-                "type": "aufgabe",
-                "content": "<p><i>Was denkst du, was passiert?<br>\n • Erwärmt sich das Wasser sofort?<br>\n • Bleibt die Temperatur gleich?<br>\n • Warum dauert es so lange, bis das Wasser über 0 °C steigt?</i></p>"
+                "content": "<h4>3. Kraftgesetz (2. Newton’sches Gesetz)</h4>\n<p>Eine Kraft bewirkt eine Beschleunigung eines Körpers mit Masse.</p>"
             },
             {
                 "type": "merksatz",
-                "content": "<p><b>Erklärung:</b><br>\n • Obwohl der Herd Wärme zuführt, bleibt die Temperatur bei 0 °C, solange noch Eis vorhanden ist.<br>\n • Die zugeführte Energie wird nicht zur Erwärmung genutzt – sondern für das Schmelzen des Eises.<br>\n • Erst nachdem alles Eis geschmolzen ist, steigt die Temperatur weiter an.<br>\n Fachbegriff: Schmelzwärme (auch: Schmelzenthalpie)<br>\n → Energie wird „versteckt“ aufgenommen, ohne dass man es an der Temperatur merkt.</p>"
-            },
-            {
-                "type": "text",
-                "content": "<p><b>Was hat das mit dem Alltag zu tun?</b><br>\n • Kühlbox mit Eisbeuteln:<br>\n   → Das Eis hält die Temperatur über Stunden bei ca. 0 °C, selbst wenn außen 30 °C sind.<br>\n   → Weil das Eis viel Wärme schluckt, ohne warm zu werden – solange es noch nicht geschmolzen ist.<br>\n • Speiseeis in Thermoboxen:<br>\n   → Beim Transport schmilzt es langsam, aber die Box bleibt lange konstant kalt, weil die Energie erst mal nur für das Schmelzen draufgeht.</p>"
-            },
-            {
-                "type": "text",
-                "content": "<br></br>"
-            },
-            {
-                "type": "text",
-                "content": "<p><b><u>3.1.1 Wenn Dosen zerknicken: Das Volumen von Gasen</u></b></p>\n\n<p><b>Was du brauchst:</b><br>\n • 1 leere Getränkedose (z. B. Alu-Dose)<br>\n • 1 Zange (um die Dose sicher zu halten)<br>\n • 1 Bunsenbrenner oder Teelicht<br>\n • 1 Schüssel mit kaltem Wasser<br>\n • Etwas Wasser (ca. 1 cm) für die Dose</p>\n\n<p><b>So geht’s:</b><br>\nFülle etwa 1 cm Wasser in die leere Getränkedose.<br>\nErhitze die Dose über dem Brenner/Teelicht, bis das Wasser sprudelnd kocht.<br>\nWichtig: Halte die Dose mit der Zange fest – nicht mit der Hand!<br>\nSobald Dampf austritt, drehe die Dose schnell um und tauche sie kopfüber in die Schüssel mit kaltem Wasser.<br>\nBeobachte, was mit der Dose passiert.</p>"
-            },
-            {
-                "type": "aufgabe",
-                "content": "<p><i>Was passiert?<br>\n • Die Dose implodiert plötzlich – wird von außen eingedrückt.<br>\n • Warum passiert das?</i></p>"
+                "content": "<p><b>Formel:</b><br>\nF = m · a<br>\nF: Kraft [N], m: Masse [kg], a: Beschleunigung [m/s²]</p>"
             },
             {
                 "type": "merksatz",
-                "content": "<p><b>Erklärung:</b><br>\n • Beim Erhitzen verdampft das Wasser → Die Dose füllt sich mit Wasserdampf.<br>\n • Dieser Dampf verdrängt die Luft im Inneren.<br>\n • Wird die Dose plötzlich gekühlt, kondensiert der Dampf schlagartig → das Gasvolumen wird sehr klein.<br>\n • In der Dose entsteht ein Unterdruck – der äußere Luftdruck drückt die Dose zusammen.<br>\n Das zeigt: Gase brauchen bei hoher Temperatur mehr Platz – und ziehen sich beim Abkühlen stark zusammen.</p>"
+                "content": "<p><b>Merksatz:</b> Je größer die Masse oder Beschleunigung, desto größer die Kraft.</p>"
             },
             {
                 "type": "text",
-                "content": "<p><b>Was hat das mit dem Alltag zu tun?</b><br>\n • Industrietanks & Dampfkessel:<br>\n   → Wenn große Metallbehälter mit heißem Dampf befüllt wurden und danach schnell abkühlen, kann das ganze Ding eingedrückt werden – wie die Dose. Deshalb gibt es Sicherheitsventile!<br>\n • Wasserdampf in der Küche:<br>\n   → Wenn du z. B. einen Topf mit Dampf luftdicht verschließt und ihn dann in kaltes Wasser stellst, „zieht“ sich der Deckel stark fest.<br>\n • Thermosflaschen & Plastikbehälter:<br>\n   → Werden sie mit heißem Inhalt verschlossen und abgekühlt, ziehen sie sich zusammen oder knicken ein → weil sich der Luftdruck innen stark verändert.</p>"
-            },
-            {
-                "type": "text",
-                "content": "<br></br>"
-            },
-            {
-                "type": "text",
-                "content": "<p><b><u>3.1.2 Wie Dampf wieder zu Wasser wird</u></b></p>\n\n<p><b>Was du brauchst:</b><br>\n • 1 Wasserkocher oder Kochtopf mit Deckel<br>\n • 1 Glasscheibe (z. B. Backofenglas, Glasdeckel oder dicke Folie)<br>\n • 1 kleiner Topf (für die Destillationsvariante)</p>\n\n<p><b>So geht’s:</b><br>\nFülle den Wasserkocher mit Wasser und schalte ihn ein.<br>\nSobald das Wasser kocht und Dampf aufsteigt, halte die Glasscheibe waagrecht über die Öffnung (vorsichtig!).<br>\nBeobachte, was auf der Scheibe passiert.</p>"
-            },
-            {
-                "type": "aufgabe",
-                "content": "<p><i>Was fällt dir auf?<br>\n • Die Glasscheibe wird nass – warum?</i></p>"
+                "content": "<h4>4. Gewichtskraft</h4>\n<p>Die Gewichtskraft ist die Kraft, mit der die Erde einen Körper anzieht.</p>"
             },
             {
                 "type": "merksatz",
-                "content": "<p><b>Erklärung:</b><br>\n • Der heiße Wasserdampf trifft auf die kühle Scheibe.<br>\n • Dort kühlt er schnell ab – der Wasserdampf wird wieder flüssig.<br>\n • Das nennt man Kondensation.<br>\n Das Wasser wechselt vom gasförmigen zurück in den flüssigen Aggregatzustand.</p>"
-            },
-            {
-                "type": "text",
-                "content": "<p><b>Was hat das mit dem Alltag zu tun?</b><br>\n • Beim Duschen: Der Spiegel beschlägt – Wasserdampf trifft auf kaltes Glas → Kondensation.<br>\n • Im Winter: An kalten Fenstern bilden sich Tropfen → Warme, feuchte Luft kondensiert.<br>\n • Wolken und Regen: In der Atmosphäre kühlt aufsteigender Wasserdampf ab und bildet Tröpfchen → Wolken → später Regen.</p>"
-            },
-            {
-                "type": "text",
-                "content": "<p><b>Teil 2: Mini-Destille – Wie man reines Wasser gewinnt</b></p>\n\n<p><b>Zusätzliche Durchführung:</b><br>\nBringe Wasser in einem großen Topf zum Kochen.<br>\nHalte eine Glasscheibe schräg darüber (z. B. mit einem Kochlöffel stützen).<br>\nUnter dem tieferliegenden Ende der Glasscheibe steht ein kleiner Topf.<br>\nWarte einige Minuten – Wasser beginnt hineinzutropfen.</p>"
-            },
-            {
-                "type": "aufgabe",
-                "content": "<p><i>Was passiert?<br>\n • Was bildet sich auf der Glasplatte, wenn du sie über den Wasserdampf hältst?<br>\n • Warum wird aus dem unsichtbaren Dampf plötzlich wieder flüssiges Wasser?<br>\n • Was zeigt uns das über den Unterschied zwischen Gas und Flüssigkeit?<br>\n • Wie hängt die Temperatur der Glasplatte mit der Veränderung des Aggregatzustands zusammen?</i></p>"
+                "content": "<p><b>Formel:</b><br>\nF_G = m · g<br>\nF_G: Gewichtskraft [N], m: Masse [kg], g: Erdbeschleunigung (≈ 9,81 m/s²)</p>"
             },
             {
                 "type": "merksatz",
-                "content": "<p><b>Erklärung:</b><br>\n • Das ist eine einfache Form der Destillation:<br>\n Man trennt Stoffe über den Aggregatzustand → zuerst Verdampfen, dann Kondensieren.</p>"
+                "content": "<p><b>Merksatz:</b> Die Erde zieht alles mit der gleichen Fallbeschleunigung an.</p>"
             },
             {
                 "type": "text",
-                "content": "<p><b>Was hat das mit dem Alltag zu tun?</b><br>\n • Meerwasserentsalzung: In heißen Regionen gewinnt man Trinkwasser aus Meerwasser durch Destillation.<br>\n • In der Chemie & Medizin: Viele Stoffe werden so gereinigt – z. B. Alkohol, ätherische Öle oder Medikamente.<br>\n • Destilliertes Wasser: Wird so hergestellt – zum Bügeln oder für Autobatterien.</p>"
-            },
-            {
-                "type": "text",
-                "content": "<br></br>"
-            },
-            {
-                "type": "text",
-                "content": "<p><b><u>3.1.3 Frostschutz: Warum friert nicht alles ein?</u></b></p>\n\n<p><b>Was du brauchst:</b><br>\n • 1 Einweckglas oder große Schüssel<br>\n • Eiswürfel (zerkleinert)<br>\n • 1 Esslöffel Kochsalz<br>\n • 2 Reagenzgläser<br>\n • Glycerin (gibt’s in der Apotheke oder online)<br>\n • Wasser</p>\n\n<p><b>So geht’s:</b><br>\n1. Zerkleinere das Eis und gib es in das Einweckglas.<br>\n2. Gib etwa einen Löffel Salz über das Eis.<br>\n<span style=\"color:red;\"><b>Achtung:</b> Die Mischung wird kälter als Eiswasser – nicht mit bloßen Händen anfassen!</span><br>\n3. Fülle ein Reagenzglas etwa 3 cm hoch mit Glycerin.<br>\n4. Fülle das andere Reagenzglas ebenfalls 3 cm hoch mit Wasser.<br>\n5. Stelle beide Reagenzgläser in das Eis-Salz-Gemisch.<br>\n6. Warte einige Minuten.<br>\n7. Nimm beide Reagenzgläser heraus und beobachte.</p>"
-            },
-            {
-                "type": "aufgabe",
-                "content": "<p><i>Was fällt dir auf?<br>\n • Was kannst du nach einiger Zeit bei den beiden Reagenzgläsern beobachten?<br>\n • Welcher Stoff friert ein – und welcher nicht?</i></p>"
+                "content": "<h4>5. Arbeit</h4>\n<p>Wenn eine Kraft entlang eines Weges wirkt, wird Arbeit verrichtet.</p>"
             },
             {
                 "type": "merksatz",
-                "content": "<p><b>Erklärung:</b><br>\n • Durch das Salz wird das Eis so stark abgekühlt, dass eine Kältemischung entsteht.<br>\n • Diese Kältemischung kann Temperaturen unter –10 °C erreichen.<br>\n • Wasser friert bei 0 °C – deshalb gefriert es hier schnell.<br><br>\n • Glycerin hat einen Schmelzpunkt von etwa –19 °C – es bleibt also flüssig.<br>\n Das Glycerin hat einen Frostschutz-Effekt.</p>"
-            },
-            {
-                "type": "text",
-                "content": "<p><b>Was hat das mit dem Alltag zu tun?</b><br>\n • Scheibenfrostschutz im Auto:<br> In kalten Wintern mischt man Glycerin oder Alkohol ins Wischwasser – damit es nicht in den Leitungen gefriert.<br>\n • Kühlmittel im Auto (z. B. mit Ethylenglykol):<br> Damit der Motorkühler nicht platzt, wird ein Frostschutzmittel beigemischt.<br>\n • Medizin:<br> Glycerin wird auch als Frostschutz in Medikamenten oder in der Tiefkühl-Lagerung von Zellen verwendet.</p>"
-            },
-            {
-                "type": "text",
-                "content": "<br></br>"
-            },
-            {
-                "type": "text",
-                "content": "<p><b><u>4.1.1 Der sich biegende Draht</u></b></p>\n\n<p><b>Was du brauchst:</b><br>\n • 1 Metalldraht (z. B. aus Eisen oder Kupfer)<br>\n • 1 gebogener Nagel (als Zeiger)<br>\n • 2 stabile Stangen oder Stativstangen zum Einspannen<br>\n • Papier (für Hintergrundmarkierung)<br>\n • Hitzequelle: Bunsenbrenner, Kerze oder Feuerzeug</p>\n\n<p><b>So geht’s:</b><br>\n1. Spanne den Metalldraht zwischen den beiden Stangen fest ein, sodass er straff gespannt ist.<br>\n2. Hänge den gebogenen Nagel genau in die Mitte des Drahts – er dient als Zeiger.<br>\n3. Befestige ein weißes Papier im Hintergrund hinter dem Nagel und markiere die Ausgangsposition.<br>\n4. Jetzt erhitze vorsichtig den Draht in der Mitte mit der Hitzequelle.<br>\n5. Beobachte, was mit dem Nagel passiert!</p>"
-            },
-            {
-                "type": "aufgabe",
-                "content": "<p><i>Was fällt dir auf?<br>\n • Bewegt sich der Nagel, nachdem du den Draht erhitzt hast?<br>\n • In welche Richtung bewegt er sich – und warum gerade dorthin?<br>\n • Was passiert mit dem Draht, wenn er wieder abkühlt?<br>\n • Wie hängt die Bewegung mit der Temperatur des Metalls zusammen?</i></p>"
+                "content": "<p><b>Formel:</b><br>\nW = F · s<br>\nW: Arbeit [J], F: Kraft [N], s: Weg [m]</p>"
             },
             {
                 "type": "merksatz",
-                "content": "<p><b>Erklärung:</b><br>\n • Metalle dehnen sich aus, wenn sie warm werden.<br>\n • Dabei verlängert sich der Draht in der Mitte, was dazu führt, dass der Nagel sich bewegt.<br>\n • Beim Abkühlen zieht sich der Draht wieder zusammen und der Nagel kehrt zur Ausgangsposition zurück.<br>\n • Dieses Verhalten nennt man thermische Ausdehnung.</p>"
+                "content": "<p><b>Merksatz:</b> Ohne Weg keine Arbeit – auch bei großer Kraft.</p>"
             },
             {
                 "type": "text",
-                "content": "<p><b>Was hat das mit dem Alltag zu tun?</b>🪢<br>\n • Stromleitungen hängen im Sommer stärker durch:<br> Die Kabel dehnen sich durch Sonneneinstrahlung aus – im Winter sind sie dagegen kürzer und gespannter.<br>\n • Brücken haben Dehnfugen (kleine Spalten):<br> Diese Ausdehnungsfugen verhindern, dass sich die Brücke bei Hitze verformt oder Risse bekommt.<br>\n • Gleise bei der Bahn:<br> Schienen müssen mit Spielraum verlegt werden, da sie sich bei Hitze ausdehnen und sich sonst verdrücken könnten (→ Gleisverwerfungen im Sommer).</p>"
-            },
-            {
-                "type": "text",
-                "content": "<br></br>"
-            },
-            {
-                "type": "text",
-                "content": "<p><b><u>5.1.1 – Wärmeleitung: Welcher Löffel wird heiß?</u></b></p>\n\n<p><b>Was du brauchst:</b><br>\n • 1 Tasse<br>\n • 1 Teebeutel<br>\n • 1 Metalllöffel (z. B. Edelstahl)<br>\n • 1 Plastiklöffel<br>\n • Heißes Wasser</p>\n\n<p><b>So geht’s:</b><br>\n1. Gib den Teebeutel in die Tasse.<br>\n2. Fülle die Tasse mit heißem Wasser auf.<br>\n3. Lege beide Löffel gleichzeitig in die Tasse (jeweils mit dem Griff nach außen).<br>\n4. Warte etwa 5–8 Minuten, bis der Tee gezogen ist.<br>\n5. Fasse zuerst den Plastiklöffel, dann den Metalllöffel am Griff an.</p>"
-            },
-            {
-                "type": "aufgabe",
-                "content": "<p><i>Was fällt dir auf?<br>\n • Wie fühlt sich der Plastiklöffel an?<br>\n • Ist der Metalllöffel gleich warm oder wärmer?<br>\n • Woran könnte das liegen?<br>\n • Leiten alle Materialien Wärme gleich gut?</i></p>"
+                "content": "<h4>6. Leistung</h4>\n<p>Leistung beschreibt, wie schnell Arbeit verrichtet wird.</p>"
             },
             {
                 "type": "merksatz",
-                "content": "<p><b>Erklärung:</b><br>\n • Metall leitet Wärme sehr gut – die Hitze vom heißen Wasser wird über den Metalllöffel schnell bis zum Griff transportiert, deshalb wird er heiß.<br>\n • Plastik leitet Wärme schlecht, daher bleibt der Plastiklöffel am Griff kühl.<br>\n • Wärmeleitung ist der Prozess, bei dem Wärmeenergie von einem wärmeren Bereich zu einem kälteren Bereich fließt – in Metallen besonders effizient durch die Bewegung freier Elektronen.</p>"
-            },
-            {
-                "type": "text",
-                "content": "<p><b>Was hat das mit dem Alltag zu tun?</b><br>\n • Kochbesteck aus Kunststoff oder Holz bleibt am Griff kühl – ideal beim Kochen.<br>\n • Hitzeschutzbleche und Isoliermaterialien bestehen aus Stoffen, die Wärme schlecht leiten, um Verbrennungen zu vermeiden.</p>"
-            },
-            {
-                "type": "text",
-                "content": "<br></br>"
-            },
-            {
-                "type": "text",
-                "content": "<p><b><u>5.1.2 – Die Thermoflasche</u></b></p>\n\n<p><b>Was du brauchst:</b><br>\n• 2 Stückchen Butter<br>\n• 1 großes Marmeladenglas<br>\n• 2 kleine Marmeladengläser, die ins große passen<br>\n• Heißes Wasser</p>\n\n<p><b>So geht’s:</b><br>\n1. Stelle ein kleines Marmeladenglas in das große Glas.<br>\n2. Klebe ein Stück Butter außen an das kleine Glas (das nicht im großen Glas steht).<br>\n3. Klebe das zweite Butterstück an die Außenwand des großen Glases.<br>\n4. Fülle heißes Wasser in beide kleinen Gläser.<br>\n5. Warte einige Minuten und beobachte die Butterstücke.</p>"
-            },
-            {
-                "type": "aufgabe",
-                "content": "<p><i>Was fällt dir auf?<br>\n• Welches Butterstück beginnt zuerst zu schmelzen?<br>\n• Warum ist das so, obwohl beide Gläser heißes Wasser enthalten?<br>\n• Was könnte die Rolle der Luft zwischen den Gläsern sein?</i></p>"
+                "content": "<p><b>Formel:</b><br>\nP = W / t<br>\nP: Leistung [W], W: Arbeit [J], t: Zeit [s]</p>"
             },
             {
                 "type": "merksatz",
-                "content": "<p><b>Erklärung:</b><br>\n• Die Butter am freien kleinen Glas (nicht im großen) schmilzt schneller, weil sie direkten Kontakt mit der heißen Wand hat.<br>\n• Die Butter an der Außenseite im großen Glas bekommt die Wärme nur über die Luftschicht dazwischen.<br>\n• Luft leitet Wärme sehr schlecht – deshalb bleibt die Außenwand des großen Glases länger kühl.</p>"
+                "content": "<p><b>Merksatz:</b> Wer in kurzer Zeit viel leistet, bringt mehr Leistung.</p>"
             },
             {
                 "type": "text",
-                "content": "<p><b>Was hat das mit dem Alltag zu tun?</b><br>\n• In einer Thermoflasche gibt es zwischen dem Innen- und Außengefäß Luft oder sogar ein Vakuum.<br>\n• Dadurch wird kaum Wärme nach außen geleitet – die heiße Flüssigkeit bleibt über Stunden warm.<br>\n• Genauso funktioniert es auch umgekehrt: Kalte Getränke bleiben länger kalt, weil Wärme nicht so leicht hinein kommt.</p>"
-            },
-            {
-                "type": "text",
-                "content": "<br></br>"
-            },
-            {
-                "type": "text",
-                "content": "<p><b><u>6.1.1 – Die Zentralheizung: Wie zirkuliert Wärme?</u></b></p>\n\n<p><b>Was du brauchst:</b><br>\n • 1 Stativ mit Halterung<br>\n • 1 geschlossenes Glasrohr (kreisförmig) mit kleiner Öffnung<br>\n • Wasser<br>\n • Tinte<br>\n • Bunsenbrenner oder andere Wärmequelle</p>\n\n<p><b>So geht’s:</b><br>\n1. Fülle das Glasrohr vollständig mit Wasser.<br>\n2. Gib 2–3 Tropfen Tinte über die Öffnung ins Rohr.<br>\n3. Befestige das Glasrohr waagerecht am Stativ.<br>\n4. Erhitze eine Stelle des Rohrs (z. B. den unteren Teil eines vertikalen Abschnitts) mit dem Bunsenbrenner.<br>\n5. Beobachte, wie sich die Tinte verhält.</p>"
-            },
-            {
-                "type": "aufgabe",
-                "content": "<p><i>Was fällt dir auf?<br>\n • Bewegt sich die Tinte?<br>\n • Entsteht eine Strömung im Wasser?<br>\n • Lässt sich ein Kreislauf erkennen?</i></p>"
+                "content": "<h4>7. Energie</h4>\n<p>Energie ist die Fähigkeit, Arbeit zu verrichten. Zwei wichtige Energieformen sind:</p>"
             },
             {
                 "type": "merksatz",
-                "content": "<p><b>Erklärung:</b><br>\n • Erwärmtes Wasser dehnt sich aus → seine Dichte nimmt ab → es steigt auf.<br>\n • Das Wasser nimmt die Tinte mit und wandert im Rohr weiter.<br>\n • An anderer Stelle kühlt sich das Wasser ab, wird dichter und sinkt wieder ab.<br>\n • Ergebnis: eine kreisförmige Strömung – ein sogenannter Konvektionsstrom entsteht.</p>"
-            },
-            {
-                "type": "text",
-                "content": "<p><b>Was hat das mit dem Alltag zu tun?</b><br>\n • <b>Zentralheizung:</b> In klassischen Heizkörpern (ohne Pumpe) steigt warmes Wasser von allein auf, kaltes sinkt ab – genau wie in deinem Experiment.<br>\n • <b>Passatwinde & Wetter:</b> Warme Luft steigt am Äquator auf, kühlt in der Höhe ab, sinkt in anderen Breiten wieder – so entstehen Luftzirkulationen wie Passat- und Westwinde.<br>\n • <b>Plattentektonik:</b> Im Erdmantel fließt Gestein ganz langsam in riesigen Konvektionsströmen – das bewegt die Erdplatten und führt zu Erdbeben, Vulkanismus und Gebirgsbildung.</p>"
-            },
-            {
-                "type": "text",
-                "content": "<br></br>"
-            },
-            {
-                "type": "text",
-                "content": "<p><b><u>6.1.2 – Das Glashaus: Warum bleibt es dahinter warm?</u></b></p>\n\n<p><b>Was du brauchst:</b><br>\n • Wärmelampe oder Infrarotstrahler<br>\n • Glasscheibe<br>\n • Holzbrett<br>\n • Stativ/Halterung (zum Fixieren der Scheibe/Brett)<br>\n • Deine Hand als Wärmesensor</p>\n\n<p><b>So geht’s:</b><br>\n1. Spanne die Glasscheibe so ein, dass sie senkrecht steht.<br>\n2. Stelle die Wärmelampe in ca. 20 cm Entfernung vor die Glasscheibe.<br>\n3. Schalte die Lampe ein und halte deine Hand hinter die Glasscheibe.<br>\n4. Notiere, was du fühlst.<br>\n5. Wiederhole den Versuch mit dem Holzbrett statt der Glasscheibe.</p>"
-            },
-            {
-                "type": "aufgabe",
-                "content": "<p><i>Was fällt dir auf?<br>\n • Spürst du Wärme hinter dem Glas?<br>\n • Spürst du auch Wärme hinter dem Holz?<br>\n • Wo ist der Unterschied? Warum?</i></p>"
+                "content": "<p><b>Formeln:</b><br>\nE_kin = ½ · m · v² (kinetische Energie)<br>\nE_pot = m · g · h (potenzielle Energie)<br>\nE: Energie [J], m: Masse [kg], v: Geschwindigkeit [m/s], h: Höhe [m]</p>"
             },
             {
                 "type": "merksatz",
-                "content": "<p><b>Erklärung:</b><br>\n • Infrarotstrahlung (Wärmestrahlung) kann durch Glas hindurchtreten, trifft also auf deine Hand – du spürst Wärme.<br>\n • Holz absorbiert die Wärmestrahlung – sie kommt nicht auf der anderen Seite an.<br>\n • Glas wirkt also wie ein Filter, der bestimmte Strahlung durchlässt – aber auch gewisse Wärmestrahlung „einsperren“ kann.</p>"
+                "content": "<p><b>Merksatz:</b> Energie verschwindet nicht – sie wandelt sich nur um.</p>"
             },
             {
                 "type": "text",
-                "content": "<p><b>Was hat das mit dem Alltag zu tun?</b><br>\n • <b>Gewächshaus-Effekt (Treibhauseffekt):</b><br>\n Sonnenlicht dringt durch die Glasdecke eines Gewächshauses.<br>\n Der Boden erwärmt sich und sendet Infrarotstrahlung zurück, die aber nicht mehr entweichen kann – das Innere heizt sich auf.<br>\n • <b>Ähnlich auf der Erde:</b><br>\n Der Treibhauseffekt entsteht durch Gase wie CO₂ oder Methan, die Wärmestrahlung zurückhalten.<br>\n • <b>Fenster in Häusern:</b><br>\n Isolierglas wird gezielt hergestellt, um Wärmestrahlung zu regulieren – zum Beispiel in Wärmeschutzfenstern oder zur Solargewinnung.<br>\n • <b>Aufgeheizte Autos im Sommer:</b><br>\n Sonnenlicht dringt durch die Autoscheiben, der Innenraum erwärmt sich – aber die Wärme kann nicht mehr hinaus: Mini-Gewächshaus-Effekt.</p>"
+                "content": "<h4>8. Impuls</h4>\n<p>Der Impuls beschreibt die Bewegungsmenge eines Körpers.</p>"
+            },
+            {
+                "type": "merksatz",
+                "content": "<p><b>Formel:</b><br>\np = m · v<br>\np: Impuls [kg·m/s], m: Masse [kg], v: Geschwindigkeit [m/s]</p>"
+            },
+            {
+                "type": "merksatz",
+                "content": "<p><b>Merksatz:</b> Großer Impuls entsteht durch große Masse oder hohe Geschwindigkeit.</p>"
+            },
+            {
+                "type": "text",
+                "content": "<h4>9. Hebelgesetz</h4>\n<p>Ein Hebel ist im Gleichgewicht, wenn beide Seiten das gleiche Drehmoment erzeugen.</p>"
+            },
+            {
+                "type": "merksatz",
+                "content": "<p><b>Formel:</b><br>\nF₁ · r₁ = F₂ · r₂<br>\nF: Kraft [N], r: Hebelarm [m]</p>"
+            },
+            {
+                "type": "merksatz",
+                "content": "<p><b>Merksatz:</b> Mit einem langen Hebel spart man Kraft.</p>"
+            },
+            {
+                "type": "text",
+                "content": "<h4>10. Gleichgewicht der Kräfte</h4>\n<p>Ein Körper ist im Gleichgewicht, wenn alle auf ihn wirkenden Kräfte sich gegenseitig aufheben.</p>"
+            },
+            {
+                "type": "merksatz",
+                "content": "<p><b>Merksatz:</b> Wenn sich alle Kräfte ausgleichen, bewegt sich nichts.</p>"
+            },
+            {
+                "type": "text",
+                "content": "<h3>Anwendungen der Mechanik im Alltag</h3>\n<ul>\n  <li>Fahrradfahren nutzt Impuls, Reibung und Hebelwirkung.</li>\n  <li>Aufzüge arbeiten mit Kräften, Gegengewichten und Energie.</li>\n  <li>Brücken und Gebäude benötigen statisches Gleichgewicht.</li>\n  <li>Sportler verwenden gezielt Kraft, Impuls und Hebelarme.</li>\n  <li>Autos beschleunigen, bremsen und benötigen Arbeit & Leistung.</li>\n</ul>\n\n<h3>Zusammenfassung</h3>\n<p>Die Mechanik erklärt, wie sich Körper bewegen und welche Kräfte dabei wirken. Mit einfachen Gesetzen wie dem Kraftgesetz, dem Hebelgesetz oder der Impulsformel lassen sich viele Vorgänge des Alltags verstehen. Mechanik ist eine Grundlage für Technik, Sport, Bauwerke und vieles mehr.</p>"
             }
         ],
         "schoolType": "Gemeinschaftsschule"
     },
+    
     {
-        "title": "Optik Experimente",
-        "shortDescription": "<p><strong>In der Optik geht dir ein Licht auf!</strong><br>\nHier geht es darum, wie Licht funktioniert, wie wir sehen – und warum manchmal alles ganz anders aussieht, als es wirklich ist.</p>\n\n<p>Auf dieser Seite findest du einfache Experimente.<br>\nDu kannst sie ganz leicht zu Hause oder in der Schule nachmachen.</p>\n\n<p>Wir erklären dir auch:<br>\n– Was dabei in der Physik passiert.<br>\n– Wo du das im Alltag erleben kannst.</p>\n\n<p><strong>Viel Spaß beim Forschen und Ausprobieren!<br>\nWünscht euch das AlltagsLabor.</strong></p>",
+        "title": "Mechanik Aufgaben",
+        "shortDescription": "<p>\nIn der Mechanik dreht sich alles um Bewegung, Kräfte und Energie!<br>\nHier findest du spannende Aufgaben zu Geschwindigkeit, Kraft, Arbeit und vielem mehr. Die Aufgaben helfen dir, besser zu verstehen, wie sich Dinge bewegen und warum manche schwerer anzuschieben sind als andere.\n</p>\n<p>\nEntdecke, wie Physik deinen Alltag beeinflusst – ganz einfach erklärt und mit vielen Aha-Momenten!\n</p>\n<p><b>Viel Freude beim Tüfteln und Rechnen wünscht dir dein AlltagsLabor!</b></p>\n",
         "subject": "Physik",
         "gradeLevel": "7",
         "steps": [
             {
-                "type": "text",
-                "content": "<p><b><u>1. Geradlinige Ausbreitung des Lichts</u></b></p>\n\n<p><b>Ziel:</b><br>\nUntersuchung der geradlinigen Ausbreitung von Licht anhand eines einfachen Schattenexperiments.</p>\n\n<p><b>Was du brauchst:</b><br>\n• Experimentierleuchte oder Taschenlampe<br>\n• Kamm<br>\n• Weißes Papier oder eine weiße Wand als Projektionsfläche</p>\n\n<p><b>So geht’s:</b><br>\n1. Stelle den Kamm senkrecht auf und positioniere ihn etwa 20–30 cm vor einer weißen Wand oder einem weißen Blatt Papier.<br>\n2. Richte den Lichtstrahl der Taschenlampe so auf den Kamm, dass der Lichtkegel durch die Zwischenräume der Zinken auf die Wand fällt.<br>\n3. Achte darauf, dass der Raum möglichst abgedunkelt ist, damit das Ergebnis gut sichtbar ist.</p>"
+                "type": "aufgabe",
+                "content": "<h2>Mechanik – Übungsaufgaben</h2>\n\n<h3>Rechenaufgaben</h3>\n\n<ol>\n  <li>\n    <p>Ein Auto fährt mit einer Geschwindigkeit von 20 m/s. Wie weit fährt es in 5 Sekunden?</p>\n    <p><b>Formel:</b> Weg = Geschwindigkeit × Zeit</p>\n  </li>\n  \n  <li>\n    <p>Ein Fahrradfahrer tritt mit einer Kraft von 50 N in die Pedale. Wie groß ist die Kraft, wenn er die Kraft verdoppelt?</p>\n  </li>\n  \n  <li>\n    <p>Ein Gegenstand hat eine Masse von 10 kg. Wie groß ist seine Gewichtskraft auf der Erde? (Erdbeschleunigung g = 9,81 m/s²)</p>\n    <p><b>Formel:</b> Gewichtskraft = Masse × Erdbeschleunigung</p>\n  </li>\n  \n  <li>\n    <p>Ein Ball wird mit 15 N Kraft nach oben geworfen. Welche Kraft wirkt auf den Ball durch die Erdanziehung, wenn seine Masse 1,5 kg beträgt?</p>\n  </li>\n</ol>\n\n<h3>Logikaufgaben</h3>\n\n<ol>\n  <li>\n    <p>Warum bleibt ein Buch liegen, wenn du es auf den Tisch legst?</p>\n  </li>\n  \n  <li>\n    <p>Ein Radfahrer fährt bergab schneller als bergauf. Warum?</p>\n  </li>\n  \n  <li>\n    <p>Wenn du gegen eine Wand drückst, bewegt sich die Wand nicht. Warum spürst du trotzdem einen Widerstand?</p>\n  </li>\n  \n  <li>\n    <p>Ein Gegenstand fällt zu Boden. Warum fällt er nicht seitlich oder nach oben?</p>\n  </li>\n</ol>"
             },
             {
-                "type": "aufgabe",
-                "content": "<p><b>Was fällt dir auf?</b><br>\n• Auf der Wand hinter dem Kamm erscheinen deutliche Schatten der Kammzinken.<br>\n• Ein fächerartiges Muster von Lichtstrahlen ist in den Zwischenräumen sichtbar.<br>\n• Die Licht- und Schattenbereiche verlaufen gerade und parallel zueinander.</p>"
+                "type": "text",
+                "content": "<br></br><br></br><br></br><br></br><br></br>"
             },
             {
                 "type": "merksatz",
-                "content": "<p><b>Erklärung:</b><br>\nLicht breitet sich geradlinig aus. Dies erkennt man daran, dass die Schatten der Kammzinken scharf und gerade sind und die Lichtstrahlen in den Zwischenräumen in geraden Linien verlaufen.</p>"
-            },
-            {
-                "type": "text",
-                "content": "<p><b>Was hat das mit dem Alltag zu tun?</b><br>\n• Diese geradlinige Ausbreitung von Licht erklärt zum Beispiel, warum wir klare Schatten sehen, wenn die Sonne auf ein Hindernis trifft.<br>\n• Auch bei einer Taschenlampe, die im Dunkeln Licht auf einen Weg wirft, entstehen durch die geradlinige Ausbreitung klare Licht- und Schattenbereiche, die uns Orientierung geben.</p>"
-            },
-            {
-                "type": "text",
-                "content": "<br></br>"
-            },
-            {
-                "type": "text",
-                "content": "<p><b><u>2. Lichtabsorption von Farben</u></b></p>\n\n<p><b>Ziel:</b><br>\nUntersuchen, wie unterschiedlich helle und dunkle Farben Licht absorbieren.</p>\n\n<p><b>Was du brauchst:</b><br>\n• Weißes Papier<br>\n• Schwarzes Papier<br>\n• Taschenlampe (helle Lichtquelle)<br>\n• Raum mit abgedunkeltem Licht oder dunkle Umgebung<br>\n• Zwei kleine, flache Unterlagen (z. B. Pappe oder Teller)</p>\n\n<p><b>So geht’s:</b><br>\n1. Lege das weiße Papier auf eine Unterlage und das schwarze Papier auf die andere Unterlage.<br>\n2. Halte die Taschenlampe so, dass sie von oben auf beide Papiere gleichzeitig scheint.<br>\n3. Beobachte die Helligkeit und das Licht, das von den beiden Papieren reflektiert wird.<br>\n4. Vergleiche, welches Papier mehr Licht zurückwirft und welches weniger.</p>"
-            },
-            {
-                "type": "aufgabe",
-                "content": "<p><b>Was fällt dir auf?</b><br>\n• Welches Papier reflektiert mehr Licht?<br>\n• Welches Papier scheint dunkler zu sein?<br>\n• Warum sieht das schwarze Papier dunkler aus?<br>\n• Wie hängt die Farbe mit der Lichtabsorption zusammen?</p>"
-            },
-            {
-                "type": "merksatz",
-                "content": "<p><b>Erklärung:</b><br>\nWenn Licht auf ein Material trifft, wird es entweder reflektiert (zurückgeworfen) oder absorbiert (aufgenommen).<br>\nWeißes Papier reflektiert fast das ganze Licht – deshalb sieht es hell aus.<br>\nSchwarzes Papier absorbiert fast das gesamte Licht und reflektiert sehr wenig – deswegen erscheint es dunkel.</p>"
-            },
-            {
-                "type": "text",
-                "content": "<p><b>Was hat das mit dem Alltag zu tun?</b><br>\n• Das erklärt auch, warum man an einem sonnigen Tag lieber ein weißes T-Shirt trägt als ein schwarzes:<br>\n• Das weiße T-Shirt reflektiert das Sonnenlicht und bleibt dadurch kühler.<br>\n• Das schwarze T-Shirt absorbiert das Licht und erwärmt sich schneller.</p>"
-            },
-            {
-                "type": "text",
-                "content": "<br></br>"
-            },
-            {
-                "type": "text",
-                "content": "<p><b><u>3. Schatten, Kernschatten und Halbschatten</u></b></p>\n\n<p><b>Ziel:</b><br>\nUntersuchen, wie Schatten entstehen und die Unterschiede zwischen Kernschatten und Halbschatten verstehen.</p>\n\n<p><b>Was du brauchst:</b><br>\n• Taschenlampe (oder Lampe mit stark gebündeltem Licht)<br>\n• Zwei Tischlampen (optional, für Mehrfachlichtquellen)<br>\n• Kugel oder runder Gegenstand (z. B. Tennisball oder Orange)<br>\n• Weißes Blatt Papier oder weiße Wand als Projektionsfläche<br>\n• Dunkler Raum oder abgedunkelter Bereich</p>\n\n<p><b>Vorbereitung:</b><br>\nStelle das weiße Papier oder die Wand als Projektionsfläche auf. Dunkle den Raum ab, damit die Lichtquelle gut sichtbar ist.</p>\n\n<p><b>So geht’s:</b><br>\n<b>Teil 1: Entstehung eines Schattens</b><br>\n1. Leuchte mit der Taschenlampe auf den runden Gegenstand, sodass er einen Schatten auf das Papier oder die Wand wirft.<br>\n2. Beobachte die Form und die Größe des Schattens.<br><br>\n\n<b>Teil 2: Kernschatten und Halbschatten mit einer Lichtquelle</b><br>\n1. Bewege die Taschenlampe langsam näher und weiter weg vom Gegenstand und beobachte, wie sich der Schatten verändert.<br>\n2. Versuche, die dunklere Mitte (Kernschatten) und die hellere Umgebung (Halbschatten) zu erkennen.<br><br>\n\n<b>Teil 3: Kernschatten und Halbschatten mit zwei Lichtquellen</b><br>\n1. Stelle zwei Taschenlampen so auf, dass sie aus unterschiedlichen Winkeln auf den Gegenstand leuchten.<br>\n2. Beobachte den Schatten, der auf der Wand entsteht:<br>\n&nbsp;&nbsp;&nbsp;&nbsp;• Wo sich die Schatten der beiden Lichtquellen überlappen, ist der Kernschatten (dunkler Schatten).<br>\n&nbsp;&nbsp;&nbsp;&nbsp;• Wo nur eine Lichtquelle durchkommt, ist der Halbschatten (hellerer Schattenbereich).</p>"
-            },
-            {
-                "type": "aufgabe",
-                "content": "<p><b>Was fällt dir auf?</b><br>\n• Wie sieht der Schatten bei einer Lichtquelle aus?<br>\n• Kannst du Kernschatten und Halbschatten unterscheiden? Wo?<br>\n• Wie verändert sich der Schatten, wenn du die Lichtquelle näher oder weiter weg bewegst?<br>\n• Wie sieht der Schatten bei zwei Lichtquellen aus? Beschreibe Kernschatten und Halbschatten.</p>"
-            },
-            {
-                "type": "merksatz",
-                "content": "<p><b>Erklärung:</b><br>\nSchatten entstehen, wenn ein undurchsichtiger Gegenstand das Licht einer Lichtquelle blockiert.<br>\nDer Kernschatten ist der Bereich, in dem das Licht vollständig blockiert wird – er ist dunkel und scharf begrenzt.<br>\nDer Halbschatten entsteht, wenn nur ein Teil des Lichts blockiert wird, z. B. wenn mehrere Lichtquellen da sind – er ist heller und weniger scharf.<br>\nBei zwei Lichtquellen überlagern sich die Schatten teilweise, so entstehen deutlich sichtbare Kern- und Halbschatten.</p>"
-            },
-            {
-                "type": "text",
-                "content": "<p><b>Was hat das mit dem Alltag zu tun?</b><br>\n• Bei starker Sonne werfen Gegenstände einen klaren Schatten mit scharfen Rändern – das ist der Kernschatten.<br>\n• Wenn die Sonne durch Wolken scheint oder mehrere Lichtquellen vorhanden sind (z. B. Straßenlaternen), entstehen weichere Schatten mit Halbschatten.</p>"
-            },
-            {
-                "type": "text",
-                "content": "<br></br>"
-            },
-            {
-                "type": "text",
-                "content": "<p><b><u>4. Spektralfarben sichtbar machen</u></b></p>\n\n<p><b>Ziel:</b><br>\nZeigen, dass weißes Licht aus verschiedenen Farben (Spektralfarben) zusammengesetzt ist.</p>\n\n<p><b>Was du brauchst:</b><br>\n• Eine CD oder DVD (funktioniert als einfacher Spiegel mit Regenbogeneffekt)<br>\n• Taschenlampe oder Sonnenlicht<br>\n• Weißes Blatt Papier<br>\n• Dunkler Raum (optional)</p>\n\n<p><b>So geht’s:</b><br>\n1. Halte die CD so, dass ein Lichtstrahl (von Taschenlampe oder Sonnenlicht) darauf fällt.<br>\n2. Richte den reflektierten Lichtstrahl auf das weiße Blatt Papier.<br>\n3. Beobachte die bunten Regenbogenfarben, die auf dem Papier erscheinen.<br>\n4. Bewege die CD leicht hin und her, um die verschiedenen Farben deutlicher zu sehen.</p>"
-            },
-            {
-                "type": "aufgabe",
-                "content": "<p><b>Was fällt dir auf?</b><br>\n• Du siehst auf dem Papier viele verschiedene Farben, die wie ein Regenbogen aussehen.<br>\n• Diese Farben nennt man Spektralfarben.<br>\n• Sie sind Bestandteile des weißen Lichts.</p>"
-            },
-            {
-                "type": "merksatz",
-                "content": "<p><b>Erklärung:</b><br>\nWeißes Licht besteht aus vielen verschiedenen Farben, die zusammen gemischt sind.<br>\nWenn das Licht auf eine Oberfläche trifft, die das Licht in seine Bestandteile zerlegt (wie die CD-Oberfläche), erscheinen die Spektralfarben als bunte Streifen.</p>"
-            },
-            {
-                "type": "text",
-                "content": "<p><b>Was hat das mit dem Alltag zu tun?</b><br>\n• Dieses Experiment zeigt, dass weißes Licht aus vielen Farben besteht.<br>\n• Ein gutes Alltagsbeispiel sind Regenbögen nach einem Regenschauer:<br>\n• Dort wird das Sonnenlicht durch Wassertropfen in die verschiedenen Spektralfarben zerlegt – genau wie bei der CD im Experiment.</p>"
-            },
-            {
-                "type": "text",
-                "content": "<br></br>"
-            },
-            {
-                "type": "text",
-                "content": "<p><b><u>5. Reflexion von Licht</u></b></p>\n\n<p><b>Ziel:</b><br>\nUntersuchen, wie Licht an glatten Oberflächen reflektiert wird und das Reflexionsgesetz verstehen.</p>\n\n<p><b>Was du brauchst:</b><br>\n• Taschenlampe<br>\n• Glatter Spiegel<br>\n• Weißes Blatt Papier<br>\n• Geodreieck oder Winkelmesser (optional)<br>\n• Dunkler Raum oder abgedunkelter Bereich</p>\n\n<p><b>So geht’s:</b><br>\n1. Lege das weiße Blatt Papier flach auf den Tisch.<br>\n2. Stelle den Spiegel senkrecht auf das Papier (z. B. mit einem kleinen Ständer oder an eine Wand gelehnt).<br>\n3. Richte die Taschenlampe so aus, dass ein Lichtstrahl schräg auf den Spiegel fällt.<br>\n4. Beobachte den reflektierten Lichtstrahl auf dem Papier.<br>\n5. Zeichne mit Bleistift die Einfallsrichtung (den ankommenden Lichtstrahl), das Lot (senkrecht zum Spiegel) und die reflektierte Richtung ein.<br>\n6. Falls möglich, miss mit dem Geodreieck den Einfallswinkel (zwischen einfallendem Strahl und Lot) und den Reflexionswinkel (zwischen reflektiertem Strahl und Lot).</p>"
-            },
-            {
-                "type": "aufgabe",
-                "content": "<p><b>Was fällt dir auf?</b><br>\n• Wie verhält sich der Lichtstrahl beim Auftreffen auf den Spiegel?<br>\n• Wie groß sind Einfallswinkel und Reflexionswinkel? Sind sie gleich?<br>\n• Wie verändert sich der reflektierte Strahl, wenn du den Einfallswinkel änderst?</p>"
-            },
-            {
-                "type": "merksatz",
-                "content": "<p><b>Erklärung:</b><br>\nLicht wird an glatten Oberflächen reflektiert.<br>\nDabei gilt das Reflexionsgesetz: Der Einfallswinkel ist gleich dem Reflexionswinkel.<br>\nDer Lichtstrahl „prallt“ also so vom Spiegel ab, dass der Winkel beim Auftreffen und Abprallen gleich ist.</p>"
-            },
-            {
-                "type": "text",
-                "content": "<p><b>Was hat das mit dem Alltag zu tun?</b><br>\n• Dieses Experiment zeigt, wie Licht reflektiert wird – ein Prinzip, das man täglich nutzt:<br>\n• Wenn man sich im Spiegel betrachtet oder Sonnenlicht von glatten Wasseroberflächen zurückgeworfen wird, folgt das Licht dem Reflexionsgesetz.</p>"
-            },
-            {
-                "type": "text",
-                "content": "<br></br>"
-            },
-            {
-                "type": "text",
-                "content": "<p><b><u>6. Lichtreflexion am Hohlspiegel (konkav)</u></b></p>\n\n<p><b>Ziel:</b><br>\nUntersuchen, wie Licht an einem konkaven (Hohl-) Spiegel reflektiert wird und wie sich das Licht bündelt.</p>\n\n<p><b>Was du brauchst:</b><br>\n• Konkaver (Hohl-) Spiegel (z. B. aus einem Experimentier-Set oder als kosmetischer Vergrößerungsspiegel)<br>\n• Taschenlampe<br>\n• Weißes Blatt Papier<br>\n• Dunkler Raum oder abgedunkelter Bereich</p>\n\n<p><b>So geht’s:</b><br>\n1. Halte den konkaven Spiegel so, dass du mit der Taschenlampe einen Lichtstrahl auf die spiegelnde Fläche richtest.<br>\n2. Richte die Taschenlampe so aus, dass der Lichtstrahl parallel auf die konkave Oberfläche trifft.<br>\n3. Halte das weiße Blatt Papier in den Bereich, in den das Licht reflektiert wird (in den sogenannten Brennpunkt).<br>\n4. Beobachte, ob und wo sich das Licht auf dem Papier konzentriert.<br>\n5. Bewege das Papier näher oder weiter vom Spiegel weg und beobachte die Veränderung des Lichtflecks.</p>"
-            },
-            {
-                "type": "aufgabe",
-                "content": "<p><b>Was fällt dir auf?</b><br>\n• Wie verändert sich der Lichtstrahl beim Auftreffen auf den Hohlspiegel?<br>\n• Wo auf dem Papier konzentriert sich das Licht?<br>\n• Wie verändert sich der Lichtfleck, wenn du das Papier bewegst?</p>"
-            },
-            {
-                "type": "merksatz",
-                "content": "<p><b>Erklärung:</b><br>\nEin konkaver Spiegel bündelt parallele Lichtstrahlen in einem Punkt, dem sogenannten Brennpunkt.<br>\nDadurch wird das Licht konzentriert und kann z. B. Wärme erzeugen oder Lichtstrahlen fokussieren.<br>\nDies unterscheidet sich von einem flachen Spiegel, der das Licht nur gerade reflektiert.</p>"
-            },
-            {
-                "type": "text",
-                "content": "<p><b>Was hat das mit dem Alltag zu tun?</b><br>\n• Das Prinzip der Lichtbündelung durch konkave Spiegel findet man auch im Alltag:<br>\n• Z. B. bei Taschenlampen mit Reflektoren oder bei Scheinwerfern von Autos, die das Licht bündeln, um die Straße besser auszuleuchten.</p>"
-            },
-            {
-                "type": "text",
-                "content": "<br></br>"
-            },
-            {
-                "type": "text",
-                "content": "<p><b><u>7. Lichtbrechung an Wasser</u></b></p>\n\n<p><b>Ziel:</b><br>\nUntersuchen, wie Licht beim Übergang von Luft in Wasser seine Richtung ändert (Lichtbrechung).</p>\n\n<p><b>Was du brauchst:</b><br>\n• Trinkglas oder durchsichtiges Gefäß<br>\n• Wasser<br>\n• Bleistift oder Strohhalm<br>\n• Taschenlampe (optional)</p>\n\n<p><b>So geht’s:</b><br>\n1. Fülle das Glas etwa zu 2/3 mit Wasser.<br>\n2. Stecke den Bleistift oder Strohhalm schräg in das Wasser.<br>\n3. Beobachte den Bleistift von der Seite des Glases.<br>\n4. (Optional) Leuchte mit der Taschenlampe von der Seite auf das Glas, um den Lichtstrahl sichtbar zu machen.</p>"
-            },
-            {
-                "type": "aufgabe",
-                "content": "<p><b>Was fällt dir auf?</b><br>\n• Wie erscheint der Bleistift im Wasser verglichen mit außerhalb?<br>\n• Verändert sich die Richtung des Bleistifts optisch?<br>\n• Was passiert mit dem Lichtstrahl, wenn er von Luft ins Wasser eintritt?</p>"
-            },
-            {
-                "type": "merksatz",
-                "content": "<p><b>Erklärung:</b><br>\nDas Licht ändert seine Richtung, wenn es von einem Medium in ein anderes übergeht, z. B. von Luft ins Wasser.<br>\nDieses Phänomen nennt man Lichtbrechung.<br>\nDadurch sieht der Bleistift im Wasser „gebrochen“ oder geknickt aus, obwohl er gerade ist.</p>"
-            },
-            {
-                "type": "text",
-                "content": "<p><b>Was hat das mit dem Alltag zu tun?</b><br>\n• Lichtbrechung erklärt viele Alltagseffekte:<br>\n• Z. B. warum Gegenstände im Wasser verzerrt aussehen oder warum ein Strohhalm im Glas „gebrochen“ wirkt.</p>"
-            },
-            {
-                "type": "text",
-                "content": "<br></br>"
-            },
-            {
-                "type": "text",
-                "content": "<p><b><u>Experiment 8: Wassertropfenlupe – Vergrößerung durch Lichtbrechung</u></b></p>\n\n<p><b>Ziel</b><br>\nUntersuchen, wie ein Wassertropfen als Lupe wirkt und Objekte vergrößert erscheinen lässt.</p>\n\n<p><b>Materialien</b><br>\n• Weißes Blatt Papier mit kleingedrucktem Text oder feinen Mustern<br>\n• Wasser<br>\n• Pipette oder kleiner Löffel zum Tropfengeben<br>\n• Taschenlampe (optional)</p>\n\n<p><b>Durchführung</b><br>\n1. Lege das weiße Blatt Papier mit Text oder feinen Mustern vor dich.<br>\n2. Gib mit der Pipette oder dem Löffel einen einzelnen, möglichst runden Wassertropfen auf das Papier.<br>\n3. Beobachte den Text oder das Muster durch den Wassertropfen hindurch.<br>\n4. (Optional) Beleuchte den Wassertropfen mit der Taschenlampe, um die Wirkung besser zu sehen.</p>"
-            },
-            {
-                "type": "aufgabe",
-                "content": "<p><b>Beobachtung / Protokoll – Frage</b><br>\n• Wie sieht der Text oder das Muster unter dem Wassertropfen aus?<br>\n• Vergrößert der Wassertropfen das Bild?<br>\n• Warum verändert sich die Sicht auf den Text?</p>"
-            },
-            {
-                "type": "merksatz",
-                "content": "<p><b>Erklärung</b><br>\nDer Wassertropfen wirkt wie eine konvexe Linse. Er bricht das Licht so, dass es gebündelt wird und das Bild des Textes oder Musters vergrößert erscheint. Dadurch kann man Details besser erkennen.</p>"
-            },
-            {
-                "type": "text",
-                "content": "<p><b>Fazit</b><br>\nDieses Prinzip der Lichtbrechung und Vergrößerung nutzen auch richtige Lupen oder Brillen. Wassertropfen können so als einfache Lupe dienen, was man leicht mit Alltagsmaterialien nachmachen kann.</p>"
-            },
-            {
-                "type": "text",
-                "content": "<br></br>"
-            },
-            {
-                "type": "text",
-                "content": "<p><b><u>Experiment 9: Optik der Farben – Farben mischen mit Licht</u></b></p>\n\n<p><b>Ziel</b><br>\nUntersuchen, wie sich verschiedene Lichtfarben mischen und wie Weißes Licht aus den Grundfarben zusammengesetzt ist.</p>\n\n<p><b>Materialien</b><br>\nTaschenlampen (oder LEDs) in den Farben Rot, Grün und Blau (RGB) – alternativ farbige Folien für eine weiße Lichtquelle<br>\nWeißes Blatt Papier oder weiße Wand als Projektionsfläche<br>\nDunkler Raum oder abgedunkelter Bereich</p>"
-            },
-            {
-                "type": "aufgabe",
-                "content": "<p><b>Durchführung</b><br>\n1. Richte die roten, grünen und blauen Lichtquellen so aus, dass sich ihre Lichtstrahlen auf der weißen Fläche überschneiden.<br>\n2. Beobachte die Farben, die dort entstehen, wo sich zwei Farben mischen.<br>\n3. Beobachte, welche Farbe entsteht, wenn alle drei Farben überlappen.<br>\n4. Variiere die Positionen der Lichtquellen und beobachte die Veränderungen.</p>"
-            },
-            {
-                "type": "text",
-                "content": "<p><b>Beobachtung / Protokoll</b><br>\n<b>Frage</b><br>\nWelche Farbe entsteht, wenn Rot und Grün sich überlappen?<br>\nWelche Farbe entsteht bei Überlappung von Grün und Blau?<br>\nWelche Farbe entsteht bei Überlappung von Rot und Blau?<br>\nWelche Farbe entsteht, wenn Rot, Grün und Blau zusammen scheinen?</p>"
-            },
-            {
-                "type": "merksatz",
-                "content": "<p><b>Erklärung</b><br>\nWeißes Licht setzt sich aus den drei Grundfarben Rot, Grün und Blau zusammen. Wenn diese Farben kombiniert werden, entstehen andere Farben:<br>\nRot + Grün = Gelb<br>\nGrün + Blau = Cyan<br>\nRot + Blau = Magenta<br>\nRot + Grün + Blau = Weiß<br>\nDas Experiment zeigt den additiven Farb-Mischprozess, der z. B. bei Bildschirmen oder Bühnenbeleuchtung verwendet wird.</p>"
-            },
-            {
-                "type": "text",
-                "content": "<p><b>Fazit</b><br>\nDas Wissen um die Zusammensetzung von Lichtfarben erklärt, wie Farben auf Bildschirmen entstehen und warum man durch Mischung von Lichtfarben neue Farben erzeugen kann.</p>"
-            },
-            {
-                "type": "text",
-                "content": "<br></br>"
-            },
-            {
-                "type": "text",
-                "content": "<p><b><u>Experiment 10: Polarisation von Licht</u></b></p>\n\n<p><b>Ziel</b><br>\nUntersuchen, wie Licht durch Polarisationsfilter polarisiert wird und wie sich die Lichtintensität verändert.</p>\n\n<p><b>Materialien</b><br>\nZwei Polarisationsfilter (z. B. aus einer Sonnenbrille mit Polarisationsgläsern oder als Folien erhältlich)<br>\nTaschenlampe oder Smartphone als Lichtquelle<br>\nWeißes Blatt Papier oder helle Wand als Projektionsfläche</p>"
-            },
-            {
-                "type": "aufgabe",
-                "content": "<p><b>Durchführung</b><br>\n1. Halte einen Polarisationsfilter vor die Lichtquelle (Taschenlampe oder Smartphone).<br>\n2. Richte das Licht durch den Filter auf das weiße Blatt Papier oder die Wand.<br>\n3. Halte den zweiten Polarisationsfilter zwischen die Lichtquelle und die Projektionsfläche, sodass du durch beide Filter hindurchschaust.<br>\n4. Drehe den zweiten Polarisationsfilter langsam und beobachte, wie sich die Helligkeit des Lichtes auf dem Papier verändert.</p>"
-            },
-            {
-                "type": "text",
-                "content": "<p><b>Beobachtung / Protokoll</b><br>\n<b>Frage</b><br>\nWie verändert sich die Lichtintensität, wenn du den zweiten Filter drehst?<br>\nWann ist das Licht am hellsten?<br>\nWann ist das Licht am dunkelsten?</p>"
-            },
-            {
-                "type": "merksatz",
-                "content": "<p><b>Erklärung</b><br>\nLichtwellen schwingen normalerweise in vielen Richtungen. Ein Polarisationsfilter lässt nur Lichtwellen einer bestimmten Schwingungsrichtung durch.<br>\nWenn zwei Filter übereinander gelegt und gegeneinander verdreht werden, verändert sich die Intensität des durchgelassenen Lichts:<br>\nBei 0° oder 180° Ausrichtung ist das Licht am hellsten (maximal durchlässig),<br>\nbei 90° Ausrichtung wird das Licht nahezu vollständig blockiert.<br>\nDas liegt daran, dass die Schwingungsebenen dann senkrecht zueinander stehen.</p>"
-            },
-            {
-                "type": "text",
-                "content": "<p><b>Fazit</b><br>\nDie Polarisation von Licht wird in vielen technischen Anwendungen genutzt, z. B. in Sonnenbrillen, LCD-Bildschirmen und Kamerafiltern.<br>\nDieses Experiment zeigt, wie Lichtwellen in eine bestimmte Richtung „sortiert“ werden können.</p>"
-            },
-            {
-                "type": "text",
-                "content": "<br></br>"
+                "content": "<h2>Mechanik – Lösungen</h2>\n\n<h3>Rechenaufgaben</h3>\n\n<ol>\n  <li>\n    <p><b>Aufgabe:</b> Ein Auto fährt mit 20 m/s. Wie weit fährt es in 5 Sekunden?</p>\n    <p><b>Lösung:</b> Weg = Geschwindigkeit × Zeit = 20 m/s × 5 s = 100 m</p>\n  </li>\n\n  <li>\n    <p><b>Aufgabe:</b> Fahrradfahrer tritt mit 50 N Kraft. Wie groß ist die Kraft, wenn er sie verdoppelt?</p>\n    <p><b>Lösung:</b> 50 N × 2 = 100 N</p>\n  </li>\n\n  <li>\n    <p><b>Aufgabe:</b> Masse = 10 kg. Gewichtskraft auf Erde berechnen (g = 9,81 m/s²)</p>\n    <p><b>Lösung:</b> Gewichtskraft = Masse × g = 10 kg × 9,81 m/s² = 98,1 N</p>\n  </li>\n\n  <li>\n    <p><b>Aufgabe:</b> Ball mit 15 N Kraft nach oben geworfen, Masse 1,5 kg. Gewichtskraft berechnen.</p>\n    <p><b>Lösung:</b> Gewichtskraft = Masse × g = 1,5 kg × 9,81 m/s² = 14,7 N</p>\n  </li>\n</ol>\n\n<h3>Logikaufgaben</h3>\n\n<ol>\n  <li>\n    <p><b>Frage:</b> Warum bleibt ein Buch auf dem Tisch liegen?</p>\n    <p><b>Antwort:</b> Weil die Kräfte ausgeglichen sind. Die Schwerkraft zieht das Buch nach unten, der Tisch hält es nach oben.</p>\n  </li>\n\n  <li>\n    <p><b>Frage:</b> Warum fährt ein Radfahrer bergab schneller als bergauf?</p>\n    <p><b>Antwort:</b> Weil die Schwerkraft ihn bergab zieht, beim Bergauffahren muss er gegen die Schwerkraft arbeiten.</p>\n  </li>\n\n  <li>\n    <p><b>Frage:</b> Warum spürt man Widerstand, wenn man gegen eine Wand drückt?</p>\n    <p><b>Antwort:</b> Die Wand übt eine gleich große Kraft zurück aus (Reaktionskraft), deshalb spürst du Widerstand.</p>\n  </li>\n\n  <li>\n    <p><b>Frage:</b> Warum fällt ein Gegenstand gerade nach unten?</p>\n    <p><b>Antwort:</b> Weil die Schwerkraft ihn zur Erde zieht und es keine Kraft gibt, die ihn zur Seite oder nach oben zieht.</p>\n  </li>\n</ol>"
             }
         ],
         "schoolType": "Gemeinschaftsschule"
     },
-    {
-        "title": "Optik Theorie",
-        "shortDescription": "<p>Hier findet ihr die grundlegende Theorie zur Optik, die das Verhalten von Licht und seine Wechselwirkung mit Materialien einfach erklärt. Dieses Wissen hilft euch, die Experimente besser zu verstehen und zu begleiten.</p>\n\n<p><b>Viel Spaß beim Wissensentdecken wünscht das Alltagslabor!</b></p>",
-        "subject": "Physik",
-        "gradeLevel": "7",
-        "steps": [
-            {
-                "type": "text",
-                "content": "<h2>Grundlagentheorie zur Optik</h2>\n\n<h3>Was ist Optik?</h3>\n<p>Optik ist der Teilbereich der Physik, der sich mit dem Verhalten und der Ausbreitung von Licht beschäftigt. Sie untersucht, wie Lichtstrahlen entstehen, sich ausbreiten, reflektieren, brechen, absorbiert oder polarisiert werden, und wie Farben entstehen.</p>"
-            },
-            {
-                "type": "merksatz",
-                "content": "<h3>Wichtige Begriffe</h3>\n<ul>\n  <li><b>Lichtstrahl:</b> Eine idealisierte Darstellung von Licht, das sich geradlinig ausbreitet.</li>\n  <li><b>Lichtquelle:</b> Ein Körper oder Gerät, das Licht erzeugt (z. B. Sonne, Lampe).</li>\n  <li><b>Transparent:</b> Material, das Licht vollständig durchlässt (z. B. Glas, Wasser).</li>\n  <li><b>Opak:</b> Undurchsichtiges Material, das Licht nicht durchlässt (z. B. Holz, Metall).</li>\n  <li><b>Reflexion:</b> Zurückwerfen von Licht an einer Grenzfläche.</li>\n  <li><b>Brechung:</b> Richtungsänderung von Licht beim Übergang zwischen verschiedenen Medien.</li>\n  <li><b>Absorption:</b> Aufnahme von Lichtenergie durch ein Material.</li>\n  <li><b>Polarisation:</b> Ausrichtung der Schwingungsebene von Lichtwellen in eine bestimmte Richtung.</li>\n  <li><b>Spektrum:</b> Aufspaltung von Licht in seine Bestandteile (Farben).</li>\n</ul>"
-            },
-            {
-                "type": "text",
-                "content": "<br></br>"
-            },
-            {
-                "type": "text",
-                "content": "<h3>Grundlagen und Gesetze</h3>"
-            },
-            {
-                "type": "text",
-                "content": "<h4>1. Geradlinige Ausbreitung des Lichts</h4>\n<p>Licht breitet sich in einem homogenen Medium immer geradlinig aus. Dies erklärt die Entstehung von Schatten und die Ausrichtung von Lichtstrahlen.</p>\n\n<h4>2. Reflexionsgesetz</h4>\n<p>Beim Auftreffen auf eine glatte Oberfläche wird Licht reflektiert.</p>"
-            },
-            {
-                "type": "merksatz",
-                "content": "<p><b>Einfallswinkel = Reflexionswinkel</b><br>\nDer Winkel, unter dem das Licht auf die Oberfläche trifft, ist gleich dem Winkel, unter dem es reflektiert wird.</p>"
-            },
-            {
-                "type": "text",
-                "content": "<h4>3. Brechungsgesetz (Snellius’sches Gesetz)</h4>\n<p>Beim Übergang von einem Medium in ein anderes ändert Licht seine Geschwindigkeit und damit seine Richtung.</p>"
-            },
-            {
-                "type": "merksatz",
-                "content": "<p><b>Formel:</b><br>\nn₁ · sin(θ₁) = n₂ · sin(θ₂)<br>\nn₁ und n₂: Brechungsindizes der Medien<br>\nθ₁: Einfallswinkel<br>\nθ₂: Brechungswinkel</p>"
-            },
-            {
-                "type": "text",
-                "content": "<h4>4. Dispersion</h4>\n<p>Licht wird in seine Spektralfarben aufgespalten, weil verschiedene Wellenlängen unterschiedlich stark gebrochen werden.<br>\nBeispiel: Regenbogen, Prismen.</p>"
-            },
-            {
-                "type": "text",
-                "content": "<h4>5. Additive Farbmischung</h4>\n<p>Weißes Licht setzt sich aus den Grundfarben Rot, Grün und Blau zusammen. Die Mischung dieser Farben erzeugt alle anderen Farben:</p>"
-            },
-            {
-                "type": "merksatz",
-                "content": "<p><b>Rot + Grün = Gelb, Rot + Blau = Magenta, Grün + Blau = Cyan, Rot + Grün + Blau = Weiß.</b></p>"
-            },
-            {
-                "type": "text",
-                "content": "<h4>6. Polarisation von Licht</h4>\n<p>Lichtwellen schwingen normalerweise in vielen Richtungen. Polarisationsfilter lassen nur Licht einer bestimmten Schwingungsebene durch, was man als Polarisation bezeichnet.</p>"
-            },
-            {
-                "type": "merksatz",
-                "content": "<h3>Wichtige Phänomene der Optik</h3>\n<ul>\n  <li><b>Schattenbildung:</b> Entsteht durch Blockierung von Lichtstrahlen durch ein undurchsichtiges Objekt.</li>\n  <li><b>Kernschatten & Halbschatten:</b> Kernschatten ist der Bereich, in dem das Licht vollständig blockiert wird, Halbschatten der Bereich mit teilweiser Lichtabschirmung.</li>\n  <li><b>Linsenwirkung:</b> Konvexe (Sammel-) Linsen bündeln Licht und vergrößern Objekte, konkave (Streulinsen) zerstreuen Licht.</li>\n  <li><b>Spiegelarten:</b> Flachspiegel reflektieren Licht gerade, Hohlspiegel bündeln Licht in einem Brennpunkt.</li>\n</ul>"
-            },
-            {
-                "type": "text",
-                "content": "<h3>Anwendungen der Optik im Alltag</h3>\n<ul>\n  <li>Sonnenbrillen nutzen Polarisation, um Blendung zu reduzieren.</li>\n  <li>Kameras und Brillen arbeiten mit Linsen und Brechung, um Bilder scharf zu stellen.</li>\n  <li>Bildschirme erzeugen Farben durch additive Farbmischung von RGB-Licht.</li>\n  <li>Taschenlampen und Scheinwerfer verwenden Hohlspiegel, um Licht zu bündeln.</li>\n  <li>Regenbögen zeigen die Dispersion von Sonnenlicht in Wassertropfen.</li>\n</ul>"
-            },
-            {
-                "type": "text",
-                "content": "<h3>Zusammenfassung</h3>\n<p>Die Optik beschreibt, wie Licht sich verhält und mit Materie interagiert. Durch Gesetze wie die geradlinige Ausbreitung, Reflexion und Brechung können wir Phänomene wie Schatten, Spiegelbilder oder die Farben der Natur erklären. Das Verständnis der Optik ist wichtig für viele Technologien und hilft uns, die Welt um uns herum besser zu verstehen.</p>"
-            }
-        ],
-        "schoolType": "Gemeinschaftsschule"
-    },
+    
     {
         "title": "Elektrizitätslehre Experimente",
         "shortDescription": "<p><strong>In der Elektrizitätslehre fließt der Funke über!</strong><br>\nHier lernst du, was Strom ist, wie er fließt – und warum er so nützlich (und manchmal gefährlich) ist.</p>\n\n<p>Auf dieser Seite findest du einfache Experimente.<br>\nDu kannst sie ganz leicht zu Hause oder in der Schule nachmachen.</p>\n\n<p>Wir erklären dir auch:<br>\n– Was dabei in der Physik passiert.<br>\n– Wo du das im Alltag erleben kannst.</p>\n\n<p><strong>Viel Spaß beim Forschen und Ausprobieren!<br>\nWünscht euch das AlltagsLabor.</strong></p>",
@@ -1565,138 +1138,324 @@
         "schoolType": "Gemeinschaftsschule"
     },
     {
-        "title": "Mechanik Theorie",
-        "shortDescription": "<p>Hier findet ihr die grundlegende Theorie zur Mechanik, die die Bewegung von Körpern und die Kräfte, die auf sie wirken, einfach und verständlich beschreibt. Dieses Wissen hilft euch, die Experimente zur Bewegung und zum Gleichgewicht besser zu verstehen.</p>\n\n<p><b>Viel Spaß beim Wissensentdecken wünscht das Alltagslabor!</b></p>",
+        "title": "Elektrizitätslehre Aufgaben",
+        "shortDescription": "<p>\nWas ist eigentlich Strom – und warum geht ohne ihn fast nichts mehr?<br>\nHier findest du Aufgaben, bei denen du Stromstärke, Spannung und Widerstand berechnen kannst. Du lernst spielerisch, wie ein Stromkreis funktioniert und wie Energie genutzt wird.\n</p>\n<p>\nSchalte dein Wissen ein – es wird elektrisierend!\n</p>\n<p><b>Viel Freude beim Tüfteln und Rechnen wünscht dir dein AlltagsLabor!</b></p>\n",
+        "subject": "Physik",
+        "gradeLevel": "7",
+        "steps": [
+            {
+                "type": "aufgabe",
+                "content": "<h2>Elektrizitätslehre – Übungsaufgaben</h2>\n\n<h3>Rechenaufgaben</h3>\n\n<ol>\n  <li>\n    <p><b>Aufgabe:</b> Ein Strom fließt mit einer Stärke von 2 Ampere für 3 Sekunden. Wie viel Ladung fließt?</p>\n  </li>\n  <li>\n    <p><b>Aufgabe:</b> Eine Batterie liefert eine Spannung von 9 Volt. Wenn der Strom 0,5 Ampere beträgt, wie groß ist der Widerstand im Stromkreis?</p>\n  </li>\n  <li>\n    <p><b>Aufgabe:</b> Ein elektrisches Gerät hat eine Leistung von 60 Watt und wird 2 Stunden benutzt. Wie viel Energie verbraucht es in Wattstunden?</p>\n  </li>\n  <li>\n    <p><b>Aufgabe:</b> In einem Stromkreis fließen 4 Ampere bei 12 Volt. Berechne die elektrische Leistung.</p>\n  </li>\n</ol>\n\n<h3>Logikaufgaben</h3>\n\n<ol>\n  <li>\n    <p><b>Frage:</b> Warum fließt Strom nur, wenn der Stromkreis geschlossen ist?</p>\n  </li>\n  <li>\n    <p><b>Frage:</b> Was passiert mit dem Strom, wenn der Widerstand größer wird?</p>\n  </li>\n  <li>\n    <p><b>Frage:</b> Warum braucht eine Glühbirne Spannung, um zu leuchten?</p>\n  </li>\n  <li>\n    <p><b>Frage:</b> Warum ist es gefährlich, mit nassen Händen an elektrische Geräte zu fassen?</p>\n  </li>\n</ol>"
+            },
+            {
+                "type": "text",
+                "content": "<br></br><br></br><br></br><br></br><br></br>"
+            },
+            {
+                "type": "merksatz",
+                "content": "<h2>Elektrizitätslehre – Übungsaufgaben mit Lösungen</h2>\n\n<h3>Rechenaufgaben</h3>\n\n<ol>\n  <li>\n    <p><b>Aufgabe:</b> Ein Strom fließt mit einer Stärke von 2 Ampere für 3 Sekunden. Wie viel Ladung fließt?</p>\n    <p><b>Formel:</b> Q = I * t</p>\n    <p><b>Lösung:</b> Q = 2 A * 3 s = 6 Coulomb</p>\n  </li>\n  <li>\n    <p><b>Aufgabe:</b> Eine Batterie liefert eine Spannung von 9 Volt. Wenn der Strom 0,5 Ampere beträgt, wie groß ist der Widerstand im Stromkreis?</p>\n    <p><b>Formel:</b> R = U / I</p>\n    <p><b>Lösung:</b> R = 9 V / 0,5 A = 18 Ohm</p>\n  </li>\n  <li>\n    <p><b>Aufgabe:</b> Ein elektrisches Gerät hat eine Leistung von 60 Watt und wird 2 Stunden benutzt. Wie viel Energie verbraucht es in Wattstunden?</p>\n    <p><b>Formel:</b> E = P * t</p>\n    <p><b>Lösung:</b> E = 60 W * 2 h = 120 Wh</p>\n  </li>\n  <li>\n    <p><b>Aufgabe:</b> In einem Stromkreis fließen 4 Ampere bei 12 Volt. Berechne die elektrische Leistung.</p>\n    <p><b>Formel:</b> P = U * I</p>\n    <p><b>Lösung:</b> P = 12 V * 4 A = 48 Watt</p>\n  </li>\n</ol>\n\n<h3>Logikaufgaben</h3>\n\n<ol>\n  <li>\n    <p><b>Frage:</b> Warum fließt Strom nur, wenn der Stromkreis geschlossen ist?</p>\n    <p><b>Antwort:</b> Weil der Strom einen geschlossenen Weg braucht, um fließen zu können. Ist der Kreis offen, kann der Strom nicht durchfließen.</p>\n  </li>\n  <li>\n    <p><b>Frage:</b> Was passiert mit dem Strom, wenn der Widerstand größer wird?</p>\n    <p><b>Antwort:</b> Der Strom wird kleiner, weil der Widerstand den Fluss der Ladungen bremst.</p>\n  </li>\n  <li>\n    <p><b>Frage:</b> Warum braucht eine Glühbirne Spannung, um zu leuchten?</p>\n    <p><b>Antwort:</b> Die Spannung sorgt dafür, dass der Strom durch den Draht in der Glühbirne fließt und ihn zum Leuchten bringt.</p>\n  </li>\n  <li>\n    <p><b>Frage:</b> Warum ist es gefährlich, mit nassen Händen an elektrische Geräte zu fassen?</p>\n    <p><b>Antwort:</b> Weil Wasser Strom leitet und dadurch Strom durch den Körper fließen kann, was zu einem elektrischen Schlag führt.</p>\n  </li>\n</ol>"
+            }
+        ],
+        "schoolType": "Gemeinschaftsschule"
+    },
+    
+    {
+        "title": "Wärmelehre Experimente",
+        "shortDescription": "<p><b>\"In der Wärmelehre geht es heiß her!\"</b><br>\nHier geht es darum, wie warm oder kalt Dinge sind.<br>\nUnd was passiert, wenn Dinge warm werden oder abkühlen.<br>\nAuf dieser Seite findest du einfache Experimente.<br>\nDu kannst sie ganz leicht in der Schule nachmachen.<br>\nWir erklären dir auch:</p>\n\n<ul>\n  <li>Was dabei in der Physik passiert.</li>\n  <li>Wo du das im Alltag erleben kannst.</li>\n</ul>\n\n<p><b>\"Viel Spaß beim Forschen und Ausprobieren! Wünscht euch das AlltagsLabor.\"</b></p>",
         "subject": "Physik",
         "gradeLevel": "7",
         "steps": [
             {
                 "type": "text",
-                "content": "<h2>Grundlagentheorie zur Mechanik</h2>\n\n<h3>Was ist Mechanik?</h3>\n<p>Die Mechanik ist ein Teilbereich der Physik, der sich mit Bewegungen von Körpern sowie mit den Kräften beschäftigt, die diese Bewegungen verursachen oder verändern. Sie wird in drei Hauptbereiche unterteilt: Kinematik (Bewegung), Dynamik (Kraftwirkungen) und Statik (Gleichgewicht).</p>"
+                "content": "<p><b><u>1.1 Temperatur fühlen – Täuscht uns unser Gefühl?</u></b></p>\n\n<p><b>Was du brauchst:</b><br>\n • 3 Schüsseln oder Wannen<br>\n • Warmes Wasser (ca. 40 °C)<br>\n • Kaltes Wasser mit Eiswürfeln (ca. 0 °C)<br>\n • Lauwarmes Wasser (ca. 20 °C)<br>\n • Deine beiden Hände<br>\nTipp: Markiere die Schüsseln farbig, z. B. rot für warm, blau für kalt, und neutral für lauwarm.</p>\n\n<p><b>So geht’s:</b><br>\nFülle die rote Schüssel mit warmem Wasser (nicht zu heiß – ca. 40 °C).<br>\nFülle die blaue Schüssel mit kaltem Wasser (am besten mit Eiswürfeln – ca. 0 °C).<br>\nFülle die mittlere Wanne mit lauwarmem Wasser (etwa 20 °C).<br>\nStecke deine linke Hand in die rote (warme) Schüssel und die rechte Hand in die blaue (kalte) Schüssel.<br>\nWarte ca. 1 Minute.<br>\nJetzt tauche beide Hände gleichzeitig in das lauwarme Wasser.</p>"
+            },
+            {
+                "type": "aufgabe",
+                "content": "<p><i>Was fühlst du?<br>\n • Spürt jede Hand die gleiche Temperatur?<br>\n • Welche Hand fühlt das Wasser eher warm? Welche eher kalt?<br>\n • Wie kann das sein – obwohl es das gleiche Wasser ist?</i></p>"
             },
             {
                 "type": "merksatz",
-                "content": "<h3>Wichtige Begriffe</h3>\n<ul>\n  <li><b>Bewegung:</b> Änderung der Position eines Körpers im Raum.</li>\n  <li><b>Geschwindigkeit:</b> Maß dafür, wie schnell sich ein Körper bewegt.</li>\n  <li><b>Beschleunigung:</b> Änderung der Geschwindigkeit eines Körpers pro Zeit.</li>\n  <li><b>Kraft:</b> Einwirkung, die einen Körper verformen oder beschleunigen kann.</li>\n  <li><b>Arbeit:</b> Energieaufwand, um einen Körper mit Kraft über eine Strecke zu bewegen.</li>\n  <li><b>Leistung:</b> Arbeit pro Zeit.</li>\n  <li><b>Energie:</b> Fähigkeit, Arbeit zu verrichten oder Wärme abzugeben.</li>\n  <li><b>Impuls:</b> Maß für die Bewegungsmenge eines Körpers.</li>\n</ul>"
+                "content": "<p><b>Erklärung:</b><br>\nDeine Haut passt sich an die Temperatur an.<br>\n • Die Hand im kalten Wasser ist daran gewöhnt, dass es richtig kalt ist.<br>\n • Die Hand im warmen Wasser ist an Wärme gewöhnt.<br>\nWenn beide Hände jetzt ins gleiche lauwarme Wasser kommen:<br>\n • Die „kalte“ Hand findet es plötzlich warm.<br>\n • Die „warme“ Hand findet es plötzlich kalt.<br><br>\nDas zeigt:<br>\nUnser Wärmegefühl ist nicht objektiv, sondern hängt davon ab, was wir vorher gespürt haben.</p>"
             },
             {
                 "type": "text",
-                "content": "<h3>Grundlagen und Gesetze</h3>\n\n<h4>1. Gleichförmige Bewegung</h4>\n<p>Bei einer gleichförmigen Bewegung bleibt die Geschwindigkeit konstant.</p>"
-            },
-            {
-                "type": "merksatz",
-                "content": "<p><b>Formel:</b><br>\nv = s / t<br>\nv: Geschwindigkeit [m/s], s: Strecke [m], t: Zeit [s]</p>"
-            },
-            {
-                "type": "merksatz",
-                "content": "<p><b>Merksatz:</b> Je länger der Weg in kurzer Zeit, desto größer die Geschwindigkeit.</p>"
+                "content": "<p><b>Was hat das mit dem Alltag zu tun?</b><br>\n • Wenn du im Winter draußen warst und dann ins Haus kommst, fühlt sich alles plötzlich heiß an – sogar lauwarmes Wasser beim Händewaschen.<br>\n • Oder umgekehrt: An einem heißen Sommertag kommt dir lauwarmes Wasser eher kalt vor.</p>"
             },
             {
                 "type": "text",
-                "content": "<h4>2. Beschleunigte Bewegung</h4>\n<p>Wenn sich die Geschwindigkeit eines Körpers ändert, spricht man von beschleunigter Bewegung.</p>"
-            },
-            {
-                "type": "merksatz",
-                "content": "<p><b>Formel:</b><br>\na = Δv / t<br>\na: Beschleunigung [m/s²], Δv: Geschwindigkeitsänderung, t: Zeit [s]</p>"
-            },
-            {
-                "type": "merksatz",
-                "content": "<p><b>Merksatz:</b> Beschleunigung ist die Geschwindigkeit pro Zeitänderung.</p>"
+                "content": "<br></br>"
             },
             {
                 "type": "text",
-                "content": "<h4>3. Kraftgesetz (2. Newton’sches Gesetz)</h4>\n<p>Eine Kraft bewirkt eine Beschleunigung eines Körpers mit Masse.</p>"
+                "content": "<p><b><u>1.2 Wie funktioniert ein Thermometer?</u></b></p>\n\n<p><b>Was du brauchst:</b><br>\n • 1 große durchsichtige PET-Flasche (leer & sauber)<br>\n • 1 Gummistopfen mit einem Loch (z. B. aus dem Laborbedarf oder selbst gebastelt mit Knete)<br>\n • 1 Glasrohr oder Strohhalm (mindestens 40 cm lang)<br>\n • Tinte oder Lebensmittelfarbe<br>\n • Klebeband<br>\n • Filzstift zum Markieren<br>\n • 1 Thermometer zum Messen der Temperatur</p>\n\n<p><b>So geht’s:</b><br>\nFülle die Flasche fast ganz mit Wasser. Gib ein paar Tropfen Tinte dazu, damit man den Wasserstand im Röhrchen gut sehen kann.<br>\nStelle die Flasche für mindestens 30 Minuten in den Kühlschrank (damit das Wasser kalt wird – ca. 6 °C).<br>\nMiss jetzt die Temperatur des Wassers mit dem Thermometer.<br>\nStecke das Glasrohr oder den Strohhalm durch das Loch im Gummistopfen.<br>\nSetze den Gummistopfen auf die Flasche, sodass das Röhrchen etwa 5 cm ins Wasser ragt. Dichte alles gut ab mit Klebeband, damit keine Luft entweicht.<br>\nMarkiere den Wasserstand im Röhrchen mit einem Filzstift.<br>\nStelle die Flasche an einen warmen Ort im Raum (Zimmertemperatur, ca. 22 °C).<br>\nWarte etwa einen Tag. Dann miss wieder die Temperatur und markiere erneut den Wasserstand.<br>\nOptional: Stelle die Flasche in ein Becken mit warmem Wasser (z. B. 35–40 °C). Miss wieder die Temperatur und markiere den Wasserstand nach ca. 15 Minuten.</p>"
+            },
+            {
+                "type": "aufgabe",
+                "content": "<p><i>Was fällt auf?<br>\n • Ist der Wasserstand im Röhrchen gestiegen oder gesunken?<br>\n • Was passiert mit dem Wasser, wenn es wärmer wird?</i></p>"
             },
             {
                 "type": "merksatz",
-                "content": "<p><b>Formel:</b><br>\nF = m · a<br>\nF: Kraft [N], m: Masse [kg], a: Beschleunigung [m/s²]</p>"
-            },
-            {
-                "type": "merksatz",
-                "content": "<p><b>Merksatz:</b> Je größer die Masse oder Beschleunigung, desto größer die Kraft.</p>"
+                "content": "<p><b>Erklärung:</b><br>\nWenn Wasser wärmer wird, nimmt es mehr Platz ein – es dehnt sich aus.<br>\nIn der Flasche braucht das Wasser also mehr Raum – darum steigt der Wasserstand im Röhrchen.<br><br>\nSo funktioniert auch ein echtes Flüssigkeitsthermometer:<br>\nJe wärmer die Umgebung, desto mehr dehnt sich die Flüssigkeit aus und steigt im Röhrchen nach oben.</p>"
             },
             {
                 "type": "text",
-                "content": "<h4>4. Gewichtskraft</h4>\n<p>Die Gewichtskraft ist die Kraft, mit der die Erde einen Körper anzieht.</p>"
-            },
-            {
-                "type": "merksatz",
-                "content": "<p><b>Formel:</b><br>\nF_G = m · g<br>\nF_G: Gewichtskraft [N], m: Masse [kg], g: Erdbeschleunigung (≈ 9,81 m/s²)</p>"
-            },
-            {
-                "type": "merksatz",
-                "content": "<p><b>Merksatz:</b> Die Erde zieht alles mit der gleichen Fallbeschleunigung an.</p>"
+                "content": "<p><b>Was hat das mit dem Alltag zu tun?</b><br>\n • Genau so messen Thermometer die Temperatur – zum Beispiel Fieberthermometer oder alte Flüssigkeitsthermometer im Garten.</p>"
             },
             {
                 "type": "text",
-                "content": "<h4>5. Arbeit</h4>\n<p>Wenn eine Kraft entlang eines Weges wirkt, wird Arbeit verrichtet.</p>"
-            },
-            {
-                "type": "merksatz",
-                "content": "<p><b>Formel:</b><br>\nW = F · s<br>\nW: Arbeit [J], F: Kraft [N], s: Weg [m]</p>"
-            },
-            {
-                "type": "merksatz",
-                "content": "<p><b>Merksatz:</b> Ohne Weg keine Arbeit – auch bei großer Kraft.</p>"
+                "content": "<br></br>"
             },
             {
                 "type": "text",
-                "content": "<h4>6. Leistung</h4>\n<p>Leistung beschreibt, wie schnell Arbeit verrichtet wird.</p>"
+                "content": "<p><b><u>1.3 Von Wärme zu Bewegung: Wie funktioniert eine Dampfturbine?</u></b></p>\n\n<p><b>Was du brauchst:</b><br>\n • 1 kleiner Topf<br>\n • Wasser<br>\n • 1 Herdplatte (oder Campingkocher – bitte mit Aufsicht!)<br>\n • 1 Korkscheibe oder Topfdeckel mit kleinem Loch<br>\n • 1 kleine Windmühle (leicht, aus Papier oder Kunststoff – z. B. Spielzeug)<br>\n • Topfuntersetzer<br>\n Tipp: Die Korkplatte muss gut auf den Topf passen und möglichst dicht abschließen, damit der Dampf nur durch das kleine Loch entweichen kann.</p>\n\n<p><b>So geht’s:</b><br>\nFülle den Topf zur Hälfte mit Wasser.<br>\nVerschließe ihn mit dem Deckel oder der Korkscheibe, in dem sich ein kleines Loch befindet.<br>\nErhitze den Topf auf der Herdplatte – warte, bis das Wasser anfängt zu kochen.<br>\nHalte die Windmühle direkt über das Loch (Achtung: heißer Dampf! Nur mit Aufsicht oder Zange halten).<br>\nBeobachte, was passiert.</p>"
+            },
+            {
+                "type": "aufgabe",
+                "content": "<p><i>Was stellst du fest?<br>\n • Was passiert mit der Windmühle?<br>\n • Woher kommt die Bewegung?<br>\n • Wie hängt das mit der Hitze zusammen?</i></p>"
             },
             {
                 "type": "merksatz",
-                "content": "<p><b>Formel:</b><br>\nP = W / t<br>\nP: Leistung [W], W: Arbeit [J], t: Zeit [s]</p>"
-            },
-            {
-                "type": "merksatz",
-                "content": "<p><b>Merksatz:</b> Wer in kurzer Zeit viel leistet, bringt mehr Leistung.</p>"
+                "content": "<p><b>Erklärung:</b><br>\n • Das Wasser wird erhitzt → es beginnt zu sieden.<br>\n • Dabei entsteht Wasserdampf, der viel mehr Platz braucht als flüssiges Wasser.<br>\n • Der Dampf entweicht mit Druck durch das kleine Loch.<br>\n • Dieser Druck trifft auf die Windmühle – und bringt sie zum Drehen.<br><br>\nDas ist ein Modell für eine Dampfturbine.</p>"
             },
             {
                 "type": "text",
-                "content": "<h4>7. Energie</h4>\n<p>Energie ist die Fähigkeit, Arbeit zu verrichten. Zwei wichtige Energieformen sind:</p>"
-            },
-            {
-                "type": "merksatz",
-                "content": "<p><b>Formeln:</b><br>\nE_kin = ½ · m · v² (kinetische Energie)<br>\nE_pot = m · g · h (potenzielle Energie)<br>\nE: Energie [J], m: Masse [kg], v: Geschwindigkeit [m/s], h: Höhe [m]</p>"
-            },
-            {
-                "type": "merksatz",
-                "content": "<p><b>Merksatz:</b> Energie verschwindet nicht – sie wandelt sich nur um.</p>"
+                "content": "<p><b>Was hat das mit dem Alltag zu tun?</b><br>\n • In einem Kraftwerk passiert genau das:<br>\n → Wasser wird durch Kohle, Gas, Biomasse oder Kernenergie erhitzt.<br>\n → Der entstehende Dampf wird mit hohem Druck auf eine Turbine geleitet.<br>\n → Die Turbine dreht sich – wie bei dir die Windmühle.<br>\n → Diese Drehung treibt einen Generator an, der daraus Strom erzeugt.<br>\n • Auch in einer alten Dampflok wurde Wasserdampf benutzt – dort wurde der Dampf in Zylinder geleitet, um die Räder zu bewegen.</p>"
             },
             {
                 "type": "text",
-                "content": "<h4>8. Impuls</h4>\n<p>Der Impuls beschreibt die Bewegungsmenge eines Körpers.</p>"
-            },
-            {
-                "type": "merksatz",
-                "content": "<p><b>Formel:</b><br>\np = m · v<br>\np: Impuls [kg·m/s], m: Masse [kg], v: Geschwindigkeit [m/s]</p>"
-            },
-            {
-                "type": "merksatz",
-                "content": "<p><b>Merksatz:</b> Großer Impuls entsteht durch große Masse oder hohe Geschwindigkeit.</p>"
+                "content": "<br></br>"
             },
             {
                 "type": "text",
-                "content": "<h4>9. Hebelgesetz</h4>\n<p>Ein Hebel ist im Gleichgewicht, wenn beide Seiten das gleiche Drehmoment erzeugen.</p>"
+                "content": "<p><b><u>1.4 Wie pustet sich ein Ballon von selbst auf?</u></b></p>\n\n<p><b>Was du brauchst:</b><br>\n • 1 kleine leere Wasserflasche (z. B. 0,5 l)<br>\n • 1 Ballon<br>\n • 1 große Schüssel<br>\n • Warmes Wasser (nicht kochend – ca. 50–60 °C)</p>\n\n<p><b>So geht’s:</b><br>\nStülpe den Ballon über die Öffnung der leeren Flasche.<br>\nStelle die Flasche mit dem Ballon in eine Schüssel mit warmem Wasser.<br>\nBeobachte, was mit dem Ballon passiert.</p>"
+            },
+            {
+                "type": "aufgabe",
+                "content": "<p><i>Was beobachtest du?<br>\n • Füllt sich der Ballon?<br>\n • Woran könnte das liegen?<br>\n • Wurde Luft hinzugefügt?</i></p>"
             },
             {
                 "type": "merksatz",
-                "content": "<p><b>Formel:</b><br>\nF₁ · r₁ = F₂ · r₂<br>\nF: Kraft [N], r: Hebelarm [m]</p>"
-            },
-            {
-                "type": "merksatz",
-                "content": "<p><b>Merksatz:</b> Mit einem langen Hebel spart man Kraft.</p>"
+                "content": "<p><b>Erklärung:</b><br>\n • In der Flasche ist Luft eingeschlossen.<br>\n • Durch das warme Wasser wird die Luft in der Flasche erwärmt.<br>\n • Warme Luft dehnt sich aus – sie braucht mehr Platz.<br>\n • Da die Flasche geschlossen ist, drückt die Luft in den Ballon.<br>\n • Der Ballon bläht sich ein wenig auf, ganz ohne Pusten!<br><br>\nDie Luftmenge bleibt gleich – sie wird nur größer durch Wärme.</p>"
             },
             {
                 "type": "text",
-                "content": "<h4>10. Gleichgewicht der Kräfte</h4>\n<p>Ein Körper ist im Gleichgewicht, wenn alle auf ihn wirkenden Kräfte sich gegenseitig aufheben.</p>"
-            },
-            {
-                "type": "merksatz",
-                "content": "<p><b>Merksatz:</b> Wenn sich alle Kräfte ausgleichen, bewegt sich nichts.</p>"
+                "content": "<p><b>Was hat das mit dem Alltag zu tun?</b><br>\n • So funktioniert ein Heißluftballon:<br>\n → In die Ballonhülle wird heiße Luft geblasen.<br>\n → Diese ist leichter als kalte Luft – deshalb steigt der Ballon auf.<br>\n • Aerosoldosen (z. B. Deo, Haarspray) dürfen nicht in der Sonne liegen!<br>\n → Die Gase darin dehnen sich bei Hitze aus.<br>\n → Wenn zu viel Druck entsteht, kann die Dose platzen!<br>\n • Auch Autoreifen haben im Sommer höheren Luftdruck – weil sich die Luft ausdehnt.</p>"
             },
             {
                 "type": "text",
-                "content": "<h3>Anwendungen der Mechanik im Alltag</h3>\n<ul>\n  <li>Fahrradfahren nutzt Impuls, Reibung und Hebelwirkung.</li>\n  <li>Aufzüge arbeiten mit Kräften, Gegengewichten und Energie.</li>\n  <li>Brücken und Gebäude benötigen statisches Gleichgewicht.</li>\n  <li>Sportler verwenden gezielt Kraft, Impuls und Hebelarme.</li>\n  <li>Autos beschleunigen, bremsen und benötigen Arbeit & Leistung.</li>\n</ul>\n\n<h3>Zusammenfassung</h3>\n<p>Die Mechanik erklärt, wie sich Körper bewegen und welche Kräfte dabei wirken. Mit einfachen Gesetzen wie dem Kraftgesetz, dem Hebelgesetz oder der Impulsformel lassen sich viele Vorgänge des Alltags verstehen. Mechanik ist eine Grundlage für Technik, Sport, Bauwerke und vieles mehr.</p>"
+                "content": "<br></br>"
+            },
+            {
+                "type": "text",
+                "content": "<p><b><u>2.1.1 Warum schwimmt Eis? Die Dichte von Wasser</u></b></p>\n\n<p><b>Was du brauchst:</b><br>\n • 1 durchsichtige Schüssel<br>\n • Klares Wasser<br>\n • 1 großer Eiswürfel oder Eisblock</p>\n\n<p><b>So geht’s:</b><br>\nFülle die Schüssel etwa halbvoll mit Wasser.<br>\nGib den Eiswürfel vorsichtig hinein.<br>\nFülle die Schüssel komplett auf, bis das Wasser bis zum Rand reicht.<br>\nBeobachte, was passiert, wenn das Eis schmilzt.</p>"
+            },
+            {
+                "type": "aufgabe",
+                "content": "<p><i>Was fällt dir auf?<br>\n • Schwimmt der Eiswürfel oben?<br>\n • Läuft Wasser über, wenn der Eiswürfel schmilzt?<br>\n • Warum bleibt der Eiswürfel an der Oberfläche?</i></p>"
+            },
+            {
+                "type": "merksatz",
+                "content": "<p><b>Erklärung:</b><br>\n • Wasser hat eine besondere Eigenschaft:<br>\n   Beim Gefrieren dehnt es sich aus – es wird weniger dicht als flüssiges Wasser.<br>\n • Deshalb hat Eis eine geringere Dichte als Wasser → es schwimmt oben.<br>\n • Wenn das Eis schmilzt, verändert sich nur seine Form – das geschmolzene Wasser hat das gleiche Volumen wie zuvor der eingetauchte Teil des Eises → kein Wasser läuft über.</p>"
+            },
+            {
+                "type": "text",
+                "content": "<p><b>Was hat das mit dem Alltag zu tun?</b><br>\n • Seen frieren von oben nach unten:<br>\n   → Eis schwimmt oben und bildet eine Isolationsschicht.<br>\n   → Unten bleibt das Wasser flüssig und „warm“ (4 °C) – das sichert das Überleben von Fischen im Winter.<br>\n • Getränke mit Eis bleiben oben schön kühl, weil das Eis an der Oberfläche schwimmt.</p>\n\n<p><b>Extra-Info für Fortgeschrittene:</b><br>\nDie größte Dichte hat Wasser bei 4 °C, kälter als das, sinkt es nicht weiter ab, sondern steigt wieder auf, wenn es gefriert.</p>"
+            },
+            {
+                "type": "text",
+                "content": "<br></br>"
+            },
+            {
+                "type": "text",
+                "content": "<p><b><u>2.1.2 Trotz Hitze bleibt's kalt: Warum das Eis nicht wärmer wird</u></b></p>\n\n<p><b>Was du brauchst:</b><br>\n • 1 Kochtopf<br>\n • Wasser<br>\n • Eiswürfel<br>\n • 1 Thermometer (z. B. Küchenthermometer)<br>\n • 1 Herdplatte</p>\n\n<p><b>So geht’s:</b><br>\nFülle den Kochtopf mit etwas Wasser.<br>\nGib ein paar Eiswürfel dazu.<br>\nStelle den Topf auf die Herdplatte und schalte sie ein.<br>\nHalte das Thermometer ins Wasser und rühre regelmäßig um.<br>\nBeobachte die Temperatur, solange noch Eis im Topf ist.</p>"
+            },
+            {
+                "type": "aufgabe",
+                "content": "<p><i>Was denkst du, was passiert?<br>\n • Erwärmt sich das Wasser sofort?<br>\n • Bleibt die Temperatur gleich?<br>\n • Warum dauert es so lange, bis das Wasser über 0 °C steigt?</i></p>"
+            },
+            {
+                "type": "merksatz",
+                "content": "<p><b>Erklärung:</b><br>\n • Obwohl der Herd Wärme zuführt, bleibt die Temperatur bei 0 °C, solange noch Eis vorhanden ist.<br>\n • Die zugeführte Energie wird nicht zur Erwärmung genutzt – sondern für das Schmelzen des Eises.<br>\n • Erst nachdem alles Eis geschmolzen ist, steigt die Temperatur weiter an.<br>\n Fachbegriff: Schmelzwärme (auch: Schmelzenthalpie)<br>\n → Energie wird „versteckt“ aufgenommen, ohne dass man es an der Temperatur merkt.</p>"
+            },
+            {
+                "type": "text",
+                "content": "<p><b>Was hat das mit dem Alltag zu tun?</b><br>\n • Kühlbox mit Eisbeuteln:<br>\n   → Das Eis hält die Temperatur über Stunden bei ca. 0 °C, selbst wenn außen 30 °C sind.<br>\n   → Weil das Eis viel Wärme schluckt, ohne warm zu werden – solange es noch nicht geschmolzen ist.<br>\n • Speiseeis in Thermoboxen:<br>\n   → Beim Transport schmilzt es langsam, aber die Box bleibt lange konstant kalt, weil die Energie erst mal nur für das Schmelzen draufgeht.</p>"
+            },
+            {
+                "type": "text",
+                "content": "<br></br>"
+            },
+            {
+                "type": "text",
+                "content": "<p><b><u>3.1.1 Wenn Dosen zerknicken: Das Volumen von Gasen</u></b></p>\n\n<p><b>Was du brauchst:</b><br>\n • 1 leere Getränkedose (z. B. Alu-Dose)<br>\n • 1 Zange (um die Dose sicher zu halten)<br>\n • 1 Bunsenbrenner oder Teelicht<br>\n • 1 Schüssel mit kaltem Wasser<br>\n • Etwas Wasser (ca. 1 cm) für die Dose</p>\n\n<p><b>So geht’s:</b><br>\nFülle etwa 1 cm Wasser in die leere Getränkedose.<br>\nErhitze die Dose über dem Brenner/Teelicht, bis das Wasser sprudelnd kocht.<br>\nWichtig: Halte die Dose mit der Zange fest – nicht mit der Hand!<br>\nSobald Dampf austritt, drehe die Dose schnell um und tauche sie kopfüber in die Schüssel mit kaltem Wasser.<br>\nBeobachte, was mit der Dose passiert.</p>"
+            },
+            {
+                "type": "aufgabe",
+                "content": "<p><i>Was passiert?<br>\n • Die Dose implodiert plötzlich – wird von außen eingedrückt.<br>\n • Warum passiert das?</i></p>"
+            },
+            {
+                "type": "merksatz",
+                "content": "<p><b>Erklärung:</b><br>\n • Beim Erhitzen verdampft das Wasser → Die Dose füllt sich mit Wasserdampf.<br>\n • Dieser Dampf verdrängt die Luft im Inneren.<br>\n • Wird die Dose plötzlich gekühlt, kondensiert der Dampf schlagartig → das Gasvolumen wird sehr klein.<br>\n • In der Dose entsteht ein Unterdruck – der äußere Luftdruck drückt die Dose zusammen.<br>\n Das zeigt: Gase brauchen bei hoher Temperatur mehr Platz – und ziehen sich beim Abkühlen stark zusammen.</p>"
+            },
+            {
+                "type": "text",
+                "content": "<p><b>Was hat das mit dem Alltag zu tun?</b><br>\n • Industrietanks & Dampfkessel:<br>\n   → Wenn große Metallbehälter mit heißem Dampf befüllt wurden und danach schnell abkühlen, kann das ganze Ding eingedrückt werden – wie die Dose. Deshalb gibt es Sicherheitsventile!<br>\n • Wasserdampf in der Küche:<br>\n   → Wenn du z. B. einen Topf mit Dampf luftdicht verschließt und ihn dann in kaltes Wasser stellst, „zieht“ sich der Deckel stark fest.<br>\n • Thermosflaschen & Plastikbehälter:<br>\n   → Werden sie mit heißem Inhalt verschlossen und abgekühlt, ziehen sie sich zusammen oder knicken ein → weil sich der Luftdruck innen stark verändert.</p>"
+            },
+            {
+                "type": "text",
+                "content": "<br></br>"
+            },
+            {
+                "type": "text",
+                "content": "<p><b><u>3.1.2 Wie Dampf wieder zu Wasser wird</u></b></p>\n\n<p><b>Was du brauchst:</b><br>\n • 1 Wasserkocher oder Kochtopf mit Deckel<br>\n • 1 Glasscheibe (z. B. Backofenglas, Glasdeckel oder dicke Folie)<br>\n • 1 kleiner Topf (für die Destillationsvariante)</p>\n\n<p><b>So geht’s:</b><br>\nFülle den Wasserkocher mit Wasser und schalte ihn ein.<br>\nSobald das Wasser kocht und Dampf aufsteigt, halte die Glasscheibe waagrecht über die Öffnung (vorsichtig!).<br>\nBeobachte, was auf der Scheibe passiert.</p>"
+            },
+            {
+                "type": "aufgabe",
+                "content": "<p><i>Was fällt dir auf?<br>\n • Die Glasscheibe wird nass – warum?</i></p>"
+            },
+            {
+                "type": "merksatz",
+                "content": "<p><b>Erklärung:</b><br>\n • Der heiße Wasserdampf trifft auf die kühle Scheibe.<br>\n • Dort kühlt er schnell ab – der Wasserdampf wird wieder flüssig.<br>\n • Das nennt man Kondensation.<br>\n Das Wasser wechselt vom gasförmigen zurück in den flüssigen Aggregatzustand.</p>"
+            },
+            {
+                "type": "text",
+                "content": "<p><b>Was hat das mit dem Alltag zu tun?</b><br>\n • Beim Duschen: Der Spiegel beschlägt – Wasserdampf trifft auf kaltes Glas → Kondensation.<br>\n • Im Winter: An kalten Fenstern bilden sich Tropfen → Warme, feuchte Luft kondensiert.<br>\n • Wolken und Regen: In der Atmosphäre kühlt aufsteigender Wasserdampf ab und bildet Tröpfchen → Wolken → später Regen.</p>"
+            },
+            {
+                "type": "text",
+                "content": "<p><b>Teil 2: Mini-Destille – Wie man reines Wasser gewinnt</b></p>\n\n<p><b>Zusätzliche Durchführung:</b><br>\nBringe Wasser in einem großen Topf zum Kochen.<br>\nHalte eine Glasscheibe schräg darüber (z. B. mit einem Kochlöffel stützen).<br>\nUnter dem tieferliegenden Ende der Glasscheibe steht ein kleiner Topf.<br>\nWarte einige Minuten – Wasser beginnt hineinzutropfen.</p>"
+            },
+            {
+                "type": "aufgabe",
+                "content": "<p><i>Was passiert?<br>\n • Was bildet sich auf der Glasplatte, wenn du sie über den Wasserdampf hältst?<br>\n • Warum wird aus dem unsichtbaren Dampf plötzlich wieder flüssiges Wasser?<br>\n • Was zeigt uns das über den Unterschied zwischen Gas und Flüssigkeit?<br>\n • Wie hängt die Temperatur der Glasplatte mit der Veränderung des Aggregatzustands zusammen?</i></p>"
+            },
+            {
+                "type": "merksatz",
+                "content": "<p><b>Erklärung:</b><br>\n • Das ist eine einfache Form der Destillation:<br>\n Man trennt Stoffe über den Aggregatzustand → zuerst Verdampfen, dann Kondensieren.</p>"
+            },
+            {
+                "type": "text",
+                "content": "<p><b>Was hat das mit dem Alltag zu tun?</b><br>\n • Meerwasserentsalzung: In heißen Regionen gewinnt man Trinkwasser aus Meerwasser durch Destillation.<br>\n • In der Chemie & Medizin: Viele Stoffe werden so gereinigt – z. B. Alkohol, ätherische Öle oder Medikamente.<br>\n • Destilliertes Wasser: Wird so hergestellt – zum Bügeln oder für Autobatterien.</p>"
+            },
+            {
+                "type": "text",
+                "content": "<br></br>"
+            },
+            {
+                "type": "text",
+                "content": "<p><b><u>3.1.3 Frostschutz: Warum friert nicht alles ein?</u></b></p>\n\n<p><b>Was du brauchst:</b><br>\n • 1 Einweckglas oder große Schüssel<br>\n • Eiswürfel (zerkleinert)<br>\n • 1 Esslöffel Kochsalz<br>\n • 2 Reagenzgläser<br>\n • Glycerin (gibt’s in der Apotheke oder online)<br>\n • Wasser</p>\n\n<p><b>So geht’s:</b><br>\n1. Zerkleinere das Eis und gib es in das Einweckglas.<br>\n2. Gib etwa einen Löffel Salz über das Eis.<br>\n<span style=\"color:red;\"><b>Achtung:</b> Die Mischung wird kälter als Eiswasser – nicht mit bloßen Händen anfassen!</span><br>\n3. Fülle ein Reagenzglas etwa 3 cm hoch mit Glycerin.<br>\n4. Fülle das andere Reagenzglas ebenfalls 3 cm hoch mit Wasser.<br>\n5. Stelle beide Reagenzgläser in das Eis-Salz-Gemisch.<br>\n6. Warte einige Minuten.<br>\n7. Nimm beide Reagenzgläser heraus und beobachte.</p>"
+            },
+            {
+                "type": "aufgabe",
+                "content": "<p><i>Was fällt dir auf?<br>\n • Was kannst du nach einiger Zeit bei den beiden Reagenzgläsern beobachten?<br>\n • Welcher Stoff friert ein – und welcher nicht?</i></p>"
+            },
+            {
+                "type": "merksatz",
+                "content": "<p><b>Erklärung:</b><br>\n • Durch das Salz wird das Eis so stark abgekühlt, dass eine Kältemischung entsteht.<br>\n • Diese Kältemischung kann Temperaturen unter –10 °C erreichen.<br>\n • Wasser friert bei 0 °C – deshalb gefriert es hier schnell.<br><br>\n • Glycerin hat einen Schmelzpunkt von etwa –19 °C – es bleibt also flüssig.<br>\n Das Glycerin hat einen Frostschutz-Effekt.</p>"
+            },
+            {
+                "type": "text",
+                "content": "<p><b>Was hat das mit dem Alltag zu tun?</b><br>\n • Scheibenfrostschutz im Auto:<br> In kalten Wintern mischt man Glycerin oder Alkohol ins Wischwasser – damit es nicht in den Leitungen gefriert.<br>\n • Kühlmittel im Auto (z. B. mit Ethylenglykol):<br> Damit der Motorkühler nicht platzt, wird ein Frostschutzmittel beigemischt.<br>\n • Medizin:<br> Glycerin wird auch als Frostschutz in Medikamenten oder in der Tiefkühl-Lagerung von Zellen verwendet.</p>"
+            },
+            {
+                "type": "text",
+                "content": "<br></br>"
+            },
+            {
+                "type": "text",
+                "content": "<p><b><u>4.1.1 Der sich biegende Draht</u></b></p>\n\n<p><b>Was du brauchst:</b><br>\n • 1 Metalldraht (z. B. aus Eisen oder Kupfer)<br>\n • 1 gebogener Nagel (als Zeiger)<br>\n • 2 stabile Stangen oder Stativstangen zum Einspannen<br>\n • Papier (für Hintergrundmarkierung)<br>\n • Hitzequelle: Bunsenbrenner, Kerze oder Feuerzeug</p>\n\n<p><b>So geht’s:</b><br>\n1. Spanne den Metalldraht zwischen den beiden Stangen fest ein, sodass er straff gespannt ist.<br>\n2. Hänge den gebogenen Nagel genau in die Mitte des Drahts – er dient als Zeiger.<br>\n3. Befestige ein weißes Papier im Hintergrund hinter dem Nagel und markiere die Ausgangsposition.<br>\n4. Jetzt erhitze vorsichtig den Draht in der Mitte mit der Hitzequelle.<br>\n5. Beobachte, was mit dem Nagel passiert!</p>"
+            },
+            {
+                "type": "aufgabe",
+                "content": "<p><i>Was fällt dir auf?<br>\n • Bewegt sich der Nagel, nachdem du den Draht erhitzt hast?<br>\n • In welche Richtung bewegt er sich – und warum gerade dorthin?<br>\n • Was passiert mit dem Draht, wenn er wieder abkühlt?<br>\n • Wie hängt die Bewegung mit der Temperatur des Metalls zusammen?</i></p>"
+            },
+            {
+                "type": "merksatz",
+                "content": "<p><b>Erklärung:</b><br>\n • Metalle dehnen sich aus, wenn sie warm werden.<br>\n • Dabei verlängert sich der Draht in der Mitte, was dazu führt, dass der Nagel sich bewegt.<br>\n • Beim Abkühlen zieht sich der Draht wieder zusammen und der Nagel kehrt zur Ausgangsposition zurück.<br>\n • Dieses Verhalten nennt man thermische Ausdehnung.</p>"
+            },
+            {
+                "type": "text",
+                "content": "<p><b>Was hat das mit dem Alltag zu tun?</b>🪢<br>\n • Stromleitungen hängen im Sommer stärker durch:<br> Die Kabel dehnen sich durch Sonneneinstrahlung aus – im Winter sind sie dagegen kürzer und gespannter.<br>\n • Brücken haben Dehnfugen (kleine Spalten):<br> Diese Ausdehnungsfugen verhindern, dass sich die Brücke bei Hitze verformt oder Risse bekommt.<br>\n • Gleise bei der Bahn:<br> Schienen müssen mit Spielraum verlegt werden, da sie sich bei Hitze ausdehnen und sich sonst verdrücken könnten (→ Gleisverwerfungen im Sommer).</p>"
+            },
+            {
+                "type": "text",
+                "content": "<br></br>"
+            },
+            {
+                "type": "text",
+                "content": "<p><b><u>5.1.1 – Wärmeleitung: Welcher Löffel wird heiß?</u></b></p>\n\n<p><b>Was du brauchst:</b><br>\n • 1 Tasse<br>\n • 1 Teebeutel<br>\n • 1 Metalllöffel (z. B. Edelstahl)<br>\n • 1 Plastiklöffel<br>\n • Heißes Wasser</p>\n\n<p><b>So geht’s:</b><br>\n1. Gib den Teebeutel in die Tasse.<br>\n2. Fülle die Tasse mit heißem Wasser auf.<br>\n3. Lege beide Löffel gleichzeitig in die Tasse (jeweils mit dem Griff nach außen).<br>\n4. Warte etwa 5–8 Minuten, bis der Tee gezogen ist.<br>\n5. Fasse zuerst den Plastiklöffel, dann den Metalllöffel am Griff an.</p>"
+            },
+            {
+                "type": "aufgabe",
+                "content": "<p><i>Was fällt dir auf?<br>\n • Wie fühlt sich der Plastiklöffel an?<br>\n • Ist der Metalllöffel gleich warm oder wärmer?<br>\n • Woran könnte das liegen?<br>\n • Leiten alle Materialien Wärme gleich gut?</i></p>"
+            },
+            {
+                "type": "merksatz",
+                "content": "<p><b>Erklärung:</b><br>\n • Metall leitet Wärme sehr gut – die Hitze vom heißen Wasser wird über den Metalllöffel schnell bis zum Griff transportiert, deshalb wird er heiß.<br>\n • Plastik leitet Wärme schlecht, daher bleibt der Plastiklöffel am Griff kühl.<br>\n • Wärmeleitung ist der Prozess, bei dem Wärmeenergie von einem wärmeren Bereich zu einem kälteren Bereich fließt – in Metallen besonders effizient durch die Bewegung freier Elektronen.</p>"
+            },
+            {
+                "type": "text",
+                "content": "<p><b>Was hat das mit dem Alltag zu tun?</b><br>\n • Kochbesteck aus Kunststoff oder Holz bleibt am Griff kühl – ideal beim Kochen.<br>\n • Hitzeschutzbleche und Isoliermaterialien bestehen aus Stoffen, die Wärme schlecht leiten, um Verbrennungen zu vermeiden.</p>"
+            },
+            {
+                "type": "text",
+                "content": "<br></br>"
+            },
+            {
+                "type": "text",
+                "content": "<p><b><u>5.1.2 – Die Thermoflasche</u></b></p>\n\n<p><b>Was du brauchst:</b><br>\n• 2 Stückchen Butter<br>\n• 1 großes Marmeladenglas<br>\n• 2 kleine Marmeladengläser, die ins große passen<br>\n• Heißes Wasser</p>\n\n<p><b>So geht’s:</b><br>\n1. Stelle ein kleines Marmeladenglas in das große Glas.<br>\n2. Klebe ein Stück Butter außen an das kleine Glas (das nicht im großen Glas steht).<br>\n3. Klebe das zweite Butterstück an die Außenwand des großen Glases.<br>\n4. Fülle heißes Wasser in beide kleinen Gläser.<br>\n5. Warte einige Minuten und beobachte die Butterstücke.</p>"
+            },
+            {
+                "type": "aufgabe",
+                "content": "<p><i>Was fällt dir auf?<br>\n• Welches Butterstück beginnt zuerst zu schmelzen?<br>\n• Warum ist das so, obwohl beide Gläser heißes Wasser enthalten?<br>\n• Was könnte die Rolle der Luft zwischen den Gläsern sein?</i></p>"
+            },
+            {
+                "type": "merksatz",
+                "content": "<p><b>Erklärung:</b><br>\n• Die Butter am freien kleinen Glas (nicht im großen) schmilzt schneller, weil sie direkten Kontakt mit der heißen Wand hat.<br>\n• Die Butter an der Außenseite im großen Glas bekommt die Wärme nur über die Luftschicht dazwischen.<br>\n• Luft leitet Wärme sehr schlecht – deshalb bleibt die Außenwand des großen Glases länger kühl.</p>"
+            },
+            {
+                "type": "text",
+                "content": "<p><b>Was hat das mit dem Alltag zu tun?</b><br>\n• In einer Thermoflasche gibt es zwischen dem Innen- und Außengefäß Luft oder sogar ein Vakuum.<br>\n• Dadurch wird kaum Wärme nach außen geleitet – die heiße Flüssigkeit bleibt über Stunden warm.<br>\n• Genauso funktioniert es auch umgekehrt: Kalte Getränke bleiben länger kalt, weil Wärme nicht so leicht hinein kommt.</p>"
+            },
+            {
+                "type": "text",
+                "content": "<br></br>"
+            },
+            {
+                "type": "text",
+                "content": "<p><b><u>6.1.1 – Die Zentralheizung: Wie zirkuliert Wärme?</u></b></p>\n\n<p><b>Was du brauchst:</b><br>\n • 1 Stativ mit Halterung<br>\n • 1 geschlossenes Glasrohr (kreisförmig) mit kleiner Öffnung<br>\n • Wasser<br>\n • Tinte<br>\n • Bunsenbrenner oder andere Wärmequelle</p>\n\n<p><b>So geht’s:</b><br>\n1. Fülle das Glasrohr vollständig mit Wasser.<br>\n2. Gib 2–3 Tropfen Tinte über die Öffnung ins Rohr.<br>\n3. Befestige das Glasrohr waagerecht am Stativ.<br>\n4. Erhitze eine Stelle des Rohrs (z. B. den unteren Teil eines vertikalen Abschnitts) mit dem Bunsenbrenner.<br>\n5. Beobachte, wie sich die Tinte verhält.</p>"
+            },
+            {
+                "type": "aufgabe",
+                "content": "<p><i>Was fällt dir auf?<br>\n • Bewegt sich die Tinte?<br>\n • Entsteht eine Strömung im Wasser?<br>\n • Lässt sich ein Kreislauf erkennen?</i></p>"
+            },
+            {
+                "type": "merksatz",
+                "content": "<p><b>Erklärung:</b><br>\n • Erwärmtes Wasser dehnt sich aus → seine Dichte nimmt ab → es steigt auf.<br>\n • Das Wasser nimmt die Tinte mit und wandert im Rohr weiter.<br>\n • An anderer Stelle kühlt sich das Wasser ab, wird dichter und sinkt wieder ab.<br>\n • Ergebnis: eine kreisförmige Strömung – ein sogenannter Konvektionsstrom entsteht.</p>"
+            },
+            {
+                "type": "text",
+                "content": "<p><b>Was hat das mit dem Alltag zu tun?</b><br>\n • <b>Zentralheizung:</b> In klassischen Heizkörpern (ohne Pumpe) steigt warmes Wasser von allein auf, kaltes sinkt ab – genau wie in deinem Experiment.<br>\n • <b>Passatwinde & Wetter:</b> Warme Luft steigt am Äquator auf, kühlt in der Höhe ab, sinkt in anderen Breiten wieder – so entstehen Luftzirkulationen wie Passat- und Westwinde.<br>\n • <b>Plattentektonik:</b> Im Erdmantel fließt Gestein ganz langsam in riesigen Konvektionsströmen – das bewegt die Erdplatten und führt zu Erdbeben, Vulkanismus und Gebirgsbildung.</p>"
+            },
+            {
+                "type": "text",
+                "content": "<br></br>"
+            },
+            {
+                "type": "text",
+                "content": "<p><b><u>6.1.2 – Das Glashaus: Warum bleibt es dahinter warm?</u></b></p>\n\n<p><b>Was du brauchst:</b><br>\n • Wärmelampe oder Infrarotstrahler<br>\n • Glasscheibe<br>\n • Holzbrett<br>\n • Stativ/Halterung (zum Fixieren der Scheibe/Brett)<br>\n • Deine Hand als Wärmesensor</p>\n\n<p><b>So geht’s:</b><br>\n1. Spanne die Glasscheibe so ein, dass sie senkrecht steht.<br>\n2. Stelle die Wärmelampe in ca. 20 cm Entfernung vor die Glasscheibe.<br>\n3. Schalte die Lampe ein und halte deine Hand hinter die Glasscheibe.<br>\n4. Notiere, was du fühlst.<br>\n5. Wiederhole den Versuch mit dem Holzbrett statt der Glasscheibe.</p>"
+            },
+            {
+                "type": "aufgabe",
+                "content": "<p><i>Was fällt dir auf?<br>\n • Spürst du Wärme hinter dem Glas?<br>\n • Spürst du auch Wärme hinter dem Holz?<br>\n • Wo ist der Unterschied? Warum?</i></p>"
+            },
+            {
+                "type": "merksatz",
+                "content": "<p><b>Erklärung:</b><br>\n • Infrarotstrahlung (Wärmestrahlung) kann durch Glas hindurchtreten, trifft also auf deine Hand – du spürst Wärme.<br>\n • Holz absorbiert die Wärmestrahlung – sie kommt nicht auf der anderen Seite an.<br>\n • Glas wirkt also wie ein Filter, der bestimmte Strahlung durchlässt – aber auch gewisse Wärmestrahlung „einsperren“ kann.</p>"
+            },
+            {
+                "type": "text",
+                "content": "<p><b>Was hat das mit dem Alltag zu tun?</b><br>\n • <b>Gewächshaus-Effekt (Treibhauseffekt):</b><br>\n Sonnenlicht dringt durch die Glasdecke eines Gewächshauses.<br>\n Der Boden erwärmt sich und sendet Infrarotstrahlung zurück, die aber nicht mehr entweichen kann – das Innere heizt sich auf.<br>\n • <b>Ähnlich auf der Erde:</b><br>\n Der Treibhauseffekt entsteht durch Gase wie CO₂ oder Methan, die Wärmestrahlung zurückhalten.<br>\n • <b>Fenster in Häusern:</b><br>\n Isolierglas wird gezielt hergestellt, um Wärmestrahlung zu regulieren – zum Beispiel in Wärmeschutzfenstern oder zur Solargewinnung.<br>\n • <b>Aufgeheizte Autos im Sommer:</b><br>\n Sonnenlicht dringt durch die Autoscheiben, der Innenraum erwärmt sich – aber die Wärme kann nicht mehr hinaus: Mini-Gewächshaus-Effekt.</p>"
             }
         ],
         "schoolType": "Gemeinschaftsschule"
@@ -1771,48 +1530,6 @@
         "schoolType": "Gemeinschaftsschule"
     },
     {
-        "title": "Mechanik Aufgaben",
-        "shortDescription": "<p>\nIn der Mechanik dreht sich alles um Bewegung, Kräfte und Energie!<br>\nHier findest du spannende Aufgaben zu Geschwindigkeit, Kraft, Arbeit und vielem mehr. Die Aufgaben helfen dir, besser zu verstehen, wie sich Dinge bewegen und warum manche schwerer anzuschieben sind als andere.\n</p>\n<p>\nEntdecke, wie Physik deinen Alltag beeinflusst – ganz einfach erklärt und mit vielen Aha-Momenten!\n</p>\n<p><b>Viel Freude beim Tüfteln und Rechnen wünscht dir dein AlltagsLabor!</b></p>\n",
-        "subject": "Physik",
-        "gradeLevel": "7",
-        "steps": [
-            {
-                "type": "aufgabe",
-                "content": "<h2>Mechanik – Übungsaufgaben</h2>\n\n<h3>Rechenaufgaben</h3>\n\n<ol>\n  <li>\n    <p>Ein Auto fährt mit einer Geschwindigkeit von 20 m/s. Wie weit fährt es in 5 Sekunden?</p>\n    <p><b>Formel:</b> Weg = Geschwindigkeit × Zeit</p>\n  </li>\n  \n  <li>\n    <p>Ein Fahrradfahrer tritt mit einer Kraft von 50 N in die Pedale. Wie groß ist die Kraft, wenn er die Kraft verdoppelt?</p>\n  </li>\n  \n  <li>\n    <p>Ein Gegenstand hat eine Masse von 10 kg. Wie groß ist seine Gewichtskraft auf der Erde? (Erdbeschleunigung g = 9,81 m/s²)</p>\n    <p><b>Formel:</b> Gewichtskraft = Masse × Erdbeschleunigung</p>\n  </li>\n  \n  <li>\n    <p>Ein Ball wird mit 15 N Kraft nach oben geworfen. Welche Kraft wirkt auf den Ball durch die Erdanziehung, wenn seine Masse 1,5 kg beträgt?</p>\n  </li>\n</ol>\n\n<h3>Logikaufgaben</h3>\n\n<ol>\n  <li>\n    <p>Warum bleibt ein Buch liegen, wenn du es auf den Tisch legst?</p>\n  </li>\n  \n  <li>\n    <p>Ein Radfahrer fährt bergab schneller als bergauf. Warum?</p>\n  </li>\n  \n  <li>\n    <p>Wenn du gegen eine Wand drückst, bewegt sich die Wand nicht. Warum spürst du trotzdem einen Widerstand?</p>\n  </li>\n  \n  <li>\n    <p>Ein Gegenstand fällt zu Boden. Warum fällt er nicht seitlich oder nach oben?</p>\n  </li>\n</ol>"
-            },
-            {
-                "type": "text",
-                "content": "<br></br><br></br><br></br><br></br><br></br>"
-            },
-            {
-                "type": "merksatz",
-                "content": "<h2>Mechanik – Lösungen</h2>\n\n<h3>Rechenaufgaben</h3>\n\n<ol>\n  <li>\n    <p><b>Aufgabe:</b> Ein Auto fährt mit 20 m/s. Wie weit fährt es in 5 Sekunden?</p>\n    <p><b>Lösung:</b> Weg = Geschwindigkeit × Zeit = 20 m/s × 5 s = 100 m</p>\n  </li>\n\n  <li>\n    <p><b>Aufgabe:</b> Fahrradfahrer tritt mit 50 N Kraft. Wie groß ist die Kraft, wenn er sie verdoppelt?</p>\n    <p><b>Lösung:</b> 50 N × 2 = 100 N</p>\n  </li>\n\n  <li>\n    <p><b>Aufgabe:</b> Masse = 10 kg. Gewichtskraft auf Erde berechnen (g = 9,81 m/s²)</p>\n    <p><b>Lösung:</b> Gewichtskraft = Masse × g = 10 kg × 9,81 m/s² = 98,1 N</p>\n  </li>\n\n  <li>\n    <p><b>Aufgabe:</b> Ball mit 15 N Kraft nach oben geworfen, Masse 1,5 kg. Gewichtskraft berechnen.</p>\n    <p><b>Lösung:</b> Gewichtskraft = Masse × g = 1,5 kg × 9,81 m/s² = 14,7 N</p>\n  </li>\n</ol>\n\n<h3>Logikaufgaben</h3>\n\n<ol>\n  <li>\n    <p><b>Frage:</b> Warum bleibt ein Buch auf dem Tisch liegen?</p>\n    <p><b>Antwort:</b> Weil die Kräfte ausgeglichen sind. Die Schwerkraft zieht das Buch nach unten, der Tisch hält es nach oben.</p>\n  </li>\n\n  <li>\n    <p><b>Frage:</b> Warum fährt ein Radfahrer bergab schneller als bergauf?</p>\n    <p><b>Antwort:</b> Weil die Schwerkraft ihn bergab zieht, beim Bergauffahren muss er gegen die Schwerkraft arbeiten.</p>\n  </li>\n\n  <li>\n    <p><b>Frage:</b> Warum spürt man Widerstand, wenn man gegen eine Wand drückt?</p>\n    <p><b>Antwort:</b> Die Wand übt eine gleich große Kraft zurück aus (Reaktionskraft), deshalb spürst du Widerstand.</p>\n  </li>\n\n  <li>\n    <p><b>Frage:</b> Warum fällt ein Gegenstand gerade nach unten?</p>\n    <p><b>Antwort:</b> Weil die Schwerkraft ihn zur Erde zieht und es keine Kraft gibt, die ihn zur Seite oder nach oben zieht.</p>\n  </li>\n</ol>"
-            }
-        ],
-        "schoolType": "Gemeinschaftsschule"
-    },
-    {
-        "title": "Elektrizitätslehre Aufgaben",
-        "shortDescription": "<p>\nWas ist eigentlich Strom – und warum geht ohne ihn fast nichts mehr?<br>\nHier findest du Aufgaben, bei denen du Stromstärke, Spannung und Widerstand berechnen kannst. Du lernst spielerisch, wie ein Stromkreis funktioniert und wie Energie genutzt wird.\n</p>\n<p>\nSchalte dein Wissen ein – es wird elektrisierend!\n</p>\n<p><b>Viel Freude beim Tüfteln und Rechnen wünscht dir dein AlltagsLabor!</b></p>\n",
-        "subject": "Physik",
-        "gradeLevel": "7",
-        "steps": [
-            {
-                "type": "aufgabe",
-                "content": "<h2>Elektrizitätslehre – Übungsaufgaben</h2>\n\n<h3>Rechenaufgaben</h3>\n\n<ol>\n  <li>\n    <p><b>Aufgabe:</b> Ein Strom fließt mit einer Stärke von 2 Ampere für 3 Sekunden. Wie viel Ladung fließt?</p>\n  </li>\n  <li>\n    <p><b>Aufgabe:</b> Eine Batterie liefert eine Spannung von 9 Volt. Wenn der Strom 0,5 Ampere beträgt, wie groß ist der Widerstand im Stromkreis?</p>\n  </li>\n  <li>\n    <p><b>Aufgabe:</b> Ein elektrisches Gerät hat eine Leistung von 60 Watt und wird 2 Stunden benutzt. Wie viel Energie verbraucht es in Wattstunden?</p>\n  </li>\n  <li>\n    <p><b>Aufgabe:</b> In einem Stromkreis fließen 4 Ampere bei 12 Volt. Berechne die elektrische Leistung.</p>\n  </li>\n</ol>\n\n<h3>Logikaufgaben</h3>\n\n<ol>\n  <li>\n    <p><b>Frage:</b> Warum fließt Strom nur, wenn der Stromkreis geschlossen ist?</p>\n  </li>\n  <li>\n    <p><b>Frage:</b> Was passiert mit dem Strom, wenn der Widerstand größer wird?</p>\n  </li>\n  <li>\n    <p><b>Frage:</b> Warum braucht eine Glühbirne Spannung, um zu leuchten?</p>\n  </li>\n  <li>\n    <p><b>Frage:</b> Warum ist es gefährlich, mit nassen Händen an elektrische Geräte zu fassen?</p>\n  </li>\n</ol>"
-            },
-            {
-                "type": "text",
-                "content": "<br></br><br></br><br></br><br></br><br></br>"
-            },
-            {
-                "type": "merksatz",
-                "content": "<h2>Elektrizitätslehre – Übungsaufgaben mit Lösungen</h2>\n\n<h3>Rechenaufgaben</h3>\n\n<ol>\n  <li>\n    <p><b>Aufgabe:</b> Ein Strom fließt mit einer Stärke von 2 Ampere für 3 Sekunden. Wie viel Ladung fließt?</p>\n    <p><b>Formel:</b> Q = I * t</p>\n    <p><b>Lösung:</b> Q = 2 A * 3 s = 6 Coulomb</p>\n  </li>\n  <li>\n    <p><b>Aufgabe:</b> Eine Batterie liefert eine Spannung von 9 Volt. Wenn der Strom 0,5 Ampere beträgt, wie groß ist der Widerstand im Stromkreis?</p>\n    <p><b>Formel:</b> R = U / I</p>\n    <p><b>Lösung:</b> R = 9 V / 0,5 A = 18 Ohm</p>\n  </li>\n  <li>\n    <p><b>Aufgabe:</b> Ein elektrisches Gerät hat eine Leistung von 60 Watt und wird 2 Stunden benutzt. Wie viel Energie verbraucht es in Wattstunden?</p>\n    <p><b>Formel:</b> E = P * t</p>\n    <p><b>Lösung:</b> E = 60 W * 2 h = 120 Wh</p>\n  </li>\n  <li>\n    <p><b>Aufgabe:</b> In einem Stromkreis fließen 4 Ampere bei 12 Volt. Berechne die elektrische Leistung.</p>\n    <p><b>Formel:</b> P = U * I</p>\n    <p><b>Lösung:</b> P = 12 V * 4 A = 48 Watt</p>\n  </li>\n</ol>\n\n<h3>Logikaufgaben</h3>\n\n<ol>\n  <li>\n    <p><b>Frage:</b> Warum fließt Strom nur, wenn der Stromkreis geschlossen ist?</p>\n    <p><b>Antwort:</b> Weil der Strom einen geschlossenen Weg braucht, um fließen zu können. Ist der Kreis offen, kann der Strom nicht durchfließen.</p>\n  </li>\n  <li>\n    <p><b>Frage:</b> Was passiert mit dem Strom, wenn der Widerstand größer wird?</p>\n    <p><b>Antwort:</b> Der Strom wird kleiner, weil der Widerstand den Fluss der Ladungen bremst.</p>\n  </li>\n  <li>\n    <p><b>Frage:</b> Warum braucht eine Glühbirne Spannung, um zu leuchten?</p>\n    <p><b>Antwort:</b> Die Spannung sorgt dafür, dass der Strom durch den Draht in der Glühbirne fließt und ihn zum Leuchten bringt.</p>\n  </li>\n  <li>\n    <p><b>Frage:</b> Warum ist es gefährlich, mit nassen Händen an elektrische Geräte zu fassen?</p>\n    <p><b>Antwort:</b> Weil Wasser Strom leitet und dadurch Strom durch den Körper fließen kann, was zu einem elektrischen Schlag führt.</p>\n  </li>\n</ol>"
-            }
-        ],
-        "schoolType": "Gemeinschaftsschule"
-    },
-    {
         "title": "Wärmelehre Aufgaben",
         "shortDescription": "<p>\nIn der Wärmelehre wird es heiß – aber keine Sorge, nicht zu schwierig!<br>\nHier erfährst du, wie sich Stoffe beim Erwärmen verändern, wie Wärme übertragen wird und warum eine Wärmflasche warm bleibt. Die Aufgaben bringen dir bei, wie Temperatur, Energie und Materialien zusammenhängen.\n</p>\n<p>\nFinde heraus, wie Wärme im Alltag wirkt – Schritt für Schritt und mit viel Neugier!\n</p>\n<p><b>Viel Freude beim Tüfteln und Rechnen wünscht dir dein AlltagsLabor!</b></p>\n",
         "subject": "Physik",
@@ -1829,6 +1546,292 @@
             {
                 "type": "merksatz",
                 "content": "<h2>Wärmelehre – Lösungen</h2>\n\n<h3>Rechenaufgaben</h3>\n\n<ol>\n  <li>\n    <p><b>Aufgabe:</b> Ein Liter Wasser (1 kg) wird um 10 °C erwärmt. Wie viel Wärme wird benötigt?<br>\n    (c = 4,18 J/g°C)</p>\n    <p><b>Lösung:</b><br>\n    m = 2 kg = 2000 g<br>\n    ΔT = 10 °C<br>\n    Q = m · c · ΔT = 2000 · 4,18 · 10 = <b>83.600 J</b></p>\n  </li>\n\n  <li>\n    <p><b>Aufgabe:</b> Ein Metallblock mit 500 g wird um 30 °C erhitzt. Der Stoff hat die Wärmekapazität c = 0,9 J/g°C. Wie viel Wärme wird zugeführt?</p>\n    <p><b>Lösung:</b><br>\n    Q = m · c · ΔT = 500 · 0,9 · 30 = <b>13.500 J</b></p>\n  </li>\n\n  <li>\n    <p><b>Aufgabe:</b> Ein Stoff nimmt 500 J Wärme auf, seine Wärmekapazität ist 20 J/K. Um wie viel Grad steigt seine Temperatur?</p>\n    <p><b>Lösung:</b><br>\n    ΔT = Q / C = 500 / 20 = <b>25 K</b></p>\n  </li>\n\n  <li>\n    <p><b>Aufgabe:</b> 3 kg Wasser werden von 15 °C auf 100 °C erhitzt. Wie viel Wärme wird dafür benötigt?<br>\n    (c = 4,18 J/g°C)</p>\n    <p><b>Lösung:</b><br>\n    m = 3 kg = 3000 g<br>\n    ΔT = 85 °C<br>\n    Q = 3000 · 4,18 · 85 = <b>1.066.050 J</b></p>\n  </li>\n</ol>\n\n<h3>Logikaufgaben</h3>\n\n<ol>\n  <li>\n    <p><b>Frage:</b> Warum fühlt sich ein Metalllöffel kälter an als ein Holzlöffel, obwohl beide im selben Raum liegen?</p>\n    <p><b>Antwort:</b> Metall leitet Wärme gut und entzieht der Haut schnell Wärme – es fühlt sich kälter an als Holz, das schlecht leitet.</p>\n  </li>\n\n  <li>\n    <p><b>Frage:</b> Was passiert mit der Temperatur eines Stoffes, wenn ihm Wärme zugeführt oder entzogen wird?</p>\n    <p><b>Antwort:</b> Wird Wärme zugeführt, steigt die Temperatur. Wird sie entzogen, sinkt sie – außer beim Schmelzen oder Verdampfen.</p>\n  </li>\n\n  <li>\n    <p><b>Frage:</b> Warum dehnt sich ein Metallstab bei Erwärmung aus?</p>\n    <p><b>Antwort:</b> Die Teilchen bewegen sich bei Wärme stärker und brauchen mehr Platz – dadurch dehnt sich das Metall aus.</p>\n  </li>\n\n  <li>\n    <p><b>Frage:</b> Warum hält eine Thermoskanne Getränke lange warm?</p>\n    <p><b>Antwort:</b> Sie verhindert Wärmeverlust durch Vakuum, silberne Wände und gute Isolation – so bleibt die Wärme drin.</p>\n  </li>\n</ol>"
+            }
+        ],
+        "schoolType": "Gemeinschaftsschule"
+    }, 
+    {
+        "title": "Optik Experimente",
+        "shortDescription": "<p><strong>In der Optik geht dir ein Licht auf!</strong><br>\nHier geht es darum, wie Licht funktioniert, wie wir sehen – und warum manchmal alles ganz anders aussieht, als es wirklich ist.</p>\n\n<p>Auf dieser Seite findest du einfache Experimente.<br>\nDu kannst sie ganz leicht zu Hause oder in der Schule nachmachen.</p>\n\n<p>Wir erklären dir auch:<br>\n– Was dabei in der Physik passiert.<br>\n– Wo du das im Alltag erleben kannst.</p>\n\n<p><strong>Viel Spaß beim Forschen und Ausprobieren!<br>\nWünscht euch das AlltagsLabor.</strong></p>",
+        "subject": "Physik",
+        "gradeLevel": "7",
+        "steps": [
+            {
+                "type": "text",
+                "content": "<p><b><u>1. Geradlinige Ausbreitung des Lichts</u></b></p>\n\n<p><b>Ziel:</b><br>\nUntersuchung der geradlinigen Ausbreitung von Licht anhand eines einfachen Schattenexperiments.</p>\n\n<p><b>Was du brauchst:</b><br>\n• Experimentierleuchte oder Taschenlampe<br>\n• Kamm<br>\n• Weißes Papier oder eine weiße Wand als Projektionsfläche</p>\n\n<p><b>So geht’s:</b><br>\n1. Stelle den Kamm senkrecht auf und positioniere ihn etwa 20–30 cm vor einer weißen Wand oder einem weißen Blatt Papier.<br>\n2. Richte den Lichtstrahl der Taschenlampe so auf den Kamm, dass der Lichtkegel durch die Zwischenräume der Zinken auf die Wand fällt.<br>\n3. Achte darauf, dass der Raum möglichst abgedunkelt ist, damit das Ergebnis gut sichtbar ist.</p>"
+            },
+            {
+                "type": "aufgabe",
+                "content": "<p><b>Was fällt dir auf?</b><br>\n• Auf der Wand hinter dem Kamm erscheinen deutliche Schatten der Kammzinken.<br>\n• Ein fächerartiges Muster von Lichtstrahlen ist in den Zwischenräumen sichtbar.<br>\n• Die Licht- und Schattenbereiche verlaufen gerade und parallel zueinander.</p>"
+            },
+            {
+                "type": "merksatz",
+                "content": "<p><b>Erklärung:</b><br>\nLicht breitet sich geradlinig aus. Dies erkennt man daran, dass die Schatten der Kammzinken scharf und gerade sind und die Lichtstrahlen in den Zwischenräumen in geraden Linien verlaufen.</p>"
+            },
+            {
+                "type": "text",
+                "content": "<p><b>Was hat das mit dem Alltag zu tun?</b><br>\n• Diese geradlinige Ausbreitung von Licht erklärt zum Beispiel, warum wir klare Schatten sehen, wenn die Sonne auf ein Hindernis trifft.<br>\n• Auch bei einer Taschenlampe, die im Dunkeln Licht auf einen Weg wirft, entstehen durch die geradlinige Ausbreitung klare Licht- und Schattenbereiche, die uns Orientierung geben.</p>"
+            },
+            {
+                "type": "text",
+                "content": "<br></br>"
+            },
+            {
+                "type": "text",
+                "content": "<p><b><u>2. Lichtabsorption von Farben</u></b></p>\n\n<p><b>Ziel:</b><br>\nUntersuchen, wie unterschiedlich helle und dunkle Farben Licht absorbieren.</p>\n\n<p><b>Was du brauchst:</b><br>\n• Weißes Papier<br>\n• Schwarzes Papier<br>\n• Taschenlampe (helle Lichtquelle)<br>\n• Raum mit abgedunkeltem Licht oder dunkle Umgebung<br>\n• Zwei kleine, flache Unterlagen (z. B. Pappe oder Teller)</p>\n\n<p><b>So geht’s:</b><br>\n1. Lege das weiße Papier auf eine Unterlage und das schwarze Papier auf die andere Unterlage.<br>\n2. Halte die Taschenlampe so, dass sie von oben auf beide Papiere gleichzeitig scheint.<br>\n3. Beobachte die Helligkeit und das Licht, das von den beiden Papieren reflektiert wird.<br>\n4. Vergleiche, welches Papier mehr Licht zurückwirft und welches weniger.</p>"
+            },
+            {
+                "type": "aufgabe",
+                "content": "<p><b>Was fällt dir auf?</b><br>\n• Welches Papier reflektiert mehr Licht?<br>\n• Welches Papier scheint dunkler zu sein?<br>\n• Warum sieht das schwarze Papier dunkler aus?<br>\n• Wie hängt die Farbe mit der Lichtabsorption zusammen?</p>"
+            },
+            {
+                "type": "merksatz",
+                "content": "<p><b>Erklärung:</b><br>\nWenn Licht auf ein Material trifft, wird es entweder reflektiert (zurückgeworfen) oder absorbiert (aufgenommen).<br>\nWeißes Papier reflektiert fast das ganze Licht – deshalb sieht es hell aus.<br>\nSchwarzes Papier absorbiert fast das gesamte Licht und reflektiert sehr wenig – deswegen erscheint es dunkel.</p>"
+            },
+            {
+                "type": "text",
+                "content": "<p><b>Was hat das mit dem Alltag zu tun?</b><br>\n• Das erklärt auch, warum man an einem sonnigen Tag lieber ein weißes T-Shirt trägt als ein schwarzes:<br>\n• Das weiße T-Shirt reflektiert das Sonnenlicht und bleibt dadurch kühler.<br>\n• Das schwarze T-Shirt absorbiert das Licht und erwärmt sich schneller.</p>"
+            },
+            {
+                "type": "text",
+                "content": "<br></br>"
+            },
+            {
+                "type": "text",
+                "content": "<p><b><u>3. Schatten, Kernschatten und Halbschatten</u></b></p>\n\n<p><b>Ziel:</b><br>\nUntersuchen, wie Schatten entstehen und die Unterschiede zwischen Kernschatten und Halbschatten verstehen.</p>\n\n<p><b>Was du brauchst:</b><br>\n• Taschenlampe (oder Lampe mit stark gebündeltem Licht)<br>\n• Zwei Tischlampen (optional, für Mehrfachlichtquellen)<br>\n• Kugel oder runder Gegenstand (z. B. Tennisball oder Orange)<br>\n• Weißes Blatt Papier oder weiße Wand als Projektionsfläche<br>\n• Dunkler Raum oder abgedunkelter Bereich</p>\n\n<p><b>Vorbereitung:</b><br>\nStelle das weiße Papier oder die Wand als Projektionsfläche auf. Dunkle den Raum ab, damit die Lichtquelle gut sichtbar ist.</p>\n\n<p><b>So geht’s:</b><br>\n<b>Teil 1: Entstehung eines Schattens</b><br>\n1. Leuchte mit der Taschenlampe auf den runden Gegenstand, sodass er einen Schatten auf das Papier oder die Wand wirft.<br>\n2. Beobachte die Form und die Größe des Schattens.<br><br>\n\n<b>Teil 2: Kernschatten und Halbschatten mit einer Lichtquelle</b><br>\n1. Bewege die Taschenlampe langsam näher und weiter weg vom Gegenstand und beobachte, wie sich der Schatten verändert.<br>\n2. Versuche, die dunklere Mitte (Kernschatten) und die hellere Umgebung (Halbschatten) zu erkennen.<br><br>\n\n<b>Teil 3: Kernschatten und Halbschatten mit zwei Lichtquellen</b><br>\n1. Stelle zwei Taschenlampen so auf, dass sie aus unterschiedlichen Winkeln auf den Gegenstand leuchten.<br>\n2. Beobachte den Schatten, der auf der Wand entsteht:<br>\n&nbsp;&nbsp;&nbsp;&nbsp;• Wo sich die Schatten der beiden Lichtquellen überlappen, ist der Kernschatten (dunkler Schatten).<br>\n&nbsp;&nbsp;&nbsp;&nbsp;• Wo nur eine Lichtquelle durchkommt, ist der Halbschatten (hellerer Schattenbereich).</p>"
+            },
+            {
+                "type": "aufgabe",
+                "content": "<p><b>Was fällt dir auf?</b><br>\n• Wie sieht der Schatten bei einer Lichtquelle aus?<br>\n• Kannst du Kernschatten und Halbschatten unterscheiden? Wo?<br>\n• Wie verändert sich der Schatten, wenn du die Lichtquelle näher oder weiter weg bewegst?<br>\n• Wie sieht der Schatten bei zwei Lichtquellen aus? Beschreibe Kernschatten und Halbschatten.</p>"
+            },
+            {
+                "type": "merksatz",
+                "content": "<p><b>Erklärung:</b><br>\nSchatten entstehen, wenn ein undurchsichtiger Gegenstand das Licht einer Lichtquelle blockiert.<br>\nDer Kernschatten ist der Bereich, in dem das Licht vollständig blockiert wird – er ist dunkel und scharf begrenzt.<br>\nDer Halbschatten entsteht, wenn nur ein Teil des Lichts blockiert wird, z. B. wenn mehrere Lichtquellen da sind – er ist heller und weniger scharf.<br>\nBei zwei Lichtquellen überlagern sich die Schatten teilweise, so entstehen deutlich sichtbare Kern- und Halbschatten.</p>"
+            },
+            {
+                "type": "text",
+                "content": "<p><b>Was hat das mit dem Alltag zu tun?</b><br>\n• Bei starker Sonne werfen Gegenstände einen klaren Schatten mit scharfen Rändern – das ist der Kernschatten.<br>\n• Wenn die Sonne durch Wolken scheint oder mehrere Lichtquellen vorhanden sind (z. B. Straßenlaternen), entstehen weichere Schatten mit Halbschatten.</p>"
+            },
+            {
+                "type": "text",
+                "content": "<br></br>"
+            },
+            {
+                "type": "text",
+                "content": "<p><b><u>4. Spektralfarben sichtbar machen</u></b></p>\n\n<p><b>Ziel:</b><br>\nZeigen, dass weißes Licht aus verschiedenen Farben (Spektralfarben) zusammengesetzt ist.</p>\n\n<p><b>Was du brauchst:</b><br>\n• Eine CD oder DVD (funktioniert als einfacher Spiegel mit Regenbogeneffekt)<br>\n• Taschenlampe oder Sonnenlicht<br>\n• Weißes Blatt Papier<br>\n• Dunkler Raum (optional)</p>\n\n<p><b>So geht’s:</b><br>\n1. Halte die CD so, dass ein Lichtstrahl (von Taschenlampe oder Sonnenlicht) darauf fällt.<br>\n2. Richte den reflektierten Lichtstrahl auf das weiße Blatt Papier.<br>\n3. Beobachte die bunten Regenbogenfarben, die auf dem Papier erscheinen.<br>\n4. Bewege die CD leicht hin und her, um die verschiedenen Farben deutlicher zu sehen.</p>"
+            },
+            {
+                "type": "aufgabe",
+                "content": "<p><b>Was fällt dir auf?</b><br>\n• Du siehst auf dem Papier viele verschiedene Farben, die wie ein Regenbogen aussehen.<br>\n• Diese Farben nennt man Spektralfarben.<br>\n• Sie sind Bestandteile des weißen Lichts.</p>"
+            },
+            {
+                "type": "merksatz",
+                "content": "<p><b>Erklärung:</b><br>\nWeißes Licht besteht aus vielen verschiedenen Farben, die zusammen gemischt sind.<br>\nWenn das Licht auf eine Oberfläche trifft, die das Licht in seine Bestandteile zerlegt (wie die CD-Oberfläche), erscheinen die Spektralfarben als bunte Streifen.</p>"
+            },
+            {
+                "type": "text",
+                "content": "<p><b>Was hat das mit dem Alltag zu tun?</b><br>\n• Dieses Experiment zeigt, dass weißes Licht aus vielen Farben besteht.<br>\n• Ein gutes Alltagsbeispiel sind Regenbögen nach einem Regenschauer:<br>\n• Dort wird das Sonnenlicht durch Wassertropfen in die verschiedenen Spektralfarben zerlegt – genau wie bei der CD im Experiment.</p>"
+            },
+            {
+                "type": "text",
+                "content": "<br></br>"
+            },
+            {
+                "type": "text",
+                "content": "<p><b><u>5. Reflexion von Licht</u></b></p>\n\n<p><b>Ziel:</b><br>\nUntersuchen, wie Licht an glatten Oberflächen reflektiert wird und das Reflexionsgesetz verstehen.</p>\n\n<p><b>Was du brauchst:</b><br>\n• Taschenlampe<br>\n• Glatter Spiegel<br>\n• Weißes Blatt Papier<br>\n• Geodreieck oder Winkelmesser (optional)<br>\n• Dunkler Raum oder abgedunkelter Bereich</p>\n\n<p><b>So geht’s:</b><br>\n1. Lege das weiße Blatt Papier flach auf den Tisch.<br>\n2. Stelle den Spiegel senkrecht auf das Papier (z. B. mit einem kleinen Ständer oder an eine Wand gelehnt).<br>\n3. Richte die Taschenlampe so aus, dass ein Lichtstrahl schräg auf den Spiegel fällt.<br>\n4. Beobachte den reflektierten Lichtstrahl auf dem Papier.<br>\n5. Zeichne mit Bleistift die Einfallsrichtung (den ankommenden Lichtstrahl), das Lot (senkrecht zum Spiegel) und die reflektierte Richtung ein.<br>\n6. Falls möglich, miss mit dem Geodreieck den Einfallswinkel (zwischen einfallendem Strahl und Lot) und den Reflexionswinkel (zwischen reflektiertem Strahl und Lot).</p>"
+            },
+            {
+                "type": "aufgabe",
+                "content": "<p><b>Was fällt dir auf?</b><br>\n• Wie verhält sich der Lichtstrahl beim Auftreffen auf den Spiegel?<br>\n• Wie groß sind Einfallswinkel und Reflexionswinkel? Sind sie gleich?<br>\n• Wie verändert sich der reflektierte Strahl, wenn du den Einfallswinkel änderst?</p>"
+            },
+            {
+                "type": "merksatz",
+                "content": "<p><b>Erklärung:</b><br>\nLicht wird an glatten Oberflächen reflektiert.<br>\nDabei gilt das Reflexionsgesetz: Der Einfallswinkel ist gleich dem Reflexionswinkel.<br>\nDer Lichtstrahl „prallt“ also so vom Spiegel ab, dass der Winkel beim Auftreffen und Abprallen gleich ist.</p>"
+            },
+            {
+                "type": "text",
+                "content": "<p><b>Was hat das mit dem Alltag zu tun?</b><br>\n• Dieses Experiment zeigt, wie Licht reflektiert wird – ein Prinzip, das man täglich nutzt:<br>\n• Wenn man sich im Spiegel betrachtet oder Sonnenlicht von glatten Wasseroberflächen zurückgeworfen wird, folgt das Licht dem Reflexionsgesetz.</p>"
+            },
+            {
+                "type": "text",
+                "content": "<br></br>"
+            },
+            {
+                "type": "text",
+                "content": "<p><b><u>6. Lichtreflexion am Hohlspiegel (konkav)</u></b></p>\n\n<p><b>Ziel:</b><br>\nUntersuchen, wie Licht an einem konkaven (Hohl-) Spiegel reflektiert wird und wie sich das Licht bündelt.</p>\n\n<p><b>Was du brauchst:</b><br>\n• Konkaver (Hohl-) Spiegel (z. B. aus einem Experimentier-Set oder als kosmetischer Vergrößerungsspiegel)<br>\n• Taschenlampe<br>\n• Weißes Blatt Papier<br>\n• Dunkler Raum oder abgedunkelter Bereich</p>\n\n<p><b>So geht’s:</b><br>\n1. Halte den konkaven Spiegel so, dass du mit der Taschenlampe einen Lichtstrahl auf die spiegelnde Fläche richtest.<br>\n2. Richte die Taschenlampe so aus, dass der Lichtstrahl parallel auf die konkave Oberfläche trifft.<br>\n3. Halte das weiße Blatt Papier in den Bereich, in den das Licht reflektiert wird (in den sogenannten Brennpunkt).<br>\n4. Beobachte, ob und wo sich das Licht auf dem Papier konzentriert.<br>\n5. Bewege das Papier näher oder weiter vom Spiegel weg und beobachte die Veränderung des Lichtflecks.</p>"
+            },
+            {
+                "type": "aufgabe",
+                "content": "<p><b>Was fällt dir auf?</b><br>\n• Wie verändert sich der Lichtstrahl beim Auftreffen auf den Hohlspiegel?<br>\n• Wo auf dem Papier konzentriert sich das Licht?<br>\n• Wie verändert sich der Lichtfleck, wenn du das Papier bewegst?</p>"
+            },
+            {
+                "type": "merksatz",
+                "content": "<p><b>Erklärung:</b><br>\nEin konkaver Spiegel bündelt parallele Lichtstrahlen in einem Punkt, dem sogenannten Brennpunkt.<br>\nDadurch wird das Licht konzentriert und kann z. B. Wärme erzeugen oder Lichtstrahlen fokussieren.<br>\nDies unterscheidet sich von einem flachen Spiegel, der das Licht nur gerade reflektiert.</p>"
+            },
+            {
+                "type": "text",
+                "content": "<p><b>Was hat das mit dem Alltag zu tun?</b><br>\n• Das Prinzip der Lichtbündelung durch konkave Spiegel findet man auch im Alltag:<br>\n• Z. B. bei Taschenlampen mit Reflektoren oder bei Scheinwerfern von Autos, die das Licht bündeln, um die Straße besser auszuleuchten.</p>"
+            },
+            {
+                "type": "text",
+                "content": "<br></br>"
+            },
+            {
+                "type": "text",
+                "content": "<p><b><u>7. Lichtbrechung an Wasser</u></b></p>\n\n<p><b>Ziel:</b><br>\nUntersuchen, wie Licht beim Übergang von Luft in Wasser seine Richtung ändert (Lichtbrechung).</p>\n\n<p><b>Was du brauchst:</b><br>\n• Trinkglas oder durchsichtiges Gefäß<br>\n• Wasser<br>\n• Bleistift oder Strohhalm<br>\n• Taschenlampe (optional)</p>\n\n<p><b>So geht’s:</b><br>\n1. Fülle das Glas etwa zu 2/3 mit Wasser.<br>\n2. Stecke den Bleistift oder Strohhalm schräg in das Wasser.<br>\n3. Beobachte den Bleistift von der Seite des Glases.<br>\n4. (Optional) Leuchte mit der Taschenlampe von der Seite auf das Glas, um den Lichtstrahl sichtbar zu machen.</p>"
+            },
+            {
+                "type": "aufgabe",
+                "content": "<p><b>Was fällt dir auf?</b><br>\n• Wie erscheint der Bleistift im Wasser verglichen mit außerhalb?<br>\n• Verändert sich die Richtung des Bleistifts optisch?<br>\n• Was passiert mit dem Lichtstrahl, wenn er von Luft ins Wasser eintritt?</p>"
+            },
+            {
+                "type": "merksatz",
+                "content": "<p><b>Erklärung:</b><br>\nDas Licht ändert seine Richtung, wenn es von einem Medium in ein anderes übergeht, z. B. von Luft ins Wasser.<br>\nDieses Phänomen nennt man Lichtbrechung.<br>\nDadurch sieht der Bleistift im Wasser „gebrochen“ oder geknickt aus, obwohl er gerade ist.</p>"
+            },
+            {
+                "type": "text",
+                "content": "<p><b>Was hat das mit dem Alltag zu tun?</b><br>\n• Lichtbrechung erklärt viele Alltagseffekte:<br>\n• Z. B. warum Gegenstände im Wasser verzerrt aussehen oder warum ein Strohhalm im Glas „gebrochen“ wirkt.</p>"
+            },
+            {
+                "type": "text",
+                "content": "<br></br>"
+            },
+            {
+                "type": "text",
+                "content": "<p><b><u>Experiment 8: Wassertropfenlupe – Vergrößerung durch Lichtbrechung</u></b></p>\n\n<p><b>Ziel</b><br>\nUntersuchen, wie ein Wassertropfen als Lupe wirkt und Objekte vergrößert erscheinen lässt.</p>\n\n<p><b>Materialien</b><br>\n• Weißes Blatt Papier mit kleingedrucktem Text oder feinen Mustern<br>\n• Wasser<br>\n• Pipette oder kleiner Löffel zum Tropfengeben<br>\n• Taschenlampe (optional)</p>\n\n<p><b>Durchführung</b><br>\n1. Lege das weiße Blatt Papier mit Text oder feinen Mustern vor dich.<br>\n2. Gib mit der Pipette oder dem Löffel einen einzelnen, möglichst runden Wassertropfen auf das Papier.<br>\n3. Beobachte den Text oder das Muster durch den Wassertropfen hindurch.<br>\n4. (Optional) Beleuchte den Wassertropfen mit der Taschenlampe, um die Wirkung besser zu sehen.</p>"
+            },
+            {
+                "type": "aufgabe",
+                "content": "<p><b>Beobachtung / Protokoll – Frage</b><br>\n• Wie sieht der Text oder das Muster unter dem Wassertropfen aus?<br>\n• Vergrößert der Wassertropfen das Bild?<br>\n• Warum verändert sich die Sicht auf den Text?</p>"
+            },
+            {
+                "type": "merksatz",
+                "content": "<p><b>Erklärung</b><br>\nDer Wassertropfen wirkt wie eine konvexe Linse. Er bricht das Licht so, dass es gebündelt wird und das Bild des Textes oder Musters vergrößert erscheint. Dadurch kann man Details besser erkennen.</p>"
+            },
+            {
+                "type": "text",
+                "content": "<p><b>Fazit</b><br>\nDieses Prinzip der Lichtbrechung und Vergrößerung nutzen auch richtige Lupen oder Brillen. Wassertropfen können so als einfache Lupe dienen, was man leicht mit Alltagsmaterialien nachmachen kann.</p>"
+            },
+            {
+                "type": "text",
+                "content": "<br></br>"
+            },
+            {
+                "type": "text",
+                "content": "<p><b><u>Experiment 9: Optik der Farben – Farben mischen mit Licht</u></b></p>\n\n<p><b>Ziel</b><br>\nUntersuchen, wie sich verschiedene Lichtfarben mischen und wie Weißes Licht aus den Grundfarben zusammengesetzt ist.</p>\n\n<p><b>Materialien</b><br>\nTaschenlampen (oder LEDs) in den Farben Rot, Grün und Blau (RGB) – alternativ farbige Folien für eine weiße Lichtquelle<br>\nWeißes Blatt Papier oder weiße Wand als Projektionsfläche<br>\nDunkler Raum oder abgedunkelter Bereich</p>"
+            },
+            {
+                "type": "aufgabe",
+                "content": "<p><b>Durchführung</b><br>\n1. Richte die roten, grünen und blauen Lichtquellen so aus, dass sich ihre Lichtstrahlen auf der weißen Fläche überschneiden.<br>\n2. Beobachte die Farben, die dort entstehen, wo sich zwei Farben mischen.<br>\n3. Beobachte, welche Farbe entsteht, wenn alle drei Farben überlappen.<br>\n4. Variiere die Positionen der Lichtquellen und beobachte die Veränderungen.</p>"
+            },
+            {
+                "type": "text",
+                "content": "<p><b>Beobachtung / Protokoll</b><br>\n<b>Frage</b><br>\nWelche Farbe entsteht, wenn Rot und Grün sich überlappen?<br>\nWelche Farbe entsteht bei Überlappung von Grün und Blau?<br>\nWelche Farbe entsteht bei Überlappung von Rot und Blau?<br>\nWelche Farbe entsteht, wenn Rot, Grün und Blau zusammen scheinen?</p>"
+            },
+            {
+                "type": "merksatz",
+                "content": "<p><b>Erklärung</b><br>\nWeißes Licht setzt sich aus den drei Grundfarben Rot, Grün und Blau zusammen. Wenn diese Farben kombiniert werden, entstehen andere Farben:<br>\nRot + Grün = Gelb<br>\nGrün + Blau = Cyan<br>\nRot + Blau = Magenta<br>\nRot + Grün + Blau = Weiß<br>\nDas Experiment zeigt den additiven Farb-Mischprozess, der z. B. bei Bildschirmen oder Bühnenbeleuchtung verwendet wird.</p>"
+            },
+            {
+                "type": "text",
+                "content": "<p><b>Fazit</b><br>\nDas Wissen um die Zusammensetzung von Lichtfarben erklärt, wie Farben auf Bildschirmen entstehen und warum man durch Mischung von Lichtfarben neue Farben erzeugen kann.</p>"
+            },
+            {
+                "type": "text",
+                "content": "<br></br>"
+            },
+            {
+                "type": "text",
+                "content": "<p><b><u>Experiment 10: Polarisation von Licht</u></b></p>\n\n<p><b>Ziel</b><br>\nUntersuchen, wie Licht durch Polarisationsfilter polarisiert wird und wie sich die Lichtintensität verändert.</p>\n\n<p><b>Materialien</b><br>\nZwei Polarisationsfilter (z. B. aus einer Sonnenbrille mit Polarisationsgläsern oder als Folien erhältlich)<br>\nTaschenlampe oder Smartphone als Lichtquelle<br>\nWeißes Blatt Papier oder helle Wand als Projektionsfläche</p>"
+            },
+            {
+                "type": "aufgabe",
+                "content": "<p><b>Durchführung</b><br>\n1. Halte einen Polarisationsfilter vor die Lichtquelle (Taschenlampe oder Smartphone).<br>\n2. Richte das Licht durch den Filter auf das weiße Blatt Papier oder die Wand.<br>\n3. Halte den zweiten Polarisationsfilter zwischen die Lichtquelle und die Projektionsfläche, sodass du durch beide Filter hindurchschaust.<br>\n4. Drehe den zweiten Polarisationsfilter langsam und beobachte, wie sich die Helligkeit des Lichtes auf dem Papier verändert.</p>"
+            },
+            {
+                "type": "text",
+                "content": "<p><b>Beobachtung / Protokoll</b><br>\n<b>Frage</b><br>\nWie verändert sich die Lichtintensität, wenn du den zweiten Filter drehst?<br>\nWann ist das Licht am hellsten?<br>\nWann ist das Licht am dunkelsten?</p>"
+            },
+            {
+                "type": "merksatz",
+                "content": "<p><b>Erklärung</b><br>\nLichtwellen schwingen normalerweise in vielen Richtungen. Ein Polarisationsfilter lässt nur Lichtwellen einer bestimmten Schwingungsrichtung durch.<br>\nWenn zwei Filter übereinander gelegt und gegeneinander verdreht werden, verändert sich die Intensität des durchgelassenen Lichts:<br>\nBei 0° oder 180° Ausrichtung ist das Licht am hellsten (maximal durchlässig),<br>\nbei 90° Ausrichtung wird das Licht nahezu vollständig blockiert.<br>\nDas liegt daran, dass die Schwingungsebenen dann senkrecht zueinander stehen.</p>"
+            },
+            {
+                "type": "text",
+                "content": "<p><b>Fazit</b><br>\nDie Polarisation von Licht wird in vielen technischen Anwendungen genutzt, z. B. in Sonnenbrillen, LCD-Bildschirmen und Kamerafiltern.<br>\nDieses Experiment zeigt, wie Lichtwellen in eine bestimmte Richtung „sortiert“ werden können.</p>"
+            },
+            {
+                "type": "text",
+                "content": "<br></br>"
+            }
+        ],
+        "schoolType": "Gemeinschaftsschule"
+    },
+    {
+        "title": "Optik Theorie",
+        "shortDescription": "<p>Hier findet ihr die grundlegende Theorie zur Optik, die das Verhalten von Licht und seine Wechselwirkung mit Materialien einfach erklärt. Dieses Wissen hilft euch, die Experimente besser zu verstehen und zu begleiten.</p>\n\n<p><b>Viel Spaß beim Wissensentdecken wünscht das Alltagslabor!</b></p>",
+        "subject": "Physik",
+        "gradeLevel": "7",
+        "steps": [
+            {
+                "type": "text",
+                "content": "<h2>Grundlagentheorie zur Optik</h2>\n\n<h3>Was ist Optik?</h3>\n<p>Optik ist der Teilbereich der Physik, der sich mit dem Verhalten und der Ausbreitung von Licht beschäftigt. Sie untersucht, wie Lichtstrahlen entstehen, sich ausbreiten, reflektieren, brechen, absorbiert oder polarisiert werden, und wie Farben entstehen.</p>"
+            },
+            {
+                "type": "merksatz",
+                "content": "<h3>Wichtige Begriffe</h3>\n<ul>\n  <li><b>Lichtstrahl:</b> Eine idealisierte Darstellung von Licht, das sich geradlinig ausbreitet.</li>\n  <li><b>Lichtquelle:</b> Ein Körper oder Gerät, das Licht erzeugt (z. B. Sonne, Lampe).</li>\n  <li><b>Transparent:</b> Material, das Licht vollständig durchlässt (z. B. Glas, Wasser).</li>\n  <li><b>Opak:</b> Undurchsichtiges Material, das Licht nicht durchlässt (z. B. Holz, Metall).</li>\n  <li><b>Reflexion:</b> Zurückwerfen von Licht an einer Grenzfläche.</li>\n  <li><b>Brechung:</b> Richtungsänderung von Licht beim Übergang zwischen verschiedenen Medien.</li>\n  <li><b>Absorption:</b> Aufnahme von Lichtenergie durch ein Material.</li>\n  <li><b>Polarisation:</b> Ausrichtung der Schwingungsebene von Lichtwellen in eine bestimmte Richtung.</li>\n  <li><b>Spektrum:</b> Aufspaltung von Licht in seine Bestandteile (Farben).</li>\n</ul>"
+            },
+            {
+                "type": "text",
+                "content": "<br></br>"
+            },
+            {
+                "type": "text",
+                "content": "<h3>Grundlagen und Gesetze</h3>"
+            },
+            {
+                "type": "text",
+                "content": "<h4>1. Geradlinige Ausbreitung des Lichts</h4>\n<p>Licht breitet sich in einem homogenen Medium immer geradlinig aus. Dies erklärt die Entstehung von Schatten und die Ausrichtung von Lichtstrahlen.</p>\n\n<h4>2. Reflexionsgesetz</h4>\n<p>Beim Auftreffen auf eine glatte Oberfläche wird Licht reflektiert.</p>"
+            },
+            {
+                "type": "merksatz",
+                "content": "<p><b>Einfallswinkel = Reflexionswinkel</b><br>\nDer Winkel, unter dem das Licht auf die Oberfläche trifft, ist gleich dem Winkel, unter dem es reflektiert wird.</p>"
+            },
+            {
+                "type": "text",
+                "content": "<h4>3. Brechungsgesetz (Snellius’sches Gesetz)</h4>\n<p>Beim Übergang von einem Medium in ein anderes ändert Licht seine Geschwindigkeit und damit seine Richtung.</p>"
+            },
+            {
+                "type": "merksatz",
+                "content": "<p><b>Formel:</b><br>\nn₁ · sin(θ₁) = n₂ · sin(θ₂)<br>\nn₁ und n₂: Brechungsindizes der Medien<br>\nθ₁: Einfallswinkel<br>\nθ₂: Brechungswinkel</p>"
+            },
+            {
+                "type": "text",
+                "content": "<h4>4. Dispersion</h4>\n<p>Licht wird in seine Spektralfarben aufgespalten, weil verschiedene Wellenlängen unterschiedlich stark gebrochen werden.<br>\nBeispiel: Regenbogen, Prismen.</p>"
+            },
+            {
+                "type": "text",
+                "content": "<h4>5. Additive Farbmischung</h4>\n<p>Weißes Licht setzt sich aus den Grundfarben Rot, Grün und Blau zusammen. Die Mischung dieser Farben erzeugt alle anderen Farben:</p>"
+            },
+            {
+                "type": "merksatz",
+                "content": "<p><b>Rot + Grün = Gelb, Rot + Blau = Magenta, Grün + Blau = Cyan, Rot + Grün + Blau = Weiß.</b></p>"
+            },
+            {
+                "type": "text",
+                "content": "<h4>6. Polarisation von Licht</h4>\n<p>Lichtwellen schwingen normalerweise in vielen Richtungen. Polarisationsfilter lassen nur Licht einer bestimmten Schwingungsebene durch, was man als Polarisation bezeichnet.</p>"
+            },
+            {
+                "type": "merksatz",
+                "content": "<h3>Wichtige Phänomene der Optik</h3>\n<ul>\n  <li><b>Schattenbildung:</b> Entsteht durch Blockierung von Lichtstrahlen durch ein undurchsichtiges Objekt.</li>\n  <li><b>Kernschatten & Halbschatten:</b> Kernschatten ist der Bereich, in dem das Licht vollständig blockiert wird, Halbschatten der Bereich mit teilweiser Lichtabschirmung.</li>\n  <li><b>Linsenwirkung:</b> Konvexe (Sammel-) Linsen bündeln Licht und vergrößern Objekte, konkave (Streulinsen) zerstreuen Licht.</li>\n  <li><b>Spiegelarten:</b> Flachspiegel reflektieren Licht gerade, Hohlspiegel bündeln Licht in einem Brennpunkt.</li>\n</ul>"
+            },
+            {
+                "type": "text",
+                "content": "<h3>Anwendungen der Optik im Alltag</h3>\n<ul>\n  <li>Sonnenbrillen nutzen Polarisation, um Blendung zu reduzieren.</li>\n  <li>Kameras und Brillen arbeiten mit Linsen und Brechung, um Bilder scharf zu stellen.</li>\n  <li>Bildschirme erzeugen Farben durch additive Farbmischung von RGB-Licht.</li>\n  <li>Taschenlampen und Scheinwerfer verwenden Hohlspiegel, um Licht zu bündeln.</li>\n  <li>Regenbögen zeigen die Dispersion von Sonnenlicht in Wassertropfen.</li>\n</ul>"
+            },
+            {
+                "type": "text",
+                "content": "<h3>Zusammenfassung</h3>\n<p>Die Optik beschreibt, wie Licht sich verhält und mit Materie interagiert. Durch Gesetze wie die geradlinige Ausbreitung, Reflexion und Brechung können wir Phänomene wie Schatten, Spiegelbilder oder die Farben der Natur erklären. Das Verständnis der Optik ist wichtig für viele Technologien und hilft uns, die Welt um uns herum besser zu verstehen.</p>"
             }
         ],
         "schoolType": "Gemeinschaftsschule"
