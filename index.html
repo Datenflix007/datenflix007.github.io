@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <title>AlltagsLabor</title>
+    <title>Felix Staacke</title>
     <style>
         body {
             font-family: sans-serif;
@@ -18,38 +18,9 @@
 </head>
 <body>
 
-    <h1>AlltagsLabor – Experimente</h1>
+    <h1>Felix Staacke</h1>
     <div id="experimentList">Lade Experimente...</div>
 
-    <script>
-        // Fetch-Daten aus data/editor/_experiments.json
-        fetch('dataEditor/_experiments.json')
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP-Fehler: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                const container = document.getElementById('experimentList');
-                container.innerHTML = ''; // Liste leeren
-                data.forEach(exp => {
-                    const el = document.createElement('div');
-                    el.className = 'experiment';
-                    el.innerHTML = `
-                        <h3>${exp.title || 'Kein Titel'}</h3>
-                        <p><strong>Fach:</strong> ${exp.subject || 'unbekannt'}</p>
-                        <p><strong>Klasse:</strong> ${exp.gradeLevel || 'unbekannt'}</p>
-                        <p>${exp.shortDescription || ''}</p>
-                    `;
-                    container.appendChild(el);
-                });
-            })
-            .catch(error => {
-                document.getElementById('experimentList').innerText = 
-                    'Fehler beim Laden der Experimente.';
-                console.error('Fehler:', error);
-            });
-    </script>
+  
 </body>
 </html>
