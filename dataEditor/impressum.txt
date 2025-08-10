@@ -1,8 +1,0 @@
-Dieses Programm wurde im Rahmen der unten benannten Veranstaltung an der FSU Jena entwickelt. 
-Ergo ist dies in der zur Bewertung abgegebenen Form eine nicht kommerziellen Webseite. Eine Kennzeichnung nach §5 TMG ist nicht notwendig.
-
-Friedrich-Schiller-Universität Jena
-Institut für Erziehungswissenschaft 
-L4a - Digitales Lehren und Lernen an der Werkstattschule Jena
-Dozentin: Dr. phil. Stefanie Czempiel
-Studenten: Claudius Gladewitz, Patrick Köhler, Felix Staacke
