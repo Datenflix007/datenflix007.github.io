@@ -1,26 +1,116 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <title>Felix Staacke</title>
-    <style>
-        body {
-            font-family: sans-serif;
-            margin: 40px;
-        }
-        .experiment {
-            border: 1px solid #ccc;
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 6px;
-        }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Persönliche Referenzen – Ihr Name</title>
+  <meta name="description" content="Eine kompakte, moderne Referenzen‑Seite mit kurzen Testimonials, Projekten und Kontakt.">
+
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg: #0b0d10;
+      --surface: #111418;
+      --muted: #8892a6;
+      --text: #e6e9ef;
+      --accent: #7dd3fc;
+      --accent-2: #a78bfa;
+      --ring: #334155;
+      --shadow: 0 10px 30px rgba(2,6,23,.4);
+      --radius: 16px;
+      --maxw: 1100px;
+    }
+    .light{
+      --bg: #f7f7fb;
+      --surface: #ffffff;
+      --muted: #5b6472;
+      --text: #0b0d10;
+      --ring: #cbd5e1;
+      --shadow: 0 10px 30px rgba(2,6,23,.08);
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji"; background:var(--bg); color:var(--text);}
+    a{color:inherit}
+    .container{max-width:var(--maxw); margin:0 auto; padding:0 20px}
+
+    header{position:sticky;top:0;backdrop-filter:blur(6px); background:color-mix(in hsl, var(--bg) 85%, transparent); border-bottom:1px solid var(--ring); z-index:10}
+    .nav{display:flex;align-items:center;justify-content:space-between; padding:14px 0}
+    .brand{display:flex;gap:12px;align-items:center;font-weight:700}
+    .brand .logo{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent-2)); box-shadow:var(--shadow)}
+    .nav a.btn{padding:10px 14px;border:1px solid var(--ring);border-radius:999px;text-decoration:none; font-weight:600}
+    .toggle{cursor:pointer;border:none;background:transparent;font:inherit;color:inherit;padding:8px 12px;border:1px solid var(--ring);border-radius:999px}
+
+    .hero{display:grid;gap:22px; grid-template-columns:1.2fr .8fr; align-items:center; padding:60px 0}
+    .hero h1{font-size:clamp(28px,5vw,44px); line-height:1.1; margin:0}
+    .hero p{color:var(--muted); font-size:1.1rem}
+    .chip{display:inline-flex;gap:8px;align-items:center;border:1px solid var(--ring);border-radius:999px;padding:6px 10px;font-size:.9rem;color:var(--muted)}
+    .avatar{
+      justify-self:end;
+      width:200px;
+      height:200px;
+      border-radius:30px;
+      background:linear-gradient(var(--bg), var(--bg)), url('./media/avatar.jpg') center/cover no-repeat;
+      box-shadow:var(--shadow);
+      border:4px solid transparent;
+      background-origin:border-box;
+      background-clip:padding-box, border-box;
+      padding:4px;
+      background-image:linear-gradient(var(--bg), var(--bg)), linear-gradient(135deg, var(--accent), var(--accent-2));
+    }
+
+    section{padding:28px 0}
+    .card{background:var(--surface); border:1px solid var(--ring); border-radius:var(--radius); box-shadow:var(--shadow)}
+
+    @media (max-width:900px){
+      .hero{grid-template-columns:1fr;}
+      .avatar{justify-self:start}
+    }
+  </style>
 </head>
 <body>
+  <header aria-label="Seitennavigation">
+    <div class="container nav">
+      <div class="brand" aria-label="Marke">
+        <div class="logo" aria-hidden="true"></div>
+        <span>Ihr Name</span>
+      </div>
+      <nav>
+        <a class="btn" href="referenzen.html">Referenzen</a>
+        <a class="btn" href="projekte.html">Projekte</a>
+        <a class="btn" href="kontakt.html">Kontakt</a>
+        <button class="toggle" id="themeToggle" aria-label="Darstellung wechseln">☾/☀︎</button>
+      </nav>
+    </div>
+  </header>
 
-    <h1>Felix Staacke</h1>
-    <div id="experimentList">Lade Experimente...</div>
+  <main class="container">
+    <section class="hero" aria-label="Intro">
+      <div>
+        <span class="chip">Vertrauen durch Ergebnisse</span>
+        <h1>Ich helfe Teams, Ideen in messbaren Wert zu verwandeln.</h1>
+        <p>Produktsicht, pragmatische Umsetzung und saubere Kommunikation – das ist mein Ansatz.</p>
+      </div>
+      <div class="avatar" aria-hidden="true"></div>
+    </section>
+  </main>
 
-  
+  <footer>
+    <div class="container">© <span id="year"></span> Ihr Name · Impressum auf Anfrage.</div>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+    const toggle = document.getElementById('themeToggle');
+    const stored = localStorage.getItem('pref-theme');
+    if(stored === 'light'){ document.documentElement.classList.add('light') }
+    toggle.addEventListener('click',()=>{
+      document.documentElement.classList.toggle('light');
+      localStorage.setItem('pref-theme', document.documentElement.classList.contains('light') ? 'light' : 'dark');
+    });
+  </script>
 </body>
 </html>
