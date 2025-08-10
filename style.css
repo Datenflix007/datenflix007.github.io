@@ -1,0 +1,53 @@
+<!-- =========================
+  Datei: styles.css
+  (In ein separates styles.css speichern und in allen HTML-Dateien einbinden)
+========================= -->
+/* Basis-Design, komplett ohne JavaScript – ideal für GitHub Pages */
+:root{
+  --bg: #0b0d10;
+  --surface: #111418;
+  --muted: #8892a6;
+  --text: #e6e9ef;
+  --accent: #7dd3fc;
+  --accent-2: #a78bfa;
+  --ring: #334155;
+  --shadow: 0 10px 30px rgba(2,6,23,.4);
+  --radius: 16px;
+  --maxw: 1100px;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji"; background:var(--bg); color:var(--text);}
+a{color:inherit}
+.container{max-width:var(--maxw); margin:0 auto; padding:0 20px}
+header{position:sticky;top:0;backdrop-filter:blur(6px); background:color-mix(in hsl, var(--bg) 85%, transparent); border-bottom:1px solid var(--ring); z-index:10}
+.nav{display:flex;align-items:center;justify-content:space-between; padding:14px 0}
+.brand{display:flex;gap:12px;align-items:center;font-weight:700}
+.brand .logo{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent-2)); box-shadow:var(--shadow)}
+.nav a.btn{padding:10px 14px;border:1px solid var(--ring);border-radius:999px;text-decoration:none; font-weight:600}
+main{min-height:60vh}
+.hero{display:grid;gap:22px; grid-template-columns:1.2fr .8fr; align-items:center; padding:60px 0}
+.hero h1{font-size:clamp(28px,5vw,44px); line-height:1.1; margin:0}
+.hero p{color:var(--muted); font-size:1.1rem}
+.chip{display:inline-flex;gap:8px;align-items:center;border:1px solid var(--ring);border-radius:999px;padding:6px 10px;font-size:.9rem;color:var(--muted)}
+/* Avatar mit "coolem" Verlauf-Rahmen – ohne JS, mit <img> */
+.avatar{justify-self:end; width:220px; height:220px; border-radius:30px; position:relative; box-shadow:var(--shadow); overflow:hidden}
+.avatar::before{content:""; position:absolute; inset:0; padding:4px; border-radius:inherit; background:linear-gradient(135deg, var(--accent), var(--accent-2)); -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite:xor; mask-composite:exclude}
+.avatar img{position:absolute; inset:6px; width:calc(100% - 12px); height:calc(100% - 12px); object-fit:cover; border-radius:24px}
+section{padding:28px 0}
+.card{background:var(--surface); border:1px solid var(--ring); border-radius:var(--radius); box-shadow:var(--shadow)}
+.grid{display:grid; gap:16px}
+.grid-3{grid-template-columns:repeat(3,1fr)}
+.grid-2{grid-template-columns:repeat(2,1fr)}
+.quote{padding:22px}
+.quote p{margin:0 0 14px 0}
+.who{display:flex;align-items:center;gap:12px}
+.who .dot{width:34px;height:34px;border-radius:999px;background:linear-gradient(135deg,var(--accent),var(--accent-2))}
+.who small{display:block;color:var(--muted)}
+.project{padding:16px}
+.project h3{margin:0 0 6px 0; font-size:1.05rem}
+.tag{display:inline-block;border:1px solid var(--ring); border-radius:999px; padding:4px 8px; font-size:.8rem; color:var(--muted); margin-right:8px}
+.contact{display:flex;gap:14px;flex-wrap:wrap; padding:20px}
+.contact a{padding:10px 14px;border:1px solid var(--ring); border-radius:999px; text-decoration:none; font-weight:600}
+footer{padding:40px 0 60px; color:var(--muted); text-align:center}
+@media (max-width:900px){.hero{grid-template-columns:1fr;} .avatar{justify-self:start}}
