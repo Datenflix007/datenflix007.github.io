@@ -390,3 +390,46 @@ footer {
         height: 156px
     }
 }
+
+
+/* -------------------------------------------
+   Extra Optimierung für Tablets (768px – 1024px)
+-------------------------------------------- */
+
+@media (max-width: 1024px) and (min-width: 681px) {
+    .hero {
+        grid-template-columns: 1fr;
+        /* Avatar unter Text */
+        text-align: center;
+    }
+    .avatar {
+        margin: 0 auto;
+        /* Avatar mittig setzen */
+    }
+    .nav {
+        gap: 8px;
+    }
+}
+
+
+/* -------------------------------------------
+   Smartphones Hochformat (bis 480px)
+-------------------------------------------- */
+
+@media (max-width: 480px) {
+    .hero h1 {
+        font-size: 1.6rem;
+    }
+    .hero p {
+        font-size: 1rem;
+    }
+    .chip {
+        font-size: 0.8rem;
+        padding: 4px 8px;
+    }
+    .contact a {
+        flex: 1 1 100%;
+        /* Buttons in voller Breite */
+        text-align: center;
+    }
+}
