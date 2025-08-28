@@ -36,9 +36,7 @@
     --maxw: 1100px;
     /* Quote animation tuning */
     --quote-stagger: 0.045s;
-    /* Abstand zwischen Buchstaben */
     --quote-char-dur: 0.38s;
-    /* Dauer pro Buchstabe */
 }
 
 
@@ -335,7 +333,7 @@ footer {
 
 
 /* --------------------------------------------------------
-   Responsive
+   Responsive (Basis)
 --------------------------------------------------------- */
 
 @media (max-width: 1024px) {
@@ -392,74 +390,155 @@ footer {
 }
 
 
-/* -------------------------------------------
-   Extra Optimierung für Tablets (768px – 1024px)
--------------------------------------------- */
+/* =========================================
+   MOBILE & TABLET POLISH
+   — bündige Typo, ruhigere Abstände, kompakter Header
+========================================= */
+
+
+/* Tablets (681–1024px) */
 
 @media (max-width: 1024px) and (min-width: 681px) {
+    .nav {
+        padding: 10px 0;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+    .brand .logo {
+        width: 30px;
+        height: 30px;
+        border-radius: 8px;
+    }
     .hero {
         grid-template-columns: 1fr;
-        /* Avatar unter Text */
-        text-align: center;
+        gap: 18px;
+        padding: 44px 0;
+    }
+    .hero h1,
+    .hero p {
+        text-align: left;
     }
     .avatar {
-        margin: 0 auto;
-        /* Avatar mittig setzen */
+        justify-self: start;
+        margin-top: 8px;
+        width: 200px;
+        height: 200px;
+        transform: none !important;
     }
-    .nav {
-        gap: 8px;
+    .avatar:hover {
+        transform: none;
     }
 }
 
 
-/* -------------------------------------------
-   Smartphones Hochformat (bis 480px)
--------------------------------------------- */
+/* Smartphones (<= 680px) – fokus auf Lesbarkeit & Bündigkeit */
 
-@media (max-width: 480px) {
+@media (max-width: 680px) {
+    .container {
+        padding: 0 14px;
+    }
+    header {
+        backdrop-filter: saturate(120%) blur(8px);
+    }
+    .nav {
+        padding: 10px 0;
+        gap: 8px 10px;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+    }
+    .brand {
+        gap: 10px;
+        font-weight: 700;
+    }
+    .brand .logo {
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+    }
+    .nav a.btn {
+        padding: 7px 12px;
+        font-size: 0.95rem;
+        line-height: 1.1;
+        border-radius: 999px;
+    }
+    .hero {
+        grid-template-columns: 1fr;
+        padding: 32px 0 24px;
+        gap: 14px;
+    }
     .hero h1 {
-        font-size: 1.6rem;
+        font-size: clamp(22px, 7vw, 32px);
+        margin: 0;
+        text-align: left;
     }
     .hero p {
         font-size: 1rem;
+        margin: 6px 0 0 0;
+        color: var(--muted);
+        text-align: left;
+        text-indent: 0;
     }
     .chip {
-        font-size: 0.8rem;
+        font-size: 0.85rem;
         padding: 4px 8px;
+    }
+    .tag {
+        font-size: 0.78rem;
+        padding: 4px 8px;
+    }
+    .avatar {
+        justify-self: start;
+        width: 168px;
+        height: 168px;
+        margin-top: 6px;
+        transform: none !important;
+    }
+    .avatar:hover {
+        transform: none;
+    }
+    .grid-3,
+    .grid-2 {
+        grid-template-columns: 1fr;
+    }
+    .project {
+        padding: 16px;
+    }
+    .quote {
+        padding: 18px;
+    }
+    .contact {
+        padding: 16px;
+        gap: 10px;
     }
     .contact a {
         flex: 1 1 100%;
-        /* Buttons in voller Breite */
         text-align: center;
+        padding: 10px 12px;
     }
 }
 
 
-/* Referenzen */
+/* Very small phones (<= 380px) – letzte Feinkorrektur */
 
-.ref-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+@media (max-width: 380px) {
+    .hero {
+        gap: 12px;
+    }
+    .hero h1 {
+        font-size: clamp(20px, 8.5vw, 28px);
+    }
+    .avatar {
+        width: 150px;
+        height: 150px;
+    }
 }
 
-.ref-list li {
-    margin-bottom: 10px;
-}
 
-.ref-list a {
-    display: inline-block;
-    padding: 10px 14px;
-    border: 1px solid var(--ring);
-    border-radius: var(--radius);
-    text-decoration: none;
-    font-weight: 600;
-    color: var(--text);
-    background: var(--surface);
-    box-shadow: var(--shadow);
-}
+/* Optional: Nur auf Touch-Geräten Hover-Scale vollständig deaktivieren */
 
-.ref-list a:hover {
-    color: var(--accent);
-    border-color: var(--accent);
+@media (pointer: coarse) {
+    .avatar:hover {
+        transform: none;
+    }
 }
