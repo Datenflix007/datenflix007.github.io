@@ -3,50 +3,95 @@
 ========================= -->
 <!doctype html>
 <html lang="de">
+
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Felix Staacke</title>
-  <meta name="description" content="Moderne persönliche Website mit Referenzen, Projekten und Kontakt.">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Felix Staacke</title>
+    <meta name="description" content="Moderne persönliche Website mit Referenzen, Projekten und Kontakt.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
-  <header aria-label="Seitennavigation">
-    <div class="container nav">
-      <div class="brand" aria-label="Marke">
-        <div class="logo" aria-hidden="true"></div>
-        <span>Felix Staacke</span>
-      </div>
-      <nav>
-        <a class="btn" href="src/Referenzen.html">Referenzen</a>
-        <a class="btn" href="src/projekte.html">Projekte</a>
-        <a class="btn" href="src/kontakt.html">Kontakt</a>
-      </nav>
-    </div>
-  </header>
+    <header aria-label="Seitennavigation">
+        <div class="container nav">
+            <div class="brand" aria-label="Marke">
+                <div class="logo" aria-hidden="true"></div>
+                <span>Felix Staacke</span>
+            </div>
+            <nav>
+                <a class="btn" href="src/Referenzen.html">Referenzen</a>
+                <a class="btn" href="src/projekte.html">Projekte</a>
+                <a class="btn" href="src/kontakt.html">Kontakt</a>
+            </nav>
+        </div>
+    </header>
 
-  <main class="container">
-    <section class="hero" aria-label="Intro">
-      <div>
-        <span class="chip">Lehramt</span>
-        <span class="chip">Informatik</span>
-        <span class="chip">Geschichte</span><br /><br /><br />
-        <h1>"Fortes fortuna adiuvat."<br /><span style="font-size: medium; color: grey;">Ter. Phorm. 1, 4, 203.</span></h1><br />
-        <p>Hier muss noch ein catchy Satz hin.</p>
-      </div>
-      <div class="avatar" aria-hidden="true">
-        <img src="media/avatar.jpg" alt="Porträt von Felix Staacke" loading="eager" />
-      </div>
-    </section>
-  </main>
+    <main class="container">
+        <section class="hero" aria-label="Intro">
+            <div>
+                <span class="chip">Lehramt</span>
+                <span class="chip">Informatik</span>
+                <span class="chip">Geschichte</span>
+                <br><br><br>
 
+                <!-- Zitat in zwei Zeilen -->
+                <h1 class="quote-handwritten" id="quote">"&nbspNon scholae,</h1>
+                <h1 class="quote-handwritten" id="quote2">&nbsp&nbspsed vitae discimus"</h1>
 
-    <br /><br /><br />
-  <footer>
-    <div class="container">© 2025 Felix Staacke</div>
-  </footer>
+                <br/><br />
+                <span style="font-size: medium; color: grey;">
+                  <span style="cursor:pointer" onclick="window.location.href='https://de.wikipedia.org/wiki/Seneca'">
+                    &nbsp&nbsp&nbsp&nbsp&nbsp
+                    Moderne Umkehrung nach: Sen. epist. 106, 11f.
+                  </span>
+                <br/>&nbsp&nbsp&nbsp&nbsp&nbsp z.d.: „Nicht für die Schule, sondern für das Leben lernen wir“
+                </span>
+
+                <br/><br /><br />
+                <p>Hier muss noch ein catchy Satz hin.</p>
+            </div>
+
+            <div class="avatar" aria-hidden="true">
+                <img src="media/avatar.jpg" alt="Porträt von Felix Staacke" loading="eager" />
+            </div>
+        </section>
+    </main>
+
+    <br><br><br>
+    <footer>
+        <div class="container">© 2025 Felix Staacke</div>
+    </footer>
+
+    <!-- Animation Script -->
+    <script>
+        // Hilfsfunktion: Text in <span class="char">…</span> zerlegen
+        function buildChars(el, startIndex = 0) {
+            const text = el.textContent;
+            el.textContent = '';
+            for (let i = 0; i < text.length; i++) {
+                const span = document.createElement('span');
+                span.className = 'char';
+                span.style.setProperty('--i', startIndex + i);
+                span.textContent = text[i];
+                el.appendChild(span);
+            }
+            return text.length;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const q1 = document.getElementById('quote');
+            const q2 = document.getElementById('quote2');
+            if (!q1 || !q2) return;
+
+            // Erste Zeile aufbauen
+            const len1 = buildChars(q1, 0);
+
+            // Zweite Zeile startet nach der ersten (+ kleine Pause)
+            buildChars(q2, len1 + 2);
+        });
+    </script>
 </body>
+
 </html>
-
-
