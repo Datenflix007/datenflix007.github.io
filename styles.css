@@ -1,8 +1,23 @@
 /* --------------------------------------------------------
-   Global fonts & quote font (Trajan-ähnlich)
+   Lokale Fonts (Trajan-ähnlich: Cinzel, TTF-Version)
 --------------------------------------------------------- */
 
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
+@font-face {
+    font-family: 'Cinzel';
+    src: url('fonts/Cinzel-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Cinzel';
+    src: url('fonts/Cinzel-Bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
 
 /* --------------------------------------------------------
    Design Tokens
@@ -151,7 +166,7 @@ main {
 
 
 /* --------------------------------------------------------
-   Avatar (ohne JS)
+   Avatar
 --------------------------------------------------------- */
 
 .avatar {
@@ -276,11 +291,8 @@ footer {
 
 
 /* --------------------------------------------------------
-   Quote: Trajan-ähnliche Schrift + Feder-Schreib-Animation
+   Quote mit Cinzel + scharfer Animation
 --------------------------------------------------------- */
-
-
-/* Quote: Trajan-ähnliche Schrift + scharfe Feder-Animation */
 
 .hero h1.quote-handwritten {
     font-family: "Cinzel", serif;
@@ -295,8 +307,6 @@ footer {
     display: inline-block;
     opacity: 0;
     transform: translateY(.18em);
-    /* leichte Federbewegung */
-    /* keine Unschärfe mehr */
     animation: quote-write var(--quote-char-dur) cubic-bezier(.2, .7, .2, 1) calc(var(--i) * var(--quote-stagger)) forwards;
     will-change: transform, opacity;
 }
@@ -315,25 +325,18 @@ footer {
     }
 }
 
-
-/* Bewegungs-Reduktion respektieren */
-
 @media (prefers-reduced-motion: reduce) {
     .hero h1.quote-handwritten .char {
         animation: none !important;
         opacity: 1;
         transform: none;
-        filter: none;
     }
 }
 
 
 /* --------------------------------------------------------
-   Responsive Tweaks
+   Responsive
 --------------------------------------------------------- */
-
-
-/* Tablets */
 
 @media (max-width: 1024px) {
     .grid-3 {
@@ -347,9 +350,6 @@ footer {
         height: 220px
     }
 }
-
-
-/* Phones */
 
 @media (max-width: 680px) {
     .container {
@@ -383,9 +383,6 @@ footer {
         padding: 20px
     }
 }
-
-
-/* Sehr kleine Geräte */
 
 @media (max-width: 380px) {
     .avatar {
