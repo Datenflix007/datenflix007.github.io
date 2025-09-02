@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Markdown Generator</title>
+    <link rel="icon" type="image/x-icon" href="https://github.com/Datenflix007/MarkdownGenerator/raw/main/logo.png">
+    <style>
+         :root {
+            --bg-0: #0b1020;
+            --bg-1: #0e1428;
+            --text-0: #e7ecff;
+            --text-1: #a9b1d6;
+            --accent: #7aa2f7;
+            --accent-2: #a78bfa;
+            --shadow: 0 10px 30px rgba(0, 0, 0, .35);
+            --radius: 18px;
+        }
+        
+        * {
+            box-sizing: border-box
+        }
+        
+        html,
+        body {
+            height: 100%
+        }
+        
+        body {
+            margin: 0;
+            color: var(--text-0);
+            background: radial-gradient(1200px 800px at 10% -10%, #1a1f3a 0%, transparent 60%), radial-gradient(900px 700px at 100% 20%, #111a3f 0%, transparent 60%), linear-gradient(180deg, var(--bg-0), #050814 60%);
+            font: 15px/1.55 system-ui, -apple-system, Segoe UI, Roboto, Inter, "Helvetica Neue", Arial, "Noto Sans";
+            overflow: hidden
+        }
+        
+        .app {
+            height: 100%;
+            display: grid;
+            grid-template-rows: 64px 1fr;
+            gap: 18px;
+            padding: 24px
+        }
+        
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, .04), rgba(255, 255, 255, .02));
+            border: 1px solid rgba(255, 255, 255, .08);
+            box-shadow: var(--shadow);
+            border-radius: var(--radius);
+            padding: 12px 16px
+        }
+        
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px
+        }
+        
+        .brandLogo {
+            background: linear-gradient(135deg, #7aa2f7, #a78bfa);
+            padding: 4px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 40px;
+            width: 40px;
+            transition: all 0.3s ease;
+        }
+        
+        .brandLogo img {
+            width: 24px;
+            height: 24px;
+            transition: all 0.3s ease;
+        }
+        
+        .brandLogo:hover img {
+            width: 60px;
+            height: 60px;
+        }
+        
+        .brand h1 {
+            margin: 0;
+            font-size: 18px
+        }
+        
+        .main {
+            min-height: 0;
+            display: grid;
+            grid-template-columns: 240px 1fr 1fr;
+            gap: 18px
+        }
+        
+        .toolbar {
+            background: linear-gradient(180deg, rgba(255, 255, 255, .03), rgba(255, 255, 255, .015));
+            border: 1px solid rgba(255, 255, 255, .08);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px
+        }
+        
+        .toolbar h2 {
+            margin: 0 0 8px;
+            font-size: 14px;
+            color: var(--text-1);
+            font-weight: 600;
+            text-transform: uppercase
+        }
+        
+        .btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid rgba(255, 255, 255, .08);
+            background: linear-gradient(180deg, rgba(255, 255, 255, .025), rgba(255, 255, 255, .01));
+            color: var(--text-0);
+            border-radius: 12px;
+            cursor: pointer
+        }
+        
+        .btn:hover {
+            border-color: rgba(122, 162, 247, .55)
+        }
+        
+        .btn small {
+            color: var(--text-1);
+            margin-left: auto
+        }
+        
+        .card {
+            background: linear-gradient(180deg, rgba(255, 255, 255, .04), rgba(255, 255, 255, .02));
+            border: 1px solid rgba(255, 255, 255, .08);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            min-height: 0
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 6px 10px 10px;
+            border-bottom: 1px dashed rgba(255, 255, 255, .08);
+            margin: 0 0 10px
+        }
+        
+        .card-header h3 {
+            margin: 0;
+            font-size: 14px;
+            color: var(--text-1);
+            text-transform: uppercase
+        }
+        
+        .icon-btn {
+            background: rgba(255, 255, 255, .02);
+            border: 1px solid rgba(255, 255, 255, .12);
+            color: var(--text-0);
+            border-radius: 10px;
+            padding: 6px 10px;
+            cursor: pointer
+        }
+        
+        .icon-btn:hover {
+            border-color: rgba(122, 162, 247, .55)
+        }
+        
+        textarea#editor {
+            flex: 1;
+            width: 100%;
+            min-height: 0;
+            resize: none;
+            border: none;
+            outline: none;
+            border-radius: 12px;
+            padding: 14px;
+            font: 14px/1.5 ui-monospace, Monaco, Consolas, monospace;
+            color: var(--text-0);
+            background: rgba(255, 255, 255, .02);
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .06)
+        }
+        
+        .preview {
+            flex: 1;
+            overflow: auto;
+            padding: 6px 10px 12px
+        }
+        
+        .preview h1 {
+            font-size: 28px
+        }
+        
+        .preview h2 {
+            font-size: 22px
+        }
+        
+        .preview h3 {
+            font-size: 18px
+        }
+        
+        .preview a {
+            color: var(--accent);
+            text-decoration: none;
+            border-bottom: 1px dashed rgba(122, 162, 247, .6)
+        }
+        
+        .preview img {
+            max-width: 100%;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, .35)
+        }
+        
+        .preview ul {
+            padding-left: 20px;
+            margin: 8px 0
+        }
+        
+        .preview pre {
+            background: rgba(255, 255, 255, .04);
+            border: 1px solid rgba(255, 255, 255, .08);
+            padding: 12px;
+            border-radius: 12px;
+            overflow: auto
+        }
+        /* Neuer Footer */
+        
+        footer {
+            position: fixed;
+            bottom: 50px;
+            left: 70px;
+            right: 0;
+            text-align: left;
+            font-size: 13px;
+            color: var(--text-1);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app">
+        <header class="header">
+            <div class="brand">
+                <div class="brandLogo">
+                    <img src="https://github.com/Datenflix007/MarkdownGenerator/raw/main/logo.png" alt="Logo">
+                </div>
+                <span style="font-size: 18px"><b>Markdown Generator</b></span>
+            </div>
+            <div class="hint">Editor links · Vorschau rechts · Elemente im linken Menüband</div>
+        </header>
+
+        <div class="main">
+            <aside class="toolbar">
+                <h2>Elemente</h2>
+                <button class="btn" data-action="h1">Überschrift <small>#</small></button>
+                <button class="btn" data-action="h2">Unterüberschrift <small>##</small></button>
+                <button class="btn" data-action="bold">Fett <small>** **</small></button>
+                <button class="btn" data-action="italic">Kursiv <small>* *</small></button>
+                <button class="btn" data-action="link">Link <small>[ ]( )</small></button>
+                <button class="btn" data-action="image">Bild <small>![ ]( )</small></button>
+                <button class="btn" data-action="ul">Liste <small>-</small></button>
+                <button class="btn" data-action="br">Zeilenumbruch <small>&lt;br /&gt;</small></button>
+                <button class="btn" data-action="code">Code <small>```</small></button>
+                <button class="btn" data-action="outline">Gliederung</button>
+            </aside>
+
+            <section class="card">
+                <div class="card-header">
+                    <h3>Editor</h3><button id="downloadMd" class="icon-btn" title="README.md herunterladen">⬇️ MD</button></div>
+                <textarea id="editor" placeholder="Passen Sie die Überschrift und den Autor an. Schreiben Sie dann hier Ihren Artikel"></textarea>
+            </section>
+
+            <section class="card">
+                <div class="card-header">
+                    <h3>Vorschau</h3>
+                </div>
+                <div id="preview" class="preview"></div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        © 2025 Felix Staacke
+    </footer>
+
+    <!-- exakt formatgetreuer PDF-Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <script>
+        function slugify(text) {
+            return text.toLowerCase()
+                .replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss')
+                .normalize('NFD').replace(/[^\p{Letter}\p{Number}\s-]/gu, '')
+                .trim().replace(/\s+/g, '-').replace(/-+/g, '-');
+        }
+
+        function parseMarkdown(src) {
+            src = src.replace(/\r\n?/g, '\n');
+            const codeBlocks = [];
+            src = src.replace(/```([\s\S]*?)```/g, (_, code) => {
+                codeBlocks.push(code);
+                return `§§CODE${codeBlocks.length-1}§§`;
+            });
+            src = src.replace(/^###\s?(.+)$/gm, (m, t) => `<h3 id="${slugify(t)}">${t}</h3>`);
+            src = src.replace(/^##\s?(.+)$/gm, (m, t) => `<h2 id="${slugify(t)}">${t}</h2>`);
+            src = src.replace(/^#\s?(.+)$/gm, (m, t) => `<h1 id="${slugify(t)}">${t}</h1>`);
+            src = src.replace(/(?:^(?:\s*[-*]\s.+)\n?)+/gm, block => {
+                const items = block.trim().split(/\n/).map(l => '<li>' + l.replace(/^\s*[-*]\s/, '') + '</li>').join('');
+                return `<ul>${items}</ul>`;
+            });
+            src = src.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img alt="$1" src="$2" />');
+            src = src.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+            src = src.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+            src = src.replace(/(^|\W)\*(?!\*)([^*]+)\*(?!\*)/g, '$1<em>$2</em>');
+            src = src.split(/\n{2,}/).map(b => /<h\d|<ul|<img|§§CODE/.test(b) ? b : `<p>${b.replace(/\n/g,'<br>')}</p>`).join('\n');
+            src = src.replace(/§§CODE(\d+)§§/g, (_, i) => `<pre><code>${codeBlocks[+i].replace(/[&<>]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[ch]))}</code></pre>`);
+            return src;
+        }
+
+        const editor = document.getElementById('editor');
+        const preview = document.getElementById('preview');
+
+        function render() {
+            preview.innerHTML = parseMarkdown(editor.value.trim());
+        }
+        editor.addEventListener('input', render);
+
+        function wrapSelection(before, after, placeholder) {
+            const s = editor.selectionStart,
+                e = editor.selectionEnd;
+            const sel = e > s ? editor.value.slice(s, e) : (placeholder || 'Text');
+            editor.setRangeText(before + sel + (after || ''), s, e, 'end');
+            editor.focus();
+            render();
+        }
+
+        function insertLine(prefix, sample) {
+            const s = editor.selectionStart,
+                e = editor.selectionEnd,
+                v = editor.value;
+            const ls = v.lastIndexOf('\n', s - 1) + 1,
+                le = v.indexOf('\n', e),
+                endPos = le === -1 ? v.length : le;
+            const current = v.slice(ls, endPos).trim() || sample || '';
+            editor.setSelectionRange(ls, endPos);
+            editor.setRangeText(prefix + current, ls, endPos, 'end');
+            editor.focus();
+            render();
+        }
+
+        function insertAtCursor(text) {
+            const s = editor.selectionStart,
+                e = editor.selectionEnd;
+            editor.setRangeText(text, s, e, 'end');
+            editor.focus();
+            render();
+        }
+
+        function generateOutline() {
+            const lines = editor.value.split(/\n/);
+            let outline = '## Gliederung\n\n';
+            let h2Count = 0;
+            for (let i = 0; i < lines.length; i++) {
+                const l = lines[i];
+                if (/^##\s+/.test(l) && !/^###/.test(l)) {
+                    h2Count++;
+                    const h2Text = l.replace(/^##\s+/, '').trim();
+                    const h2Slug = slugify(h2Text);
+                    let h3Count = 0;
+                    const subs = [];
+                    let j = i + 1;
+                    while (j < lines.length && !/^##\s+/.test(lines[j])) {
+                        if (/^###\s+/.test(lines[j])) {
+                            h3Count++;
+                            const t = lines[j].replace(/^###\s+/, '').trim();
+                            subs.push(`  ${h2Count}.${h3Count} [${t}](#${slugify(t)})`);
+                        }
+                        j++;
+                    }
+                    outline += `${h2Count}. [${h2Text}](#${h2Slug})` + (subs.length ? '<br />\n' + subs.join('\n') + '\n' : '\n');
+                }
+            }
+            insertAtCursor(outline);
+        }
+
+        document.querySelectorAll('.toolbar .btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const a = btn.getAttribute('data-action');
+                switch (a) {
+                    case 'h1':
+                        insertLine('# ', 'Überschrift');
+                        break;
+                    case 'h2':
+                        insertLine('## ', 'Unterüberschrift');
+                        break;
+                    case 'bold':
+                        wrapSelection('**', '**', 'fett');
+                        break;
+                    case 'italic':
+                        wrapSelection('*', '*', 'kursiv');
+                        break;
+                    case 'link':
+                        wrapSelection('[', '](https://example.com)', 'Link');
+                        break;
+                    case 'image':
+                        wrapSelection('![', '](https://placehold.co/800x400)', 'Bild');
+                        break;
+                    case 'ul':
+                        insertLine('- ', 'Listeneintrag');
+                        break;
+                    case 'br':
+                        insertAtCursor('<br />\n');
+                        break;
+                    case 'code':
+                        wrapSelection('```\n', '\n```', 'code');
+                        break;
+                    case 'outline':
+                        generateOutline();
+                        break;
+                }
+            });
+        });
+
+        document.getElementById('downloadMd').addEventListener('click', () => {
+            const blob = new Blob([editor.value], {
+                type: 'text/markdown;charset=utf-8'
+            });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'README.md';
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+
+        const today = new Date();
+        const d = today.toLocaleDateString('de-DE', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit'
+        });
+        editor.value = `# Artikel-Titel\n\n*von **Autor** ${d}*\n\n`;
+        render();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scrum 4 School</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+         :root {
+            --bg: #0b0f17;
+            --card: #0f1624;
+            --text: #d4d9e3;
+            --muted: #93a0b4;
+            --accent1: #7aa8ff;
+            --accent2: #a78bfa;
+            --radius: 18px;
+            --shadow: 0 6px 30px rgba(0, 0, 0, .32), inset 0 1px 0 rgba(255, 255, 255, .03);
+            --ok: #38d39f;
+            --warn: #ffd166;
+            --danger: #ff7a7a;
+        }
+        
+        * {
+            box-sizing: border-box
+        }
+        
+        html,
+        body {
+            height: 100%
+        }
+        
+        body {
+            margin: 0;
+            font-family: 'Inter', system-ui, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+            color: var(--text);
+            background: radial-gradient(80% 120% at 10% 0%, #111b2d 0%, var(--bg) 40%) no-repeat fixed;
+            line-height: 1.55;
+        }
+        
+        header {
+            width: 100%;
+            padding: 24px 20px;
+            text-align: center;
+            font-size: 28px;
+            font-weight: 900;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            background: linear-gradient(180deg, #1a1d23 0%, #111318 100%);
+            color: #e4e7ed;
+            border-bottom: 2px solid rgba(255, 255, 255, .08);
+            box-shadow: 0 4px 18px rgba(0, 0, 0, .6);
+            text-shadow: 0 2px 8px rgba(0, 0, 0, .6);
+        }
+        
+        .wrap {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px 20px 60px;
+        }
+        
+        .section {
+            margin: 20px 0;
+            padding: 18px;
+            background: rgba(255, 255, 255, .04);
+            border: 1px solid rgba(255, 255, 255, .08);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+        
+        details {
+            border-radius: 14px;
+        }
+        
+        summary {
+            list-style: none;
+            cursor: pointer;
+            padding: 8px 0 14px;
+            color: #e7ebf4;
+            border-bottom: 1px dashed rgba(255, 255, 255, .12);
+            user-select: none;
+        }
+        
+        details[open]>summary {
+            border-bottom-style: solid;
+        }
+        
+        summary::-webkit-details-marker {
+            display: none
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 12px 12px;
+        }
+        
+        label {
+            font-size: 13px;
+            color: #a6b1c2;
+            font-weight: 600;
+        }
+        
+        input[type="text"],
+        input[type="date"],
+        textarea,
+        select {
+            width: 100%;
+            appearance: none;
+            background: rgba(255, 255, 255, .04);
+            border: 1px solid rgba(255, 255, 255, .12);
+            color: var(--text);
+            padding: 10px 12px;
+            border-radius: 12px;
+            outline: none;
+            transition: border-color .15s, box-shadow .15s;
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        input[type="text"]:focus,
+        input[type="date"]:focus,
+        textarea:focus,
+        select:focus {
+            border-color: rgba(122, 168, 255, .6);
+            box-shadow: 0 0 0 3px rgba(122, 168, 255, .15);
+        }
+        
+        .button,
+        button {
+            background: linear-gradient(135deg, var(--accent1), var(--accent2));
+            color: #0b0f17;
+            font-weight: 800;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: transform .06s, filter .2s;
+        }
+        
+        .button:hover,
+        button:hover {
+            filter: brightness(1.06)
+        }
+        
+        .button:active,
+        button:active {
+            transform: translateY(1px)
+        }
+        
+        .button.outline {
+            background: transparent;
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, .16);
+        }
+        
+        .todo-list,
+        .sprint-list {
+            padding: 0;
+            list-style: none;
+        }
+        
+        .todo-item,
+        .sprint {
+            margin: 10px 0;
+            padding: 12px;
+            background: rgba(255, 255, 255, .03);
+            border: 1px solid rgba(255, 255, 255, .08);
+            border-radius: 12px;
+        }
+        
+        .todo-head {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 700;
+        }
+        
+        .todo-desc {
+            opacity: .9;
+            margin-top: 4px;
+        }
+        
+        .comment-section {
+            margin-top: 10px;
+        }
+        
+        .comment {
+            margin: 6px 0;
+            padding: 8px 10px;
+            background: rgba(255, 255, 255, .06);
+            border: 1px solid rgba(255, 255, 255, .1);
+            border-radius: 10px;
+            color: #dfe4ee;
+        }
+        
+        .status-circle {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            box-shadow: 0 0 0 2px rgba(0, 0, 0, .25), 0 0 10px rgba(0, 0, 0, .15) inset;
+        }
+        
+        .status-red {
+            background-color: var(--danger);
+        }
+        
+        .status-yellow {
+            background-color: var(--warn);
+        }
+        
+        .status-green {
+            background-color: var(--ok);
+        }
+        
+        .status-inactive {
+            opacity: .35;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .team-member {
+            margin: 6px 0;
+        }
+        
+        .hint {
+            color: var(--muted);
+            font-size: 12px;
+        }
+        
+        .inline-form {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            background: rgba(255, 255, 255, .03);
+            border: 1px dashed rgba(255, 255, 255, .15);
+            padding: 12px;
+            border-radius: 12px;
+        }
+        
+        .inline-form .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        
+        .inline-form .row-full {
+            display: block;
+        }
+        
+        .toolbar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        /* Issues innerhalb der Unterrichtsstunden */
+        
+        .issue-head {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            cursor: pointer;
+            padding: 8px 10px;
+            border-radius: 10px;
+        }
+        
+        .issue-head:hover {
+            background: rgba(255, 255, 255, .06);
+        }
+        
+        .issue-title {
+            font-weight: 600;
+        }
+        
+        .issue-body {
+            margin: 8px 0 0 0;
+            padding: 8px 10px;
+            border-left: 2px solid rgba(255, 255, 255, .12);
+            display: none;
+        }
+        /* Ziele (Chips) */
+        
+        .goals-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 6px;
+        }
+        
+        .goal-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, .06);
+            border: 1px solid rgba(255, 255, 255, .12);
+            font-size: 13px;
+        }
+        
+        .goal-chip .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        
+        .goal-open .dot {
+            background: var(--danger);
+        }
+        
+        .goal-done .dot {
+            background: var(--ok);
+        }
+        /* Logbuch */
+        
+        .log-entry {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+        
+        .log-time {
+            font-family: ui-monospace, Menlo, Consolas, monospace;
+            color: var(--muted);
+            font-size: 12px;
+            white-space: nowrap;
+            padding-top: 2px;
+        }
+        
+        .log-msg {
+            flex: 1;
+        }
+        
+        footer {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 36px 0 60px;
+            color: #a6b1c2;
+        }
+        
+        footer a {
+            color: #a6b1c2;
+            text-decoration: none;
+        }
+        
+        @media (max-width:720px) {
+            table {
+                border-spacing: 8px 10px;
+            }
+            .wrap {
+                padding: 18px 14px 48px;
+            }
+            header {
+                font-size: 24px;
+            }
+            .inline-form .row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+</head>
+
+<body>
+    <header>Scrum 4 School</header>
+
+    <div class="wrap">
+
+        <div class="section" id="backlog">
+            <details open>
+                <summary><label style="font-size: 20px;"><b>Backlog-Informationen</b></label></summary>
+
+                <form id="backlogForm">
+                    <table>
+                        <tr>
+                            <td><label for="projectTitle">Projekttitel:</label></td>
+                            <td colspan="3"><input type="text" id="projectTitle" required></td>
+                        </tr>
+                        <tr>
+                            <td><label for="projectDescription">Projektbeschreibung:</label></td>
+                            <td colspan="3"><textarea id="projectDescription" placeholder="Projektbeschreibung hier eingeben..."></textarea></td>
+                        </tr>
+                        <tr>
+                            <td><label for="startDate">Projektstart:</label></td>
+                            <td><input type="date" id="startDate" required></td>
+                            <td><label for="endDate">Projektende:</label></td>
+                            <td><input type="date" id="endDate" required onchange="calculateDaysLeft()"></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td colspan="3">
+                                <div id="daysLeft" class="hint"></div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><label>Teammitglieder:</label></td>
+                            <td colspan="3">
+                                <div id="teamMembersContainer">
+                                    <div class="team-member"><input type="text" class="team-member-input" id="team-member-input" placeholder="Mitgliedsname"></div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td colspan="3" class="actions">
+                                <button type="button" class="button outline" onclick="addTeamMember()">Teammitglied hinzufügen</button>
+                            </td>
+                        </tr>
+
+                        <!-- TODOs (globales Backlog) -->
+                        <tr>
+                            <td><label>TODO's:</label></td>
+                            <td colspan="3">
+                                <div class="toolbar">
+                                    <span class="hint">Ansicht:</span>
+                                    <select id="todoFilter">
+                    <option value="status-red" selected>Offen</option>
+                    <option value="status-yellow">In Bearbeitung</option>
+                    <option value="status-green">Beendet</option>
+                  </select>
+                                </div>
+
+                                <ul id="todoList" class="todo-list"></ul>
+
+                                <!-- Inline-Form für neue TODOs -->
+                                <div id="newTodoForm" class="inline-form" style="display:none;">
+                                    <div class="row">
+                                        <div>
+                                            <label for="newTodoTitle">Titel</label>
+                                            <input type="text" id="newTodoTitle" placeholder="Kurzer Titel" />
+                                        </div>
+                                        <div>
+                                            <label for="newTodoStatus">Start-Status</label>
+                                            <select id="newTodoStatus">
+                        <option value="status-red" selected>Offen</option>
+                        <option value="status-yellow">In Bearbeitung</option>
+                        <option value="status-green">Beendet</option>
+                      </select>
+                                        </div>
+                                    </div>
+                                    <div class="row-full">
+                                        <label for="newTodoDesc">Beschreibung</label>
+                                        <textarea id="newTodoDesc" placeholder="Beschreibung"></textarea>
+                                    </div>
+                                    <div class="actions">
+                                        <button type="button" class="button" id="createTodoBtn">Hinzufügen</button>
+                                        <button type="button" class="button outline" id="cancelTodoBtn">Abbrechen</button>
+                                    </div>
+                                </div>
+
+                                <div class="actions" style="margin-top:10px;">
+                                    <button type="button" class="button outline" id="toggleNewTodo">TODO hinzufügen</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <div class="actions" style="margin-top:6px;">
+                        <button type="button" class="button" onclick="saveProject()">Projekt speichern</button>
+                        <button type="button" class="button" onclick="loadProject()">Projekt öffnen</button>
+                        <button type="button" class="button" onclick="exportToPDF()">PDF-Report-Export</button>
+                        <input type="file" id="fileInput" style="display:none" accept=".json">
+                    </div>
+                </form>
+            </details>
+        </div>
+
+        <div class="section" id="sprints">
+            <details open>
+                <summary><label style="font-size:20px;"><b>Unterrichtsstunden</b></label></summary>
+            </details>
+
+            <!-- Formular zum Anlegen einer Stunde -->
+            <div id="lessonForm" class="inline-form" style="display:none;">
+                <div class="row">
+                    <div>
+                        <label for="lessonDate">Datum der Stunde</label>
+                        <input type="date" id="lessonDate">
+                    </div>
+                    <div>
+                        <label for="lessonGoalInput">Neues Ziel</label>
+                        <div style="display:flex; gap:8px;">
+                            <input type="text" id="lessonGoalInput" placeholder="z. B. Template Repository weiter aufbereiten">
+                            <button class="button outline" id="addLessonGoalBtn" type="button">Ziel hinzufügen</button>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <div class="hint">Ziele (nicht bearbeitbar, Status später per Issue):</div>
+                    <div id="lessonGoalsPreview" class="goals-list"></div>
+                </div>
+                <div class="actions">
+                    <button class="button" id="createLessonBtn" type="button">Stunde anlegen</button>
+                    <button class="button outline" id="cancelLessonBtn" type="button">Abbrechen</button>
+                </div>
+            </div>
+
+            <div id="sprintContainer"></div>
+            <div class="actions" style="margin-top:8px;">
+                <button class="button outline" id="toggleLessonForm">Unterrichtsstunde hinzufügen</button>
+            </div>
+        </div>
+
+        <!-- Logbuch -->
+        <div class="section" id="logbook">
+            <details open>
+                <summary><label style="font-size:20px;"><b>Logbuch</b></label></summary>
+            </details>
+            <ul id="logList" class="todo-list"></ul>
+        </div>
+
+        <footer>
+            <a id="footerLink" href="https://datenflix007.github.io/" target="_blank" rel="noopener">© <span id="year"></span> Felix Staacke</a>
+        </footer>
+    </div>
+
+    <script>
+        let todos = [];
+        // Stunde: { date:'YYYY-MM-DD', goals:[{text, done, carry?:true}], todos:[{title}], notes:[{time,text}] }
+        let sprints = [];
+        let logbook = [];
+
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        // ===== Utilities =====
+        const esc = s => String(s).replace(/[&<>"']/g, m => ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#39;'
+        }[m]));
+        const statusLabel = s => ({
+            'status-red': 'Offen',
+            'status-yellow': 'In Bearbeitung',
+            'status-green': 'Beendet'
+        })[s] || s;
+        const fmt = iso => new Date(iso).toLocaleString();
+        const todoNum = idx => (idx >= 0 ? idx + 1 : '?'); // globale TODO-Nummer
+
+        function logEvent(type, info) {
+            const entry = {
+                time: new Date().toISOString(),
+                type,
+                info: String(info == null ? '' : info)
+            };
+            logbook.push(entry);
+            renderLogbook();
+        }
+
+
+        function renderLogbook() {
+            const list = document.getElementById('logList');
+            list.innerHTML = logbook.slice().reverse().map(e => `
+        <li class="todo-item">
+          <div class="log-entry">
+            <span class="log-time">${fmt(e.time)}</span>
+            <div class="log-msg"><b>${esc(e.type)}:</b> ${esc(e.info)}</div>
+          </div>
+        </li>`).join('');
+        }
+
+        // ===== Termine / Projektkopf =====
+        function calculateDaysLeft() {
+            const endVal = document.getElementById("endDate").value;
+            const endDate = new Date(endVal);
+            const today = new Date();
+            const el = document.getElementById("daysLeft");
+            if (isNaN(endDate.getTime())) {
+                el.textContent = "Bitte ein gültiges Enddatum auswählen.";
+                el.style.color = 'var(--muted)';
+                return;
+            }
+            const timeDiff = endDate - today;
+            const daysLeft = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+            el.textContent = daysLeft > 0 ? `Noch ${daysLeft} Tag(e) bis zum Projektende.` :
+                (daysLeft === 0 ? "Das Projekt endet heute." : `Das Projekt ist bereits vor ${-daysLeft} Tag(en) beendet.`);
+            el.style.color = (daysLeft <= 7) ? 'var(--danger)' : 'var(--muted)';
+        }
+
+        document.getElementById('projectTitle').addEventListener('change', e => logEvent('Projekttitel gesetzt', e.target.value));
+        document.getElementById('projectDescription').addEventListener('change', e => logEvent('Projektbeschreibung geändert', e.target.value));
+        document.getElementById('startDate').addEventListener('change', e => logEvent('Projektstart gesetzt', e.target.value));
+        document.getElementById('endDate').addEventListener('change', e => logEvent('Projektende gesetzt', e.target.value));
+
+        // ===== Team =====
+        function attachTeamMemberLogging(inputEl) {
+            inputEl.addEventListener('change', () => logEvent('Teammitglied', inputEl.value));
+        }
+        attachTeamMemberLogging(document.getElementById("team-member-input"));
+
+        function addTeamMember() {
+            const container = document.getElementById("teamMembersContainer");
+            const div = document.createElement("div");
+            div.classList.add("team-member");
+            div.innerHTML = '<input type="text" class="team-member-input" placeholder="Mitgliedsname">';
+            container.appendChild(div);
+            attachTeamMemberLogging(div.querySelector('input'));
+            logEvent('Teammitglied-Feld hinzugefügt', 'Neuer Eintrag');
+        }
+
+        // ===== TODOs (Backlog) =====
+        const toggleNewTodoBtn = document.getElementById('toggleNewTodo');
+        const newTodoForm = document.getElementById('newTodoForm');
+        const createTodoBtn = document.getElementById('createTodoBtn');
+        const cancelTodoBtn = document.getElementById('cancelTodoBtn');
+        const todoFilter = document.getElementById('todoFilter');
+
+        toggleNewTodoBtn.addEventListener('click', () => {
+            newTodoForm.style.display = newTodoForm.style.display === 'none' ? 'grid' : 'none';
+            if (newTodoForm.style.display !== 'none') {
+                document.getElementById('newTodoTitle').focus();
+            }
+        });
+        cancelTodoBtn.addEventListener('click', () => {
+            newTodoForm.style.display = 'none';
+            document.getElementById('newTodoTitle').value = '';
+            document.getElementById('newTodoDesc').value = '';
+            document.getElementById('newTodoStatus').value = 'status-red';
+        });
+        createTodoBtn.addEventListener('click', () => {
+            const title = document.getElementById('newTodoTitle').value.trim();
+            const description = document.getElementById('newTodoDesc').value.trim();
+            const status = document.getElementById('newTodoStatus').value;
+            if (!title || !description) {
+                alert('Bitte Titel und Beschreibung angeben.');
+                return;
+            }
+            todos.push({
+                title,
+                description,
+                status,
+                comments: []
+            });
+            logEvent('TODO hinzugefügt', `${title} — ${description}`);
+            cancelTodoBtn.click();
+            updateTodoList();
+            renderSprints();
+        });
+        todoFilter.addEventListener('change', updateTodoList);
+
+        function updateTodoList() {
+            const list = document.getElementById("todoList");
+            list.innerHTML = '';
+            const filter = todoFilter.value;
+
+            const items = todos
+                .map((t, i) => ({
+                    t,
+                    i
+                }))
+                .filter(({
+                    t
+                }) => t.status === filter);
+
+            items.forEach(({
+                        t,
+                        i
+                    }) => {
+                        const num = todoNum(i);
+                        const li = document.createElement('li');
+                        li.className = 'todo-item';
+                        li.innerHTML = `
+          <div class="todo-head">
+            <span class="status-circle ${t.status}"></span>
+            <span>#${num} ${esc(t.title)}</span>
+          </div>
+          <div class="todo-desc">${esc(t.description)}</div>
+
+          <div class="comment-section">
+            <label><b>Kommentare:</b></label>
+            <ul class="todo-list">${t.comments.map(c=>`<li class="comment">${esc(c)}</li>`).join('')}</ul>
+            <textarea id="todoComment-${i}" placeholder="Kommentar schreiben …"></textarea>
+            <div class="actions" style="margin-top:6px;">
+              <select id="todoStatus-${i}">
+                <option value="status-red" ${t.status==='status-red'?'selected':''}>Offen</option>
+                <option value="status-yellow" ${t.status==='status-yellow'?'selected':''}>In Bearbeitung</option>
+                <option value="status-green" ${t.status==='status-green'?'selected':''}>Beendet</option>
+              </select>
+              <button class="button" type="button" onclick="saveTodoMeta(${i})">Speichern</button>
+              <button class="button outline" type="button" onclick="removeTodo(${i})">Entfernen</button>
+            </div>
+          </div>`;
+        list.appendChild(li);
+      });
+    }
+
+    function saveTodoMeta(index){
+      if(index<0 || index>=todos.length) return;
+      const cta = document.getElementById(`todoComment-${index}`);
+      const sel = document.getElementById(`todoStatus-${index}`);
+      const txt = (cta?.value || '').trim();
+      const oldStatus = todos[index].status;
+      if(txt){ todos[index].comments.push(txt); logEvent('Kommentar', `TODO #${todoNum(index)} „${todos[index].title}“ — ${txt}`); }
+      if(sel && sel.value !== oldStatus){ todos[index].status = sel.value; logEvent('Status geändert', `TODO #${todoNum(index)} „${todos[index].title}“: ${statusLabel(oldStatus)} → ${statusLabel(sel.value)}`); }
+      if(cta) cta.value='';
+      updateTodoList(); renderSprints();
+    }
+    function removeTodo(index){
+      const title=todos[index]?.title || 'Unbekannt';
+      logEvent('TODO entfernt', `#${todoNum(index)} ${title}`);
+      todos.splice(index,1);
+      updateTodoList(); renderSprints();
+    }
+
+    // ===== Unterrichtsstunden (Stunden) =====
+    const sprintContainer = document.getElementById("sprintContainer");
+
+    // Formular interaktiv
+    const lessonForm = document.getElementById('lessonForm');
+    const toggleLessonFormBtn = document.getElementById('toggleLessonForm');
+    const createLessonBtn = document.getElementById('createLessonBtn');
+    const cancelLessonBtn = document.getElementById('cancelLessonBtn');
+    const addLessonGoalBtn = document.getElementById('addLessonGoalBtn');
+    const lessonGoalsPreview = document.getElementById('lessonGoalsPreview');
+    let draftGoals = [];
+
+    toggleLessonFormBtn.addEventListener('click', ()=>{
+      lessonForm.style.display = lessonForm.style.display === 'none' ? 'grid' : 'none';
+      if(lessonForm.style.display !== 'none'){
+        document.getElementById('lessonDate').focus();
+        draftGoals = [];
+        renderDraftGoals();
+      }
+    });
+    cancelLessonBtn.addEventListener('click', ()=>{
+      lessonForm.style.display = 'none';
+      draftGoals = []; renderDraftGoals();
+      document.getElementById('lessonDate').value = '';
+      document.getElementById('lessonGoalInput').value = '';
+    });
+    addLessonGoalBtn.addEventListener('click', ()=>{
+      const val = document.getElementById('lessonGoalInput').value.trim();
+      if(!val) return;
+      draftGoals.push({ text: val, done: false });
+      document.getElementById('lessonGoalInput').value = '';
+      renderDraftGoals();
+    });
+    function renderDraftGoals(){
+      lessonGoalsPreview.innerHTML = draftGoals.map((g,idx)=>`
+        <span class="goal-chip goal-open" title="Unerledigt">
+          <span class="dot"></span><span>!${idx+1} ${esc(g.text)}</span>
+        </span>`).join('') || '<span class="hint">Noch keine Ziele hinzugefügt.</span>';
+    }
+
+    createLessonBtn.addEventListener('click', ()=>{
+      const date = document.getElementById('lessonDate').value;
+      if(!date){ alert('Bitte ein Datum für die Stunde wählen.'); return; }
+
+      // neue Stunde
+      const sprint = { date, goals: draftGoals.slice(), todos: [], notes: [] };
+
+      // carry-over: unerledigte Ziele der letzten Stunde übernehmen
+      if(sprints.length){
+        const prev = sprints[sprints.length-1];
+        const carry = (prev.goals || []).filter(g => !g.done).map(g => ({ text: g.text, done:false, carry:true }));
+        sprint.goals = [...carry, ...sprint.goals];
+      }
+
+      sprints.push(sprint);
+      logEvent('Unterrichtsstunde angelegt', `${date} • Ziele: ${sprint.goals.length}`);
+
+      // aufräumen
+      cancelLessonBtn.click();
+
+      renderSprints();
+      // letzten Eintrag öffnen
+      const all = sprintContainer.querySelectorAll('details.lesson');
+      all.forEach((d,idx)=> d.open = (idx === all.length-1));
+    });
+
+    function addTodoToSprint(sprintIndex){
+      const dropdown = document.getElementById(`todoDropdown-${sprintIndex}`);
+      const selectedTitle = dropdown.value;
+      const todo = todos.find(t => t.title === selectedTitle);
+      if(todo){
+        sprints[sprintIndex].todos.push({ title: todo.title });
+        const idx = todos.indexOf(todo);
+        logEvent('TODO der Stunde zugeordnet', `Stunde ${sprintIndex+1}: TODO #${todoNum(idx)} ${selectedTitle}`);
+        renderSprints();
+        const det = sprintContainer.querySelector(`details.lesson[data-index="${sprintIndex}"]`);
+        if(det) det.open = true;
+      }
+    }
+
+    // Issue-Body ein/aus
+    sprintContainer.addEventListener('click', (e)=>{
+      const head = e.target.closest('.issue-head');
+      if(!head) return;
+      const s = head.getAttribute('data-sprint');
+      const t = head.getAttribute('data-todoindex');
+      const body = document.getElementById(`issue-body-${s}-${t}`);
+      if(body) body.style.display = (body.style.display === 'none' || !body.style.display) ? 'block' : 'none';
+    });
+
+    // immer nur eine Stunde geöffnet
+    sprintContainer.addEventListener('toggle', (e)=>{
+      const d = e.target;
+      if(d.tagName.toLowerCase() === 'details' && d.classList.contains('lesson') && d.open){
+        sprintContainer.querySelectorAll('details.lesson').forEach(x => { if(x !== d) x.open = false; });
+      }
+    }, true);
+
+    function renderSprints(){
+      sprintContainer.innerHTML = '';
+      sprints.forEach((sprint, sprintIndex) => {
+        const totalGoals = (sprint.goals || []).length;
+        const doneGoals  = (sprint.goals || []).filter(g=>g.done).length;
+
+        // wählbare TODOs (noch nicht in dieser Stunde) – mit globaler Nummer
+        const options = todos
+          .map((todo, idx)=>({todo, idx}))
+          .filter(({todo}) => !sprint.todos.some(st => st.title === todo.title))
+          .map(({todo, idx}) => `<option value="${esc(todo.title)}">#${idx+1} ${esc(todo.title)}</option>`)
+          .join('');
+
+        // Ziele-Liste visualisieren – mit Nummern der Stunde
+        const goalsHtml = (sprint.goals || []).map((g,gi)=>`
+            <span class="goal-chip ${g.done?'goal-done':'goal-open'}" title="${g.done?'Erledigt':'Unerledigt'}${g.carry?' • übernommen':''}">
+              <span class="dot"></span><span>#${gi+1} ${esc(g.text)}</span>
+            </span>`).join('') || '<span class="hint">Noch keine Ziele.</span>';
+
+        // Issue-Liste
+        const issues = sprint.todos.map(stTodo => {
+          const mainTodo = todos.find(t => t.title === stTodo.title) || {title: stTodo.title, description:'', status:'status-red', comments:[]};
+          const todoIndex = todos.indexOf(mainTodo);
+          const bodyId = `issue-body-${sprintIndex}-${todoIndex}`;
+          const num = todoNum(todoIndex);
+
+          // Dropdown der noch offenen Ziele dieser Stunde – mit Zielnummern
+          const openGoals = (sprint.goals || []).map((g,idx)=>({g,idx})).filter(x=>!x.g.done);
+          const goalSelect = openGoals.length
+            ? `<select id="goalSelect-${sprintIndex}-${todoIndex}">
+                ${openGoals.map(({g,idx})=>`<option value="${idx}">#${idx+1} ${esc(g.text)}</option>`).join('')}
+               </select>
+               <button class="button" type="button" onclick="markGoalDone(${sprintIndex}, ${todoIndex})">Ziel als erledigt markieren</button>`
+            : `<span class="hint">Alle Ziele dieser Stunde sind erledigt.</span>`;
+
+          return `
+            <li class="todo-item">
+              <div class="issue-head" data-sprint="${sprintIndex}" data-todoindex="${todoIndex}">
+                <span class="status-circle ${mainTodo.status}"></span>
+                <span class="issue-title">#${num} ${esc(mainTodo.title)}</span>
+              </div>
+              <div class="issue-body" id="${bodyId}">
+                <div class="todo-desc">${esc(mainTodo.description)}</div>
+                <div class="comment-section" style="margin-top:10px;">
+                  <div class="hint" style="margin-bottom:6px;">Stundenziel erfüllen:</div>
+                  <div class="actions" style="margin-bottom:10px;">
+                    ${goalSelect}
+                  </div>
+                  <label><b>Kommentare:</b></label>
+                  <ul class="todo-list">
+                    ${(mainTodo.comments || []).map(c => `<li class="comment">${esc(c)}</li>`).join('')}
+                  </ul>
+                  <textarea placeholder="Neuen Kommentar hinzufügen" id="comment-${sprintIndex}-${todoIndex}"></textarea>
+                  <div class="actions" style="margin-top:6px;">
+                    <select id="status-${sprintIndex}-${todoIndex}">
+                      <option value="status-red" ${mainTodo.status === "status-red" ? "selected" : ""}>Offen</option>
+                      <option value="status-yellow" ${mainTodo.status === "status-yellow" ? "selected" : ""}>In Bearbeitung</option>
+                      <option value="status-green" ${mainTodo.status === "status-green" ? "selected" : ""}>Beendet</option>
+                    </select>
+                    <button class="button" type="button" onclick="saveSprintTodo(${sprintIndex}, ${todoIndex})">Speichern</button>
+                  </div>
+                </div>
+              </div>
+            </li>`;
+        }).join('');
+
+        // Anmerkungen HTML
+        const notesHtml = (sprint.notes || []).map(n => `
+          <li class="comment"><b>${fmt(n.time)}:</b> ${esc(n.text)}</li>
+        `).join('') || '<span class="hint">Noch keine Anmerkungen.</span>';
+
+        const det = document.createElement('details');
+        det.className = 'lesson';
+        det.setAttribute('data-index', String(sprintIndex));
+        det.innerHTML = `
+          <summary>
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+              <div><b>Unterrichtsstunde ${sprintIndex + 1}</b> • <span>${esc(sprint.date || '')}</span></div>
+              <div class="hint">Ziele erledigt: ${doneGoals}/${totalGoals}</div>
+            </div>
+          </summary>
+          <div class="lesson-body" style="padding-top:12px;">
+            <div class="hint" style="margin-bottom:6px;">Datum: ${esc(sprint.date || '')}</div>
+            <div>
+              <div class="hint">Ziele dieser Stunde:</div>
+              <div class="goals-list">${goalsHtml}</div>
+            </div>
+
+            <div class="actions" style="margin:12px 0;">
+              <select id="todoDropdown-${sprintIndex}">
+                ${options}
+              </select>
+              <button class="button outline" onclick="addTodoToSprint(${sprintIndex})">Issue hinzufügen</button>
+            </div>
+
+            <ul id="sprintTodos-${sprintIndex}" class="todo-list">
+              ${issues}
+            </ul>
+
+            <div style="margin-top:16px;">
+              <div class="hint" style="margin-bottom:6px;">Anmerkungen:</div>
+              <ul class="todo-list" id="notesList-${sprintIndex}">${notesHtml}</ul>
+              <textarea id="noteText-${sprintIndex}" placeholder="Anmerkung eingeben …"></textarea>
+              <div class="actions" style="margin-top:6px;">
+                <button class="button outline" type="button" onclick="addLessonNote(${sprintIndex})">Anmerkung hinzufügen</button>
+              </div>
+            </div>
+          </div>
+        `;
+        sprintContainer.appendChild(det);
+      });
+    }
+
+    // Issue-Aktion: Ziel als erledigt markieren
+    function markGoalDone(sprintIndex, todoIndex){
+      const sel = document.getElementById(`goalSelect-${sprintIndex}-${todoIndex}`);
+      if(!sel) return;
+      const gi = parseInt(sel.value,10);
+      const sprint = sprints[sprintIndex];
+      if(!sprint || !sprint.goals || sprint.goals[gi]==null) return;
+      sprint.goals[gi].done = true;
+
+      const issue = todos[todoIndex];
+      logEvent('Stundenziel erledigt', `Stunde ${sprintIndex+1}: Ziel #${gi+1} „${sprint.goals[gi].text}“ via TODO #${todoNum(todoIndex)} „${issue?.title||'–'}“`);
+      renderSprints();
+      updateTodoList();
+
+      const det = sprintContainer.querySelector(`details.lesson[data-index="${sprintIndex}"]`);
+      if(det) det.open = true;
+    }
+
+    function saveSprintTodo(sprintIndex, todoIndex){
+      const commentInput = document.getElementById(`comment-${sprintIndex}-${todoIndex}`);
+      const statusSelect = document.getElementById(`status-${sprintIndex}-${todoIndex}`);
+      const newComment = (commentInput?.value || '').trim();
+      const oldStatus = todos[todoIndex]?.status || 'status-red';
+      const newStatus = statusSelect?.value || oldStatus;
+      if (todoIndex < 0 || todoIndex >= todos.length) return;
+
+      if (newComment) {
+        todos[todoIndex].comments.push(newComment);
+        logEvent('Sprint-Kommentar', `Stunde ${sprintIndex + 1} • TODO #${todoNum(todoIndex)} „${todos[todoIndex].title}“ — ${newComment}`);
+      }
+      if (newStatus !== oldStatus) {
+        todos[todoIndex].status = newStatus;
+        logEvent('Status geändert (Stunde)', `TODO #${todoNum(todoIndex)} „${todos[todoIndex].title}“: ${statusLabel(oldStatus)} → ${statusLabel(newStatus)}`);
+      }
+      if(commentInput) commentInput.value = "";
+      updateTodoList();
+      renderSprints();
+      const det = sprintContainer.querySelector(`details.lesson[data-index="${sprintIndex}"]`);
+      if(det) det.open = true;
+    }
+
+    // Manuelle Notizen pro Stunde
+    function addLessonNote(sprintIndex){
+      const ta = document.getElementById(`noteText-${sprintIndex}`);
+      const text = (ta?.value || '').trim();
+      if(!text) return;
+      const s = sprints[sprintIndex];
+      if(!s.notes) s.notes = [];
+      s.notes.push({ time:new Date().toISOString(), text });
+      logEvent('Stunden-Notiz', `Stunde ${sprintIndex+1}: ${text}`);
+      if(ta) ta.value = '';
+      renderSprints();
+      const det = sprintContainer.querySelector(`details.lesson[data-index="${sprintIndex}"]`);
+      if(det) det.open = true;
+    }
+
+    // ===== Projekt speichern / laden =====
+    function saveProject(){
+      try{
+        const title = document.getElementById("projectTitle").value.trim();
+        const desc  = document.getElementById("projectDescription").value.trim();
+        const start = document.getElementById("startDate").value;
+        const end   = document.getElementById("endDate").value;
+        const members = Array.from(document.querySelectorAll(".team-member-input")).map(i=>i.value.trim()).filter(Boolean);
+
+        if(!title){ alert("Bitte einen Projekttitel angeben."); return; }
+        if(!start || !end){ alert("Bitte Start- und Enddatum angeben."); return; }
+        if(new Date(start) > new Date(end)){ alert("Das Startdatum darf nicht nach dem Enddatum liegen."); return; }
+
+        const project = { title, description:desc, startDate:start, endDate:end, teamMembers:members, todos, sprints, logbook };
+        const json = JSON.stringify(project, null, 2);
+        const d = new Date();
+        const fname = `${title.replace(/\s+/g,'_')}_${d.getFullYear()}${(d.getMonth()+1+'').padStart(2,'0')}${(d.getDate()+'').padStart(2,'0')}_${(d.getHours()+'' ).padStart(2,'0')}${(d.getMinutes()+'' ).padStart(2,'0')}.json`;
+        const blob = new Blob([json], {type:"application/json"});
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob); a.download = fname; a.click();
+        logEvent('Projekt gespeichert', fname);
+        alert("Das Projekt wurde erfolgreich gespeichert!");
+      }catch(err){
+        console.error(err); alert("Fehler beim Speichern.");
+      }
+    }
+
+    function loadProject(){
+      const input = document.getElementById("fileInput");
+      input.click();
+      input.onchange = (event)=>{
+        const file = event.target.files[0]; if(!file) return;
+        const reader = new FileReader();
+        reader.onload = (e)=> loadProjectData(JSON.parse(e.target.result));
+        reader.readAsText(file);
+      };
+    }
+
+    function loadProjectData(data){
+      document.getElementById("projectTitle").value = data.title || '';
+      document.getElementById("projectDescription").value = data.description || '';
+      document.getElementById("startDate").value = data.startDate || '';
+      document.getElementById("endDate").value = data.endDate || '';
+      calculateDaysLeft();
+
+      const teamContainer = document.getElementById("teamMembersContainer");
+      teamContainer.innerHTML = '';
+      (data.teamMembers || []).forEach(member=>{
+        const div=document.createElement("div");
+        div.classList.add("team-member");
+        div.innerHTML = `<input type="text" class="team-member-input" value="${esc(member)}">`;
+        teamContainer.appendChild(div);
+        attachTeamMemberLogging(div.querySelector('input'));
+      });
+
+      todos = (data.todos || []).map(t => ({
+        title: t.title, description: t.description, status: t.status||'status-red',
+        comments: Array.isArray(t.comments) ? t.comments : []
+      }));
+
+      // Stunden laden (kompatibel)
+      sprints = (data.sprints || []).map(s => {
+        let goalsArr;
+        if (Array.isArray(s.goals)) {
+          goalsArr = s.goals.map(g => ({ text:g.text || String(g), done: !!g.done, carry: !!g.carry }));
+        } else if (typeof s.goals === 'string' && s.goals.trim()) {
+          goalsArr = [{ text: s.goals.trim(), done:false }];
+        } else if (typeof s.description === 'string' && s.description.trim()) {
+          goalsArr = [{ text: s.description.trim(), done:false }];
+        } else {
+          goalsArr = [];
+        }
+        return { date: s.date || '', goals: goalsArr, todos: s.todos || [], notes: Array.isArray(s.notes)? s.notes: [] };
+      });
+
+      logbook = Array.isArray(data.logbook) ? data.logbook : [];
+      renderLogbook();
+      updateTodoList();
+      renderSprints();
+      logEvent('Projekt geladen', data.title || 'Ohne Titel');
+    }
+
+    // ===== PDF-Export =====
+    function exportToPDF(){
+      const element = document.body;
+      const options = { margin:1, filename:'Projekt-Report.pdf', image:{type:'jpeg',quality:0.98}, html2canvas:{scale:2}, jsPDF:{unit:'cm',format:'a4',orientation:'portrait'} };
+      html2pdf().from(element).set(options).save();
+      logEvent('PDF exportiert', 'Projekt-Report.pdf');
+    }
+
+    // Initial
+    updateTodoList(); renderLogbook(); calculateDaysLeft();
+    </script>
+</body>
+
+</html>
