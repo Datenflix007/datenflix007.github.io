@@ -1,26 +1,4 @@
 {
-    "type": "FeatureCollection",
-    "features": [{
-            "type": "Feature",
-            "geometry": { "type": "Point", "coordinates": [12.3747, 51.3402] },
-            "properties": {
-                "title": "Altes Rathaus",
-                "subtitle": "Stadtkern",
-                "description": "Erstmals erwähnt im 13. Jahrhundert…",
-                "era": "Hochmittelalter",
-                "tags": ["Rathaus", "Bauwerk"],
-                "link": "https://de.wikipedia.org/wiki/Beispiel"
-            }
-        },
-        {
-            "type": "Feature",
-            "geometry": { "type": "Point", "coordinates": [12.379, 51.338] },
-            "properties": {
-                "title": "Stadtmauerrest",
-                "description": "Mauerabschnitt nahe …",
-                "era": ["Spätmittelalter", "Frühe Neuzeit"],
-                "tags": ["Befestigung"]
-            }
-        }
-    ]
+  "type": "FeatureCollection",
+  "features": []
 }
