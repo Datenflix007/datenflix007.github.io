@@ -6,8 +6,8 @@
     <meta name="viewport" content="initial-scale=1, width=device-width" />
     <title>Naumburg Interaktiv</title>
 
-    <!-- Leaflet (CDN, funktioniert auf GitHub Pages) -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <!-- Leaflet (CDN) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
     <style>
@@ -73,6 +73,21 @@
             gap: 4px;
         }
         
+        .sep {
+            height: 1px;
+            background: #e5e7eb;
+            margin: 8px 0;
+        }
+        
+        input[type="range"] {
+            width: 100%;
+        }
+        
+        .leaflet-control-attribution {
+            font-size: 11px;
+        }
+        /* Info-Panel */
+        
         #info {
             position: absolute;
             right: 12px;
@@ -82,9 +97,9 @@
             border: 1px solid var(--panel-border);
             border-radius: var(--panel-radius);
             padding: 12px;
-            width: min(380px, 92vw);
+            width: min(420px, 92vw);
             font-family: system-ui, sans-serif;
-            max-height: 40%;
+            max-height: 50%;
             overflow: auto;
             box-shadow: 0 10px 24px rgba(0, 0, 0, .12);
         }
@@ -95,16 +110,14 @@
         }
         
         #info p {
-            margin: 0 0 6px;
+            margin: 0 0 10px;
             font-size: 13px;
-            line-height: 1.35;
+            line-height: 1.4;
         }
         
-        #chips {
-            display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
-            margin-top: 6px;
+        .muted {
+            color: var(--muted);
+            font-size: 12px;
         }
         
         .chip {
@@ -114,33 +127,71 @@
             font-size: 11px;
         }
         
-        .sep {
-            height: 1px;
-            background: #e5e7eb;
-            margin: 8px 0;
+        #chips {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-top: 6px;
         }
+        /* Infokarten Controls */
         
-        .muted {
-            color: var(--muted);
-            font-size: 12px;
-        }
-        
-        .tight {
-            margin: 0;
-        }
-        
-        .switch {
-            display: inline-flex;
-            gap: 8px;
+        .info-controls {
+            position: sticky;
+            top: 0;
+            display: flex;
+            justify-content: flex-end;
             align-items: center;
+            gap: 6px;
+            margin: -6px -6px 8px 0;
         }
         
-        input[type="range"] {
-            width: 100%;
+        .btn-icon {
+            appearance: none;
+            border: 1px solid var(--panel-border);
+            background: #fff;
+            border-radius: 10px;
+            width: 28px;
+            height: 28px;
+            display: inline-grid;
+            place-items: center;
+            cursor: pointer;
+            font-weight: 700;
+            line-height: 1;
+            padding: 0;
         }
         
-        .leaflet-control-attribution {
-            font-size: 11px;
+        .btn-icon:hover {
+            filter: brightness(0.98);
+        }
+        
+        .nav-wrap {
+            display: flex;
+            gap: 6px;
+            margin-left: auto;
+        }
+        
+        .info-meta {
+            font-size: 12px;
+            color: #333;
+            margin-left: auto;
+        }
+        /* Hilfe-Button rechts unten */
+        
+        #helpBtn {
+            position: absolute;
+            right: 16px;
+            bottom: 16px;
+            z-index: 900;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: #fff;
+            border: 1px solid var(--panel-border);
+            box-shadow: 0 8px 18px rgba(0, 0, 0, .15);
+            display: grid;
+            place-items: center;
+            cursor: pointer;
+            font-weight: 800;
         }
     </style>
 </head>
@@ -171,80 +222,76 @@
         <input id="overlayOpacity" type="range" min="0" max="1" step="0.05" value="0.6" aria-label="Overlay-Transparenz">
     </section>
 
-    <!-- Info Panel -->
-    <aside id="info" aria-live="polite">
-        <h3>Willkommen 👋</h3>
-        <p class="tight">Klicke auf einen POI oder eine Fläche, um Details zu sehen.</p>
-        <p class="muted tight">Epoche filtert Inhalte; Karten-Overlays können ein- und ausgeblendet werden.</p>
-        <div id="chips"></div>
-    </aside>
+    <!-- Info Panel (POI/Polygon-Infos & Infokarten) -->
+    <aside id="info" aria-live="polite"></aside>
+
+    <!-- Hilfe-Button -->
+    <button id="helpBtn" title="Hilfe (Infokarten anzeigen)">?</button>
 
     <script>
         // --------- Konfiguration & Epochen ----------
-        const DEFAULT_ERAS = [
-            "Frühmittelalter",
-            "Hochmittelalter",
-            "Spätmittelalter",
-            "Frühe Neuzeit",
-            "Moderne",
-            "Postmoderne"
-        ];
+        var DEFAULT_ERAS = ["Frühmittelalter", "Hochmittelalter", "Spätmittelalter", "Frühe Neuzeit", "Moderne", "Postmoderne"];
 
-        // Datenquellen (relativ – funktionieren auf GitHub Pages)
-        const DATA = {
+        // Datenquellen
+        var DATA = {
             config: 'assets/data/config.json',
             pois: 'assets/data/pois.json',
             polygons: 'assets/data/polygons.geojson',
-            overlays: 'assets/data/overlays.json'
+            overlays: 'assets/data/overlays.json',
+            cardsIdx: 'assets/infocards/index.json', // <- Liste der Markdown-Dateien
+            cardsDir: 'assets/infocards/'
         };
 
         // Globale Variablen/Layers
-        let map, poiLayer, polygonLayer;
-        let overlayLayers = []; // L.ImageOverlay[]
-        let ERAS = DEFAULT_ERAS;
-        let currentEraIndex = 0;
+        var map, poiLayer, polygonLayer;
+        var overlayLayers = [];
+        var ERAS = DEFAULT_ERAS;
+        var currentEraIndex = 0;
 
-        // Utility: Leaflet-Icon-Pfad für GitHub Pages fixen
+        // Infokarten
+        var infoCards = []; // [{title, file, html}]
+        var infoCardIndex = 0; // aktueller Slide
+        var infoPanelOpen = true; // Status
+
+        // Leaflet-Icons fixen (CDN)
         (function fixLeafletIconPath() {
-            const iconUrl = "https://unpkg.com/leaflet@1.9.4/dist/images/";
-            const LIcon = L.Icon.Default;
+            var base = "https://unpkg.com/leaflet@1.9.4/dist/images/";
+            var LIcon = L.Icon.Default;
             LIcon.mergeOptions({
-                iconRetinaUrl: iconUrl + 'marker-icon-2x.png',
-                iconUrl: iconUrl + 'marker-icon.png',
-                shadowUrl: iconUrl + 'marker-shadow.png'
+                iconRetinaUrl: base + 'marker-icon-2x.png',
+                iconUrl: base + 'marker-icon.png',
+                shadowUrl: base + 'marker-shadow.png'
             });
         })();
 
         // --------- Init ----------
         (async function init() {
-            // 1) Config laden
-            const cfg = await fetchJSON(DATA.config, {
+            // 1) Config
+            var cfg = await fetchJSON(DATA.config, {
                 start: {
                     lat: 52.52,
                     lon: 13.405,
                     zoom: 12
-                }, // Fallback Berlin
+                },
                 eras: DEFAULT_ERAS
             });
-            ERAS = Array.isArray(cfg.eras) && cfg.eras.length ? cfg.eras : DEFAULT_ERAS;
+            ERAS = (cfg && Array.isArray(cfg.eras) && cfg.eras.length) ? cfg.eras : DEFAULT_ERAS;
 
-            // 2) Karte aufsetzen
+            // 2) Map
             map = L.map('map', {
                 center: [cfg.start.lat, cfg.start.lon],
                 zoom: cfg.start.zoom,
                 preferCanvas: true
             });
 
-            // 3) OSM-Basiskarte
-            const osm = L.tileLayer(
-                'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    maxZoom: 20,
-                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> Mitwirkende'
-                }
-            ).addTo(map);
+            // 3) OSM
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 20,
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> Mitwirkende'
+            }).addTo(map);
 
-            // 4) Daten laden: POIs, Polygone, Overlays
-            const [pois, polygons, overlays] = await Promise.all([
+            // 4) Daten
+            var all = await Promise.all([
                 fetchJSON(DATA.pois, {
                     features: []
                 }),
@@ -252,24 +299,25 @@
                     type: "FeatureCollection",
                     features: []
                 }),
-                fetchJSON(DATA.overlays, [])
+                fetchJSON(DATA.overlays, []),
+                loadInfoCards() // Infokarten laden
             ]);
+            var pois = all[0];
+            var polygons = all[1];
+            var overlays = all[2];
 
-            // 5) Layer erstellen
+            // 5) POIs
             poiLayer = L.geoJSON(pois, {
                 pointToLayer: function(feature, latlng) {
                     var title = "POI";
                     if (feature && feature.properties && feature.properties.title !== undefined && feature.properties.title !== null && feature.properties.title !== "") {
                         title = feature.properties.title;
                     }
-
                     var m = L.marker(latlng, {
                         title: title
                     });
-
-                    // Interaktion
                     m.on('click', function() {
-                        showInfo(feature);
+                        showFeatureInfo(feature);
                     });
                     return m;
                 },
@@ -278,26 +326,15 @@
                 }
             }).addTo(map);
 
-
+            // 6) Polygone
             polygonLayer = L.geoJSON(polygons, {
                 style: function(f) {
                     var p = (f && f.properties) ? f.properties : {};
-
-                    var color = (p.stroke !== undefined && p.stroke !== null && p.stroke !== '') ?
-                        p.stroke : '#0a7cff';
-
-                    var weight = (p['stroke-width'] !== undefined && p['stroke-width'] !== null && p['stroke-width'] !== '') ?
-                        Number(p['stroke-width']) : 2;
-
-                    var opacity = (p['stroke-opacity'] !== undefined && p['stroke-opacity'] !== null && p['stroke-opacity'] !== '') ?
-                        Number(p['stroke-opacity']) : 0.9;
-
-                    var fillColor = (p.fill !== undefined && p.fill !== null && p.fill !== '') ?
-                        p.fill : '#0a7cff';
-
-                    var fillOpacity = (p['fill-opacity'] !== undefined && p['fill-opacity'] !== null && p['fill-opacity'] !== '') ?
-                        Number(p['fill-opacity']) : 0.15;
-
+                    var color = (p.stroke !== undefined && p.stroke !== null && p.stroke !== '') ? p.stroke : '#0a7cff';
+                    var weight = (p['stroke-width'] !== undefined && p['stroke-width'] !== null && p['stroke-width'] !== '') ? Number(p['stroke-width']) : 2;
+                    var opacity = (p['stroke-opacity'] !== undefined && p['stroke-opacity'] !== null && p['stroke-opacity'] !== '') ? Number(p['stroke-opacity']) : 0.9;
+                    var fillColor = (p.fill !== undefined && p.fill !== null && p.fill !== '') ? p.fill : '#0a7cff';
+                    var fillOpacity = (p['fill-opacity'] !== undefined && p['fill-opacity'] !== null && p['fill-opacity'] !== '') ? Number(p['fill-opacity']) : 0.15;
                     return {
                         color: color,
                         weight: weight,
@@ -308,7 +345,7 @@
                 },
                 onEachFeature: function(feature, layer) {
                     layer.on('click', function() {
-                        showInfo(feature);
+                        showFeatureInfo(feature);
                     });
                 },
                 filter: function(f) {
@@ -316,17 +353,13 @@
                 }
             }).addTo(map);
 
-
-
-            // 6) Bild-Overlays anlegen (z.B. historische Karten-Ausschnitte)
-            overlayLayers = overlays.map(ov => {
-                // Erwartet ov.bounds = [[south, west], [north, east]] oder vier Eckpunkte?
-                // Wir unterstützen standardmäßig Leaflet-Bounds: [[south, west], [north, east]]
-                const bounds = toBounds(ov);
-                const layer = L.imageOverlay(ov.url, bounds, {
+            // 7) Overlays
+            overlayLayers = overlays.map(function(ov) {
+                var bounds = toBounds(ov);
+                var layer = L.imageOverlay(ov.url, bounds, {
                     opacity: 0.6,
                     interactive: false,
-                    crossOrigin: 'anonymous' // hilfreich, falls externe Quellen CORS erlauben
+                    crossOrigin: 'anonymous'
                 });
                 if (filterByEra({
                         properties: ov
@@ -337,19 +370,22 @@
             });
             updateOverlayMeta();
 
-            // 7) UI verbinden
+            // 8) UI
             setupUI(cfg);
 
-            // 8) Optional: Startausdehnung aus Config (wenn vorhanden)
-            if (cfg.fitBounds && Array.isArray(cfg.fitBounds) && cfg.fitBounds.length === 2) {
+            // 9) Start-Bounds optional
+            if (cfg && Array.isArray(cfg.fitBounds) && cfg.fitBounds.length === 2) {
                 map.fitBounds(cfg.fitBounds);
             }
+
+            // 10) Zu Beginn: Infokarten anzeigen
+            renderInfoCards();
         })();
 
         // --------- Helpers ----------
-        async function fetchJSON(url, fallback = null) {
+        async function fetchJSON(url, fallback) {
             try {
-                const res = await fetch(url, {
+                var res = await fetch(url, {
                     cache: 'no-store'
                 });
                 if (!res.ok) throw new Error(res.status + ' ' + url);
@@ -361,28 +397,18 @@
         }
 
         function filterByEra(feature) {
-            // Feature darf die Eigenschaft "era" haben:
-            // - string (genau einer der ERAS)
-            // - array von strings (mehrere Epochen)
-
             var propEra = null;
             if (feature && feature.properties && feature.properties.era !== undefined && feature.properties.era !== null) {
                 propEra = feature.properties.era;
             }
-
-            if (propEra === null) return true; // ohne Angabe in allen Epochen sichtbar
-
+            if (propEra === null) return true;
             var eraName = ERAS[currentEraIndex];
-
-            if (Array.isArray(propEra)) {
-                return propEra.indexOf(eraName) !== -1;
-            }
+            if (Array.isArray(propEra)) return propEra.indexOf(eraName) !== -1;
             return propEra === eraName;
         }
 
-
         function refreshFilters() {
-            // POIs aktualisieren
+            // POIs
             poiLayer.clearLayers();
             fetchJSON(DATA.pois, {
                 features: []
@@ -393,8 +419,7 @@
                     poiLayer.addData(pois);
                 }
             });
-
-            // Polygone neu
+            // Polygone
             polygonLayer.clearLayers();
             fetchJSON(DATA.polygons, {
                 type: "FeatureCollection",
@@ -402,14 +427,11 @@
             }).then(function(polygons) {
                 polygonLayer.addData(polygons);
             });
-
-            // Overlays je nach Epoche zeigen/verbergen
+            // Overlays
             fetchJSON(DATA.overlays, []).then(function(overlays) {
-                // Entferne alte
                 overlayLayers.forEach(function(l) {
                     map.removeLayer(l);
                 });
-
                 overlayLayers = overlays.map(function(ov) {
                     var bounds = toBounds(ov);
                     var layer = L.imageOverlay(ov.url, bounds, {
@@ -417,16 +439,12 @@
                         interactive: false,
                         crossOrigin: 'anonymous'
                     });
-
-                    // explizit prüfen
                     var toggleEl = document.getElementById('toggleOverlays');
                     var visible = false;
-                    if (toggleEl && toggleEl.checked) {
-                        if (filterByEra({
-                                properties: ov
-                            })) {
-                            visible = true;
-                        }
+                    if (toggleEl && toggleEl.checked && filterByEra({
+                            properties: ov
+                        })) {
+                        visible = true;
                     }
                     if (visible) {
                         layer.addTo(map);
@@ -437,32 +455,31 @@
             });
         }
 
-
         function toBounds(ov) {
-            // Unterstützt zwei Varianten:
-            // 1) ov.bounds = [[south, west], [north, east]]  (Leaflet LatLngBounds)
-            // 2) ov.corners = { nw:[lat,lon], ne:[lat,lon], se:[lat,lon], sw:[lat,lon] } -> wir approximieren Bounds
-            if (Array.isArray(ov.bounds) && ov.bounds.length === 2) return ov.bounds;
-            if (ov.corners) {
-                const lats = Object.values(ov.corners).map(c => c[0]);
-                const lons = Object.values(ov.corners).map(c => c[1]);
+            if (ov && Array.isArray(ov.bounds) && ov.bounds.length === 2) return ov.bounds;
+            if (ov && ov.corners) {
+                var lats = Object.values(ov.corners).map(function(c) {
+                    return c[0];
+                });
+                var lons = Object.values(ov.corners).map(function(c) {
+                    return c[1];
+                });
                 return [
-                    [Math.min(...lats), Math.min(...lons)],
-                    [Math.max(...lats), Math.max(...lons)]
+                    [Math.min.apply(null, lats), Math.min.apply(null, lons)],
+                    [Math.max.apply(null, lats), Math.max.apply(null, lons)]
                 ];
             }
             throw new Error('Overlay ohne gültige bounds/corners');
         }
 
         function setupUI(cfg) {
-            const eraInput = document.getElementById('era');
-            const eraName = document.getElementById('eraName');
-            const eraIndexOut = document.getElementById('eraIndex');
-            const toggleOverlays = document.getElementById('toggleOverlays');
-            const overlayOpacity = document.getElementById('overlayOpacity');
-            const opacityVal = document.getElementById('opacityVal');
+            var eraInput = document.getElementById('era');
+            var eraName = document.getElementById('eraName');
+            var eraIndexOut = document.getElementById('eraIndex');
+            var toggleOverlays = document.getElementById('toggleOverlays');
+            var overlayOpacity = document.getElementById('overlayOpacity');
+            var opacityVal = document.getElementById('opacityVal');
 
-            // Slider-Beschriftung & Grenzen gemäß ERAS
             eraInput.max = ERAS.length - 1;
 
             function updateEraUI(idx) {
@@ -470,10 +487,8 @@
                 eraIndexOut.textContent = (parseInt(idx, 10) + 1) + '/' + ERAS.length;
             }
 
-            // Startwert ggf. aus URL-Parametern ?era=Spätmittelalter
             var url = new URL(location.href);
             var pEra = url.searchParams.get('era');
-
             var startIdx;
             if (pEra && ERAS.indexOf(pEra) >= 0) {
                 startIdx = Math.max(0, ERAS.indexOf(pEra));
@@ -482,77 +497,250 @@
             } else {
                 startIdx = 0;
             }
-
-            if (isFinite(startIdx)) {
-                currentEraIndex = startIdx;
-            } else {
-                currentEraIndex = 0;
-            }
+            currentEraIndex = isFinite(startIdx) ? startIdx : 0;
 
             eraInput.value = currentEraIndex;
             updateEraUI(currentEraIndex);
 
-
-            eraInput.addEventListener('input', (e) => {
+            eraInput.addEventListener('input', function(e) {
                 currentEraIndex = parseInt(e.target.value, 10);
                 updateEraUI(currentEraIndex);
                 refreshFilters();
             });
-
-            toggleOverlays.addEventListener('change', () => {
-                overlayLayers.forEach(l => {
+            toggleOverlays.addEventListener('change', function() {
+                overlayLayers.forEach(function(l) {
                     if (toggleOverlays.checked) l.addTo(map);
                     else map.removeLayer(l);
                 });
                 updateOverlayMeta();
             });
-
-            overlayOpacity.addEventListener('input', (e) => {
-                const v = parseFloat(e.target.value);
+            overlayOpacity.addEventListener('input', function(e) {
+                var v = parseFloat(e.target.value);
                 opacityVal.textContent = v.toFixed(2);
-                overlayLayers.forEach(l => l.setOpacity(v));
+                overlayLayers.forEach(function(l) {
+                    l.setOpacity(v);
+                });
             });
 
-            // URL-Parameter überschreiben Startkoordinate/Zoom: ?lat=..&lon=..&z=..
-            const pLat = parseFloat(url.searchParams.get('lat'));
-            const pLon = parseFloat(url.searchParams.get('lon'));
-            const pZ = parseInt(url.searchParams.get('z'), 10);
+            var pLat = parseFloat(url.searchParams.get('lat'));
+            var pLon = parseFloat(url.searchParams.get('lon'));
+            var pZ = parseInt(url.searchParams.get('z'), 10);
             if (isFinite(pLat) && isFinite(pLon)) map.setView([pLat, pLon], isFinite(pZ) ? pZ : map.getZoom());
+
+            // Hilfe-Button
+            var hb = document.getElementById('helpBtn');
+            hb.addEventListener('click', function() {
+                infoPanelOpen = true;
+                infoCardIndex = 0;
+                renderInfoCards();
+            });
         }
 
         function updateOverlayMeta() {
-            const m = document.getElementById('overlayCount');
-            const count = overlayLayers.filter(l => map.hasLayer(l)).length;
+            var m = document.getElementById('overlayCount');
+            var count = overlayLayers.filter(function(l) {
+                return map.hasLayer(l);
+            }).length;
             m.textContent = count + ' sichtbar';
         }
 
-        function showInfo(feature) {
-            const info = document.getElementById('info');
-            const chips = document.getElementById('chips');
-            const p = feature.properties || {};
-            info.innerHTML = `
-      <h3>${escapeHTML(p.title || 'Objekt')}</h3>
-      ${p.subtitle ? `<p class="muted tight">${escapeHTML(p.subtitle)}</p>` : ''}
-      ${p.description ? `<p>${escapeHTML(p.description)}</p>` : ''}
-      ${p.link ? `<p><a href="${p.link}" target="_blank" rel="noopener">Mehr&nbsp;Infos</a></p>` : ''}
-      <div id="chips"></div>
-    `;
-    const chipWrap = info.querySelector('#chips');
-    const tags = Array.isArray(p.tags) ? p.tags : [];
-    const era = p.era ? (Array.isArray(p.era) ? p.era : [p.era]) : [];
-    [...tags, ...era].forEach(t => {
-      const s = document.createElement('span');
-      s.className = 'chip';
-      s.textContent = t;
-      chipWrap.appendChild(s);
-    });
-  }
+        // ---------- POI/Polygon-Info ----------
+        function showFeatureInfo(feature) {
+            infoPanelOpen = true; // Panel sichtbar halten
+            var info = document.getElementById('info');
+            var p = (feature && feature.properties) ? feature.properties : {};
+            var title = (p.title !== undefined && p.title !== null && p.title !== "") ? p.title : "Objekt";
 
-  function escapeHTML(str) {
-    return String(str).replace(/[&<>"']/g, s => ({
-      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-    }[s]));
-  }
+            var html = '';
+            html += '<div class="info-controls">';
+            html += '  <button class="btn-icon" id="closeInfo" title="Schließen">×</button>';
+            html += '</div>';
+            html += '<h3>' + escapeHTML(title) + '</h3>';
+            if (p.subtitle) html += '<p class="muted">' + escapeHTML(p.subtitle) + '</p>';
+            if (p.description) html += '<p>' + escapeHTML(p.description) + '</p>';
+            if (p.link) html += '<p><a href="' + p.link + '" target="_blank" rel="noopener">Mehr&nbsp;Infos</a></p>';
+
+            // Chips
+            var tags = Array.isArray(p.tags) ? p.tags : [];
+            var era = p.era ? (Array.isArray(p.era) ? p.era : [p.era]) : [];
+            if (tags.length || era.length) {
+                html += '<div id="chips">';
+                tags.concat(era).forEach(function(t) {
+                    html += '<span class="chip">' + escapeHTML(t) + '</span>';
+                });
+                html += '</div>';
+            }
+
+            var infoEl = document.getElementById('info');
+            infoEl.innerHTML = html;
+
+            document.getElementById('closeInfo').addEventListener('click', function() {
+                hideInfoPanel();
+            });
+        }
+
+        function hideInfoPanel() {
+            var info = document.getElementById('info');
+            info.innerHTML = '';
+            infoPanelOpen = false;
+        }
+
+        // ---------- Infokarten (Markdown) ----------
+        async function loadInfoCards() {
+            try {
+                var idx = await fetchJSON(DATA.cardsIdx, []);
+                if (!Array.isArray(idx)) idx = [];
+                // Lade alle Markdown-Dateien und render sie zu HTML
+                var promises = idx.map(function(entry) {
+                    var file = entry && entry.file ? entry.file : null;
+                    var title = entry && entry.title ? entry.title : '';
+                    if (!file) return Promise.resolve(null);
+                    return fetch(DATA.cardsDir + file, {
+                            cache: 'no-store'
+                        })
+                        .then(function(res) {
+                            if (!res.ok) throw new Error('fetch ' + file);
+                            return res.text();
+                        })
+                        .then(function(md) {
+                            return {
+                                title: title,
+                                file: file,
+                                html: mdToHtml(md)
+                            };
+                        })
+                        .catch(function() {
+                            return null;
+                        });
+                });
+                var results = await Promise.all(promises);
+                infoCards = results.filter(function(x) {
+                    return x !== null;
+                });
+            } catch (e) {
+                console.warn('Infokarten konnten nicht geladen werden:', e);
+                infoCards = [];
+            }
+        }
+
+        function renderInfoCards() {
+            var info = document.getElementById('info');
+            if (!infoCards.length) {
+                // Fallback-Card
+                info.innerHTML =
+                    '<div class="info-controls"><button class="btn-icon" id="closeInfo" title="Schließen">×</button></div>' +
+                    '<h3>Willkommen 👋</h3>' +
+                    '<p class="muted">Klicke auf einen POI oder eine Fläche, um Details zu sehen. Über den ?-Button unten rechts öffnest du diese Hilfe erneut.</p>';
+                document.getElementById('closeInfo').addEventListener('click', function() {
+                    hideInfoPanel();
+                });
+                return;
+            }
+
+            // Clamp Index
+            if (infoCardIndex < 0) infoCardIndex = infoCards.length - 1;
+            if (infoCardIndex >= infoCards.length) infoCardIndex = 0;
+
+            var card = infoCards[infoCardIndex];
+            var html = '';
+            html += '<div class="info-controls">';
+            html += '  <div class="nav-wrap">';
+            html += '    <button class="btn-icon" id="prevCard" title="Zurück">‹</button>';
+            html += '    <button class="btn-icon" id="nextCard" title="Weiter">›</button>';
+            html += '  </div>';
+            html += '  <button class="btn-icon" id="closeInfo" title="Schließen">×</button>';
+            html += '</div>';
+            html += '<h3>' + escapeHTML(card.title || 'Info') + '</h3>';
+            html += '<div>' + card.html + '</div>';
+            html += '<div class="info-meta">' + (infoCardIndex + 1) + ' / ' + infoCards.length + '</div>';
+
+            info.innerHTML = html;
+
+            // Events
+            document.getElementById('prevCard').addEventListener('click', function() {
+                infoCardIndex--;
+                renderInfoCards();
+            });
+            document.getElementById('nextCard').addEventListener('click', function() {
+                infoCardIndex++;
+                renderInfoCards();
+            });
+            document.getElementById('closeInfo').addEventListener('click', function() {
+                hideInfoPanel();
+            });
+
+            // Tastatur-Navigation
+            document.onkeydown = function(ev) {
+                var e = ev || window.event;
+                if (!infoPanelOpen) return;
+                if (e.key === 'ArrowLeft') {
+                    infoCardIndex--;
+                    renderInfoCards();
+                }
+                if (e.key === 'ArrowRight') {
+                    infoCardIndex++;
+                    renderInfoCards();
+                }
+                if (e.key === 'Escape') {
+                    hideInfoPanel();
+                }
+            };
+        }
+
+        // Sehr einfacher Markdown → HTML Konverter (Überschriften, Listen, Links, **fett**, *kursiv*)
+        function mdToHtml(md) {
+            if (md === undefined || md === null) return '';
+            var text = String(md).replace(/\r\n/g, '\n');
+
+            // Escape HTML vor der Umwandlung
+            text = text.replace(/[&<>]/g, function(s) {
+                return {
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;'
+                }[s];
+            });
+
+            // Überschriften
+            text = text.replace(/^### (.*)$/gm, '<h4>$1</h4>');
+            text = text.replace(/^## (.*)$/gm, '<h3>$1</h3>');
+            text = text.replace(/^# (.*)$/gm, '<h2>$1</h2>');
+
+            // Listen
+            text = text.replace(/(^|\n)- (.*)(?=(\n[^-]|$))/g, function(match, p1, p2) {
+                var items = p2.split('\n- ').map(function(li) {
+                    return '<li>' + li + '</li>';
+                }).join('');
+                return p1 + '<ul>' + items + '</ul>';
+            });
+
+            // Links [text](url)
+            text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+
+            // Fett/Kursiv
+            text = text.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+            text = text.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+
+            // Absätze (Doppel-Zeilenumbruch → <p>)
+            text = text.split(/\n{2,}/).map(function(block) {
+                if (/^<h[2-4]>/.test(block) || /^<ul>/.test(block)) return block;
+                return '<p>' + block.replace(/\n/g, '<br>') + '</p>';
+            }).join('\n');
+
+            return text;
+        }
+
+        function escapeHTML(str) {
+            return String(str).replace(/[&<>"']/g, function(s) {
+                return ({
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#39;'
+                })[s];
+            });
+        }
     </script>
 </body>
 
