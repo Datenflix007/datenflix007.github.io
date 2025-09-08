@@ -392,11 +392,7 @@ footer {
 
 /* =========================================
    MOBILE & TABLET POLISH
-   — bündige Typo, ruhigere Abstände, kompakter Header
 ========================================= */
-
-
-/* Tablets (681–1024px) */
 
 @media (max-width: 1024px) and (min-width: 681px) {
     .nav {
@@ -430,9 +426,6 @@ footer {
         transform: none;
     }
 }
-
-
-/* Smartphones (<= 680px) – fokus auf Lesbarkeit & Bündigkeit */
 
 @media (max-width: 680px) {
     .container {
@@ -518,9 +511,6 @@ footer {
     }
 }
 
-
-/* Very small phones (<= 380px) – letzte Feinkorrektur */
-
 @media (max-width: 380px) {
     .hero {
         gap: 12px;
@@ -534,11 +524,34 @@ footer {
     }
 }
 
-
-/* Optional: Nur auf Touch-Geräten Hover-Scale vollständig deaktivieren */
-
 @media (pointer: coarse) {
     .avatar:hover {
         transform: none;
     }
+}
+
+
+/* --------------------------------------------------------
+   Karte (Naumburg Interaktiv)
+--------------------------------------------------------- */
+
+.map-card {
+    width: 100%;
+    margin-top: 12px;
+    /* kleiner Abstand */
+}
+
+.map-title {
+    margin: 0 0 8px;
+    font-size: 1.1rem;
+}
+
+.map-frame {
+    width: 100%;
+    /* volle Breite */
+    height: 500px;
+    /* fixe Höhe, alternativ aspect-ratio */
+    border: 0;
+    border-radius: 12px;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, .18);
 }
