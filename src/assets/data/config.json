@@ -1,0 +1,13 @@
+{
+    "start": { "lat": 51.3402, "lon": 12.3747, "zoom": 13 },
+    "startEraIndex": 0,
+    "eras": [
+        "Frühmittelalter",
+        "Hochmittelalter",
+        "Spätmittelalter",
+        "Frühe Neuzeit",
+        "Moderne",
+        "Postmoderne"
+    ],
+    "fitBounds": null
+}

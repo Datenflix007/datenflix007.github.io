@@ -1,0 +1,21 @@
+[{
+        "title": "Stadtplan 1890",
+        "url": "assets/overlays/stadtplan_1890.png",
+        "bounds": [
+            [51.335, 12.365],
+            [51.347, 12.389]
+        ],
+        "era": "Moderne",
+        "opacity": 0.6,
+        "attribution": "Stadtarchiv Musterstadt"
+    },
+    {
+        "title": "Kataster 1750",
+        "url": "assets/overlays/kataster_1750.png",
+        "bounds": [
+            [51.336, 12.370],
+            [51.345, 12.384]
+        ],
+        "era": "Frühe Neuzeit"
+    }
+]

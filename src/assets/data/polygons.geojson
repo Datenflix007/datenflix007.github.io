@@ -1,0 +1,29 @@
+{
+    "type": "FeatureCollection",
+    "features": [{
+        "type": "Feature",
+        "geometry": {
+            "type": "Polygon",
+            "coordinates": [
+                [
+                    [12.37, 51.338],
+                    [12.381, 51.338],
+                    [12.381, 51.344],
+                    [12.37, 51.344],
+                    [12.37, 51.338]
+                ]
+            ]
+        },
+        "properties": {
+            "title": "Historischer Markt",
+            "description": "Marktplatz-Ausdehnung um 1500.",
+            "era": "Spätmittelalter",
+            "stroke": "#b91c1c",
+            "stroke-width": 2,
+            "stroke-opacity": 0.9,
+            "fill": "#b91c1c",
+            "fill-opacity": 0.12,
+            "tags": ["Markt", "Historisch"]
+        }
+    }]
+}

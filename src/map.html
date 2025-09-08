@@ -1,0 +1,559 @@
+<!doctype html>
+<html lang="de">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="initial-scale=1, width=device-width" />
+    <title>Naumburg Interaktiv</title>
+
+    <!-- Leaflet (CDN, funktioniert auf GitHub Pages) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <style>
+        html,
+        body,
+        #map {
+            height: 100%;
+            margin: 0;
+        }
+        
+         :root {
+            --panel-bg: rgba(255, 255, 255, 0.92);
+            --panel-border: rgba(0, 0, 0, 0.15);
+            --panel-radius: 12px;
+            --accent: #0a7cff;
+            --muted: #666;
+            --chip-bg: #f1f5f9;
+        }
+        
+        #ui {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            z-index: 1000;
+            background: var(--panel-bg);
+            backdrop-filter: saturate(1.2) blur(4px);
+            border: 1px solid var(--panel-border);
+            border-radius: var(--panel-radius);
+            padding: 12px;
+            font-family: system-ui, sans-serif;
+            max-width: 360px;
+            box-shadow: 0 10px 24px rgba(0, 0, 0, .12);
+        }
+        
+        #ui h2 {
+            font-size: 14px;
+            margin: 0 0 8px;
+        }
+        
+        #ui .row {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 8px;
+            align-items: center;
+            margin: 6px 0;
+        }
+        
+        #ui label {
+            font-size: 13px;
+            color: #111;
+        }
+        
+        #ui small {
+            color: var(--muted);
+        }
+        
+        #eraLabels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: var(--muted);
+            margin-top: 4px;
+            gap: 4px;
+        }
+        
+        #info {
+            position: absolute;
+            right: 12px;
+            bottom: 12px;
+            z-index: 1000;
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: var(--panel-radius);
+            padding: 12px;
+            width: min(380px, 92vw);
+            font-family: system-ui, sans-serif;
+            max-height: 40%;
+            overflow: auto;
+            box-shadow: 0 10px 24px rgba(0, 0, 0, .12);
+        }
+        
+        #info h3 {
+            margin: 0 0 6px;
+            font-size: 16px;
+        }
+        
+        #info p {
+            margin: 0 0 6px;
+            font-size: 13px;
+            line-height: 1.35;
+        }
+        
+        #chips {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-top: 6px;
+        }
+        
+        .chip {
+            background: var(--chip-bg);
+            border-radius: 999px;
+            padding: 2px 8px;
+            font-size: 11px;
+        }
+        
+        .sep {
+            height: 1px;
+            background: #e5e7eb;
+            margin: 8px 0;
+        }
+        
+        .muted {
+            color: var(--muted);
+            font-size: 12px;
+        }
+        
+        .tight {
+            margin: 0;
+        }
+        
+        .switch {
+            display: inline-flex;
+            gap: 8px;
+            align-items: center;
+        }
+        
+        input[type="range"] {
+            width: 100%;
+        }
+        
+        .leaflet-control-attribution {
+            font-size: 11px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map"></div>
+
+    <!-- UI Panel -->
+    <section id="ui" role="region" aria-label="Kartensteuerung">
+        <h2>Steuerung</h2>
+        <div class="row">
+            <label for="era">Epoche <small id="eraName"></small></label>
+            <output id="eraIndex" aria-live="polite"></output>
+        </div>
+        <input id="era" type="range" min="0" max="5" step="1" value="0" aria-label="Zeitleiste">
+        <div id="eraLabels">
+            <span>Früh-</span><span>Hoch-</span><span>Spät-</span><span>Frühe Neuzeit</span><span>Moderne</span><span>Postmod.</span>
+        </div>
+        <div class="sep"></div>
+        <div class="row">
+            <label class="switch"><input id="toggleOverlays" type="checkbox" checked> Karten einblenden</label>
+            <small id="overlayCount" class="muted"></small>
+        </div>
+        <div class="row">
+            <label for="overlayOpacity">Karten-Transparenz</label>
+            <output id="opacityVal">0.6</output>
+        </div>
+        <input id="overlayOpacity" type="range" min="0" max="1" step="0.05" value="0.6" aria-label="Overlay-Transparenz">
+    </section>
+
+    <!-- Info Panel -->
+    <aside id="info" aria-live="polite">
+        <h3>Willkommen 👋</h3>
+        <p class="tight">Klicke auf einen POI oder eine Fläche, um Details zu sehen.</p>
+        <p class="muted tight">Epoche filtert Inhalte; Karten-Overlays können ein- und ausgeblendet werden.</p>
+        <div id="chips"></div>
+    </aside>
+
+    <script>
+        // --------- Konfiguration & Epochen ----------
+        const DEFAULT_ERAS = [
+            "Frühmittelalter",
+            "Hochmittelalter",
+            "Spätmittelalter",
+            "Frühe Neuzeit",
+            "Moderne",
+            "Postmoderne"
+        ];
+
+        // Datenquellen (relativ – funktionieren auf GitHub Pages)
+        const DATA = {
+            config: 'assets/data/config.json',
+            pois: 'assets/data/pois.json',
+            polygons: 'assets/data/polygons.geojson',
+            overlays: 'assets/data/overlays.json'
+        };
+
+        // Globale Variablen/Layers
+        let map, poiLayer, polygonLayer;
+        let overlayLayers = []; // L.ImageOverlay[]
+        let ERAS = DEFAULT_ERAS;
+        let currentEraIndex = 0;
+
+        // Utility: Leaflet-Icon-Pfad für GitHub Pages fixen
+        (function fixLeafletIconPath() {
+            const iconUrl = "https://unpkg.com/leaflet@1.9.4/dist/images/";
+            const LIcon = L.Icon.Default;
+            LIcon.mergeOptions({
+                iconRetinaUrl: iconUrl + 'marker-icon-2x.png',
+                iconUrl: iconUrl + 'marker-icon.png',
+                shadowUrl: iconUrl + 'marker-shadow.png'
+            });
+        })();
+
+        // --------- Init ----------
+        (async function init() {
+            // 1) Config laden
+            const cfg = await fetchJSON(DATA.config, {
+                start: {
+                    lat: 52.52,
+                    lon: 13.405,
+                    zoom: 12
+                }, // Fallback Berlin
+                eras: DEFAULT_ERAS
+            });
+            ERAS = Array.isArray(cfg.eras) && cfg.eras.length ? cfg.eras : DEFAULT_ERAS;
+
+            // 2) Karte aufsetzen
+            map = L.map('map', {
+                center: [cfg.start.lat, cfg.start.lon],
+                zoom: cfg.start.zoom,
+                preferCanvas: true
+            });
+
+            // 3) OSM-Basiskarte
+            const osm = L.tileLayer(
+                'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 20,
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> Mitwirkende'
+                }
+            ).addTo(map);
+
+            // 4) Daten laden: POIs, Polygone, Overlays
+            const [pois, polygons, overlays] = await Promise.all([
+                fetchJSON(DATA.pois, {
+                    features: []
+                }),
+                fetchJSON(DATA.polygons, {
+                    type: "FeatureCollection",
+                    features: []
+                }),
+                fetchJSON(DATA.overlays, [])
+            ]);
+
+            // 5) Layer erstellen
+            poiLayer = L.geoJSON(pois, {
+                pointToLayer: function(feature, latlng) {
+                    var title = "POI";
+                    if (feature && feature.properties && feature.properties.title !== undefined && feature.properties.title !== null && feature.properties.title !== "") {
+                        title = feature.properties.title;
+                    }
+
+                    var m = L.marker(latlng, {
+                        title: title
+                    });
+
+                    // Interaktion
+                    m.on('click', function() {
+                        showInfo(feature);
+                    });
+                    return m;
+                },
+                filter: function(f) {
+                    return filterByEra(f);
+                }
+            }).addTo(map);
+
+
+            polygonLayer = L.geoJSON(polygons, {
+                style: function(f) {
+                    var p = (f && f.properties) ? f.properties : {};
+
+                    var color = (p.stroke !== undefined && p.stroke !== null && p.stroke !== '') ?
+                        p.stroke : '#0a7cff';
+
+                    var weight = (p['stroke-width'] !== undefined && p['stroke-width'] !== null && p['stroke-width'] !== '') ?
+                        Number(p['stroke-width']) : 2;
+
+                    var opacity = (p['stroke-opacity'] !== undefined && p['stroke-opacity'] !== null && p['stroke-opacity'] !== '') ?
+                        Number(p['stroke-opacity']) : 0.9;
+
+                    var fillColor = (p.fill !== undefined && p.fill !== null && p.fill !== '') ?
+                        p.fill : '#0a7cff';
+
+                    var fillOpacity = (p['fill-opacity'] !== undefined && p['fill-opacity'] !== null && p['fill-opacity'] !== '') ?
+                        Number(p['fill-opacity']) : 0.15;
+
+                    return {
+                        color: color,
+                        weight: weight,
+                        opacity: opacity,
+                        fillColor: fillColor,
+                        fillOpacity: fillOpacity
+                    };
+                },
+                onEachFeature: function(feature, layer) {
+                    layer.on('click', function() {
+                        showInfo(feature);
+                    });
+                },
+                filter: function(f) {
+                    return filterByEra(f);
+                }
+            }).addTo(map);
+
+
+
+            // 6) Bild-Overlays anlegen (z.B. historische Karten-Ausschnitte)
+            overlayLayers = overlays.map(ov => {
+                // Erwartet ov.bounds = [[south, west], [north, east]] oder vier Eckpunkte?
+                // Wir unterstützen standardmäßig Leaflet-Bounds: [[south, west], [north, east]]
+                const bounds = toBounds(ov);
+                const layer = L.imageOverlay(ov.url, bounds, {
+                    opacity: 0.6,
+                    interactive: false,
+                    crossOrigin: 'anonymous' // hilfreich, falls externe Quellen CORS erlauben
+                });
+                if (filterByEra({
+                        properties: ov
+                    })) {
+                    layer.addTo(map);
+                }
+                return layer;
+            });
+            updateOverlayMeta();
+
+            // 7) UI verbinden
+            setupUI(cfg);
+
+            // 8) Optional: Startausdehnung aus Config (wenn vorhanden)
+            if (cfg.fitBounds && Array.isArray(cfg.fitBounds) && cfg.fitBounds.length === 2) {
+                map.fitBounds(cfg.fitBounds);
+            }
+        })();
+
+        // --------- Helpers ----------
+        async function fetchJSON(url, fallback = null) {
+            try {
+                const res = await fetch(url, {
+                    cache: 'no-store'
+                });
+                if (!res.ok) throw new Error(res.status + ' ' + url);
+                return await res.json();
+            } catch (e) {
+                console.warn('Konnte JSON nicht laden, nutze Fallback:', url, e);
+                return fallback;
+            }
+        }
+
+        function filterByEra(feature) {
+            // Feature darf die Eigenschaft "era" haben:
+            // - string (genau einer der ERAS)
+            // - array von strings (mehrere Epochen)
+
+            var propEra = null;
+            if (feature && feature.properties && feature.properties.era !== undefined && feature.properties.era !== null) {
+                propEra = feature.properties.era;
+            }
+
+            if (propEra === null) return true; // ohne Angabe in allen Epochen sichtbar
+
+            var eraName = ERAS[currentEraIndex];
+
+            if (Array.isArray(propEra)) {
+                return propEra.indexOf(eraName) !== -1;
+            }
+            return propEra === eraName;
+        }
+
+
+        function refreshFilters() {
+            // POIs aktualisieren
+            poiLayer.clearLayers();
+            fetchJSON(DATA.pois, {
+                features: []
+            }).then(function(pois) {
+                if (pois && pois.features) {
+                    poiLayer.addData(pois.features);
+                } else {
+                    poiLayer.addData(pois);
+                }
+            });
+
+            // Polygone neu
+            polygonLayer.clearLayers();
+            fetchJSON(DATA.polygons, {
+                type: "FeatureCollection",
+                features: []
+            }).then(function(polygons) {
+                polygonLayer.addData(polygons);
+            });
+
+            // Overlays je nach Epoche zeigen/verbergen
+            fetchJSON(DATA.overlays, []).then(function(overlays) {
+                // Entferne alte
+                overlayLayers.forEach(function(l) {
+                    map.removeLayer(l);
+                });
+
+                overlayLayers = overlays.map(function(ov) {
+                    var bounds = toBounds(ov);
+                    var layer = L.imageOverlay(ov.url, bounds, {
+                        opacity: parseFloat(document.getElementById('overlayOpacity').value),
+                        interactive: false,
+                        crossOrigin: 'anonymous'
+                    });
+
+                    // explizit prüfen
+                    var toggleEl = document.getElementById('toggleOverlays');
+                    var visible = false;
+                    if (toggleEl && toggleEl.checked) {
+                        if (filterByEra({
+                                properties: ov
+                            })) {
+                            visible = true;
+                        }
+                    }
+                    if (visible) {
+                        layer.addTo(map);
+                    }
+                    return layer;
+                });
+                updateOverlayMeta();
+            });
+        }
+
+
+        function toBounds(ov) {
+            // Unterstützt zwei Varianten:
+            // 1) ov.bounds = [[south, west], [north, east]]  (Leaflet LatLngBounds)
+            // 2) ov.corners = { nw:[lat,lon], ne:[lat,lon], se:[lat,lon], sw:[lat,lon] } -> wir approximieren Bounds
+            if (Array.isArray(ov.bounds) && ov.bounds.length === 2) return ov.bounds;
+            if (ov.corners) {
+                const lats = Object.values(ov.corners).map(c => c[0]);
+                const lons = Object.values(ov.corners).map(c => c[1]);
+                return [
+                    [Math.min(...lats), Math.min(...lons)],
+                    [Math.max(...lats), Math.max(...lons)]
+                ];
+            }
+            throw new Error('Overlay ohne gültige bounds/corners');
+        }
+
+        function setupUI(cfg) {
+            const eraInput = document.getElementById('era');
+            const eraName = document.getElementById('eraName');
+            const eraIndexOut = document.getElementById('eraIndex');
+            const toggleOverlays = document.getElementById('toggleOverlays');
+            const overlayOpacity = document.getElementById('overlayOpacity');
+            const opacityVal = document.getElementById('opacityVal');
+
+            // Slider-Beschriftung & Grenzen gemäß ERAS
+            eraInput.max = ERAS.length - 1;
+
+            function updateEraUI(idx) {
+                eraName.textContent = '· ' + ERAS[idx];
+                eraIndexOut.textContent = (parseInt(idx, 10) + 1) + '/' + ERAS.length;
+            }
+
+            // Startwert ggf. aus URL-Parametern ?era=Spätmittelalter
+            var url = new URL(location.href);
+            var pEra = url.searchParams.get('era');
+
+            var startIdx;
+            if (pEra && ERAS.indexOf(pEra) >= 0) {
+                startIdx = Math.max(0, ERAS.indexOf(pEra));
+            } else if (cfg && cfg.startEraIndex !== undefined && cfg.startEraIndex !== null) {
+                startIdx = cfg.startEraIndex;
+            } else {
+                startIdx = 0;
+            }
+
+            if (isFinite(startIdx)) {
+                currentEraIndex = startIdx;
+            } else {
+                currentEraIndex = 0;
+            }
+
+            eraInput.value = currentEraIndex;
+            updateEraUI(currentEraIndex);
+
+
+            eraInput.addEventListener('input', (e) => {
+                currentEraIndex = parseInt(e.target.value, 10);
+                updateEraUI(currentEraIndex);
+                refreshFilters();
+            });
+
+            toggleOverlays.addEventListener('change', () => {
+                overlayLayers.forEach(l => {
+                    if (toggleOverlays.checked) l.addTo(map);
+                    else map.removeLayer(l);
+                });
+                updateOverlayMeta();
+            });
+
+            overlayOpacity.addEventListener('input', (e) => {
+                const v = parseFloat(e.target.value);
+                opacityVal.textContent = v.toFixed(2);
+                overlayLayers.forEach(l => l.setOpacity(v));
+            });
+
+            // URL-Parameter überschreiben Startkoordinate/Zoom: ?lat=..&lon=..&z=..
+            const pLat = parseFloat(url.searchParams.get('lat'));
+            const pLon = parseFloat(url.searchParams.get('lon'));
+            const pZ = parseInt(url.searchParams.get('z'), 10);
+            if (isFinite(pLat) && isFinite(pLon)) map.setView([pLat, pLon], isFinite(pZ) ? pZ : map.getZoom());
+        }
+
+        function updateOverlayMeta() {
+            const m = document.getElementById('overlayCount');
+            const count = overlayLayers.filter(l => map.hasLayer(l)).length;
+            m.textContent = count + ' sichtbar';
+        }
+
+        function showInfo(feature) {
+            const info = document.getElementById('info');
+            const chips = document.getElementById('chips');
+            const p = feature.properties || {};
+            info.innerHTML = `
+      <h3>${escapeHTML(p.title || 'Objekt')}</h3>
+      ${p.subtitle ? `<p class="muted tight">${escapeHTML(p.subtitle)}</p>` : ''}
+      ${p.description ? `<p>${escapeHTML(p.description)}</p>` : ''}
+      ${p.link ? `<p><a href="${p.link}" target="_blank" rel="noopener">Mehr&nbsp;Infos</a></p>` : ''}
+      <div id="chips"></div>
+    `;
+    const chipWrap = info.querySelector('#chips');
+    const tags = Array.isArray(p.tags) ? p.tags : [];
+    const era = p.era ? (Array.isArray(p.era) ? p.era : [p.era]) : [];
+    [...tags, ...era].forEach(t => {
+      const s = document.createElement('span');
+      s.className = 'chip';
+      s.textContent = t;
+      chipWrap.appendChild(s);
+    });
+  }
+
+  function escapeHTML(str) {
+    return String(str).replace(/[&<>"']/g, s => ({
+      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+    }[s]));
+  }
+    </script>
+</body>
+
+</html>
