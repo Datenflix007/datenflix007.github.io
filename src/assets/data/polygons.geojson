@@ -1,29 +1,91 @@
 {
-    "type": "FeatureCollection",
-    "features": [{
-        "type": "Feature",
-        "geometry": {
-            "type": "Polygon",
-            "coordinates": [
-                [
-                    [12.37, 51.338],
-                    [12.381, 51.338],
-                    [12.381, 51.344],
-                    [12.37, 51.344],
-                    [12.37, 51.338]
-                ]
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              12.37,
+              51.338
+            ],
+            [
+              12.381,
+              51.338
+            ],
+            [
+              12.381,
+              51.344
+            ],
+            [
+              12.37,
+              51.344
+            ],
+            [
+              12.37,
+              51.338
             ]
-        },
-        "properties": {
-            "title": "Historischer Markt",
-            "description": "Marktplatz-Ausdehnung um 1500.",
-            "era": "Spätmittelalter",
-            "stroke": "#b91c1c",
-            "stroke-width": 2,
-            "stroke-opacity": 0.9,
-            "fill": "#b91c1c",
-            "fill-opacity": 0.12,
-            "tags": ["Markt", "Historisch"]
-        }
-    }]
+          ]
+        ]
+      },
+      "properties": {
+        "title": "Historischer Markt",
+        "description": "Marktplatz-Ausdehnung um 1500.",
+        "era": "Spätmittelalter",
+        "stroke": "#b91c1c",
+        "stroke-width": 2,
+        "stroke-opacity": 0.9,
+        "fill": "#b91c1c",
+        "fill-opacity": 0.12,
+        "tags": [
+          "Markt",
+          "Historisch"
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              11.809444427490234,
+              51.152795554872505
+            ],
+            [
+              11.809422969818117,
+              51.15213604779099
+            ],
+            [
+              11.810560226440431,
+              51.152162966631884
+            ],
+            [
+              11.810452938079834,
+              51.15280901410254
+            ],
+            [
+              11.809186935424805,
+              51.153064738727615
+            ],
+            [
+              11.80910110473633,
+              51.15290322860298
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "title": "Fläche",
+        "stroke": "#0a7cff",
+        "stroke-width": 2,
+        "stroke-opacity": 0.9,
+        "fill": "#0a7cff",
+        "fill-opacity": 0.15
+      }
+    }
+  ]
 }

@@ -17,5 +17,15 @@
             [51.345, 12.384]
         ],
         "era": "Frühe Neuzeit"
+    },
+    {
+        "title": "Karte",
+        "url": "assets/images/000.png",
+        "bounds": [
+            [51.1530, 11.8088],
+            [51.1640, 11.8198]
+        ],
+        "era": "Hochmittelalter",
+        "era": "Spätmittelalter"
     }
 ]
