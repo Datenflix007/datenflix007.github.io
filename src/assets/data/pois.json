@@ -1,105 +1,104 @@
 {
-  "type": "FeatureCollection",
-  "features": [
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          11.809634659880434,
-          51.15173018202365
-        ]
-      },
-      "properties": {
-        "title": "Wenzelskirche",
-        "subtitle": "Evangelische Kirche",
-        "description": "Das ist eine Kirche",
-        "era": [
-          "Hochmittelalter",
-          "Moderne",
-          "Postmoderne"
-        ],
-        "tags": [
-          "Kirche"
-        ],
-        "image": "https://de.wikipedia.org/wiki/Stadtkirche_St._Wenzel_%28Naumburg%29",
-        "link": "https://www.google.com/url?sa=i&url=https%3A%2F%2Fde.wikipedia.org%2Fwiki%2FStadtkirche_St._Wenzel_%2528Naumburg%2529&psig=AOvVaw2VRNNCYIfVrlvYHnQgHSmf&ust=1757441946747000&source=images&cd=vfe&opi=89978449&ved=0CBgQjhxqFwoTCLiU3MzjyY8DFQAAAAAdAAAAABAE"
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          11.809634659880434,
-          51.15173018202365
-        ]
-      },
-      "properties": {
-        "title": "Wenzelskirche",
-        "subtitle": "Evangelische Kirche",
-        "description": "Das ist eine Kirche",
-        "era": [
-          "Hochmittelalter",
-          "Moderne",
-          "Postmoderne"
-        ],
-        "tags": [
-          "Kirche"
-        ],
-        "image": "https://upload.wikimedia.org/wikipedia/commons/3/31/Naumburg_stwenzel.jpg",
-        "link": "https://www.google.com/url?sa=i&url=https%3A%2F%2Fde.wikipedia.org%2Fwiki%2FStadtkirche_St._Wenzel_%2528Naumburg%2529&psig=AOvVaw2VRNNCYIfVrlvYHnQgHSmf&ust=1757441946747000&source=images&cd=vfe&opi=89978449&ved=0CBgQjhxqFwoTCLiU3MzjyY8DFQAAAAAdAAAAABAE"
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          11.809634659880434,
-          51.15173018202365
-        ]
-      },
-      "properties": {
-        "title": "Wenzelskirche",
-        "subtitle": "Evangelische Kirche",
-        "description": "Das ist eine Kirche",
-        "era": [
-          "Hochmittelalter",
-          "Moderne",
-          "Postmoderne"
-        ],
-        "tags": [
-          "Kirche"
-        ],
-        "image": "assets/images/Screenshot 2025-09-08 181736b_3.png",
-        "link": "https://www.google.com/url?sa=i&url=https%3A%2F%2Fde.wikipedia.org%2Fwiki%2FStadtkirche_St._Wenzel_%2528Naumburg%2529&psig=AOvVaw2VRNNCYIfVrlvYHnQgHSmf&ust=1757441946747000&source=images&cd=vfe&opi=89978449&ved=0CBgQjhxqFwoTCLiU3MzjyY8DFQAAAAAdAAAAABAE"
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          11.809634659880434,
-          51.15173018202365
-        ]
-      },
-      "properties": {
-        "title": "Wenzelskirche",
-        "subtitle": "Evangelische Kirche",
-        "description": "Das ist eine Kirche",
-        "era": [
-          "Hochmittelalter",
-          "Moderne",
-          "Postmoderne"
-        ],
-        "tags": [
-          "Kirche"
-        ],
-        "image": "assets/images/Screenshot 2025-09-08 181736b_4.png",
-        "link": "https://www.google.com/url?sa=i&url=https%3A%2F%2Fde.wikipedia.org%2Fwiki%2FStadtkirche_St._Wenzel_%2528Naumburg%2529&psig=AOvVaw2VRNNCYIfVrlvYHnQgHSmf&ust=1757441946747000&source=images&cd=vfe&opi=89978449&ved=0CBgQjhxqFwoTCLiU3MzjyY8DFQAAAAAdAAAAABAE"
-      }
-    }
-  ]
+    "type": "FeatureCollection",
+    "features": [{
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    11.809634659880434,
+                    51.15173018202365
+                ]
+            },
+            "properties": {
+                "title": "Wenzelskirche",
+                "subtitle": "Evangelische Kirche",
+                "description": "Das ist eine Kirche",
+                "era": [
+                    "Hochmittelalter",
+                    "Moderne",
+                    "Postmoderne"
+                ],
+                "tags": [
+                    "Kirche"
+                ],
+                "image": "https://de.wikipedia.org/wiki/Stadtkirche_St._Wenzel_%28Naumburg%29",
+                "link": "https://www.google.com/url?sa=i&url=https%3A%2F%2Fde.wikipedia.org%2Fwiki%2FStadtkirche_St._Wenzel_%2528Naumburg%2529&psig=AOvVaw2VRNNCYIfVrlvYHnQgHSmf&ust=1757441946747000&source=images&cd=vfe&opi=89978449&ved=0CBgQjhxqFwoTCLiU3MzjyY8DFQAAAAAdAAAAABAE"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    11.809634659880434,
+                    51.15173018202365
+                ]
+            },
+            "properties": {
+                "title": "Wenzelskirche",
+                "subtitle": "Evangelische Kirche",
+                "description": "Das ist eine Kirche",
+                "era": [
+                    "Hochmittelalter",
+                    "Moderne",
+                    "Postmoderne"
+                ],
+                "tags": [
+                    "Kirche"
+                ],
+                "image": "https://upload.wikimedia.org/wikipedia/commons/3/31/Naumburg_stwenzel.jpg",
+                "link": "https://www.google.com/url?sa=i&url=https%3A%2F%2Fde.wikipedia.org%2Fwiki%2FStadtkirche_St._Wenzel_%2528Naumburg%2529&psig=AOvVaw2VRNNCYIfVrlvYHnQgHSmf&ust=1757441946747000&source=images&cd=vfe&opi=89978449&ved=0CBgQjhxqFwoTCLiU3MzjyY8DFQAAAAAdAAAAABAE"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    11.809634659880434,
+                    51.15173018202365
+                ]
+            },
+            "properties": {
+                "title": "Wenzelskirche",
+                "subtitle": "Evangelische Kirche",
+                "description": "Das ist eine Kirche",
+                "era": [
+                    "Hochmittelalter",
+                    "Moderne",
+                    "Postmoderne"
+                ],
+                "tags": [
+                    "Kirche"
+                ],
+                "image": "assets/images/Screenshot 2025-09-08 181736b_3.png",
+                "link": "https://www.google.com/url?sa=i&url=https%3A%2F%2Fde.wikipedia.org%2Fwiki%2FStadtkirche_St._Wenzel_%2528Naumburg%2529&psig=AOvVaw2VRNNCYIfVrlvYHnQgHSmf&ust=1757441946747000&source=images&cd=vfe&opi=89978449&ved=0CBgQjhxqFwoTCLiU3MzjyY8DFQAAAAAdAAAAABAE"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    11.809634659880434,
+                    51.15173018202365
+                ]
+            },
+            "properties": {
+                "title": "Wenzelskirche",
+                "subtitle": "Evangelische Kirche",
+                "description": "Das ist eine Kirche",
+                "era": [
+                    "Hochmittelalter",
+                    "Moderne",
+                    "Postmoderne"
+                ],
+                "tags": [
+                    "Kirche"
+                ],
+                "image": "assets/images/Screenshot 2025-09-08 181736b_4.png",
+                "link": "https://www.google.com/url?sa=i&url=https%3A%2F%2Fde.wikipedia.org%2Fwiki%2FStadtkirche_St._Wenzel_%2528Naumburg%2529&psig=AOvVaw2VRNNCYIfVrlvYHnQgHSmf&ust=1757441946747000&source=images&cd=vfe&opi=89978449&ved=0CBgQjhxqFwoTCLiU3MzjyY8DFQAAAAAdAAAAABAE"
+            }
+        }
+    ]
 }
