@@ -5,6 +5,6 @@
         [51.1530, 11.8088],
         [51.1640, 11.8198]
     ],
-    "era": "Hochmittelalter",
-    "era": "Spätmittelalter"
+    "era": ["Hochmittelalter", "Spätmittelalter"],
+    "rotation": 60
 }]

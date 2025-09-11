@@ -356,11 +356,12 @@
             // 7) Overlays
             overlayLayers = overlays.map(function(ov) {
                 var bounds = toBounds(ov);
-                var layer = L.imageOverlay(ov.url, bounds, {
+                var rotation = ov.rotation || 0;
+                var layer = createRotatedImageOverlay(ov.url, bounds, {
                     opacity: 0.6,
                     interactive: false,
                     crossOrigin: 'anonymous'
-                });
+                }, rotation);
                 if (filterByEra({
                         properties: ov
                     })) {
@@ -741,6 +742,94 @@
                 })[s];
             });
         }
+
+        // --- RotatedImageOverlay-Klasse ---
+        L.RotatedImageOverlay = L.ImageOverlay.extend({
+            _initImage: function() {
+                var img = L.DomUtil.create('img', 'leaflet-image-layer');
+                img.style.position = 'absolute';
+                img.style.willChange = 'transform';
+                img.style.pointerEvents = this.options.interactive ? 'auto' : 'none';
+                img.style.opacity = this.options.opacity;
+                img.alt = this.options.alt || '';
+                if (this.options.crossOrigin) img.crossOrigin = '';
+                if (this.options.zIndex) img.style.zIndex = this.options.zIndex;
+                img.src = this._url;
+
+                // Container für Rotation
+                var container = L.DomUtil.create('div', 'leaflet-rotated-container');
+                container.style.position = 'absolute';
+                container.style.top = '0';
+                container.style.left = '0';
+                container.style.width = '100%';
+                container.style.height = '100%';
+                container.style.overflow = 'visible';
+                container.appendChild(img);
+
+                this._image = img;
+                this._container = container;
+                this._imageContainer = container;
+                this._image.onload = this._onImageLoad.bind(this);
+            },
+            _reset: function() {
+                var nw = this._map.latLngToLayerPoint(this._bounds.getNorthWest());
+                var se = this._map.latLngToLayerPoint(this._bounds.getSouthEast());
+                var size = se.subtract(nw);
+
+                L.DomUtil.setPosition(this._container, nw);
+
+                this._container.style.width = Math.abs(size.x) + 'px';
+                this._container.style.height = Math.abs(size.y) + 'px';
+                this._image.style.width = Math.abs(size.x) + 'px';
+                this._image.style.height = Math.abs(size.y) + 'px';
+
+                // Rotation um Mittelpunkt
+                var angle = this.options.rotation || 0;
+                var cx = Math.abs(size.x) / 2;
+                var cy = Math.abs(size.y) / 2;
+                this._container.style.transformOrigin = cx + 'px ' + cy + 'px';
+                this._container.style.transform = 'rotate(' + angle + 'deg)';
+            },
+            onAdd: function(map) {
+                this._map = map;
+                if (!this._container) this._initImage();
+                map.getPanes().overlayPane.appendChild(this._container);
+                map.on('zoomend viewreset resize move', this._reset, this);
+                this._reset();
+            },
+            onRemove: function(map) {
+                if (this._container && this._container.parentNode) {
+                    this._container.parentNode.removeChild(this._container);
+                }
+                map.off('zoomend viewreset resize move', this._reset, this);
+            },
+            setRotation: function(angle) {
+                this.options.rotation = angle;
+                this._reset();
+            }
+        });
+
+        function createRotatedImageOverlay(url, bounds, options, rotation) {
+            options = options || {};
+            options.rotation = rotation || 0;
+            return new L.RotatedImageOverlay(url, bounds, options);
+        }
+
+        // --- Overlays laden und einfügen ---
+        fetch('assets/data/overlays.json')
+            .then(res => res.json())
+            .then(overlays => {
+                overlays.forEach(function(ov) {
+                    var bounds = ov.bounds;
+                    var rotation = ov.rotation || 0;
+                    var layer = createRotatedImageOverlay(ov.url, bounds, {
+                        opacity: 0.6,
+                        interactive: false,
+                        crossOrigin: 'anonymous'
+                    }, rotation);
+                    layer.addTo(map);
+                });
+            });
     </script>
 </body>
 
