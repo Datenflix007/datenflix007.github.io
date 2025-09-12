@@ -22,18 +22,17 @@ if not exist "%LDI%"         mkdir "%LDI%"
 :: ---------- URLs ----------
 set "URL_LEAFLET_JS=https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
 set "URL_LEAFLET_CSS=https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-set "URL_LEAFLET_JS_MAP=https://unpkg.com/leaflet@1.9.4/dist/leaflet.js.map"
-set "URL_LEAFLET_CSS_MAP=https://unpkg.com/leaflet@1.9.4/dist/leaflet.css.map"
 set "URL_ICON=https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png"
 set "URL_ICON2=https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png"
 set "URL_SHADOW=https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png"
 
-:: DistortableImage: auf CDNs gibt es KEINE *.min.* und KEINE *.map – wir speichern die
-:: nicht-minifizierten Dateien unter den erwarteten Namen und erzeugen Stub-Maps.
+:: DistortableImage (auf CDNs keine *.min.* + Maps nur als .js.map)
 set "URL_LDI_JS=https://cdn.jsdelivr.net/npm/leaflet-distortableimage@0.21.9/dist/leaflet.distortableimage.js"
 set "URL_LDI_CSS=https://cdn.jsdelivr.net/npm/leaflet-distortableimage@0.21.9/dist/leaflet.distortableimage.css"
 set "URL_LDI_JS_ALT=https://cdn.jsdelivr.net/npm/leaflet-distortableimage-updated@2.0.5/dist/leaflet.distortableimage.js"
 set "URL_LDI_CSS_ALT=https://cdn.jsdelivr.net/npm/leaflet-distortableimage-updated@2.0.5/dist/leaflet.distortableimage.css"
+set "URL_LDI_JS_MAP=https://cdn.jsdelivr.net/npm/leaflet-distortableimage@0.21.9/dist/leaflet.distortableimage.js.map"
+set "URL_LDI_JS_MAP_ALT=https://cdn.jsdelivr.net/npm/leaflet-distortableimage-updated@2.0.5/dist/leaflet.distortableimage.js.map"
 
 :: ---------- Zielpfade ----------
 set "DST_LEAFLET_JS=%LEAFLET%\leaflet.js"
@@ -47,26 +46,38 @@ set "DST_SHADOW=%LEAFLET_IMG%\marker-shadow.png"
 :: DistortableImage lokal unter erwarteten Namen ablegen
 set "DST_LDI_JS=%LDI%\leaflet.distortableimage.min.js"
 set "DST_LDI_CSS=%LDI%\leaflet.distortableimage.min.css"
-set "DST_LDI_JS_MAP=%LDI%\leaflet.distortableimage.min.js.map"
+set "DST_LDI_JS_MAP=%LDI%\leaflet.distortableimage.js.map"
+set "DST_LDI_JS_MAP_MIN=%LDI%\leaflet.distortableimage.min.js.map"
 set "DST_LDI_CSS_MAP=%LDI%\leaflet.distortableimage.min.css.map"
 
 :: ---------- Downloads sicherstellen ----------
 call :ensureFile "%DST_LEAFLET_JS%"      "%URL_LEAFLET_JS%"
 call :ensureFile "%DST_LEAFLET_CSS%"     "%URL_LEAFLET_CSS%"
-call :ensureFile "%DST_LEAFLET_JS_MAP%"  "%URL_LEAFLET_JS_MAP%"
-call :ensureFile "%DST_LEAFLET_CSS_MAP%" "%URL_LEAFLET_CSS_MAP%"
+call :ensureFile "%DST_LEAFLET_JS_MAP%"  "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js.map"
+:: Leaflet CSS-Map existiert nicht -> Stub erzeugen
+if not exist "%DST_LEAFLET_CSS_MAP%" call :makeStubMap "%DST_LEAFLET_CSS_MAP%"
+
 call :ensureFile "%DST_ICON%"            "%URL_ICON%"
 call :ensureFile "%DST_ICON2%"           "%URL_ICON2%"
 call :ensureFile "%DST_SHADOW%"          "%URL_SHADOW%"
 
+:: LDI JS/CSS laden (nicht-minifizierte Datei, aber unter .min.* speichern)
 call :ensureFile "%DST_LDI_JS%"          "%URL_LDI_JS%"
 if not exist "%DST_LDI_JS%"  call :ensureFile "%DST_LDI_JS%"  "%URL_LDI_JS_ALT%"
 
 call :ensureFile "%DST_LDI_CSS%"         "%URL_LDI_CSS%"
 if not exist "%DST_LDI_CSS%" call :ensureFile "%DST_LDI_CSS%" "%URL_LDI_CSS_ALT%"
 
-:: Stub-SourceMaps erzeugen, falls nicht vorhanden (CDN liefert keine)
-if not exist "%DST_LDI_JS_MAP%"  call :makeStubMap "%DST_LDI_JS_MAP%"
+:: LDI JS-SourceMap laden (echte .js.map) + zusätzlich als .min.js.map ablegen
+call :ensureFile "%DST_LDI_JS_MAP%"      "%URL_LDI_JS_MAP%"
+if not exist "%DST_LDI_JS_MAP%"  call :ensureFile "%DST_LDI_JS_MAP%" "%URL_LDI_JS_MAP_ALT%"
+if exist "%DST_LDI_JS_MAP%" (
+  if not exist "%DST_LDI_JS_MAP_MIN%" copy /Y "%DST_LDI_JS_MAP%" "%DST_LDI_JS_MAP_MIN%" >nul
+) else (
+  if not exist "%DST_LDI_JS_MAP_MIN%" call :makeStubMap "%DST_LDI_JS_MAP_MIN%"
+)
+
+:: LDI CSS-Map existiert nicht -> Stub erzeugen
 if not exist "%DST_LDI_CSS_MAP%" call :makeStubMap "%DST_LDI_CSS_MAP%"
 
 echo.

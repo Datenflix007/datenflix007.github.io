@@ -289,23 +289,25 @@
             const opacity = parseFloat(document.getElementById('overlayOpacity').value);
 
             overlays.forEach(ov => {
-                if (!ov || !Array.isArray(ov.corners)) return;
+                if (!ov || !Array.isArray(ov.corners) || ov.corners.length < 2) return;
                 if (!filterByEraName(ov.era)) return;
 
-                let layer;
-                if (L.distortableImageOverlay && ov.corners.length === 4) {
-                    layer = L.distortableImageOverlay(ov.url, {
-                        corners: ov.corners,
-                        mode: 'lock',
-                        selected: false,
-                        opacity: opacity
-                    });
-                } else if (ov.corners.length >= 2) {
-                    const bounds = [ov.corners[0], ov.corners[2] || ov.corners[1]];
-                    layer = L.imageOverlay(ov.url, bounds, {
-                        opacity
-                    });
-                } else return;
+                // Leaflet expects [NW, SE] for bounds
+                const bounds = [ov.corners[0], ov.corners[2]];
+                const rotation = ov.rotate || 0;
+
+                // ImageOverlay mit Rotation per CSS
+                const layer = L.imageOverlay(ov.url, bounds, {
+                    opacity: opacity
+                });
+
+                layer.on('add', function() {
+                    const img = layer.getElement();
+                    if (img) {
+                        img.style.transformOrigin = "center center";
+                        img.style.transform = `rotate(${rotation}deg)`;
+                    }
+                });
 
                 overlayLayers.push(layer);
                 if (toggle.checked) layer.addTo(map);

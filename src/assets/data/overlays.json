@@ -3,9 +3,10 @@
     "url": "assets/images/000.png",
     "corners": [
         [51.1530, 11.8088],
-        [51.1530, 11.8198],
-        [51.1640, 11.8198],
-        [51.1640, 11.8088]
+        [51.1530, 11.8100],
+        [51.1540, 11.8088],
+        [51.1540, 11.8100]
     ],
-    "era": ["Hochmittelalter", "Spätmittelalter"]
+    "era": ["Hochmittelalter", "Spätmittelalter"],
+    "rotate": 60
 }]
