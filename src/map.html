@@ -6,13 +6,9 @@
     <meta name="viewport" content="initial-scale=1, width=device-width" />
     <title>Naumburg Interaktiv</title>
 
-    <!-- Leaflet (CDN) -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-    <!-- DistortableImage (aktuelle, funktionierende CDN-Links) -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet-distortableimage@0.21.9/dist/leaflet.distortableimage.min.css" />
-    <script src="https://unpkg.com/leaflet-distortableimage@0.21.9/dist/leaflet.distortableimage.min.js"></script>
+    <!-- Lokale Styles (fallen ggf. automatisch auf CDN zurück) -->
+    <link id="leaflet-css" rel="stylesheet" href="../lib/leaflet/leaflet.css">
+    <link id="ldi-css" rel="stylesheet" href="../lib/leaflet-distortableimage/leaflet.distortableimage.min.css">
 
     <style>
         html,
@@ -57,14 +53,6 @@
             margin: 6px 0
         }
         
-        #ui label {
-            font-size: 13px
-        }
-        
-        #ui small {
-            color: var(--muted)
-        }
-        
         #eraLabels {
             display: flex;
             justify-content: space-between;
@@ -87,7 +75,6 @@
         .leaflet-control-attribution {
             font-size: 11px
         }
-        /* Info-Panel minimal, bleibt erhalten */
         
         #info {
             position: absolute;
@@ -147,7 +134,6 @@
 <body>
     <div id="map"></div>
 
-    <!-- Steuerungs-Panel -->
     <section id="ui" role="region" aria-label="Kartensteuerung">
         <h2>Steuerung</h2>
 
@@ -185,24 +171,46 @@
     <aside id="info" aria-live="polite"></aside>
     <button id="helpBtn" title="Hilfe">?</button>
 
+    <!-- Lokale Skripte mit CDN-Fallback -->
+    <script src="../lib/leaflet/leaflet.js" onerror="this.onerror=null; this.src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';"></script>
+    <script src="../lib/leaflet-distortableimage/leaflet.distortableimage.min.js" onerror="this.onerror=null; this.src='https://cdn.jsdelivr.net/npm/leaflet-distortableimage@0.21.9/dist/leaflet.distortableimage.js';"></script>
+
     <script>
+        // Fallback für CSS (wenn lokale Pfade nicht existieren)
+        (function ensureCss() {
+            function add(url) {
+                var l = document.createElement('link');
+                l.rel = 'stylesheet';
+                l.href = url;
+                document.head.appendChild(l);
+            }
+            // Prüfen nach dem Laden des ersten Scripts, ob Leaflet existiert. Wenn nicht, CSS-Fallback anhängen.
+            window.addEventListener('load', function() {
+                if (typeof L === 'undefined') {
+                    add('https://unpkg.com/leaflet@1.9.4/dist/leaflet.css');
+                }
+                // DistortableImage CSS sicherheitshalber immer ergänzen, falls lokal fehlt:
+                if (!document.querySelector('link[href*="leaflet.distortableimage"]')) {
+                    add('https://cdn.jsdelivr.net/npm/leaflet-distortableimage@0.21.9/dist/leaflet.distortableimage.css');
+                }
+            });
+        })();
+
         // ---------- Grundkonfiguration ----------
         const DEFAULT_ERAS = ["Frühmittelalter", "Hochmittelalter", "Spätmittelalter", "Frühe Neuzeit", "Moderne", "Postmoderne"];
-
-        // Datenquellen (nur Overlays zwingend vorhanden)
         const DATA = {
-            config: 'assets/data/config.json', // optional
-            overlays: 'assets/data/overlays.json' // deine JSON
+            config: 'assets/data/config.json',
+            overlays: 'assets/data/overlays.json'
         };
 
-        // Globale Zustände
         let map, overlayLayers = [];
         let ERAS = DEFAULT_ERAS;
         let currentEraIndex = 0;
 
-        // Leaflet-Icon-Fix (CDN)
+        // Leaflet-Icons fix – sicher gegen fehlendes Leaflet
         (function fixLeafletIcons() {
-            const base = "https://unpkg.com/leaflet@1.9.4/dist/images/";
+            if (!(window.L && L.Icon && L.Icon.Default)) return;
+            const base = (location.pathname.indexOf('/src/') > -1 ? '../lib/leaflet/images/' : './lib/leaflet/images/');
             L.Icon.Default.mergeOptions({
                 iconRetinaUrl: base + 'marker-icon-2x.png',
                 iconUrl: base + 'marker-icon.png',
@@ -212,7 +220,15 @@
 
         // ---------- Init ----------
         (async function init() {
-            // 1) Konfig (optional vorhanden)
+            // Warten bis Leaflet lädt; wenn nicht vorhanden, erneut in 100ms prüfen (max 20x)
+            for (let i = 0; i < 20 && typeof L === 'undefined'; i++) {
+                await new Promise(r => setTimeout(r, 100));
+            }
+            if (typeof L === 'undefined') {
+                console.error('Leaflet konnte nicht geladen werden.');
+                return;
+            }
+
             const cfg = await fetchJSON(DATA.config, {
                 start: {
                     lat: 51.15,
@@ -223,32 +239,25 @@
             });
             ERAS = Array.isArray(cfg.eras) && cfg.eras.length ? cfg.eras : DEFAULT_ERAS;
 
-            // 2) Karte
             map = L.map('map', {
                 center: [cfg.start.lat, cfg.start.lon],
                 zoom: cfg.start.zoom,
                 preferCanvas: true
             });
 
-            // 3) OSM-Basiskarte
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 20,
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> Mitwirkende'
             }).addTo(map);
 
-            // 4) Overlays laden & anzeigen
             const overlays = await fetchJSON(DATA.overlays, []);
             addOverlaysForCurrentEra(overlays);
 
-            // Falls keine fitBounds in cfg: auf alle Overlay-Ecken zoomen
             if (!cfg.fitBounds && overlays.length) {
                 const allCorners = overlays.flatMap(o => (o.corners || [])).map(c => L.latLng(c[0], c[1]));
-                if (allCorners.length) {
-                    map.fitBounds(L.latLngBounds(allCorners));
-                }
+                if (allCorners.length) map.fitBounds(L.latLngBounds(allCorners));
             }
 
-            // 5) UI verdrahten
             setupUI(cfg, overlays);
         })();
 
@@ -266,14 +275,13 @@
         }
 
         function filterByEraName(eraProp) {
-            if (eraProp == null) return true; // wenn in JSON kein "era", immer anzeigen
+            if (eraProp == null) return true;
             const active = ERAS[currentEraIndex];
             if (Array.isArray(eraProp)) return eraProp.includes(active);
             return eraProp === active;
         }
 
         function addOverlaysForCurrentEra(overlays) {
-            // Vorhandene entfernen
             overlayLayers.forEach(l => map.removeLayer(l));
             overlayLayers = [];
 
@@ -285,24 +293,19 @@
                 if (!filterByEraName(ov.era)) return;
 
                 let layer;
-
-                // Wenn 4 Ecken vorhanden UND DistortableImage verfügbar -> nutzen
                 if (L.distortableImageOverlay && ov.corners.length === 4) {
                     layer = L.distortableImageOverlay(ov.url, {
-                        corners: ov.corners, // [[lat,lon], ... 4 Ecken]
-                        mode: 'lock', // Editor später; jetzt gesperrt
+                        corners: ov.corners,
+                        mode: 'lock',
                         selected: false,
                         opacity: opacity
                     });
                 } else if (ov.corners.length >= 2) {
-                    // Fallback: normales ImageOverlay mit 2-Ecken-Bounds
                     const bounds = [ov.corners[0], ov.corners[2] || ov.corners[1]];
                     layer = L.imageOverlay(ov.url, bounds, {
                         opacity
                     });
-                } else {
-                    return;
-                }
+                } else return;
 
                 overlayLayers.push(layer);
                 if (toggle.checked) layer.addTo(map);
@@ -318,19 +321,12 @@
         }
 
         function setupUI(cfg, overlays) {
-            // --- DOM ---
             const eraInput = document.getElementById('era');
             const eraNameOut = document.getElementById('eraName');
             const eraIndexOut = document.getElementById('eraIndex');
             const toggleOverlays = document.getElementById('toggleOverlays');
             const overlayOpacity = document.getElementById('overlayOpacity');
             const opacityVal = document.getElementById('opacityVal');
-
-            if (!eraInput || !eraNameOut || !eraIndexOut ||
-                !toggleOverlays || !overlayOpacity || !opacityVal) {
-                console.warn('setupUI: fehlende UI-Elemente – Abbruch');
-                return;
-            }
 
             // --- Epoche initialisieren ---
             eraInput.max = Math.max(0, ERAS.length - 1);
@@ -341,13 +337,13 @@
             updateEraUI(currentEraIndex);
             addOverlaysForCurrentEra(overlays);
 
-            // --- Events ---
             eraInput.addEventListener('input', (e) => {
                 const idx = parseInt(e.target.value, 10);
-                if (Number.isNaN(idx)) return;
-                currentEraIndex = Math.min(Math.max(idx, 0), ERAS.length - 1);
-                updateEraUI(currentEraIndex);
-                addOverlaysForCurrentEra(overlays);
+                if (!Number.isNaN(idx)) {
+                    currentEraIndex = Math.min(Math.max(idx, 0), ERAS.length - 1);
+                    updateEraUI(currentEraIndex);
+                    addOverlaysForCurrentEra(overlays);
+                }
             });
 
             toggleOverlays.addEventListener('change', () => {
@@ -366,16 +362,11 @@
                 if (Number.isNaN(v)) return;
                 opacityVal.textContent = v.toFixed(2);
                 overlayLayers.forEach((layer) => {
-                    if (!layer) return;
-                    if (typeof layer.setOpacity === 'function') layer.setOpacity(v);
-                    else if (layer.setStyle) layer.setStyle({
-                        opacity: v
-                    });
+                    if (layer.setOpacity) layer.setOpacity(v);
                 });
             });
 
-            // Rotation
-            const ROT_STEP = 5; // Grad
+            const ROT_STEP = 5;
             const btnLeft = document.getElementById('rotLeft');
             const btnRight = document.getElementById('rotRight');
 
@@ -393,7 +384,6 @@
                     // Fallbacks ignorieren – normale ImageOverlays werden nicht rotiert
                 });
             }
-
             if (btnLeft) btnLeft.addEventListener('click', () => rotateAll(-ROT_STEP));
             if (btnRight) btnRight.addEventListener('click', () => rotateAll(ROT_STEP));
 
@@ -402,9 +392,6 @@
                 eraIndexOut.textContent = (idx + 1) + '/' + ERAS.length;
             }
         }
-
-        // (Debug) Anzeige, ob Distortable geladen ist
-        console.log('DistortableImageOverlay verfügbar:', typeof L.distortableImageOverlay === 'function');
     </script>
 </body>
 
