@@ -1,0 +1,433 @@
+<!doctype html>
+<html lang="de">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Overlay-Editor → overlays.json</title>
+
+    <!-- CSS mit Fallbacks -->
+    <link id="leaflet-css" rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" onerror="this.onerror=null;this.href='https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css'">
+    <link id="toolbar-css" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-toolbar@0.4.0/dist/leaflet.toolbar.css" onerror="this.onerror=null;this.href='https://unpkg.com/leaflet-toolbar@0.4.0/dist/leaflet.toolbar.css'">
+    <link id="ldi-css" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-distortableimage@0.21.9/dist/leaflet.distortableimage.css" onerror="this.onerror=null;this.href='https://unpkg.com/leaflet-distortableimage@0.21.9/dist/leaflet.distortableimage.css'">
+
+    <style>
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial
+        }
+        
+        #map {
+            height: 100%
+        }
+        
+        .panel {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 1000;
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 12px;
+            box-shadow: 0 10px 24px rgba(0, 0, 0, .12);
+            width: min(460px, 94vw)
+        }
+        
+        .row {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 8px;
+            align-items: center;
+            margin: 6px 0
+        }
+        
+        .row input[type="text"] {
+            width: 100%
+        }
+        
+        .sep {
+            height: 1px;
+            background: #eee;
+            margin: 8px 0
+        }
+        
+        .btn {
+            appearance: none;
+            background: #111827;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 8px 12px;
+            cursor: pointer
+        }
+        
+        .btn.outline {
+            background: #fff;
+            color: #111827;
+            border: 1px solid #e5e7eb
+        }
+        
+        .btn.small {
+            padding: 6px 10px
+        }
+        
+        .muted {
+            color: #6b7280
+        }
+        
+        #out {
+            width: 100%;
+            height: 140px
+        }
+        
+        .drop {
+            border: 1px dashed #9ca3af;
+            border-radius: 10px;
+            padding: 8px;
+            text-align: center;
+            cursor: pointer
+        }
+        
+        .ctrls {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap
+        }
+        
+        .ctrls .group {
+            display: flex;
+            align-items: center;
+            gap: 6px
+        }
+        
+        .ctrls input[type="range"] {
+            width: 160px
+        }
+        
+        .status {
+            font-size: 12px;
+            color: #2563eb;
+            margin: 6px 0
+        }
+        
+        .error {
+            color: #b91c1c
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map"></div>
+
+    <div class="panel">
+        <h3 style="margin:0 0 6px">Overlay-Editor</h3>
+        <div class="row">
+            <label>Bild wählen (lokal):</label>
+            <input id="file" type="file" accept="image/*">
+        </div>
+        <div class="drop" id="drop">…oder Bild hierher ziehen</div>
+        <div class="row">
+            <label>Bild-URL (Repo/extern)</label>
+            <input id="urlField" type="text" placeholder="assets/images/000.png" value="">
+        </div>
+        <div class="row">
+            <label>Titel</label>
+            <input id="titleField" type="text" placeholder="Karte 000" value="Karte 000">
+        </div>
+        <div class="row">
+            <label>Epoche(n) (kommagetrennt)</label>
+            <input id="eraField" type="text" placeholder="Hochmittelalter, Spätmittelalter" value="Hochmittelalter, Spätmittelalter">
+        </div>
+
+        <div id="status" class="status">Bild wählen oder URL eintragen → dann **auf die Karte klicken**, um zu platzieren.</div>
+
+        <div class="sep"></div>
+
+        <div class="ctrls">
+            <div class="group">
+                <button class="btn small" id="toggleEdit">Entriegeln / Bearbeiten</button>
+                <span class="muted">Ziehen = Move, Ecken = Scale/Rotate</span>
+            </div>
+            <div class="group">
+                <label class="muted">Transparenz</label>
+                <input id="opacity" type="range" min="0" max="1" step="0.05" value="0.6">
+            </div>
+            <div class="group">
+                <label class="muted">Rot.</label>
+                <button class="btn small outline" id="rotL">↶ 5°</button>
+                <button class="btn small outline" id="rotR">↷ 5°</button>
+                <input id="rotSlider" type="range" min="-180" max="180" step="1" value="0" title="Rotation in Grad">
+                <output id="rotOut" class="muted">0°</output>
+            </div>
+            <div class="group">
+                <label class="muted">Scale</label>
+                <button class="btn small outline" id="scaleDown">−</button>
+                <button class="btn small outline" id="scaleUp">+</button>
+                <input id="scaleSlider" type="range" min="0.25" max="2.5" step="0.01" value="1">
+                <output id="scaleOut" class="muted">1.00×</output>
+            </div>
+            <div class="group">
+                <button class="btn small outline" id="fit">Auf Overlay zoomen</button>
+                <button class="btn small outline" id="remove">Overlay entfernen</button>
+            </div>
+        </div>
+
+        <div class="sep"></div>
+
+        <div class="row">
+            <button class="btn" id="exportBtn">Export JSON</button>
+            <button class="btn outline" id="copyBtn">Kopieren</button>
+        </div>
+        <textarea id="out" readonly></textarea>
+    </div>
+
+    <!-- JS mit Fallbacks (Reihenfolge wichtig) -->
+    <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" onerror="this.onerror=null;this.src='https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js';"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/leaflet-toolbar@0.4.0/dist/leaflet.toolbar.js" onerror="this.onerror=null;this.src='https://unpkg.com/leaflet-toolbar@0.4.0/dist/leaflet.toolbar.js';"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/leaflet-distortableimage@0.21.9/dist/leaflet.distortableimage.js" onerror="this.onerror=null;this.src='https://unpkg.com/leaflet-distortableimage@0.21.9/dist/leaflet.distortableimage.js';"></script>
+
+    <script>
+        (function startWhenReady() {
+            var tries = 0,
+                max = 40; // ~2s
+            function tick() {
+                if (window.L && L.distortableImageOverlay) return boot();
+                if (++tries > max) {
+                    var s = document.getElementById('status');
+                    s.classList.add('error');
+                    s.textContent = 'Fehler: Leaflet/DistortableImage konnte nicht geladen werden.';
+                    return;
+                }
+                setTimeout(tick, 50);
+            }
+            tick();
+        })();
+
+        function boot() {
+            var statusEl = document.getElementById('status');
+
+            // Karte
+            var map = L.map('map', {
+                center: [51.155, 11.81],
+                zoom: 15,
+                preferCanvas: true
+            });
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 20,
+                attribution: '&copy; OSM'
+            }).addTo(map);
+
+            // Overlay-Zustand
+            var overlay = null;
+            var pendingImageDataUrl = null; // wenn gesetzt → Linksklick platziert das Bild
+            var lastAngle = 0,
+                lastScale = 1;
+
+            function setStatus(msg, isErr) {
+                statusEl.textContent = msg;
+                if (isErr) statusEl.classList.add('error');
+                else statusEl.classList.remove('error');
+            }
+
+            function buildCornersAround(lat, lng, dLat, dLng) {
+                return [
+                    L.latLng(lat + dLat, lng - dLng),
+                    L.latLng(lat + dLat, lng + dLng),
+                    L.latLng(lat - dLat, lng - dLng),
+                    L.latLng(lat - dLat, lng + dLng)
+                ];
+            }
+
+            function createOverlayAt(imgUrl, latlng) {
+                if (!imgUrl || !latlng) return;
+
+                // heuristische Startgröße abhängig vom Zoom
+                var z = map.getZoom();
+                var k = Math.max(0.0012, 0.006 - (z - 13) * 0.0006);
+                var corners = buildCornersAround(latlng.lat, latlng.lng, k, k * 1.3);
+
+                if (overlay) {
+                    map.removeLayer(overlay);
+                    overlay = null;
+                }
+
+                overlay = L.distortableImageOverlay(imgUrl, {
+                    corners: corners,
+                    mode: 'freeRotate',
+                    selected: true,
+                    opacity: parseFloat(document.getElementById('opacity').value),
+                    suppressToolbar: false
+                }).addTo(map);
+
+                overlay.once('load', function() {
+                    lastAngle = 0;
+                    lastScale = 1;
+                    document.getElementById('rotSlider').value = 0;
+                    document.getElementById('rotOut').value = '0°';
+                    document.getElementById('scaleSlider').value = 1;
+                    document.getElementById('scaleOut').value = '1.00×';
+                    setTimeout(function() {
+                        map.fitBounds(overlay.getBounds());
+                    }, 30);
+                });
+
+                setStatus('Overlay platziert. Ziehen/Skalieren/Rotieren oder JSON exportieren.');
+            }
+
+            // Linksklick platziert, wenn pendingImageDataUrl vorhanden ist
+            map.on('click', function(ev) {
+                if (pendingImageDataUrl) {
+                    createOverlayAt(pendingImageDataUrl, ev.latlng);
+                    pendingImageDataUrl = null;
+                }
+            });
+
+            // Datei laden (robust, ohne optional chaining)
+            var file = document.getElementById('file');
+            file.addEventListener('change', function(e) {
+                var f = (e && e.target && e.target.files && e.target.files[0]) ? e.target.files[0] : null;
+                if (!f) return;
+                var reader = new FileReader();
+                reader.onload = function(ev) {
+                    pendingImageDataUrl = (ev && ev.target) ? ev.target.result : null;
+                    if (pendingImageDataUrl) setStatus('Bild geladen. Klicke auf die Karte, um es zu platzieren.');
+                };
+                reader.readAsDataURL(f);
+            });
+
+            // Drag & Drop
+            var drop = document.getElementById('drop');
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(function(n) {
+                drop.addEventListener(n, function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                });
+            });
+            drop.addEventListener('drop', function(e) {
+                var f = (e && e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]) ? e.dataTransfer.files[0] : null;
+                if (!f) return;
+                var reader = new FileReader();
+                reader.onload = function(ev) {
+                    pendingImageDataUrl = (ev && ev.target) ? ev.target.result : null;
+                    if (pendingImageDataUrl) setStatus('Bild geladen. Klicke auf die Karte, um es zu platzieren.');
+                };
+                reader.readAsDataURL(f);
+            });
+
+            // URL-Feld → Platziermodus
+            var urlField = document.getElementById('urlField');
+            urlField.addEventListener('change', function() {
+                var url = urlField.value.trim();
+                if (url) {
+                    pendingImageDataUrl = url;
+                    setStatus('URL gesetzt. Klicke auf die Karte, um zu platzieren.');
+                }
+            });
+
+            // Controls
+            document.getElementById('opacity').addEventListener('input', function() {
+                if (overlay && overlay.setOpacity) overlay.setOpacity(parseFloat(this.value));
+            });
+            document.getElementById('toggleEdit').addEventListener('click', function() {
+                if (!overlay) return;
+                overlay.setMode(overlay.options.mode === 'lock' ? 'freeRotate' : 'lock');
+            });
+
+            var rotSlider = document.getElementById('rotSlider');
+            var rotOut = document.getElementById('rotOut');
+            rotSlider.addEventListener('input', function() {
+                if (!overlay) return;
+                var newAngle = parseFloat(rotSlider.value);
+                var deltaRad = (newAngle - lastAngle) * Math.PI / 180;
+                overlay.rotateBy(deltaRad);
+                lastAngle = newAngle;
+                rotOut.value = newAngle + '°';
+            });
+            document.getElementById('rotL').addEventListener('click', function() {
+                rotSlider.value = (parseFloat(rotSlider.value) - 5);
+                rotSlider.dispatchEvent(new Event('input'));
+            });
+            document.getElementById('rotR').addEventListener('click', function() {
+                rotSlider.value = (parseFloat(rotSlider.value) + 5);
+                rotSlider.dispatchEvent(new Event('input'));
+            });
+
+            var scaleSlider = document.getElementById('scaleSlider');
+            var scaleOut = document.getElementById('scaleOut');
+            scaleSlider.addEventListener('input', function() {
+                if (!overlay) return;
+                var newScale = parseFloat(scaleSlider.value);
+                var factor = newScale / lastScale;
+                overlay.scaleBy(factor);
+                lastScale = newScale;
+                scaleOut.value = newScale.toFixed(2) + '×';
+            });
+            document.getElementById('scaleDown').addEventListener('click', function() {
+                var v = Math.max(0.25, parseFloat(scaleSlider.value) - 0.05);
+                scaleSlider.value = v.toFixed(2);
+                scaleSlider.dispatchEvent(new Event('input'));
+            });
+            document.getElementById('scaleUp').addEventListener('click', function() {
+                var v = Math.min(2.5, parseFloat(scaleSlider.value) + 0.05);
+                scaleSlider.value = v.toFixed(2);
+                scaleSlider.dispatchEvent(new Event('input'));
+            });
+
+            document.getElementById('fit').addEventListener('click', function() {
+                if (overlay) map.fitBounds(overlay.getBounds());
+            });
+            document.getElementById('remove').addEventListener('click', function() {
+                if (overlay) {
+                    map.removeLayer(overlay);
+                    overlay = null;
+                    setStatus('Overlay entfernt. Neues Bild wählen & auf Karte klicken.');
+                }
+            });
+
+            // Export
+            function toJSON() {
+                if (!overlay) return '[]';
+                var url = urlField.value.trim() || 'assets/images/xxx.png';
+                var title = document.getElementById('titleField').value.trim() || 'Karte';
+                var eras = document.getElementById('eraField').value.trim().split(',').map(function(s) {
+                    return s.trim();
+                }).filter(function(x) {
+                    return !!x;
+                });
+
+                var cList = overlay.getCorners();
+                var cs = [];
+                for (var i = 0; i < cList.length; i++) {
+                    var ll = cList[i];
+                    var lat = (ll && typeof ll.lat === 'number') ? ll.lat : (ll && ll.latlng && typeof ll.latlng.lat === 'number' ? ll.latlng.lat : null);
+                    var lng = (ll && typeof ll.lng === 'number') ? ll.lng : (ll && ll.latlng && typeof ll.latlng.lng === 'number' ? ll.latlng.lng : null);
+                    cs.push([lat, lng]);
+                }
+                var rot = (overlay.options && typeof overlay.options.rotation === 'number') ? overlay.options.rotation : 0;
+
+                return JSON.stringify([{
+                    title: title,
+                    url: url,
+                    corners: cs,
+                    era: (eras.length ? eras : undefined),
+                    rotate: rot
+                }], null, 2);
+            }
+            var out = document.getElementById('out');
+            document.getElementById('exportBtn').addEventListener('click', function() {
+                out.value = toJSON();
+            });
+            document.getElementById('copyBtn').addEventListener('click', function() {
+                out.select();
+                document.execCommand('copy');
+            });
+
+            // Info: initial KEIN Bild mehr laden → erst per Datei/URL & Linksklick platzieren.
+        }
+    </script>
+</body>
+
+</html>
