@@ -1,10 +1,11 @@
 [{
     "title": "Karte",
     "url": "assets/images/000.png",
-    "bounds": [
+    "corners": [
         [51.1530, 11.8088],
-        [51.1640, 11.8198]
+        [51.1530, 11.8198],
+        [51.1640, 11.8198],
+        [51.1640, 11.8088]
     ],
-    "era": ["Hochmittelalter", "Spätmittelalter"],
-    "rotation": 60
+    "era": ["Hochmittelalter", "Spätmittelalter"]
 }]
