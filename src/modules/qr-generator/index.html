@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>QR-Generator</title>
+    <meta name="description" content="Wandelt eine eingegebene URL in einen QR‑Code um – als Einzeldatei für GitHub Pages." />
+    <meta name="theme-color" content="#0e1628" />
+    <style>
+         :root {
+            /* Farbschema angelehnt an den Screenshot */
+            --bg: #0e1628;
+            /* sehr dunkles Blau */
+            --panel: #101a2f;
+            /* Karten-/Editor-Hintergrund */
+            --panel-2: #0c1324;
+            /* Sidebar/vertiefte Flächen */
+            --outline: #1c2742;
+            /* dezente Rahmenlinien */
+            --text: #e6ebf5;
+            /* Hauptschrift */
+            --muted: #9aa6c7;
+            /* Sekundärschrift */
+            --accent: #3b82f6;
+            /* Akzent (blau) */
+            --accent-2: #60a5fa;
+            /* helleres Blau */
+            --danger: #ef4444;
+            --success: #22c55e;
+            --shadow: 0 10px 30px rgba(0, 0, 0, .35), inset 0 1px 0 rgba(255, 255, 255, .02);
+            --radius: 18px;
+        }
+        
+        * {
+            box-sizing: border-box
+        }
+        
+        html,
+        body {
+            height: 100%
+        }
+        
+        body {
+            margin: 0;
+            font: 16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Inter, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+            color: var(--text);
+            background: radial-gradient(1200px 800px at 70% -10%, rgba(59, 130, 246, .08), transparent 60%), var(--bg);
+        }
+        
+        a {
+            color: var(--accent)
+        }
+        
+        .wrap {
+            max-width: 1100px;
+            margin-inline: auto;
+            padding: 32px 20px 24px
+        }
+        
+        header {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px
+        }
+        
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px
+        }
+        
+        .logo {
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            background: linear-gradient(145deg, var(--accent), var(--accent-2));
+            display: grid;
+            place-items: center;
+            color: white;
+            font-weight: 700;
+            box-shadow: var(--shadow)
+        }
+        
+        h1 {
+            margin: 0;
+            font-size: clamp(22px, 3.5vw, 28px);
+            letter-spacing: .2px
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: 1.1fr .9fr;
+            gap: 22px
+        }
+        
+        @media (max-width: 900px) {
+            .grid {
+                grid-template-columns: 1fr
+            }
+        }
+        
+        .card {
+            background: linear-gradient(180deg, rgba(255, 255, 255, .02), rgba(255, 255, 255, 0)), var(--panel);
+            border: 1px solid var(--outline);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow)
+        }
+        
+        .card .inner {
+            padding: 20px
+        }
+        
+        label {
+            display: block;
+            font-size: 14px;
+            color: var(--muted);
+            margin-bottom: 8px
+        }
+        
+        .row {
+            display: flex;
+            gap: 10px
+        }
+        
+        input[type="url"] {
+            flex: 1;
+            background: var(--panel-2);
+            color: var(--text);
+            border: 1px solid var(--outline);
+            border-radius: 14px;
+            padding: 14px 14px;
+            outline: none;
+            transition: border .15s ease, box-shadow .15s ease;
+        }
+        
+        input[type="url"]:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, .15)
+        }
+        
+        .btn {
+            appearance: none;
+            border: 1px solid var(--outline);
+            background: linear-gradient(180deg, rgba(255, 255, 255, .06), rgba(255, 255, 255, 0)), var(--panel-2);
+            color: var(--text);
+            padding: 12px 14px;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: 600;
+            letter-spacing: .2px;
+            transition: transform .03s ease, border-color .15s ease, background .15s ease
+        }
+        
+        .btn:hover {
+            border-color: #2a3862
+        }
+        
+        .btn:active {
+            transform: translateY(1px)
+        }
+        
+        .btn.primary {
+            background: linear-gradient(180deg, var(--accent-2), var(--accent));
+            border-color: transparent;
+            color: #fff;
+            box-shadow: 0 6px 18px rgba(59, 130, 246, .35)
+        }
+        
+        .btn.ghost {
+            background: transparent
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 12px
+        }
+        
+        .preview {
+            display: grid;
+            place-items: center;
+            min-height: 360px;
+            border-top: 1px dashed var(--outline);
+            margin-top: 16px;
+            padding-top: 18px
+        }
+        
+        #qrcode {
+            display: grid;
+            place-items: center;
+            padding: 14px;
+            background: var(--panel-2);
+            border: 1px solid var(--outline);
+            border-radius: 12px
+        }
+        
+        .meta {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+            color: var(--muted);
+            font-size: 13px;
+            margin-top: 14px
+        }
+        
+        .pill {
+            border: 1px solid var(--outline);
+            background: var(--panel-2);
+            padding: 6px 10px;
+            border-radius: 999px
+        }
+        
+        footer {
+            margin-top: 28px;
+            color: var(--muted);
+            font-size: 13px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            justify-content: space-between
+        }
+        
+        .license {
+            opacity: .9
+        }
+        
+        .links {
+            display: flex;
+            gap: 12px
+        }
+        
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            border: 0
+        }
+    </style>
+    <!-- QR-Code Bibliothek (CDN). Funktioniert auf GitHub Pages. -->
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+
+<body>
+    <div class="wrap">
+        <header>
+            <div class="brand" aria-label="QR-Generator">
+                <div class="logo" aria-hidden="true">QR</div>
+                <h1>QR-Generator</h1>
+            </div>
+        </header>
+
+        <main class="grid">
+            <!-- Eingabe -->
+            <section class="card" aria-labelledby="eingabe-titel">
+                <div class="inner">
+                    <h2 id="eingabe-titel" class="sr-only">Eingabe</h2>
+                    <label for="url">URL eingeben</label>
+                    <div class="row">
+                        <input id="url" type="url" inputmode="url" placeholder="https://beispiel.de" spellcheck="false" autocomplete="off" />
+                        <button id="generate" class="btn primary" title="QR-Code erzeugen">Erzeugen</button>
+                    </div>
+                    <div class="controls">
+                        <button id="copy" class="btn" title="URL kopieren">URL kopieren</button>
+                        <button id="download" class="btn" title="QR-Code als PNG speichern">Als PNG speichern</button>
+                        <button id="clear" class="btn ghost" title="Eingabe löschen">Leeren</button>
+                    </div>
+                    <div class="meta">
+                        <span class="pill">Fehlerkorrektur: <strong>Quartile</strong></span>
+                        <span class="pill">Größe: <strong>256 px</strong></span>
+                    </div>
+                    <div class="preview" aria-live="polite">
+                        <div id="qrcode" role="img" aria-label="QR-Code Vorschau"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Hinweise -->
+            <aside class="card" aria-labelledby="hinweis-titel">
+                <div class="inner">
+                    <h2 id="hinweis-titel" style="margin:0 0 10px; font-size:18px">Hinweise</h2>
+                    <ul style="margin:0 0 10px 18px; color:var(--muted)">
+                        <li>Gib eine <em>vollständige</em> URL ein (inkl. <code>https://</code>).</li>
+                        <li>Der QR‑Code wird lokal im Browser erzeugt – keine Datenübertragung.</li>
+                        <li>Nutze <kbd>Enter</kbd>, um direkt zu generieren.</li>
+                    </ul>
+                    <details style="margin-top:8px">
+                        <summary style="cursor:pointer">Lizenz & Danksagung</summary>
+                        <p class="license">Lizenzkennzeichnung: © <span id="year"></span> <strong>Felix Staacke</strong>. Dieses Projekt verwendet die Open‑Source‑Bibliothek <code>qrcodejs</code> (MIT‑Lizenz).</p>
+                    </details>
+                </div>
+            </aside>
+        </main>
+
+        <footer>
+            <div class="license" href="https://github.com/datenflix007/datenflix007.github.io">© <span id="year2"></span> Felix Staacke · Alle Rechte vorbehalten</div>
+            <div class="links">
+                <a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Nach oben">Nach oben ↑</a>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Jahr in Fußzeile setzen
+        const y = new Date().getFullYear();
+        document.getElementById('year').textContent = y;
+        document.getElementById('year2').textContent = y;
+
+        // QR Code Setup
+        let qrcode;
+        const holder = document.getElementById('qrcode');
+        const urlInput = document.getElementById('url');
+        const genBtn = document.getElementById('generate');
+        const copyBtn = document.getElementById('copy');
+        const dlBtn = document.getElementById('download');
+        const clearBtn = document.getElementById('clear');
+
+        function makeQR(text) {
+            holder.innerHTML = '';
+            qrcode = new QRCode(holder, {
+                text: text,
+                width: 256,
+                height: 256,
+                colorDark: "#ffffff", // hell auf dunkel für besseren Kontrast beim Dark Mode
+                colorLight: "#0c1324",
+                correctLevel: QRCode.CorrectLevel.Q
+            });
+        }
+
+        function isLikelyURL(v) {
+            try {
+                new URL(v);
+                return true;
+            } catch {
+                return false
+            }
+        }
+
+        function generate() {
+            const v = urlInput.value.trim();
+            if (!v) {
+                urlInput.focus();
+                urlInput.setAttribute('aria-invalid', 'true');
+                urlInput.style.borderColor = getComputedStyle(document.documentElement).getPropertyValue('--danger');
+                return;
+            }
+            if (!/^https?:\/\//i.test(v)) {
+                // automatisch https:// ergänzen
+                urlInput.value = 'https://' + v;
+            }
+            if (!isLikelyURL(urlInput.value)) {
+                alert('Bitte gib eine gültige URL ein.');
+                return;
+            }
+            makeQR(urlInput.value);
+        }
+
+        genBtn.addEventListener('click', generate);
+        urlInput.addEventListener('keydown', e => {
+            if (e.key === 'Enter') {
+                generate();
+            }
+        });
+        clearBtn.addEventListener('click', () => {
+            urlInput.value = '';
+            holder.innerHTML = '';
+            urlInput.style.borderColor = '';
+            urlInput.focus();
+        });
+
+        copyBtn.addEventListener('click', async() => {
+            const v = urlInput.value.trim();
+            if (!v) return;
+            try {
+                await navigator.clipboard.writeText(v);
+                flash(copyBtn, 'Kopiert', 'success');
+            } catch {
+                flash(copyBtn, 'Fehler', 'danger');
+            }
+        });
+
+        function getCanvas() {
+            // qrcodejs rendert entweder img oder canvas – wir bevorzugen canvas
+            const c = holder.querySelector('canvas');
+            if (c) return c;
+            const img = holder.querySelector('img');
+            if (!img) return null;
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0);
+            return canvas;
+        }
+
+        dlBtn.addEventListener('click', () => {
+            const canvas = getCanvas();
+            if (!canvas) {
+                flash(dlBtn, 'Kein Code', 'danger');
+                return;
+            }
+            const link = document.createElement('a');
+            link.download = 'qr-code.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+            flash(dlBtn, 'Gespeichert', 'success');
+        });
+
+        function flash(btn, label, type) {
+            const old = btn.textContent;
+            btn.textContent = label;
+            btn.style.borderColor = type === 'success' ? getCSS('--success') : getCSS('--danger');
+            setTimeout(() => {
+                btn.textContent = old;
+                btn.style.borderColor = '';
+            }, 900);
+        }
+
+        function getCSS(v) {
+            return getComputedStyle(document.documentElement).getPropertyValue(v);
+        }
+
+        // Demo-QR beim Laden (optional)
+        makeQR('https://github.com/');
+    </script>
+</body>
+
+</html>
