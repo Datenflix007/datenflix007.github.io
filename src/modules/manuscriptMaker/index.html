@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Historischer Manuskript‑Editor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;700&family=IM+Fell+English:ital@0;1&family=UnifrakturCook:wght@700&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#f7f3e8; --panel:#f2eee6; --gold:#bfa166; --ink:#1b1407}
+  *{box-sizing:border-box}
+  body{margin:0; font-family:'EB Garamond', serif; background:var(--bg)}
+  header{position:sticky; top:0; z-index:5; display:flex; gap:12px; align-items:center; padding:10px 14px; border-bottom:1px solid #ddd; background:linear-gradient(#fbf8f1,#f2eee6)}
+  h1{font-family:'IM Fell English', serif; font-size:22px; margin:0}
+  .toolbar{display:flex; flex-wrap:wrap; gap:8px}
+  .btn{appearance:none; border:1px solid #cdb; background:#fff; padding:8px 10px; border-radius:8px; cursor:pointer}
+  .btn.primary{background:var(--gold); border-color:#a98c4e; color:#231804}
+  .layout{display:grid; grid-template-columns:320px 1fr 320px; gap:12px; padding:12px}
+  aside{background:var(--panel); border:1px solid #e3dccf; border-radius:12px; padding:12px}
+  aside h3{margin:6px 0 8px; font-family:'IM Fell English', serif; font-size:18px}
+  .stack{display:flex; flex-direction:column; gap:10px}
+  .row{display:flex; align-items:center; gap:8px}
+  label{font-size:14px}
+  select,input[type="text"],input[type="number"]{border:1px solid #cdb; border-radius:8px; padding:6px 8px; background:#fff}
+  input[type="color"]{width:40px; height:32px; border:none; background:none}
+  .swatches{display:grid; grid-template-columns:repeat(6,1fr); gap:6px}
+  .swatch{height:36px; border-radius:6px; border:1px solid #cdb; cursor:pointer}
+  .swatch.selected{outline:2px solid #333; outline-offset:1px}
+
+  /* Bühne */
+  #stage-wrap{display:flex; justify-content:center}
+  #stage{position:relative; width:860px; height:1200px; border-radius:6px; background:#efe7d0; box-shadow:0 1px 0 rgba(0,0,0,.04) inset, 0 12px 40px rgba(0,0,0,.10); overflow:hidden}
+  #bgImg{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:0}
+  #bgTint{position:absolute; inset:0; mix-blend-mode:multiply; pointer-events:none; z-index:1}
+  #overlayImg{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; pointer-events:none; z-index:3}
+  #frameOverlay{position:absolute; inset:0; pointer-events:none; z-index:2}
+  .ruler{position:absolute; inset:60px; outline:1px dashed rgba(60,40,10,.28); border-radius:4px; pointer-events:none; z-index:4}
+
+  /* Elemente */
+  .item{position:absolute; cursor:move; user-select:none; z-index:5}
+  .text-box{min-width:120px; min-height:50px; padding:10px 12px; color:var(--ink); background:transparent; border:1px dashed transparent; border-radius:6px; resize:both; overflow:auto}
+  .text-box[contenteditable="true"]:focus{outline:none; border-color:#bfa16670; box-shadow:0 0 0 3px #bfa16630}
+  .initial{width:90px; height:90px; font-size:64px; line-height:1; display:flex; align-items:center; justify-content:center; font-family:'UnifrakturCook','IM Fell English',serif; color:var(--ink); background:linear-gradient(180deg,rgba(245,237,219,.95),rgba(230,216,189,.9)); border:2px solid #8a6b2e; border-radius:6px; box-shadow:inset 0 0 0 2px rgba(255,255,255,.55)}
+  .initial.red{background:linear-gradient(180deg,rgba(236,214,200,.95),rgba(222,194,180,.9)); border-color:#7a4a3a}
+  .sticker{font-size:64px}
+  .handle{position:absolute; right:-10px; bottom:-10px; width:18px; height:18px; background:#fff; border:1px solid #bbb; border-radius:50%; cursor:nwse-resize}
+  .selected{outline:2px solid #a98c4e; outline-offset:2px}
+
+  .assets{display:grid; grid-template-columns:repeat(5,1fr); gap:8px}
+  .asset{border:1px solid #cdb; border-radius:8px; background:#fff; height:64px; display:flex; align-items:center; justify-content:center; cursor:pointer}
+  .fine{font-size:12px; color:#555}
+  footer{padding:14px; text-align:center; color:#6b4e16}
+</style>
+</head>
+<body>
+<header>
+  <h1>Historischer Manuskript‑Editor</h1>
+  <div class="toolbar">
+    <button class="btn" id="addText">Textblock</button>
+    <button class="btn" id="addInitial">Initiale</button>
+    <button class="btn" id="addSticker">Marginalie (Emoji)</button>
+    <label class="btn" for="imageInput">Bild einfügen</label>
+    <input id="imageInput" type="file" accept="image/*" hidden>
+    <label class="btn" for="bgInput">Hintergrundbild</label>
+    <input id="bgInput" type="file" accept="image/*" hidden>
+    <label class="btn" for="overlayInput">Rahmen/Overlay</label>
+    <input id="overlayInput" type="file" accept="image/*" hidden>
+    <button class="btn" id="duplicate">Duplizieren</button>
+    <button class="btn" id="front">Nach vorn</button>
+    <button class="btn" id="back">Nach hinten</button>
+    <button class="btn" id="lock">Sperren/Entsperren</button>
+    <button class="btn" id="remove">Löschen</button>
+    <button class="btn primary" id="export">Als PNG exportieren</button>
+  </div>
+</header>
+
+<div class="layout">
+  <aside>
+    <h3>Pergament & Rahmen</h3>
+    <div class="stack">
+      <div>
+        <div class="row" style="justify-content:space-between"><label>Pergament‑Grund</label><span class="fine">(Klick wählt)</span></div>
+        <div id="paperSwatches" class="swatches"></div>
+      </div>
+      <div class="row"><label>Farbton</label><input type="color" id="tintColor" value="#00000000"><span class="fine">z. B. #f5e6c080</span></div>
+      <div>
+        <div class="row" style="justify-content:space-between"><label>Linienrahmen</label><label class="row fine"><input id="toggleFrame" type="checkbox" checked> zeigen</label></div>
+        <select id="frameStyle">
+          <option value="plain">Einfach</option>
+          <option value="none">Keiner</option>
+        </select>
+        <div class="fine">Tipp: Lade zusätzlich ein historisches Rahmenbild über „Rahmen/Overlay“.</div>
+      </div>
+      <div class="row" style="justify-content:space-between"><label>Hilfslinien</label><label class="row fine"><input id="toggleRuler" type="checkbox" checked> zeigen</label></div>
+    </div>
+  </aside>
+
+  <main id="stage-wrap">
+    <div id="stage" aria-label="Arbeitsfläche" tabindex="0">
+      <img id="bgImg" alt="Hintergrund"/>
+      <div id="bgTint"></div>
+      <svg id="frameOverlay" viewBox="0 0 860 1200" preserveAspectRatio="none"></svg>
+      <img id="overlayImg" alt="Overlay"/>
+      <div class="ruler" id="ruler"></div>
+    </div>
+  </main>
+
+  <aside>
+    <h3>Eigenschaften</h3>
+    <div id="noSelection" class="fine">Kein Element ausgewählt.</div>
+    <div id="props" class="stack" style="display:none">
+      <div class="row"><label>Typ:</label><span id="propType" class="fine"></span></div>
+
+      <div id="textProps" class="stack" style="display:none">
+        <div class="row"><label>Schriftart</label>
+          <select id="fontFamily">
+            <option value="'IM Fell English', serif">IM Fell English (antik)</option>
+            <option value="'EB Garamond', serif">EB Garamond</option>
+            <option value="'UnifrakturCook', serif">Unifraktur (Schriftzier)</option>
+          </select>
+        </div>
+        <div class="row"><label>Größe</label><input type="range" id="fontSize" min="10" max="120" value="24"><span id="fontSizeVal" class="fine">24px</span></div>
+        <div class="row"><label>Farbe</label><input type="color" id="fontColor" value="#1b1407"></div>
+        <div class="row"><label>Stil</label>
+          <select id="fontWeight"><option value="400">Normal</option><option value="700">Fett</option></select>
+          <select id="fontStyle"><option value="normal">Aufrecht</option><option value="italic">Kursiv</option></select>
+          <select id="textAlign"><option value="left">Links</option><option value="center">Zentriert</option><option value="right">Rechts</option><option value="justify">Blocksatz</option></select>
+        </div>
+        <div class="row"><label>Hintergrund</label><input type="color" id="textBg" value="#00000000"><span class="fine">optional</span></div>
+      </div>
+
+      <div id="initialProps" class="stack" style="display:none">
+        <div class="row"><label>Buchstabe</label><input id="initialLetter" type="text" maxlength="1" value="A" style="width:60px; text-transform:uppercase"></div>
+        <div class="row"><label>Stil</label><select id="initialStyle"><option value="default">Neutral</option><option value="red">Rot</option></select></div>
+        <div class="row"><label>Größe</label><input type="range" id="initialSize" min="40" max="260" value="90"><span id="initialSizeVal" class="fine">90px</span></div>
+      </div>
+
+      <div id="stickerProps" class="stack" style="display:none">
+        <div class="row"><label>Symbol</label><select id="stickerPicker">
+          <option>⚜️</option><option>✝️</option><option>🪶</option><option>🍇</option><option>🍓</option><option>🐌</option><option>🐸</option>
+        </select></div>
+        <div class="row"><label>Größe</label><input type="range" id="stickerSize" min="24" max="240" value="72"><span id="stickerSizeVal" class="fine">72px</span></div>
+      </div>
+
+      <div id="imageProps" class="stack" style="display:none">
+        <div class="row"><label>Skalierung</label><input type="range" id="imageScale" min="20" max="300" value="100"><span id="imageScaleVal" class="fine">100%</span></div>
+      </div>
+    </div>
+
+    <hr style="margin:12px 0">
+    <h3>Vorlagen & Zierelemente</h3>
+    <div class="assets" id="assetInitials"></div>
+    <div class="assets" id="assetStickers" style="margin-top:8px"></div>
+  </aside>
+</div>
+
+<footer>Für den authentischen Look: echte Scans als Hintergrund/Overlay nutzen (z. B. aus Public‑Domain‑Beständen).</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script>
+const $ = s=>document.querySelector(s);
+const stage=$('#stage');
+const frameSVG=$('#frameOverlay');
+const bgImg=$('#bgImg');
+const overlayImg=$('#overlayImg');
+const tint=$('#bgTint');
+const ruler=$('#ruler');
+let current=null;
+
+function select(el){document.querySelectorAll('.selected').forEach(e=>e.classList.remove('selected')); current=el; if(el){el.classList.add('selected'); showProps(el)} else hideProps();}
+function hideProps(){$('#noSelection').style.display='block'; $('#props').style.display='none';}
+function showProps(el){$('#noSelection').style.display='none'; $('#props').style.display='block'; const t=el.dataset.type; $('#propType').textContent=t; $('#textProps').style.display=t==='Text'?'block':'none'; $('#initialProps').style.display=t==='Initiale'?'block':'none'; $('#stickerProps').style.display=t==='Marginalie'?'block':'none'; $('#imageProps').style.display=t==='Bild'?'block':'none'; if(t==='Text'){ $('#fontFamily').value=getComputedStyle(el).fontFamily; const fs=parseInt(getComputedStyle(el).fontSize); $('#fontSize').value=fs; $('#fontSizeVal').textContent=fs+'px'; $('#fontColor').value=rgbToHex(getComputedStyle(el).color); $('#fontWeight').value=getComputedStyle(el).fontWeight; $('#fontStyle').value=getComputedStyle(el).fontStyle; $('#textAlign').value=getComputedStyle(el).textAlign; $('#textBg').value=rgbaToHex(getComputedStyle(el).backgroundColor);} if(t==='Initiale'){ $('#initialLetter').value=(el.textContent||'A').slice(0,1); $('#initialStyle').value=el.classList.contains('red')?'red':'default'; const s=parseInt(getComputedStyle(el).width); $('#initialSize').value=s; $('#initialSizeVal').textContent=s+'px'; } if(t==='Marginalie'){ $('#stickerPicker').value=el.textContent||'⚜️'; const fs=parseInt(getComputedStyle(el).fontSize); $('#stickerSize').value=fs; $('#stickerSizeVal').textContent=fs+'px'; } if(t==='Bild'){ const pct=Math.round((parseFloat(el.style.transform.replace(/scale\((.*)\)/,'$1'))||1)*100); $('#imageScale').value=pct; $('#imageScaleVal').textContent=pct+'%'; }}
+function rgbToHex(rgb){const m=rgb.match(/\d+/g); if(!m) return '#000000'; return '#'+m.slice(0,3).map(x=>('0'+parseInt(x).toString(16)).slice(-2)).join('');}
+function rgbaToHex(rgba){const m=rgba.match(/\d+\.?\d*/g); if(!m) return '#00000000'; const [r,g,b,a=1]=m.map(Number); const alpha=Math.round(a*255); return '#'+[r,g,b,alpha].map(v=>('0'+v.toString(16)).slice(-2)).join('');}
+
+// Pergament-Presets
+const papers=[{name:'Pergament hell', css: parchment('#f4ecd7')},{name:'Pergament warm', css: parchment('#efe2c0')},{name:'Pergament dunkel', css: parchment('#e2cfab')},{name:'Grau (staubig)', css: parchment('#e7e4da')}];
+function parchment(base){return `radial-gradient(circle at 30% 10%, rgba(255,255,255,.75), transparent 40%),radial-gradient(circle at 80% 40%, rgba(255,255,255,.55), transparent 42%),radial-gradient(circle at 60% 85%, rgba(255,255,255,.45), transparent 45%),linear-gradient(0deg, rgba(0,0,0,.05), rgba(0,0,0,0) 35%),${base}`}
+const paperSw=$('#paperSwatches'); papers.forEach((p,i)=>{const d=document.createElement('div'); d.className='swatch'; d.title=p.name; d.style.background=p.css; if(i===0) d.classList.add('selected'); d.addEventListener('click',()=>{document.querySelectorAll('#paperSwatches .swatch').forEach(s=>s.classList.remove('selected')); d.classList.add('selected'); stage.style.background=p.css;}); paperSw.appendChild(d)}); stage.style.background=papers[0].css;
+
+// Rahmen zeichnen (schlicht, wie Tintenlinie)
+function drawFrame(style){frameSVG.innerHTML=''; if(!$('#toggleFrame').checked||style==='none') return; const w=860,h=1200,inset=24; const g=document.createElementNS('http://www.w3.org/2000/svg','g'); const r1=document.createElementNS('http://www.w3.org/2000/svg','rect'); r1.setAttribute('x',inset); r1.setAttribute('y',inset); r1.setAttribute('width',w-inset*2); r1.setAttribute('height',h-inset*2); r1.setAttribute('fill','none'); r1.setAttribute('stroke','#5f4a28'); r1.setAttribute('stroke-width','2'); const r2=document.createElementNS('http://www.w3.org/2000/svg','rect'); r2.setAttribute('x',inset+14); r2.setAttribute('y',inset+14); r2.setAttribute('width',w-(inset+14)*2); r2.setAttribute('height',h-(inset+14)*2); r2.setAttribute('fill','none'); r2.setAttribute('stroke','#c0ac7a'); r2.setAttribute('stroke-width','1'); g.appendChild(r1); g.appendChild(r2); frameSVG.appendChild(g);} drawFrame('plain');
+$('#frameStyle').addEventListener('change',e=>drawFrame(e.target.value)); $('#toggleFrame').addEventListener('change',()=>drawFrame($('#frameStyle').value)); $('#toggleRuler').addEventListener('change',e=>{ruler.style.display=e.target.checked?'block':'none'}); $('#tintColor').addEventListener('input',e=>{tint.style.background=e.target.value});
+
+// Elemente hinzufügen
+function addTextBox(x=140,y=160){const el=document.createElement('div'); el.className='item text-box'; el.dataset.type='Text'; el.contentEditable=true; el.style.left=x+'px'; el.style.top=y+'px'; el.style.fontFamily="'IM Fell English', serif"; el.style.fontSize='24px'; el.style.lineHeight='1.25'; el.innerHTML='Hier Text…'; addItem(el,true);} 
+function addInitial(letter='A',variant='default',x=80,y=80){const el=document.createElement('div'); el.className='item initial'+(variant==='red'?' red':''); el.dataset.type='Initiale'; el.style.left=x+'px'; el.style.top=y+'px'; el.style.width='90px'; el.style.height='90px'; el.textContent=(letter||'A').toUpperCase(); addItem(el,true);} 
+function addSticker(char='⚜️',x=200,y=200){const el=document.createElement('div'); el.className='item sticker'; el.dataset.type='Marginalie'; el.style.left=x+'px'; el.style.top=y+'px'; el.style.fontSize='72px'; el.textContent=char; addItem(el,true);} 
+function addImageFromFile(file){const r=new FileReader(); r.onload=e=>{const url=e.target.result; const img=new Image(); img.onload=()=>{const el=document.createElement('div'); el.className='item image'; el.dataset.type='Bild'; el.style.left='260px'; el.style.top='260px'; el.style.width=img.width+'px'; el.style.height=img.height+'px'; el.style.transform='scale(1)'; el.style.backgroundImage=`url(${url})`; el.style.backgroundSize='contain'; el.style.backgroundRepeat='no-repeat'; el.style.backgroundPosition='center'; addItem(el,true);}; img.src=url;}; r.readAsDataURL(file);} 
+function addItem(el,sel=false){stage.appendChild(el); makeDraggable(el); if(el.classList.contains('text-box')) addResizeHandle(el); if(sel) select(el);} 
+
+// Asset-Galerien
+const assetInitials=$('#assetInitials'); 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').slice(0,12).forEach((L,i)=>{const a=document.createElement('div'); a.className='asset'; a.textContent=L; a.style.fontFamily="'UnifrakturCook'"; a.style.fontSize='28px'; a.title='Initiale '+L; a.addEventListener('click',()=>addInitial(L, i%4===0?'red':'default', 70+(i%5)*110, 70+Math.floor(i/5)*110)); assetInitials.appendChild(a)});
+const assetStickers=$('#assetStickers'); ['⚜️','✝️','🪶','🍇','🍓','🐌','🐸'].forEach((s,i)=>{const a=document.createElement('div'); a.className='asset'; a.textContent=s; a.style.fontSize='28px'; a.addEventListener('click',()=>addSticker(s, 360+(i%5)*80, 80+Math.floor(i/5)*90)); assetStickers.appendChild(a)});
+
+// Toolbar
+$('#addText').addEventListener('click',()=>addTextBox());
+$('#addInitial').addEventListener('click',()=>addInitial());
+$('#addSticker').addEventListener('click',()=>addSticker());
+$('#imageInput').addEventListener('change',e=>{const f=e.target.files[0]; if(f) addImageFromFile(f); e.target.value='';});
+$('#bgInput').addEventListener('change',e=>{const f=e.target.files[0]; if(!f) return; const r=new FileReader(); r.onload=ev=>{bgImg.src=ev.target.result}; r.readAsDataURL(f); e.target.value='';});
+$('#overlayInput').addEventListener('change',e=>{const f=e.target.files[0]; if(!f) return; const r=new FileReader(); r.onload=ev=>{overlayImg.src=ev.target.result; overlayImg.style.display='block'}; r.readAsDataURL(f); e.target.value='';});
+$('#duplicate').addEventListener('click',()=>{if(!current) return; const c=current.cloneNode(true); c.style.left=(parseInt(current.style.left)+20)+'px'; c.style.top=(parseInt(current.style.top)+20)+'px'; addItem(c,true)});
+$('#front').addEventListener('click',()=>{if(current) current.style.zIndex=(parseInt(current.style.zIndex||'5')+1)});
+$('#back').addEventListener('click',()=>{if(current) current.style.zIndex=(parseInt(current.style.zIndex||'5')-1)});
+$('#lock').addEventListener('click',()=>{if(!current) return; const L=current.dataset.locked==='1'; current.dataset.locked=L?'0':'1'; current.style.cursor=L?'move':'not-allowed'; current.contentEditable=(current.classList.contains('text-box') && L)?'true':'false';});
+$('#remove').addEventListener('click',()=>{if(current){current.remove(); current=null; hideProps();}});
+$('#export').addEventListener('click',async()=>{select(null); const canvas=await html2canvas(stage,{backgroundColor:null,scale:2}); const a=document.createElement('a'); a.download='manuskript.png'; a.href=canvas.toDataURL('image/png'); a.click()});
+
+// Drag/Resize
+function makeDraggable(el){el.addEventListener('pointerdown',e=>{if(e.target.classList.contains('handle')) return; if(el.dataset.locked==='1') return; select(el); const sx=e.clientX, sy=e.clientY; const L=parseInt(el.style.left||0), T=parseInt(el.style.top||0); const move=ev=>{el.style.left=(L+ev.clientX-sx)+'px'; el.style.top=(T+ev.clientY-sy)+'px'}; const up=()=>{document.removeEventListener('pointermove',move); document.removeEventListener('pointerup',up)}; document.addEventListener('pointermove',move); document.addEventListener('pointerup',up)}); el.addEventListener('click',()=>select(el)); if(el.classList.contains('text-box')) el.addEventListener('dblclick',()=>el.focus());}
+function addResizeHandle(el){const h=document.createElement('div'); h.className='handle'; el.appendChild(h); h.addEventListener('pointerdown',e=>{e.stopPropagation(); const sx=e.clientX, sy=e.clientY; const iw=el.offsetWidth, ih=el.offsetHeight; const move=ev=>{el.style.width=Math.max(80, iw+ev.clientX-sx)+'px'; el.style.height=Math.max(40, ih+ev.clientY-sy)+'px'}; const up=()=>{document.removeEventListener('pointermove',move); document.removeEventListener('pointerup',up)}; document.addEventListener('pointermove',move); document.addEventListener('pointerup',up)});}
+
+// Property bindings
+$('#fontFamily').addEventListener('change',e=>{if(current&&current.dataset.type==='Text') current.style.fontFamily=e.target.value});
+$('#fontSize').addEventListener('input',e=>{if(current&&current.dataset.type==='Text'){current.style.fontSize=e.target.value+'px'; $('#fontSizeVal').textContent=e.target.value+'px'}});
+$('#fontColor').addEventListener('input',e=>{if(current&&current.dataset.type==='Text') current.style.color=e.target.value});
+$('#fontWeight').addEventListener('change',e=>{if(current&&current.dataset.type==='Text') current.style.fontWeight=e.target.value});
+$('#fontStyle').addEventListener('change',e=>{if(current&&current.dataset.type==='Text') current.style.fontStyle=e.target.value});
+$('#textAlign').addEventListener('change',e=>{if(current&&current.dataset.type==='Text') current.style.textAlign=e.target.value});
+$('#textBg').addEventListener('input',e=>{if(current&&current.dataset.type==='Text') current.style.backgroundColor=e.target.value});
+$('#initialStyle').addEventListener('change',e=>{if(current&&current.dataset.type==='Initiale'){current.classList.toggle('red', e.target.value==='red')}});
+$('#initialLetter').addEventListener('input',e=>{if(current&&current.dataset.type==='Initiale'){current.textContent=(e.target.value||'A').slice(0,1).toUpperCase()}});
+$('#initialSize').addEventListener('input',e=>{if(current&&current.dataset.type==='Initiale'){const v=e.target.value; current.style.width=v+'px'; current.style.height=v+'px'; $('#initialSizeVal').textContent=v+'px'}});
+$('#stickerPicker').addEventListener('change',e=>{if(current&&current.dataset.type==='Marginalie') current.textContent=e.target.value});
+$('#stickerSize').addEventListener('input',e=>{if(current&&current.dataset.type==='Marginalie'){current.style.fontSize=e.target.value+'px'; $('#stickerSizeVal').textContent=e.target.value+'px'}});
+$('#imageScale').addEventListener('input',e=>{if(current&&current.dataset.type==='Bild'){const s=e.target.value; current.style.transform=`scale(${s/100})`; $('#imageScaleVal').textContent=s+'%'}});
+
+// Deselect
+stage.addEventListener('pointerdown',e=>{if(e.target===stage||e.target===frameSVG||e.target===ruler) select(null)});
+
+// Demo-Start
+addInitial('I','default',96,120); addTextBox(210,120); addSticker('⚜️',680,160);
+</script>
+</body>
+</html>
