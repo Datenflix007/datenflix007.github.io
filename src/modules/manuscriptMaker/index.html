@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="de" data-theme="dark">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -51,6 +51,31 @@
   .asset{border:1px solid #cdb; border-radius:8px; background:#fff; height:64px; display:flex; align-items:center; justify-content:center; cursor:pointer}
   .fine{font-size:12px; color:#555}
   footer{padding:14px; text-align:center; color:#6b4e16}
+  
+  /* Themes */
+  [data-theme="dark"]{
+    --bg:#10131b;
+    --panel:#1b2332;
+    --gold:#d7b972;
+    --ink:#f4edde;
+    --border:#2d3950;
+    --control-bg:#222c40;
+    --control-border:#39465f;
+    --control-text:#f6edd4;
+  }
+  [data-theme="dark"] body{color:var(--ink); background:var(--bg)}
+  [data-theme="dark"] header{border-bottom-color:var(--border); background:linear-gradient(#1f2940,#141b29)}
+  [data-theme="dark"] aside{border-color:var(--border); background:var(--panel); color:var(--ink)}
+  [data-theme="dark"] h1{color:var(--ink)}
+  [data-theme="dark"] label{color:var(--ink)}
+  [data-theme="dark"] .fine{color:#bfc7db}
+  [data-theme="dark"] .btn{background:var(--control-bg); border-color:var(--control-border); color:var(--control-text)}
+  [data-theme="dark"] .btn.primary{background:var(--gold); border-color:#a88c4a; color:#1b1407}
+  [data-theme="dark"] .asset{background:var(--control-bg); border-color:var(--control-border)}
+  [data-theme="dark"] .asset img{filter:brightness(1.1) contrast(1.05)}
+  [data-theme="dark"] #stage-wrap{background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(0,0,0,0))}
+  [data-theme="dark"] .layout{color:var(--ink)}
+  [data-theme="sepia"]{--bg:#f6f1e7; --panel:#f0eadf; --gold:#bfa166; --ink:#2a1e0b}
 </style>
 </head>
 <body>
@@ -72,6 +97,11 @@
     <button class="btn" id="lock">Sperren/Entsperren</button>
     <button class="btn" id="remove">Löschen</button>
     <button class="btn primary" id="export">Als PNG exportieren</button>
+    <select id="theme" class="btn" title="Farbschema auswählen">
+      <option value="light">Hell</option>
+      <option value="sepia">Sepia</option>
+      <option value="dark">Dunkel</option>
+    </select>
   </div>
 </header>
 
@@ -150,8 +180,15 @@
 
     <hr style="margin:12px 0">
     <h3>Vorlagen & Zierelemente</h3>
+    <div class="fine">Initialien & Hintergründe werden aus Ordnern geladen.</div>
+    <h4 class="fine" style="margin:8px 0 4px">Hintergründe (Ordner: <code>hintergründe/</code>)</h4>
+    <div class="assets" id="bgGallery"></div>
+    <h4 class="fine" style="margin:12px 0 4px">Initialien (Ordner: <code>initialien/</code>)</h4>
     <div class="assets" id="assetInitials"></div>
-    <div class="assets" id="assetStickers" style="margin-top:8px"></div>
+    <h4 class="fine" style="margin:12px 0 4px">Marginalien (Ordner: <code>marginalien/</code>)</h4>
+    <div class="assets" id="assetMarginals"></div>
+    <h4 class="fine" style="margin:12px 0 4px">Sticker (Emoji – optional)</h4>
+    <div class="assets" id="assetStickers" style="margin-top:4px"></div>
   </aside>
 </div>
 
@@ -167,6 +204,99 @@ const overlayImg=$('#overlayImg');
 const tint=$('#bgTint');
 const ruler=$('#ruler');
 let current=null;
+const assetFallbacks={
+  'hintergründe':[
+    'chansonnier_cordiforme_de_montchenu.png',
+    'horae_ad_usum_trecensem_1415-20.png',
+    'horae_ad_usum_trecensem_1415-20_2.jpg',
+    'les_voeux_du_paon_1350.jpg',
+    'li\u00e8ge_book_of_hours_ms_w16.png',
+    'parchment.jpg'
+  ],
+  'initialien':[
+    'a.png',
+    'a_scriptores_historiae_augustae.png',
+    'b2.png',
+    'c.png',
+    'c_scriptores_historiae_augustae.png',
+    'chroniques_sire_jehan_froissart_n.png',
+    'd.png',
+    'd2.png',
+    'e.png',
+    'e_scriptores_historiae_augustae.png',
+    'f_scriptores_historiae_augustae.png',
+    'g.png',
+    'g_scriptores_historiae_augustae.png',
+    'h.png',
+    'h2.png',
+    'i_scriptores_historiae_augustae.png',
+    'j.png',
+    'k.png',
+    'l.png',
+    'm.png',
+    'm_scriptores_historiae_augustae.png',
+    'n (1).png',
+    'n.png',
+    'o.png',
+    'o_scriptores_historiae_augustae.png',
+    'p_scriptores_historiae_augustae.png',
+    'q_scriptores_historiae_augustae.png',
+    'r.png',
+    'r_scriptores_historiae_augustae.png',
+    's.png',
+    's_scriptores_historiae_augustae.png',
+    't_scriptores_historiae_augustae.png',
+    'u.png',
+    'v_scriptores_historiae_augustae.png',
+    'w.png',
+    'x.png',
+    'y.png',
+    'z.png'
+  ],
+  'marginalien':[
+    'Book_of_Hours_Lyon_1505-1510_cat_sm.png',
+    'ChatGPT_Image_12._Okt._2025__18_00_46-removebg-preview.png',
+    'anabasis_1501_screamingsnail_sm.png',
+    'backbuttonlt.png',
+    'bible_france_1270-1290_lilguy_sm.png',
+    'book_of_hours_Flanders_14th_century_sm.png',
+    'book_of_hours_france_paris_1420-1425_hedgehog_sm.png',
+    'breviary_of_renaud_1302-1303_rabbit1_sm.png',
+    'breviary_of_renaud_1302-1303_rabbit2_sm.png',
+    'bruges_book_of_hours_1510-1525_snailberries_sm.png',
+    'chroniques_sire_jehan_froissart_folio79r2.png',
+    'forwardbuttonlt.png',
+    'french_book_of_hours_14birdreader_sm.png',
+    'froissarts_chronicles_luteskeleman_sm.png',
+    'heures_de_jacques_de_rambures_1460_snailwoman.png',
+    'homelt.png',
+    'institutes_of_justinian_Frod_sm.png',
+    'le_livre_des_hystoires_du_mirouer_du_monde_sm.png',
+    'lildemonlt.png',
+    'li\u00e8ge_book_of_hours_ms_w16_2.png',
+    'li\u00e8ge_book_of_hours_ms_w16_3.png',
+    'li\u00e8ge_book_of_hours_ms_w16_4.png',
+    'li\u00e8ge_book_of_hours_ms_w16_5.png',
+    'li\u00e8ge_book_of_hours_ms_w16_6.png',
+    'li\u00e8ge_book_of_hours_ms_w16_7.png',
+    'lutterell_cat.png',
+    'lutterell_goatbird_sm.png',
+    'luttrell.f.50r_amphisbaena_sm.png',
+    'luttrell_bat_sm.png',
+    'luttrell_bird_dividerpng_sm.png',
+    'luttrell_fishman_sm.png',
+    'luttrell_rat_eating_fish_sm.png',
+    'paris_bible_1485_snailcat_sm.png',
+    'pointingdemonlt.png',
+    'st_omer_psalter_1330-1420_sm.png',
+    'unknown_source_15th-c_frod_sm.png'
+  ]
+};
+const initialTheme=document.documentElement.dataset.theme||document.body.dataset.theme||'light';
+document.documentElement.dataset.theme=initialTheme;
+if(document.body.dataset.theme) document.body.removeAttribute('data-theme');
+const themeSelect=$('#theme');
+if(themeSelect) themeSelect.value=initialTheme;
 
 function select(el){document.querySelectorAll('.selected').forEach(e=>e.classList.remove('selected')); current=el; if(el){el.classList.add('selected'); showProps(el)} else hideProps();}
 function hideProps(){$('#noSelection').style.display='block'; $('#props').style.display='none';}
@@ -190,13 +320,62 @@ function addSticker(char='⚜️',x=200,y=200){const el=document.createElement('
 function addImageFromFile(file){const r=new FileReader(); r.onload=e=>{const url=e.target.result; const img=new Image(); img.onload=()=>{const el=document.createElement('div'); el.className='item image'; el.dataset.type='Bild'; el.style.left='260px'; el.style.top='260px'; el.style.width=img.width+'px'; el.style.height=img.height+'px'; el.style.transform='scale(1)'; el.style.backgroundImage=`url(${url})`; el.style.backgroundSize='contain'; el.style.backgroundRepeat='no-repeat'; el.style.backgroundPosition='center'; addItem(el,true);}; img.src=url;}; r.readAsDataURL(file);} 
 function addItem(el,sel=false){stage.appendChild(el); makeDraggable(el); if(el.classList.contains('text-box')) addResizeHandle(el); if(sel) select(el);} 
 
-// Asset-Galerien
-const assetInitials=$('#assetInitials'); 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').slice(0,12).forEach((L,i)=>{const a=document.createElement('div'); a.className='asset'; a.textContent=L; a.style.fontFamily="'UnifrakturCook'"; a.style.fontSize='28px'; a.title='Initiale '+L; a.addEventListener('click',()=>addInitial(L, i%4===0?'red':'default', 70+(i%5)*110, 70+Math.floor(i/5)*110)); assetInitials.appendChild(a)});
+// Asset-Galerien (aus Ordnern)
+function addImage(url,x=260,y=260,w=200,h=200){
+  const el=document.createElement('div'); el.className='item image'; el.dataset.type='Bild';
+  el.style.left=x+'px'; el.style.top=y+'px'; el.style.width=w+'px'; el.style.height=h+'px'; el.style.transform='scale(1)';
+  el.style.backgroundImage=`url(${url})`; el.style.backgroundSize='contain'; el.style.backgroundRepeat='no-repeat'; el.style.backgroundPosition='center';
+  addItem(el,true);
+}
+async function loadManifestOrGuess(folder, target, asBackground=false){
+  let list=[];
+  let usedFallback=false;
+  try{
+    const res=await fetch(`${folder}/manifest.json`,{cache:'no-store'});
+    if(res.ok){
+      const data=await res.json();
+      if(Array.isArray(data)){
+        list=data.map(entry=>{
+          if(typeof entry==='string') return entry;
+          if(entry && typeof entry==='object'){
+            return entry.path||entry.name||'';
+          }
+          return '';
+        }).filter(Boolean);
+      }
+    }
+  }catch(e){
+    console.info(`Kein manifest für ${folder}:`,e);
+  }
+  if(list.length===0 && assetFallbacks[folder] && assetFallbacks[folder].length){
+    list=assetFallbacks[folder].slice();
+    usedFallback=true;
+  }
+  list=[...new Set(list)];
+  target.innerHTML='';
+  if(list.length===0){
+    const p=document.createElement('div'); p.className='fine'; p.textContent='Keine Dateien gefunden.'; target.appendChild(p); return;
+  }
+  if(usedFallback){ target.dataset.fallback='true'; } else { delete target.dataset.fallback; }
+  list.forEach(name=>{
+    const encodedName=name.split('/').map(encodeURIComponent).join('/');
+    const url=`${folder}/${encodedName}`; const tile=document.createElement('div'); tile.className='asset';
+    const img=new Image(); img.loading='lazy'; img.decoding='async'; img.src=url; img.alt=name;
+    tile.appendChild(img);
+    tile.title=name; tile.addEventListener('click',()=>{ if(asBackground){ bgImg.src=url; } else { const tmp=new Image(); tmp.onload=()=>addImage(url,220+Math.random()*120,220+Math.random()*120,tmp.width,tmp.height); tmp.src=url; } });
+    target.appendChild(tile);
+  });
+}
+loadManifestOrGuess('hintergründe', document.querySelector('#bgGallery'), true);
+loadManifestOrGuess('initialien', document.querySelector('#assetInitials'), false);
+loadManifestOrGuess('marginalien', document.querySelector('#assetMarginals'), false);
+
+// Sticker (Emojis bleiben als schnelle Option)
 const assetStickers=$('#assetStickers'); ['⚜️','✝️','🪶','🍇','🍓','🐌','🐸'].forEach((s,i)=>{const a=document.createElement('div'); a.className='asset'; a.textContent=s; a.style.fontSize='28px'; a.addEventListener('click',()=>addSticker(s, 360+(i%5)*80, 80+Math.floor(i/5)*90)); assetStickers.appendChild(a)});
 
 // Toolbar
 $('#addText').addEventListener('click',()=>addTextBox());
-$('#addInitial').addEventListener('click',()=>addInitial());
+$('#addInitial').addEventListener('click',()=>{ /* Initialen kommen aus der Galerie */ });
 $('#addSticker').addEventListener('click',()=>addSticker());
 $('#imageInput').addEventListener('change',e=>{const f=e.target.files[0]; if(f) addImageFromFile(f); e.target.value='';});
 $('#bgInput').addEventListener('change',e=>{const f=e.target.files[0]; if(!f) return; const r=new FileReader(); r.onload=ev=>{bgImg.src=ev.target.result}; r.readAsDataURL(f); e.target.value='';});
@@ -208,6 +387,7 @@ $('#lock').addEventListener('click',()=>{if(!current) return; const L=current.da
 $('#remove').addEventListener('click',()=>{if(current){current.remove(); current=null; hideProps();}});
 $('#export').addEventListener('click',async()=>{select(null); const canvas=await html2canvas(stage,{backgroundColor:null,scale:2}); const a=document.createElement('a'); a.download='manuskript.png'; a.href=canvas.toDataURL('image/png'); a.click()});
 
+document.querySelector('#theme').addEventListener('change',e=>{document.documentElement.dataset.theme=e.target.value});
 // Drag/Resize
 function makeDraggable(el){el.addEventListener('pointerdown',e=>{if(e.target.classList.contains('handle')) return; if(el.dataset.locked==='1') return; select(el); const sx=e.clientX, sy=e.clientY; const L=parseInt(el.style.left||0), T=parseInt(el.style.top||0); const move=ev=>{el.style.left=(L+ev.clientX-sx)+'px'; el.style.top=(T+ev.clientY-sy)+'px'}; const up=()=>{document.removeEventListener('pointermove',move); document.removeEventListener('pointerup',up)}; document.addEventListener('pointermove',move); document.addEventListener('pointerup',up)}); el.addEventListener('click',()=>select(el)); if(el.classList.contains('text-box')) el.addEventListener('dblclick',()=>el.focus());}
 function addResizeHandle(el){const h=document.createElement('div'); h.className='handle'; el.appendChild(h); h.addEventListener('pointerdown',e=>{e.stopPropagation(); const sx=e.clientX, sy=e.clientY; const iw=el.offsetWidth, ih=el.offsetHeight; const move=ev=>{el.style.width=Math.max(80, iw+ev.clientX-sx)+'px'; el.style.height=Math.max(40, ih+ev.clientY-sy)+'px'}; const up=()=>{document.removeEventListener('pointermove',move); document.removeEventListener('pointerup',up)}; document.addEventListener('pointermove',move); document.addEventListener('pointerup',up)});}
@@ -228,10 +408,9 @@ $('#stickerSize').addEventListener('input',e=>{if(current&&current.dataset.type=
 $('#imageScale').addEventListener('input',e=>{if(current&&current.dataset.type==='Bild'){const s=e.target.value; current.style.transform=`scale(${s/100})`; $('#imageScaleVal').textContent=s+'%'}});
 
 // Deselect
-stage.addEventListener('pointerdown',e=>{if(e.target===stage||e.target===frameSVG||e.target===ruler) select(null)});
-
-// Demo-Start
-addInitial('I','default',96,120); addTextBox(210,120); addSticker('⚜️',680,160);
+stage.addEventListener('pointerdown',e=>{
+  if(e.target===stage||e.target===frameSVG||e.target===ruler) select(null);
+});
 </script>
 </body>
 </html>
