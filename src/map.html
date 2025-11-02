@@ -653,6 +653,7 @@
                 const opacity = clamp(typeof ov.opacity === 'number' ? ov.opacity : 0.6, 0, 1);
                 const bounds = toBounds(ov);
                 const rotation = typeof ov.rotation === 'number' ? ov.rotation : 0;
+                const pivot = Array.isArray(ov.pivot) && ov.pivot.length === 2 ? ov.pivot : null;
                 if (!ov.url) {
                     console.warn('Overlay ohne URL wurde übergangen:', ov);
                     return;
@@ -660,7 +661,8 @@
                 const layer = createRotatedImageOverlay(ov.url, bounds, {
                     opacity: opacity,
                     interactive: false,
-                    crossOrigin: 'anonymous'
+                    crossOrigin: 'anonymous',
+                    pivot: pivot
                 }, rotation);
 
                 const entry = createListEntry({
@@ -1546,21 +1548,38 @@
                 this._image.onload = this._onImageLoad.bind(this);
             },
             _reset: function () {
-                const nw = this._map.latLngToLayerPoint(this._bounds.getNorthWest());
-                const se = this._map.latLngToLayerPoint(this._bounds.getSouthEast());
-                const size = se.subtract(nw);
+                const map = this._map;
+                const bounds = this._bounds;
+                const nw = map.latLngToLayerPoint(bounds.getNorthWest());
+                const ne = map.latLngToLayerPoint(bounds.getNorthEast());
+                const sw = map.latLngToLayerPoint(bounds.getSouthWest());
+                const width = Math.abs(ne.x - nw.x);
+                const height = Math.abs(sw.y - nw.y);
 
-                L.DomUtil.setPosition(this._container, nw);
+                const centerLatLng = bounds.getCenter();
+                const centerPoint = map.latLngToLayerPoint(centerLatLng);
+                const topLeft = centerPoint.subtract(L.point(width / 2, height / 2));
 
-                this._container.style.width = Math.abs(size.x) + 'px';
-                this._container.style.height = Math.abs(size.y) + 'px';
-                this._image.style.width = Math.abs(size.x) + 'px';
-                this._image.style.height = Math.abs(size.y) + 'px';
+                L.DomUtil.setPosition(this._container, topLeft);
+
+                this._container.style.width = width + 'px';
+                this._container.style.height = height + 'px';
+                this._image.style.width = width + 'px';
+                this._image.style.height = height + 'px';
 
                 const angle = this.options.rotation || 0;
-                const cx = Math.abs(size.x) / 2;
-                const cy = Math.abs(size.y) / 2;
-                this._container.style.transformOrigin = cx + 'px ' + cy + 'px';
+
+                let originX = width / 2;
+                let originY = height / 2;
+
+                if (this.options.pivot) {
+                    const pivotPoint = map.latLngToLayerPoint(L.latLng(this.options.pivot));
+                    const offset = pivotPoint.subtract(topLeft);
+                    originX = offset.x;
+                    originY = offset.y;
+                }
+
+                this._container.style.transformOrigin = originX + 'px ' + originY + 'px';
                 this._container.style.transform = 'rotate(' + angle + 'deg)';
             },
             onAdd: function (map) {
