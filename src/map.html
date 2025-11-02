@@ -625,36 +625,38 @@
             state.overlays = [];
             elements.overlayList.innerHTML = '';
 
-            const baseOverlay = createDefaultOverlayConfig();
-            const overlaysListRaw = Array.isArray(overlaysData) ? overlaysData.slice(0) : [];
-
-            let hasBaseOverlay = false;
-            overlaysListRaw.forEach(function (entry) {
-                if (!entry) return;
-                const matchesBase = (entry.id && entry.id === baseOverlay.id) || (entry.url && entry.url === baseOverlay.url);
-                if (matchesBase) {
-                    hasBaseOverlay = true;
-                    entry.defaultBase = true;
-                    entry.bounds = baseOverlay.bounds.map(function (pair) {
-                        return pair.slice(0);
-                    });
-                    if (typeof entry.opacity !== 'number') {
-                        entry.opacity = baseOverlay.opacity;
+            const overlaysList = (Array.isArray(overlaysData) && overlaysData.length)
+                ? overlaysData.map(function (entry) {
+                    const copy = Object.assign({}, entry);
+                    if (Array.isArray(entry.bounds)) {
+                        copy.bounds = entry.bounds.map(function (pair) {
+                            return Array.isArray(pair) ? pair.slice(0) : pair;
+                        });
+                    } else if (entry.corners && typeof entry.corners === 'object') {
+                        copy.corners = JSON.parse(JSON.stringify(entry.corners));
                     }
-                    if (typeof entry.fitOnActivate !== 'boolean') {
-                        entry.fitOnActivate = true;
-                    }
-                }
-            });
-
-            const overlaysList = hasBaseOverlay ? overlaysListRaw : [baseOverlay].concat(overlaysListRaw);
+                    return copy;
+                })
+                : [createDefaultOverlayConfig()];
 
             overlaysList.forEach(function (ov, index) {
+                if (typeof ov.era === 'string') {
+                    ov.era = [ov.era];
+                }
+                if (Array.isArray(ov.era)) {
+                    ov.era = ov.era.map(function (name) {
+                        return sanitizeEraLabel(name, String(name));
+                    });
+                }
                 const id = ov.id || `overlay-${index}`;
                 const title = ov.title || `Karte ${index + 1}`;
                 const opacity = clamp(typeof ov.opacity === 'number' ? ov.opacity : 0.6, 0, 1);
                 const bounds = toBounds(ov);
                 const rotation = typeof ov.rotation === 'number' ? ov.rotation : 0;
+                if (!ov.url) {
+                    console.warn('Overlay ohne URL wurde übergangen:', ov);
+                    return;
+                }
                 const layer = createRotatedImageOverlay(ov.url, bounds, {
                     opacity: opacity,
                     interactive: false,
@@ -690,9 +692,6 @@
                 };
                 if (ov.fitOnActivate) {
                     record.fitOnActivate = true;
-                }
-                if (ov.defaultBase) {
-                    record.data.defaultBase = true;
                 }
 
                 entry.checkbox.checked = true;
@@ -781,9 +780,7 @@
             elements.overlayGroupToggle.addEventListener('change', function (event) {
                 const desired = event.target.checked;
                 state.overlays.forEach(function (record) {
-                    if (!record.allowed) return;
                     record.desired = desired;
-                    record.checkbox.checked = desired;
                     toggleOverlay(record, { skipSync: true });
                 });
                 syncGroupState('overlays');
@@ -793,9 +790,7 @@
             elements.poiGroupToggle.addEventListener('change', function (event) {
                 const desired = event.target.checked;
                 state.pois.forEach(function (record) {
-                    if (!record.allowed) return;
                     record.desired = desired;
-                    record.checkbox.checked = desired;
                     togglePoi(record, { skipSync: true });
                 });
                 syncGroupState('pois');
@@ -873,19 +868,12 @@
             const poisGroupChecked = elements.poiGroupToggle ? elements.poiGroupToggle.checked : false;
 
             state.overlays.forEach(function (record) {
-                let allowed;
-                if (!overlaysGroupChecked) {
-                    allowed = false;
-                } else if (record.data && record.data.defaultBase) {
-                    allowed = true;
-                } else {
-                    allowed = filterByEra(record.data);
-                }
+                const allowed = overlaysGroupChecked && filterByEra(record.data);
                 updateOverlayAllowed(record, allowed);
             });
 
             state.pois.forEach(function (record) {
-                const allowed = poisGroupChecked ? true : false;
+                const allowed = poisGroupChecked && filterByEra(record.feature);
                 updatePoiAllowed(record, allowed);
             });
 
@@ -939,7 +927,7 @@
 
         function updateEraUI() {
             const currentName = ERAS[state.currentEraIndex] || '';
-            elements.eraLabel.textContent = `Epoche · ${currentName}`;
+            elements.eraLabel.textContent = 'Epoche · ' + currentName;
             elements.eraCounter.textContent = `${state.currentEraIndex + 1} / ${ERAS.length}`;
 
             Array.from(elements.eraLabels.children).forEach(function (child, index) {
@@ -954,6 +942,7 @@
             const shouldShow = record.desired && record.allowed;
 
             record.checkbox.checked = record.allowed ? record.desired : false;
+            record.checkbox.disabled = !record.allowed;
             record.slider.disabled = !record.allowed;
             record.element.classList.toggle('is-active', shouldShow);
 
@@ -982,6 +971,7 @@
             const shouldShow = record.desired && record.allowed;
 
             record.checkbox.checked = record.allowed ? record.desired : false;
+            record.checkbox.disabled = !record.allowed;
             record.slider.disabled = !record.allowed;
             record.element.classList.toggle('is-active', shouldShow);
 
@@ -1011,6 +1001,7 @@
             if (!allowed) {
                 record.element.classList.remove('slider-open');
             }
+            record.element.hidden = !allowed;
             toggleOverlay(record, { skipSync: true });
         }
 
@@ -1020,6 +1011,7 @@
             if (!allowed) {
                 record.element.classList.remove('slider-open');
             }
+            record.element.hidden = !allowed;
             togglePoi(record, { skipSync: true });
         }
 
