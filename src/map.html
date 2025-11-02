@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="de">
 
 <head>
@@ -6,192 +6,431 @@
     <meta name="viewport" content="initial-scale=1, width=device-width" />
     <title>Naumburg Interaktiv</title>
 
-    <!-- Leaflet (CDN) -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
     <style>
+        :root {
+            --panel-bg: rgba(255, 255, 255, 0.94);
+            --panel-border: rgba(15, 23, 42, 0.16);
+            --panel-radius: 18px;
+            --shadow-soft: 0 18px 36px rgba(15, 23, 42, 0.18);
+            --text-muted: #64748b;
+            --accent: #0a7cff;
+            --bg-soft: #f8fafc;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
         html,
-        body,
+        body {
+            height: 100%;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Inter", "Segoe UI", system-ui, sans-serif;
+            color: #111827;
+            background: #e2e8f0;
+            overscroll-behavior: none;
+        }
+
         #map {
             height: 100%;
-            margin: 0;
-        }
-        
-         :root {
-            --panel-bg: rgba(255, 255, 255, 0.92);
-            --panel-border: rgba(0, 0, 0, 0.15);
-            --panel-radius: 12px;
-            --accent: #0a7cff;
-            --muted: #666;
-            --chip-bg: #f1f5f9;
-        }
-        
-        #ui {
-            position: absolute;
-            top: 12px;
-            left: 12px;
-            z-index: 1000;
-            background: var(--panel-bg);
-            backdrop-filter: saturate(1.2) blur(4px);
-            border: 1px solid var(--panel-border);
-            border-radius: var(--panel-radius);
-            padding: 12px;
-            font-family: system-ui, sans-serif;
-            max-width: 360px;
-            box-shadow: 0 10px 24px rgba(0, 0, 0, .12);
-        }
-        
-        #ui h2 {
-            font-size: 14px;
-            margin: 0 0 8px;
-        }
-        
-        #ui .row {
-            display: grid;
-            grid-template-columns: 1fr auto;
-            gap: 8px;
-            align-items: center;
-            margin: 6px 0;
-        }
-        
-        #ui label {
-            font-size: 13px;
-            color: #111;
-        }
-        
-        #ui small {
-            color: var(--muted);
-        }
-        
-        #eraLabels {
-            display: flex;
-            justify-content: space-between;
-            font-size: 11px;
-            color: var(--muted);
-            margin-top: 4px;
-            gap: 4px;
-        }
-        
-        .sep {
-            height: 1px;
-            background: #e5e7eb;
-            margin: 8px 0;
-        }
-        
-        input[type="range"] {
             width: 100%;
         }
-        
-        .leaflet-control-attribution {
-            font-size: 11px;
-        }
-        /* Info-Panel */
-        
-        #info {
+
+        #sidebar {
             position: absolute;
-            right: 12px;
-            bottom: 12px;
-            z-index: 1000;
+            inset: 0 auto 0 0;
+            width: 320px;
+            padding: 24px 24px 32px;
             background: var(--panel-bg);
-            border: 1px solid var(--panel-border);
-            border-radius: var(--panel-radius);
-            padding: 12px;
-            width: min(420px, 92vw);
-            font-family: system-ui, sans-serif;
-            max-height: 50%;
-            overflow: auto;
-            box-shadow: 0 10px 24px rgba(0, 0, 0, .12);
-        }
-        
-        #info h3 {
-            margin: 0 0 6px;
-            font-size: 16px;
-        }
-        
-        #info p {
-            margin: 0 0 10px;
-            font-size: 13px;
-            line-height: 1.4;
-        }
-        
-        .muted {
-            color: var(--muted);
-            font-size: 12px;
-        }
-        
-        .chip {
-            background: var(--chip-bg);
-            border-radius: 999px;
-            padding: 2px 8px;
-            font-size: 11px;
-        }
-        
-        #chips {
+            border-right: 1px solid rgba(15, 23, 42, 0.08);
+            box-shadow: 12px 0 32px rgba(15, 23, 42, 0.14);
             display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
-            margin-top: 6px;
+            flex-direction: column;
+            gap: 24px;
+            z-index: 1200;
+            transition: transform 0.28s ease, box-shadow 0.28s ease;
         }
-        /* Infokarten Controls */
-        
-        .info-controls {
-            position: sticky;
-            top: 0;
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            gap: 6px;
-            margin: -6px -6px 8px 0;
+
+        #sidebar.collapsed {
+            transform: translateX(calc(-100% + 52px));
+            box-shadow: none;
         }
-        
-        .btn-icon {
-            appearance: none;
-            border: 1px solid var(--panel-border);
-            background: #fff;
-            border-radius: 10px;
-            width: 28px;
-            height: 28px;
-            display: inline-grid;
-            place-items: center;
-            cursor: pointer;
-            font-weight: 700;
-            line-height: 1;
-            padding: 0;
-        }
-        
-        .btn-icon:hover {
-            filter: brightness(0.98);
-        }
-        
-        .nav-wrap {
-            display: flex;
-            gap: 6px;
-            margin-left: auto;
-        }
-        
-        .info-meta {
-            font-size: 12px;
-            color: #333;
-            margin-left: auto;
-        }
-        /* Hilfe-Button rechts unten */
-        
-        #helpBtn {
+
+        #sidebarToggle {
             position: absolute;
+            top: 20px;
             right: 16px;
-            bottom: 16px;
-            z-index: 900;
-            width: 42px;
-            height: 42px;
-            border-radius: 50%;
-            background: #fff;
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
             border: 1px solid var(--panel-border);
-            box-shadow: 0 8px 18px rgba(0, 0, 0, .15);
+            background: #fff;
+            font-weight: 700;
+            cursor: pointer;
             display: grid;
             place-items: center;
+            box-shadow: 0 6px 14px rgba(15, 23, 42, 0.12);
+        }
+
+        #sidebar.collapsed #sidebarToggle {
+            right: -40px;
+        }
+
+        #sidebar.collapsed .sidebar-inner {
+            opacity: 0;
+            pointer-events: none;
+            visibility: hidden;
+        }
+
+        .sidebar-inner {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            transition: opacity 0.18s ease;
+        }
+
+        .sidebar-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin: 0;
+            letter-spacing: -0.01em;
+        }
+
+        .group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .group-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .group-label input {
+            width: 18px;
+            height: 18px;
+        }
+
+        .item-list {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .item {
+            background: #fff;
+            border: 1px solid rgba(15, 23, 42, 0.08);
+            border-radius: 14px;
+            padding: 10px 12px;
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            transition: border-color 0.15s ease, transform 0.15s ease;
+        }
+
+        .item.is-active {
+            border-color: var(--accent);
+        }
+
+        .item.is-disabled {
+            opacity: 0.45;
+        }
+
+        .item.is-focused {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+        }
+
+        .item-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .item-toggle {
+            width: 18px;
+            height: 18px;
+        }
+
+        .item-title {
+            flex: 1;
+            padding: 4px 0;
+            background: none;
+            border: none;
+            text-align: left;
+            font-size: 15px;
+            font-weight: 600;
             cursor: pointer;
-            font-weight: 800;
+        }
+
+        .item-title:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+        }
+
+        .drag-handle {
+            width: 18px;
+            height: 18px;
+            display: grid;
+            place-items: center;
+            font-size: 16px;
+            color: var(--text-muted);
+            cursor: grab;
+            user-select: none;
+        }
+
+        .drag-handle:active {
+            cursor: grabbing;
+        }
+
+        .item-slider {
+            display: none;
+            padding-top: 4px;
+            border-top: 1px solid rgba(15, 23, 42, 0.08);
+        }
+
+        .item.slider-open .item-slider {
+            display: block;
+        }
+
+        .slider-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .slider-value {
+            font-variant-numeric: tabular-nums;
+        }
+
+        .item-slider input[type="range"] {
+            width: 100%;
+        }
+
+        .floating-panel {
+            position: absolute;
+            background: var(--panel-bg);
+            border-radius: var(--panel-radius);
+            border: 1px solid var(--panel-border);
+            box-shadow: var(--shadow-soft);
+            padding: 18px 20px;
+            font-size: 14px;
+            max-width: min(420px, 34vw);
+            z-index: 1200;
+        }
+
+        #tutorial {
+            top: 24px;
+            right: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        #tutorial.hidden {
+            display: none;
+        }
+
+        #tutorialBadge {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            width: 40px;
+            height: 40px;
+            border-radius: 999px;
+            border: 1px solid var(--panel-border);
+            background: #fff;
+            box-shadow: var(--shadow-soft);
+            font-weight: 700;
+            cursor: pointer;
+            display: none;
+            place-items: center;
+            z-index: 1200;
+        }
+
+        #tutorialBadge.is-visible {
+            display: grid;
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .panel-header h3 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .panel-actions {
+            margin-left: auto;
+            display: flex;
+            gap: 8px;
+        }
+
+        .panel-actions button {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            border: 1px solid rgba(15, 23, 42, 0.12);
+            background: #fff;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .tutorial-body {
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .tutorial-meta {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-left: auto;
+        }
+
+        #rightDock {
+            position: absolute;
+            right: 24px;
+            bottom: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 16px;
+            width: min(420px, calc(100vw - 64px));
+            z-index: 1200;
+        }
+
+        #poiDetail,
+        #timeControl {
+            position: relative;
+            width: 100%;
+            max-width: min(420px, calc(100vw - 64px));
+        }
+
+        #poiDetail.hidden {
+            display: none;
+        }
+
+        #poiDetailBody p {
+            margin-top: 0;
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+
+        #poiDetailBody img {
+            max-width: 100%;
+            border-radius: 12px;
+            display: block;
+            margin: 10px 0;
+        }
+
+        #poiDetailTags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 10px;
+        }
+
+        .chip {
+            background: var(--bg-soft);
+            border-radius: 999px;
+            padding: 4px 10px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        #timeControl header {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .time-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        #eraLabels {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+            gap: 6px;
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 8px;
+        }
+
+        #eraLabels span {
+            text-align: center;
+            padding: 4px 6px;
+            border-radius: 6px;
+            background: rgba(148, 163, 184, 0.15);
+        }
+
+        input[type="range"] {
+            accent-color: var(--accent);
+        }
+
+        a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 960px) {
+            #sidebar {
+                width: 280px;
+            }
+
+            #sidebar.collapsed {
+                transform: translateX(calc(-100% + 48px));
+            }
+
+            .floating-panel {
+                max-width: 92vw;
+            }
+
+            #tutorial {
+                right: 16px;
+                left: 16px;
+            }
+
+            #rightDock {
+                right: 16px;
+                left: 16px;
+                align-items: stretch;
+                width: calc(100% - 32px);
+            }
+
+            #timeControl,
+            #poiDetail {
+                width: 100%;
+                max-width: 100%;
+            }
         }
     </style>
 </head>
@@ -199,531 +438,1022 @@
 <body>
     <div id="map"></div>
 
-    <!-- UI Panel -->
-    <section id="ui" role="region" aria-label="Kartensteuerung">
-        <h2>Steuerung</h2>
-        <div class="row">
-            <label for="era">Epoche <small id="eraName"></small></label>
-            <output id="eraIndex" aria-live="polite"></output>
-        </div>
-        <input id="era" type="range" min="0" max="5" step="1" value="0" aria-label="Zeitleiste">
-        <div id="eraLabels">
-            <span>Früh-</span><span>Hoch-</span><span>Spät-</span><span>Frühe Neuzeit</span><span>Moderne</span><span>Postmod.</span>
-        </div>
-        <div class="sep"></div>
-        <div class="row">
-            <label class="switch"><input id="toggleOverlays" type="checkbox" checked> Karten einblenden</label>
-            <small id="overlayCount" class="muted"></small>
-        </div>
-        <div class="row">
-            <label for="overlayOpacity">Karten-Transparenz</label>
-            <output id="opacityVal">0.6</output>
-        </div>
-        <input id="overlayOpacity" type="range" min="0" max="1" step="0.05" value="0.6" aria-label="Overlay-Transparenz">
-    </section>
+    <aside id="sidebar" aria-label="Karten-Steuerung">
+        <button id="sidebarToggle" type="button" aria-expanded="true" aria-label="Menü einklappen">
+            &laquo;
+        </button>
 
-    <!-- Info Panel (POI/Polygon-Infos & Infokarten) -->
-    <aside id="info" aria-live="polite"></aside>
+        <div class="sidebar-inner">
+            <h1 class="sidebar-title">Karten-Steuerung</h1>
 
-    <!-- Hilfe-Button -->
-    <button id="helpBtn" title="Hilfe (Infokarten anzeigen)">?</button>
+            <section class="group" aria-label="Historische Karten">
+                <label class="group-label" for="toggleAllOverlays">
+                    <input id="toggleAllOverlays" type="checkbox" checked>
+                    Historische Karten
+                </label>
+                <ul id="overlayList" class="item-list"></ul>
+            </section>
+
+            <section class="group" aria-label="Historische POIs">
+                <label class="group-label" for="toggleAllPois">
+                    <input id="toggleAllPois" type="checkbox" checked>
+                    Historische POIs
+                </label>
+                <ul id="poiList" class="item-list"></ul>
+            </section>
+        </div>
+    </aside>
+
+    <aside id="tutorial" class="floating-panel" aria-live="polite">
+        <div class="panel-header">
+            <h3 id="tutorialTitle">Willkommen</h3>
+            <div class="panel-actions">
+                <button id="tutorialPrev" type="button" title="Zurück">&#8249;</button>
+                <button id="tutorialNext" type="button" title="Weiter">&#8250;</button>
+                <button id="tutorialClose" type="button" title="Tutorial schließen">&times;</button>
+            </div>
+        </div>
+        <div id="tutorialContent" class="tutorial-body"></div>
+        <div id="tutorialMeta" class="tutorial-meta"></div>
+    </aside>
+
+    <button id="tutorialBadge" type="button" title="Tutorial anzeigen">?</button>
+
+    <div id="rightDock">
+        <aside id="poiDetail" class="floating-panel hidden" aria-live="polite">
+            <div class="panel-header">
+                <h3 id="poiDetailTitle">POI</h3>
+                <div class="panel-actions">
+                    <button id="poiDetailClose" type="button" title="Details schließen">&times;</button>
+                </div>
+            </div>
+            <div id="poiDetailBody"></div>
+            <div id="poiDetailTags"></div>
+        </aside>
+
+        <section id="timeControl" class="floating-panel" aria-label="Zeiteinstellung">
+            <header>Zeiteinstellung</header>
+            <div class="time-meta">
+                <span id="eraLabel">Epoche</span>
+                <span id="eraCounter">1/1</span>
+            </div>
+            <input id="era" type="range" min="0" max="0" step="1" value="0" aria-label="Zeitleiste">
+            <div id="eraLabels"></div>
+        </section>
+    </div>
 
     <script>
-        // --------- Konfiguration & Epochen ----------
-        var DEFAULT_ERAS = ["Frühmittelalter", "Hochmittelalter", "Spätmittelalter", "Frühe Neuzeit", "Moderne", "Postmoderne"];
+        const DEFAULT_ERAS = ["Frühmittelalter", "Hochmittelalter", "Spätmittelalter", "Frühe Neuzeit", "Moderne", "Postmoderne"];
 
-        // Datenquellen
-        var DATA = {
+        const DATA = {
             config: 'assets/data/config.json',
             pois: 'assets/data/pois.json',
             polygons: 'assets/data/polygons.geojson',
             overlays: 'assets/data/overlays.json',
-            cardsIdx: 'assets/infocards/index.json', // <- Liste der Markdown-Dateien
+            cardsIdx: 'assets/infocards/index.json',
             cardsDir: 'assets/infocards/'
         };
 
-        // Globale Variablen/Layers
-        var map, poiLayer, polygonLayer;
-        var overlayLayers = [];
-        var ERAS = DEFAULT_ERAS;
-        var currentEraIndex = 0;
+        let ERAS = DEFAULT_ERAS.slice(0);
+        let map;
 
-        // Infokarten
-        var infoCards = []; // [{title, file, html}]
-        var infoCardIndex = 0; // aktueller Slide
-        var infoPanelOpen = true; // Status
+        const state = {
+            currentEraIndex: 0,
+            overlays: [],
+            pois: [],
+            polygonsData: null,
+            polygonLayer: null,
+            infoCards: [],
+            tutorialIndex: 0,
+            tutorialVisible: true,
+            activePoiId: null
+        };
 
-        // Leaflet-Icons fixen (CDN)
-        (function fixLeafletIconPath() {
-            var base = "https://unpkg.com/leaflet@1.9.4/dist/images/";
-            var LIcon = L.Icon.Default;
-            LIcon.mergeOptions({
-                iconRetinaUrl: base + 'marker-icon-2x.png',
-                iconUrl: base + 'marker-icon.png',
-                shadowUrl: base + 'marker-shadow.png'
-            });
-        })();
+        const elements = {};
+        const DEFAULT_OVERLAY_IMAGE = 'assets/images/000.png';
+        const DEFAULT_OVERLAY_DELTA = {
+            lat: 0.018,
+            lon: 0.028
+        };
 
-        // --------- Init ----------
+        fixLeafletIconPath();
+
         (async function init() {
-            // 1) Config
-            var cfg = await fetchJSON(DATA.config, {
+            elements.sidebar = document.getElementById('sidebar');
+            elements.sidebarToggle = document.getElementById('sidebarToggle');
+            elements.overlayList = document.getElementById('overlayList');
+            elements.poiList = document.getElementById('poiList');
+            elements.overlayGroupToggle = document.getElementById('toggleAllOverlays');
+            elements.poiGroupToggle = document.getElementById('toggleAllPois');
+            elements.timeSlider = document.getElementById('era');
+            elements.eraLabel = document.getElementById('eraLabel');
+            elements.eraCounter = document.getElementById('eraCounter');
+            elements.eraLabels = document.getElementById('eraLabels');
+            elements.tutorial = document.getElementById('tutorial');
+            elements.tutorialTitle = document.getElementById('tutorialTitle');
+            elements.tutorialContent = document.getElementById('tutorialContent');
+            elements.tutorialMeta = document.getElementById('tutorialMeta');
+            elements.tutorialPrev = document.getElementById('tutorialPrev');
+            elements.tutorialNext = document.getElementById('tutorialNext');
+            elements.tutorialClose = document.getElementById('tutorialClose');
+            elements.tutorialBadge = document.getElementById('tutorialBadge');
+            elements.poiDetail = document.getElementById('poiDetail');
+            elements.poiDetailTitle = document.getElementById('poiDetailTitle');
+            elements.poiDetailBody = document.getElementById('poiDetailBody');
+            elements.poiDetailTags = document.getElementById('poiDetailTags');
+            elements.poiDetailClose = document.getElementById('poiDetailClose');
+
+            const cfg = await fetchJSON(DATA.config, {
                 start: {
-                    lat: 52.52,
-                    lon: 13.405,
-                    zoom: 12
+                    lat: 51.1517,
+                    lon: 11.8096,
+                    zoom: 13
                 },
                 eras: DEFAULT_ERAS
             });
-            ERAS = (cfg && Array.isArray(cfg.eras) && cfg.eras.length) ? cfg.eras : DEFAULT_ERAS;
 
-            // 2) Map
+            ERAS = sanitizeEraList(Array.isArray(cfg.eras) && cfg.eras.length ? cfg.eras : DEFAULT_ERAS.slice(0));
+
+            initMap(cfg);
+
+            const [poisData, polygonsData, overlaysData, infoCards] = await Promise.all([
+                fetchJSON(DATA.pois, { type: "FeatureCollection", features: [] }),
+                fetchJSON(DATA.polygons, { type: "FeatureCollection", features: [] }),
+                fetchJSON(DATA.overlays, []),
+                loadInfoCards()
+            ]);
+
+            state.infoCards = infoCards;
+            state.polygonsData = polygonsData;
+
+            initOverlays(overlaysData);
+            initPois(poisData);
+            refreshPolygons();
+            buildEraLabels();
+            setupSidebar();
+            setupTimeControl(cfg);
+            setupTutorial();
+            applyEraFilter();
+
+            if (Array.isArray(cfg.fitBounds) && cfg.fitBounds.length === 2) {
+                map.fitBounds(cfg.fitBounds);
+            }
+        })();
+
+        function initMap(cfg) {
             map = L.map('map', {
                 center: [cfg.start.lat, cfg.start.lon],
                 zoom: cfg.start.zoom,
                 preferCanvas: true
             });
 
-            // 3) OSM
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 20,
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> Mitwirkende'
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>-Mitwirkende'
             }).addTo(map);
 
-            // 4) Daten
-            var all = await Promise.all([
-                fetchJSON(DATA.pois, {
-                    features: []
-                }),
-                fetchJSON(DATA.polygons, {
-                    type: "FeatureCollection",
-                    features: []
-                }),
-                fetchJSON(DATA.overlays, []),
-                loadInfoCards() // Infokarten laden
-            ]);
-            var pois = all[0];
-            var polygons = all[1];
-            var overlays = all[2];
+            const url = new URL(location.href);
+            const pLat = parseFloat(url.searchParams.get('lat'));
+            const pLon = parseFloat(url.searchParams.get('lon'));
+            const pZ = parseInt(url.searchParams.get('z'), 10);
+            if (isFinite(pLat) && isFinite(pLon)) {
+                map.setView([pLat, pLon], isFinite(pZ) ? pZ : map.getZoom());
+            }
+        }
 
-            // 5) POIs
-            poiLayer = L.geoJSON(pois, {
-                pointToLayer: function(feature, latlng) {
-                    var title = "POI";
-                    if (feature && feature.properties && feature.properties.title !== undefined && feature.properties.title !== null && feature.properties.title !== "") {
-                        title = feature.properties.title;
+        function initOverlays(overlaysData) {
+            state.overlays = [];
+            elements.overlayList.innerHTML = '';
+
+            const baseOverlay = createDefaultOverlayConfig();
+            const overlaysListRaw = Array.isArray(overlaysData) ? overlaysData.slice(0) : [];
+
+            let hasBaseOverlay = false;
+            overlaysListRaw.forEach(function (entry) {
+                if (!entry) return;
+                const matchesBase = (entry.id && entry.id === baseOverlay.id) || (entry.url && entry.url === baseOverlay.url);
+                if (matchesBase) {
+                    hasBaseOverlay = true;
+                    entry.defaultBase = true;
+                    entry.bounds = baseOverlay.bounds.map(function (pair) {
+                        return pair.slice(0);
+                    });
+                    if (typeof entry.opacity !== 'number') {
+                        entry.opacity = baseOverlay.opacity;
                     }
-                    var m = L.marker(latlng, {
-                        title: title
-                    });
-                    m.on('click', function() {
-                        showFeatureInfo(feature);
-                    });
-                    return m;
-                },
-                filter: function(f) {
-                    return filterByEra(f);
+                    if (typeof entry.fitOnActivate !== 'boolean') {
+                        entry.fitOnActivate = true;
+                    }
                 }
-            }).addTo(map);
+            });
 
-            // 6) Polygone
-            polygonLayer = L.geoJSON(polygons, {
-                style: function(f) {
-                    var p = (f && f.properties) ? f.properties : {};
-                    var color = (p.stroke !== undefined && p.stroke !== null && p.stroke !== '') ? p.stroke : '#0a7cff';
-                    var weight = (p['stroke-width'] !== undefined && p['stroke-width'] !== null && p['stroke-width'] !== '') ? Number(p['stroke-width']) : 2;
-                    var opacity = (p['stroke-opacity'] !== undefined && p['stroke-opacity'] !== null && p['stroke-opacity'] !== '') ? Number(p['stroke-opacity']) : 0.9;
-                    var fillColor = (p.fill !== undefined && p.fill !== null && p.fill !== '') ? p.fill : '#0a7cff';
-                    var fillOpacity = (p['fill-opacity'] !== undefined && p['fill-opacity'] !== null && p['fill-opacity'] !== '') ? Number(p['fill-opacity']) : 0.15;
-                    return {
-                        color: color,
-                        weight: weight,
-                        opacity: opacity,
-                        fillColor: fillColor,
-                        fillOpacity: fillOpacity
-                    };
-                },
-                onEachFeature: function(feature, layer) {
-                    layer.on('click', function() {
-                        showFeatureInfo(feature);
-                    });
-                },
-                filter: function(f) {
-                    return filterByEra(f);
-                }
-            }).addTo(map);
+            const overlaysList = hasBaseOverlay ? overlaysListRaw : [baseOverlay].concat(overlaysListRaw);
 
-            // 7) Overlays
-            overlayLayers = overlays.map(function(ov) {
-                var bounds = toBounds(ov);
-                var rotation = ov.rotation || 0;
-                var layer = createRotatedImageOverlay(ov.url, bounds, {
-                    opacity: 0.6,
+            overlaysList.forEach(function (ov, index) {
+                const id = ov.id || `overlay-${index}`;
+                const title = ov.title || `Karte ${index + 1}`;
+                const opacity = clamp(typeof ov.opacity === 'number' ? ov.opacity : 0.6, 0, 1);
+                const bounds = toBounds(ov);
+                const rotation = typeof ov.rotation === 'number' ? ov.rotation : 0;
+                const layer = createRotatedImageOverlay(ov.url, bounds, {
+                    opacity: opacity,
                     interactive: false,
                     crossOrigin: 'anonymous'
                 }, rotation);
-                if (filterByEra({
-                        properties: ov
-                    })) {
-                    layer.addTo(map);
+
+                const entry = createListEntry({
+                    id,
+                    title,
+                    initialOpacity: opacity,
+                    onToggle: function (checked) {
+                        record.desired = checked;
+                        toggleOverlay(record);
+                    },
+                    onOpacityChange: function (value) {
+                        record.opacity = value;
+                        if (map.hasLayer(record.layer)) {
+                            record.layer.setOpacity(value);
+                        }
+                    }
+                });
+
+                const record = {
+                    id,
+                    data: ov,
+                    layer,
+                    opacity,
+                    desired: true,
+                    allowed: true,
+                    element: entry.li,
+                    checkbox: entry.checkbox,
+                    slider: entry.slider
+                };
+                if (ov.fitOnActivate) {
+                    record.fitOnActivate = true;
                 }
-                return layer;
+                if (ov.defaultBase) {
+                    record.data.defaultBase = true;
+                }
+
+                entry.checkbox.checked = true;
+                entry.slider.value = opacity;
+                entry.slider.disabled = false;
+
+                state.overlays.push(record);
+                elements.overlayList.appendChild(entry.li);
             });
-            updateOverlayMeta();
 
-            // 8) UI
-            setupUI(cfg);
+            createSortable(elements.overlayList, function (order) {
+                reorderRecords('overlays', order);
+            });
 
-            // 9) Start-Bounds optional
-            if (cfg && Array.isArray(cfg.fitBounds) && cfg.fitBounds.length === 2) {
-                map.fitBounds(cfg.fitBounds);
+            updateOverlayOrder();
+        }
+
+        function initPois(poiData) {
+            state.pois = [];
+            elements.poiList.innerHTML = '';
+
+            const collection = Array.isArray(poiData.features) ? poiData.features : [];
+
+            collection.forEach(function (feature, index) {
+                if (!feature || !feature.geometry || feature.geometry.type !== 'Point') return;
+                const coords = feature.geometry.coordinates;
+                if (!Array.isArray(coords) || coords.length < 2) return;
+                const id = feature.id || feature.properties?.id || `poi-${index}`;
+                const title = feature.properties?.title || `POI ${index + 1}`;
+                const marker = L.marker([coords[1], coords[0]], {
+                    title: title
+                });
+                marker.on('click', function () {
+                    showFeatureInfo(feature);
+                });
+
+                const entry = createListEntry({
+                    id,
+                    title,
+                    initialOpacity: 1,
+                    onToggle: function (checked) {
+                        record.desired = checked;
+                        togglePoi(record);
+                    },
+                    onOpacityChange: function (value) {
+                        record.opacity = value;
+                        if (map.hasLayer(record.marker)) {
+                            record.marker.setOpacity(value);
+                        }
+                    }
+                });
+
+                const record = {
+                    id,
+                    feature,
+                    marker,
+                    opacity: 1,
+                    desired: true,
+                    allowed: true,
+                    element: entry.li,
+                    checkbox: entry.checkbox,
+                    slider: entry.slider
+                };
+
+                entry.checkbox.checked = true;
+                entry.slider.disabled = false;
+
+                state.pois.push(record);
+                elements.poiList.appendChild(entry.li);
+            });
+
+            createSortable(elements.poiList, function (order) {
+                reorderRecords('pois', order);
+            });
+
+            updatePoiOrder();
+        }
+
+        function setupSidebar() {
+            elements.sidebarToggle.addEventListener('click', function () {
+                const collapsed = elements.sidebar.classList.toggle('collapsed');
+                elements.sidebarToggle.setAttribute('aria-expanded', String(!collapsed));
+                elements.sidebarToggle.innerHTML = collapsed ? '&raquo;' : '&laquo;';
+            });
+
+            elements.overlayGroupToggle.addEventListener('change', function (event) {
+                const desired = event.target.checked;
+                state.overlays.forEach(function (record) {
+                    if (!record.allowed) return;
+                    record.desired = desired;
+                    record.checkbox.checked = desired;
+                    toggleOverlay(record, { skipSync: true });
+                });
+                syncGroupState('overlays');
+                applyEraFilter();
+            });
+
+            elements.poiGroupToggle.addEventListener('change', function (event) {
+                const desired = event.target.checked;
+                state.pois.forEach(function (record) {
+                    if (!record.allowed) return;
+                    record.desired = desired;
+                    record.checkbox.checked = desired;
+                    togglePoi(record, { skipSync: true });
+                });
+                syncGroupState('pois');
+                applyEraFilter();
+            });
+
+            elements.poiDetailClose.addEventListener('click', hidePoiDetail);
+        }
+
+        function setupTimeControl(cfg) {
+            const url = new URL(location.href);
+            const paramEra = url.searchParams.get('era');
+            let startIdx = 0;
+            if (paramEra && ERAS.includes(paramEra)) {
+                startIdx = ERAS.indexOf(paramEra);
+            } else if (Number.isInteger(cfg.startEraIndex) && cfg.startEraIndex >= 0 && cfg.startEraIndex < ERAS.length) {
+                startIdx = cfg.startEraIndex;
             }
 
-            // 10) Zu Beginn: Infokarten anzeigen
-            renderInfoCards();
-        })();
+            state.currentEraIndex = startIdx;
 
-        // --------- Helpers ----------
-        async function fetchJSON(url, fallback) {
-            try {
-                var res = await fetch(url, {
-                    cache: 'no-store'
+            elements.timeSlider.max = ERAS.length - 1;
+            elements.timeSlider.value = String(state.currentEraIndex);
+            updateEraUI();
+
+            elements.timeSlider.addEventListener('input', function (event) {
+                state.currentEraIndex = parseInt(event.target.value, 10);
+                updateEraUI();
+                applyEraFilter();
+            });
+        }
+
+        function setupTutorial() {
+            renderTutorial();
+
+            elements.tutorialPrev.addEventListener('click', function () {
+                if (!state.infoCards.length) return;
+                state.tutorialIndex = (state.tutorialIndex - 1 + state.infoCards.length) % state.infoCards.length;
+                renderTutorial();
+            });
+
+            elements.tutorialNext.addEventListener('click', function () {
+                if (!state.infoCards.length) return;
+                state.tutorialIndex = (state.tutorialIndex + 1) % state.infoCards.length;
+                renderTutorial();
+            });
+
+            elements.tutorialClose.addEventListener('click', function () {
+                hideTutorial();
+            });
+
+            elements.tutorialBadge.addEventListener('click', function () {
+                showTutorial();
+            });
+
+            window.addEventListener('keydown', function (event) {
+                if (!state.tutorialVisible) return;
+                if (state.infoCards.length === 0) return;
+                if (event.key === 'ArrowLeft') {
+                    state.tutorialIndex = (state.tutorialIndex - 1 + state.infoCards.length) % state.infoCards.length;
+                    renderTutorial();
+                }
+                if (event.key === 'ArrowRight') {
+                    state.tutorialIndex = (state.tutorialIndex + 1) % state.infoCards.length;
+                    renderTutorial();
+                }
+                if (event.key === 'Escape') {
+                    hideTutorial();
+                }
+            });
+        }
+
+        function applyEraFilter() {
+            const overlaysGroupChecked = elements.overlayGroupToggle ? elements.overlayGroupToggle.checked : false;
+            const poisGroupChecked = elements.poiGroupToggle ? elements.poiGroupToggle.checked : false;
+
+            state.overlays.forEach(function (record) {
+                let allowed;
+                if (!overlaysGroupChecked) {
+                    allowed = false;
+                } else if (record.data && record.data.defaultBase) {
+                    allowed = true;
+                } else {
+                    allowed = filterByEra(record.data);
+                }
+                updateOverlayAllowed(record, allowed);
+            });
+
+            state.pois.forEach(function (record) {
+                const allowed = poisGroupChecked ? true : false;
+                updatePoiAllowed(record, allowed);
+            });
+
+            refreshPolygons();
+            syncGroupState('overlays');
+            syncGroupState('pois');
+            updateOverlayOrder();
+            updatePoiOrder();
+        }
+
+        function refreshPolygons() {
+            if (state.polygonLayer) {
+                state.polygonLayer.remove();
+                state.polygonLayer = null;
+            }
+            if (!state.polygonsData) return;
+
+            state.polygonLayer = L.geoJSON(state.polygonsData, {
+                filter: function (feature) {
+                    return filterByEra(feature);
+                },
+                style: function (feature) {
+                    const props = feature?.properties || {};
+                    return {
+                        color: props.stroke || '#0a7cff',
+                        weight: Number(props['stroke-width'] ?? 2),
+                        opacity: Number(props['stroke-opacity'] ?? 0.9),
+                        fillColor: props.fill || '#0a7cff',
+                        fillOpacity: Number(props['fill-opacity'] ?? 0.15)
+                    };
+                },
+                onEachFeature: function (feature, layer) {
+                    layer.on('click', function () {
+                        showFeatureInfo(feature);
+                    });
+                }
+            });
+
+            state.polygonLayer.addTo(map);
+        }
+
+        function buildEraLabels() {
+            elements.eraLabels.innerHTML = '';
+            ERAS.forEach(function (name, index) {
+                const span = document.createElement('span');
+                span.textContent = name;
+                span.dataset.index = String(index);
+                elements.eraLabels.appendChild(span);
+            });
+        }
+
+        function updateEraUI() {
+            const currentName = ERAS[state.currentEraIndex] || '';
+            elements.eraLabel.textContent = `Epoche · ${currentName}`;
+            elements.eraCounter.textContent = `${state.currentEraIndex + 1} / ${ERAS.length}`;
+
+            Array.from(elements.eraLabels.children).forEach(function (child, index) {
+                child.style.background = index === state.currentEraIndex ? 'rgba(10, 124, 255, 0.18)' : 'rgba(148, 163, 184, 0.15)';
+                child.style.color = index === state.currentEraIndex ? '#0f172a' : 'var(--text-muted)';
+                child.style.fontWeight = index === state.currentEraIndex ? '600' : '500';
+            });
+        }
+
+        function toggleOverlay(record, options) {
+            const opts = options || {};
+            const shouldShow = record.desired && record.allowed;
+
+            record.checkbox.checked = record.allowed ? record.desired : false;
+            record.slider.disabled = !record.allowed;
+            record.element.classList.toggle('is-active', shouldShow);
+
+            if (shouldShow) {
+                record.layer.setOpacity(record.opacity);
+                const wasVisible = map.hasLayer(record.layer);
+                if (!wasVisible) {
+                    record.layer.addTo(map);
+                    if (record.fitOnActivate && typeof record.layer.getBounds === 'function') {
+                        map.fitBounds(record.layer.getBounds());
+                    }
+                }
+            } else if (map.hasLayer(record.layer)) {
+                map.removeLayer(record.layer);
+            }
+
+            if (!opts.skipSync) {
+                syncGroupState('overlays');
+            }
+
+            updateOverlayOrder();
+        }
+
+        function togglePoi(record, options) {
+            const opts = options || {};
+            const shouldShow = record.desired && record.allowed;
+
+            record.checkbox.checked = record.allowed ? record.desired : false;
+            record.slider.disabled = !record.allowed;
+            record.element.classList.toggle('is-active', shouldShow);
+
+            if (shouldShow) {
+                record.marker.setOpacity(record.opacity);
+                if (!map.hasLayer(record.marker)) {
+                    record.marker.addTo(map);
+                }
+            } else if (map.hasLayer(record.marker)) {
+                map.removeLayer(record.marker);
+            }
+
+            if (!opts.skipSync) {
+                syncGroupState('pois');
+            }
+
+            if (!shouldShow && state.activePoiId === record.id) {
+                hidePoiDetail();
+            }
+
+            updatePoiOrder();
+        }
+
+        function updateOverlayAllowed(record, allowed) {
+            record.allowed = allowed;
+            record.element.classList.toggle('is-disabled', !allowed);
+            if (!allowed) {
+                record.element.classList.remove('slider-open');
+            }
+            toggleOverlay(record, { skipSync: true });
+        }
+
+        function updatePoiAllowed(record, allowed) {
+            record.allowed = allowed;
+            record.element.classList.toggle('is-disabled', !allowed);
+            if (!allowed) {
+                record.element.classList.remove('slider-open');
+            }
+            togglePoi(record, { skipSync: true });
+        }
+
+        function syncGroupState(type) {
+            const records = type === 'overlays' ? state.overlays : state.pois;
+            const checkbox = type === 'overlays' ? elements.overlayGroupToggle : elements.poiGroupToggle;
+            if (!checkbox) return;
+
+            if (!records.length) {
+                checkbox.checked = false;
+                checkbox.indeterminate = false;
+                checkbox.disabled = true;
+                return;
+            }
+
+            const enabledRecords = records.filter(function (record) {
+                return record.allowed;
+            });
+            const reference = enabledRecords.length ? enabledRecords : records;
+            const activeCount = reference.filter(function (record) {
+                return record.desired;
+            }).length;
+
+            checkbox.disabled = false;
+
+            if (activeCount === 0) {
+                checkbox.checked = false;
+                checkbox.indeterminate = false;
+            } else if (activeCount === reference.length) {
+                checkbox.checked = true;
+                checkbox.indeterminate = false;
+            } else {
+                checkbox.checked = false;
+                checkbox.indeterminate = true;
+            }
+        }
+
+        function updateOverlayOrder() {
+            const total = state.overlays.length;
+            state.overlays.forEach(function (record, index) {
+                if (record.layer && record.layer.setZIndex) {
+                    const order = total - index;
+                    record.layer.setZIndex(1000 + order);
+                }
+            });
+        }
+
+        function updatePoiOrder() {
+            const total = state.pois.length;
+            state.pois.forEach(function (record, index) {
+                const order = total - index;
+                if (record.marker && record.marker.setZIndexOffset) {
+                    record.marker.setZIndexOffset(order * 1000);
+                }
+            });
+        }
+
+        function reorderRecords(type, order) {
+            const records = type === 'overlays' ? state.overlays : state.pois;
+            const mapIndex = {};
+            order.forEach(function (id, index) {
+                mapIndex[id] = index;
+            });
+            records.sort(function (a, b) {
+                const ai = mapIndex[a.id];
+                const bi = mapIndex[b.id];
+                return ai - bi;
+            });
+
+            if (type === 'overlays') {
+                updateOverlayOrder();
+            } else {
+                updatePoiOrder();
+            }
+        }
+
+        function createListEntry(options) {
+            const { id, title, initialOpacity, onToggle, onOpacityChange } = options;
+            const li = document.createElement('li');
+            li.className = 'item';
+            li.dataset.id = id;
+
+            const header = document.createElement('div');
+            header.className = 'item-header';
+
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.className = 'item-toggle';
+            checkbox.setAttribute('aria-label', `${title} einblenden`);
+
+            const titleBtn = document.createElement('button');
+            titleBtn.type = 'button';
+            titleBtn.className = 'item-title';
+            titleBtn.textContent = title;
+            titleBtn.setAttribute('aria-expanded', 'false');
+
+            const handle = document.createElement('span');
+            handle.className = 'drag-handle';
+            handle.setAttribute('draggable', 'true');
+            handle.setAttribute('title', 'Zum Sortieren ziehen');
+            handle.textContent = '⋮⋮';
+
+            header.appendChild(checkbox);
+            header.appendChild(titleBtn);
+            header.appendChild(handle);
+            li.appendChild(header);
+
+            const sliderWrap = document.createElement('div');
+            sliderWrap.className = 'item-slider';
+
+            const sliderMeta = document.createElement('div');
+            sliderMeta.className = 'slider-meta';
+
+            const sliderLabel = document.createElement('span');
+            sliderLabel.textContent = 'Deckkraft';
+
+            const value = document.createElement('span');
+            value.className = 'slider-value';
+            value.textContent = formatPercent(initialOpacity);
+
+            sliderMeta.appendChild(sliderLabel);
+            sliderMeta.appendChild(value);
+
+            const slider = document.createElement('input');
+            slider.type = 'range';
+            slider.min = '0';
+            slider.max = '1';
+            slider.step = '0.05';
+            slider.value = String(initialOpacity);
+            slider.setAttribute('aria-label', `${title} Deckkraft`);
+
+            sliderWrap.appendChild(sliderMeta);
+            sliderWrap.appendChild(slider);
+            li.appendChild(sliderWrap);
+
+            titleBtn.addEventListener('click', function () {
+                const open = li.classList.toggle('slider-open');
+                titleBtn.setAttribute('aria-expanded', String(open));
+            });
+
+            checkbox.addEventListener('change', function () {
+                onToggle(checkbox.checked);
+            });
+
+            slider.addEventListener('input', function () {
+                const val = parseFloat(slider.value);
+                value.textContent = formatPercent(val);
+                onOpacityChange(val);
+            });
+
+            return {
+                li,
+                checkbox,
+                slider
+            };
+        }
+
+        function createSortable(listElement, onOrderChange) {
+            let draggedItem = null;
+
+            listElement.addEventListener('dragstart', function (event) {
+                const handle = event.target.closest('.drag-handle');
+                if (!handle) {
+                    event.preventDefault();
+                    return;
+                }
+                draggedItem = handle.closest('.item');
+                if (!draggedItem) {
+                    event.preventDefault();
+                    return;
+                }
+                event.dataTransfer.effectAllowed = 'move';
+                event.dataTransfer.setData('text/plain', draggedItem.dataset.id);
+                requestAnimationFrame(function () {
+                    draggedItem.classList.add('dragging');
                 });
-                if (!res.ok) throw new Error(res.status + ' ' + url);
-                return await res.json();
-            } catch (e) {
-                console.warn('Konnte JSON nicht laden, nutze Fallback:', url, e);
+            });
+
+            listElement.addEventListener('dragover', function (event) {
+                if (!draggedItem) return;
+                event.preventDefault();
+                const after = getDragAfterElement(listElement, event.clientY);
+                if (!after) {
+                    listElement.appendChild(draggedItem);
+                } else if (after !== draggedItem) {
+                    listElement.insertBefore(draggedItem, after);
+                }
+            });
+
+            function cleanup() {
+                if (!draggedItem) return;
+                draggedItem.classList.remove('dragging');
+                draggedItem = null;
+                const order = Array.from(listElement.children).map(function (item) {
+                    return item.dataset.id;
+                });
+                onOrderChange(order);
+            }
+
+            listElement.addEventListener('drop', function (event) {
+                event.preventDefault();
+                cleanup();
+            });
+
+            listElement.addEventListener('dragend', function () {
+                cleanup();
+            });
+        }
+
+        function getDragAfterElement(container, y) {
+            const items = Array.from(container.querySelectorAll('.item:not(.dragging)'));
+            return items.reduce(function (closest, child) {
+                const box = child.getBoundingClientRect();
+                const offset = y - box.top - box.height / 2;
+                if (offset < 0 && offset > closest.offset) {
+                    return { offset, element: child };
+                }
+                return closest;
+            }, { offset: Number.NEGATIVE_INFINITY, element: null }).element;
+        }
+
+        function showFeatureInfo(feature) {
+            const props = feature?.properties || {};
+            const title = props.title || 'Eintrag';
+            const subtitle = props.subtitle || '';
+            const description = props.description || '';
+            const link = props.link || '';
+            const image = props.image || '';
+            const tags = Array.isArray(props.tags) ? props.tags : [];
+            const era = props.era ? (Array.isArray(props.era) ? props.era : [props.era]) : [];
+
+            elements.poiDetailTitle.textContent = title;
+
+            let bodyHtml = '';
+            if (subtitle) {
+                bodyHtml += `<p class="muted">${escapeHTML(subtitle)}</p>`;
+            }
+            if (description) {
+                bodyHtml += `<p>${escapeHTML(description)}</p>`;
+            }
+            if (image) {
+                bodyHtml += `<img src="${escapeHTML(image)}" alt="${escapeHTML(title)}">`;
+            }
+            if (link) {
+                bodyHtml += `<p><a href="${escapeHTML(link)}" target="_blank" rel="noopener">Mehr&nbsp;Infos</a></p>`;
+            }
+
+            elements.poiDetailBody.innerHTML = bodyHtml;
+
+            elements.poiDetailTags.innerHTML = '';
+            const mergedTags = tags.concat(era);
+            if (mergedTags.length) {
+                mergedTags.forEach(function (tag) {
+                    const chip = document.createElement('span');
+                    chip.className = 'chip';
+                    chip.textContent = tag;
+                    elements.poiDetailTags.appendChild(chip);
+                });
+            }
+
+            elements.poiDetail.classList.remove('hidden');
+
+            let matchedId = null;
+            state.pois.forEach(function (record) {
+                const isMatch = record.feature === feature;
+                if (isMatch) {
+                    matchedId = record.id;
+                }
+                record.element.classList.toggle('is-focused', isMatch);
+            });
+            state.activePoiId = matchedId;
+        }
+
+        function hidePoiDetail() {
+            elements.poiDetail.classList.add('hidden');
+            state.activePoiId = null;
+            state.pois.forEach(function (record) {
+                record.element.classList.remove('is-focused');
+            });
+        }
+
+        function renderTutorial() {
+            if (!state.tutorialVisible) {
+                elements.tutorial.classList.add('hidden');
+                elements.tutorialBadge.classList.add('is-visible');
+                return;
+            }
+
+            if (!state.infoCards.length) {
+                elements.tutorialTitle.textContent = 'Willkommen';
+                elements.tutorialContent.innerHTML =
+                    '<p>Ziehe historische Karten per Drag &amp; Drop in der linken Steuerung, um die Stapelreihenfolge anzupassen, und nutze die Zeitleiste unten rechts, um Inhalte nach Epochen einzublenden.</p>';
+                elements.tutorialMeta.textContent = '';
+                elements.tutorial.classList.remove('hidden');
+                elements.tutorialBadge.classList.remove('is-visible');
+                return;
+            }
+
+            if (state.tutorialIndex < 0 || state.tutorialIndex >= state.infoCards.length) {
+                state.tutorialIndex = 0;
+            }
+
+            const card = state.infoCards[state.tutorialIndex];
+            elements.tutorialTitle.textContent = card.title || 'Info';
+            elements.tutorialContent.innerHTML = card.html;
+            elements.tutorialMeta.textContent = `${state.tutorialIndex + 1} / ${state.infoCards.length}`;
+            elements.tutorial.classList.remove('hidden');
+            elements.tutorialBadge.classList.remove('is-visible');
+        }
+
+        function hideTutorial() {
+            state.tutorialVisible = false;
+            elements.tutorial.classList.add('hidden');
+            elements.tutorialBadge.classList.add('is-visible');
+        }
+
+        function showTutorial() {
+            state.tutorialVisible = true;
+            renderTutorial();
+        }
+
+        async function loadInfoCards() {
+            try {
+                const indexList = await fetchJSON(DATA.cardsIdx, []);
+                if (!Array.isArray(indexList)) return [];
+                const cards = await Promise.all(indexList.map(function (entry) {
+                    const file = entry?.file;
+                    const title = entry?.title || '';
+                    if (!file) return Promise.resolve(null);
+                    return fetch(DATA.cardsDir + file, { cache: 'no-store' })
+                        .then(function (res) {
+                            if (!res.ok && res.status !== 0) throw new Error('fetch ' + file);
+                            return res.text();
+                        })
+                        .then(function (markdown) {
+                            return {
+                                title,
+                                html: mdToHtml(markdown)
+                            };
+                        })
+                        .catch(function () {
+                            return null;
+                        });
+                }));
+                return cards.filter(Boolean);
+            } catch (error) {
+                console.warn('Infokarten konnten nicht geladen werden:', error);
+                return [];
+            }
+        }
+
+        function sanitizeEraList(list) {
+            return list.map(function (name, index) {
+                return sanitizeEraLabel(name, DEFAULT_ERAS[index] || `Epoche ${index + 1}`);
+            });
+        }
+
+        function sanitizeEraLabel(name, fallback) {
+            if (typeof name !== 'string') {
+                return fallback;
+            }
+            let normalized = name;
+            if (typeof normalized.normalize === 'function') {
+                normalized = normalized.normalize('NFC');
+            }
+            const hasReplacement = normalized.indexOf('\uFFFD') !== -1;
+            const hasLegacyMarker = /[\u01EC\u02DC\u02C6]/.test(normalized);
+            if (!hasReplacement && !hasLegacyMarker) {
+                return normalized;
+            }
+            try {
+                const repaired = decodeURIComponent(escape(normalized));
+                if (repaired && repaired.indexOf('\uFFFD') === -1 && !/[\u01EC\u02DC\u02C6]/.test(repaired)) {
+                    return repaired;
+                }
+                return repaired || fallback;
+            } catch (error) {
+                console.warn('Konnte Era-Label nicht reparieren:', name, error);
                 return fallback;
             }
         }
 
-        function filterByEra(feature) {
-            var propEra = null;
-            if (feature && feature.properties && feature.properties.era !== undefined && feature.properties.era !== null) {
-                propEra = feature.properties.era;
+        function filterByEra(item) {
+            let era = null;
+            if (item && item.properties && item.properties.era !== undefined) {
+                era = item.properties.era;
+            } else if (item && item.era !== undefined) {
+                era = item.era;
             }
-            if (propEra === null) return true;
-            var eraName = ERAS[currentEraIndex];
-            if (Array.isArray(propEra)) return propEra.indexOf(eraName) !== -1;
-            return propEra === eraName;
-        }
-
-        function refreshFilters() {
-            // POIs
-            poiLayer.clearLayers();
-            fetchJSON(DATA.pois, {
-                features: []
-            }).then(function(pois) {
-                if (pois && pois.features) {
-                    poiLayer.addData(pois.features);
-                } else {
-                    poiLayer.addData(pois);
-                }
-            });
-            // Polygone
-            polygonLayer.clearLayers();
-            fetchJSON(DATA.polygons, {
-                type: "FeatureCollection",
-                features: []
-            }).then(function(polygons) {
-                polygonLayer.addData(polygons);
-            });
-            // Overlays
-            fetchJSON(DATA.overlays, []).then(function(overlays) {
-                overlayLayers.forEach(function(l) {
-                    map.removeLayer(l);
-                });
-                overlayLayers = overlays.map(function(ov) {
-                    var bounds = toBounds(ov);
-                    var layer = L.imageOverlay(ov.url, bounds, {
-                        opacity: parseFloat(document.getElementById('overlayOpacity').value),
-                        interactive: false,
-                        crossOrigin: 'anonymous'
-                    });
-                    var toggleEl = document.getElementById('toggleOverlays');
-                    var visible = false;
-                    if (toggleEl && toggleEl.checked && filterByEra({
-                            properties: ov
-                        })) {
-                        visible = true;
-                    }
-                    if (visible) {
-                        layer.addTo(map);
-                    }
-                    return layer;
-                });
-                updateOverlayMeta();
-            });
-        }
-
-        function toBounds(ov) {
-            if (ov && Array.isArray(ov.bounds) && ov.bounds.length === 2) return ov.bounds;
-            if (ov && ov.corners) {
-                var lats = Object.values(ov.corners).map(function(c) {
-                    return c[0];
-                });
-                var lons = Object.values(ov.corners).map(function(c) {
-                    return c[1];
-                });
-                return [
-                    [Math.min.apply(null, lats), Math.min.apply(null, lons)],
-                    [Math.max.apply(null, lats), Math.max.apply(null, lons)]
-                ];
+            if (era === null || era === undefined) return true;
+            const currentEra = ERAS[state.currentEraIndex];
+            if (Array.isArray(era)) {
+                return era.includes(currentEra);
             }
-            throw new Error('Overlay ohne gültige bounds/corners');
+            return era === currentEra;
         }
 
-        function setupUI(cfg) {
-            var eraInput = document.getElementById('era');
-            var eraName = document.getElementById('eraName');
-            var eraIndexOut = document.getElementById('eraIndex');
-            var toggleOverlays = document.getElementById('toggleOverlays');
-            var overlayOpacity = document.getElementById('overlayOpacity');
-            var opacityVal = document.getElementById('opacityVal');
-
-            eraInput.max = ERAS.length - 1;
-
-            function updateEraUI(idx) {
-                eraName.textContent = '· ' + ERAS[idx];
-                eraIndexOut.textContent = (parseInt(idx, 10) + 1) + '/' + ERAS.length;
-            }
-
-            var url = new URL(location.href);
-            var pEra = url.searchParams.get('era');
-            var startIdx;
-            if (pEra && ERAS.indexOf(pEra) >= 0) {
-                startIdx = Math.max(0, ERAS.indexOf(pEra));
-            } else if (cfg && cfg.startEraIndex !== undefined && cfg.startEraIndex !== null) {
-                startIdx = cfg.startEraIndex;
-            } else {
-                startIdx = 0;
-            }
-            currentEraIndex = isFinite(startIdx) ? startIdx : 0;
-
-            eraInput.value = currentEraIndex;
-            updateEraUI(currentEraIndex);
-
-            eraInput.addEventListener('input', function(e) {
-                currentEraIndex = parseInt(e.target.value, 10);
-                updateEraUI(currentEraIndex);
-                refreshFilters();
-            });
-            toggleOverlays.addEventListener('change', function() {
-                overlayLayers.forEach(function(l) {
-                    if (toggleOverlays.checked) l.addTo(map);
-                    else map.removeLayer(l);
-                });
-                updateOverlayMeta();
-            });
-            overlayOpacity.addEventListener('input', function(e) {
-                var v = parseFloat(e.target.value);
-                opacityVal.textContent = v.toFixed(2);
-                overlayLayers.forEach(function(l) {
-                    l.setOpacity(v);
-                });
-            });
-
-            var pLat = parseFloat(url.searchParams.get('lat'));
-            var pLon = parseFloat(url.searchParams.get('lon'));
-            var pZ = parseInt(url.searchParams.get('z'), 10);
-            if (isFinite(pLat) && isFinite(pLon)) map.setView([pLat, pLon], isFinite(pZ) ? pZ : map.getZoom());
-
-            // Hilfe-Button
-            var hb = document.getElementById('helpBtn');
-            hb.addEventListener('click', function() {
-                infoPanelOpen = true;
-                infoCardIndex = 0;
-                renderInfoCards();
-            });
-        }
-
-        function updateOverlayMeta() {
-            var m = document.getElementById('overlayCount');
-            var count = overlayLayers.filter(function(l) {
-                return map.hasLayer(l);
-            }).length;
-            m.textContent = count + ' sichtbar';
-        }
-
-        // ---------- POI/Polygon-Info ----------
-        function showFeatureInfo(feature) {
-            infoPanelOpen = true; // Panel sichtbar halten
-            var info = document.getElementById('info');
-            var p = (feature && feature.properties) ? feature.properties : {};
-            var title = (p.title !== undefined && p.title !== null && p.title !== "") ? p.title : "Objekt";
-
-            var html = '';
-            html += '<div class="info-controls">';
-            html += '  <button class="btn-icon" id="closeInfo" title="Schließen">×</button>';
-            html += '</div>';
-            html += '<h3>' + escapeHTML(title) + '</h3>';
-            if (p.subtitle) html += '<p class="muted">' + escapeHTML(p.subtitle) + '</p>';
-            if (p.description) html += '<p>' + escapeHTML(p.description) + '</p>';
-            if (p.link) html += '<p><a href="' + p.link + '" target="_blank" rel="noopener">Mehr&nbsp;Infos</a></p>';
-
-            // Chips
-            var tags = Array.isArray(p.tags) ? p.tags : [];
-            var era = p.era ? (Array.isArray(p.era) ? p.era : [p.era]) : [];
-            if (tags.length || era.length) {
-                html += '<div id="chips">';
-                tags.concat(era).forEach(function(t) {
-                    html += '<span class="chip">' + escapeHTML(t) + '</span>';
-                });
-                html += '</div>';
-            }
-
-            var infoEl = document.getElementById('info');
-            infoEl.innerHTML = html;
-
-            document.getElementById('closeInfo').addEventListener('click', function() {
-                hideInfoPanel();
-            });
-        }
-
-        function hideInfoPanel() {
-            var info = document.getElementById('info');
-            info.innerHTML = '';
-            infoPanelOpen = false;
-        }
-
-        // ---------- Infokarten (Markdown) ----------
-        async function loadInfoCards() {
+        async function fetchJSON(url, fallback) {
             try {
-                var idx = await fetchJSON(DATA.cardsIdx, []);
-                if (!Array.isArray(idx)) idx = [];
-                // Lade alle Markdown-Dateien und render sie zu HTML
-                var promises = idx.map(function(entry) {
-                    var file = entry && entry.file ? entry.file : null;
-                    var title = entry && entry.title ? entry.title : '';
-                    if (!file) return Promise.resolve(null);
-                    return fetch(DATA.cardsDir + file, {
-                            cache: 'no-store'
-                        })
-                        .then(function(res) {
-                            if (!res.ok) throw new Error('fetch ' + file);
-                            return res.text();
-                        })
-                        .then(function(md) {
-                            return {
-                                title: title,
-                                file: file,
-                                html: mdToHtml(md)
-                            };
-                        })
-                        .catch(function() {
-                            return null;
-                        });
-                });
-                var results = await Promise.all(promises);
-                infoCards = results.filter(function(x) {
-                    return x !== null;
-                });
-            } catch (e) {
-                console.warn('Infokarten konnten nicht geladen werden:', e);
-                infoCards = [];
+                const res = await fetch(url, { cache: 'no-store' });
+                if (!res.ok && res.status !== 0) throw new Error(res.status + ' ' + url);
+                const raw = await res.text();
+                if (!raw) return fallback;
+                return JSON.parse(raw);
+            } catch (error) {
+                console.warn('Konnte JSON nicht laden, nutze Fallback:', url, error);
+                return fallback;
             }
         }
 
-        function renderInfoCards() {
-            var info = document.getElementById('info');
-            if (!infoCards.length) {
-                // Fallback-Card
-                info.innerHTML =
-                    '<div class="info-controls"><button class="btn-icon" id="closeInfo" title="Schließen">×</button></div>' +
-                    '<h3>Willkommen 👋</h3>' +
-                    '<p class="muted">Klicke auf einen POI oder eine Fläche, um Details zu sehen. Über den ?-Button unten rechts öffnest du diese Hilfe erneut.</p>';
-                document.getElementById('closeInfo').addEventListener('click', function() {
-                    hideInfoPanel();
-                });
-                return;
-            }
+        function mdToHtml(markdown) {
+            if (!markdown) return '';
+            let text = String(markdown).replace(/\r\n/g, '\n');
 
-            // Clamp Index
-            if (infoCardIndex < 0) infoCardIndex = infoCards.length - 1;
-            if (infoCardIndex >= infoCards.length) infoCardIndex = 0;
-
-            var card = infoCards[infoCardIndex];
-            var html = '';
-            html += '<div class="info-controls">';
-            html += '  <div class="nav-wrap">';
-            html += '    <button class="btn-icon" id="prevCard" title="Zurück">‹</button>';
-            html += '    <button class="btn-icon" id="nextCard" title="Weiter">›</button>';
-            html += '  </div>';
-            html += '  <button class="btn-icon" id="closeInfo" title="Schließen">×</button>';
-            html += '</div>';
-            html += '<h3>' + escapeHTML(card.title || 'Info') + '</h3>';
-            html += '<div>' + card.html + '</div>';
-            html += '<div class="info-meta">' + (infoCardIndex + 1) + ' / ' + infoCards.length + '</div>';
-
-            info.innerHTML = html;
-
-            // Events
-            document.getElementById('prevCard').addEventListener('click', function() {
-                infoCardIndex--;
-                renderInfoCards();
-            });
-            document.getElementById('nextCard').addEventListener('click', function() {
-                infoCardIndex++;
-                renderInfoCards();
-            });
-            document.getElementById('closeInfo').addEventListener('click', function() {
-                hideInfoPanel();
+            text = text.replace(/[&<>]/g, function (char) {
+                return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[char];
             });
 
-            // Tastatur-Navigation
-            document.onkeydown = function(ev) {
-                var e = ev || window.event;
-                if (!infoPanelOpen) return;
-                if (e.key === 'ArrowLeft') {
-                    infoCardIndex--;
-                    renderInfoCards();
-                }
-                if (e.key === 'ArrowRight') {
-                    infoCardIndex++;
-                    renderInfoCards();
-                }
-                if (e.key === 'Escape') {
-                    hideInfoPanel();
-                }
-            };
-        }
-
-        // Sehr einfacher Markdown → HTML Konverter (Überschriften, Listen, Links, **fett**, *kursiv*)
-        function mdToHtml(md) {
-            if (md === undefined || md === null) return '';
-            var text = String(md).replace(/\r\n/g, '\n');
-
-            // Escape HTML vor der Umwandlung
-            text = text.replace(/[&<>]/g, function(s) {
-                return {
-                    '&': '&amp;',
-                    '<': '&lt;',
-                    '>': '&gt;'
-                }[s];
-            });
-
-            // Überschriften
             text = text.replace(/^### (.*)$/gm, '<h4>$1</h4>');
             text = text.replace(/^## (.*)$/gm, '<h3>$1</h3>');
             text = text.replace(/^# (.*)$/gm, '<h2>$1</h2>');
 
-            // Listen
-            text = text.replace(/(^|\n)- (.*)(?=(\n[^-]|$))/g, function(match, p1, p2) {
-                var items = p2.split('\n- ').map(function(li) {
-                    return '<li>' + li + '</li>';
+            text = text.replace(/(^|\n)- (.*)(?=(\n[^-]|$))/g, function (_, lead, items) {
+                const listItems = items.split('\n- ').map(function (entry) {
+                    return '<li>' + entry + '</li>';
                 }).join('');
-                return p1 + '<ul>' + items + '</ul>';
+                return lead + '<ul>' + listItems + '</ul>';
             });
 
-            // Links [text](url)
             text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
-
-            // Fett/Kursiv
             text = text.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
             text = text.replace(/\*([^*]+)\*/g, '<em>$1</em>');
 
-            // Absätze (Doppel-Zeilenumbruch → <p>)
-            text = text.split(/\n{2,}/).map(function(block) {
+            text = text.split(/\n{2,}/).map(function (block) {
                 if (/^<h[2-4]>/.test(block) || /^<ul>/.test(block)) return block;
                 return '<p>' + block.replace(/\n/g, '<br>') + '</p>';
             }).join('\n');
@@ -732,21 +1462,74 @@
         }
 
         function escapeHTML(str) {
-            return String(str).replace(/[&<>"']/g, function(s) {
-                return ({
+            return String(str).replace(/[&<>"']/g, function (char) {
+                return {
                     '&': '&amp;',
                     '<': '&lt;',
                     '>': '&gt;',
                     '"': '&quot;',
                     "'": '&#39;'
-                })[s];
+                }[char];
             });
         }
 
-        // --- RotatedImageOverlay-Klasse ---
+        function createDefaultOverlayConfig() {
+            const fallbackCenter = { lat: 51.1517, lng: 11.8096 };
+            const center = map && typeof map.getCenter === 'function' ? map.getCenter() : fallbackCenter;
+            const lat = typeof center.lat === 'number' ? center.lat : fallbackCenter.lat;
+            const lng = typeof center.lng === 'number' ? center.lng : fallbackCenter.lng;
+            const bounds = [
+                [lat - DEFAULT_OVERLAY_DELTA.lat, lng - DEFAULT_OVERLAY_DELTA.lon],
+                [lat + DEFAULT_OVERLAY_DELTA.lat, lng + DEFAULT_OVERLAY_DELTA.lon]
+            ];
+            return {
+                id: 'historic-naumburg-base',
+                title: 'Historische Karte Naumburg',
+                url: DEFAULT_OVERLAY_IMAGE,
+                bounds: bounds,
+                rotation: 0,
+                opacity: 0.65,
+                defaultBase: true,
+                fitOnActivate: true
+            };
+        }
+
+        function toBounds(overlay) {
+            if (overlay && Array.isArray(overlay.bounds) && overlay.bounds.length === 2) {
+                return overlay.bounds;
+            }
+            if (overlay && overlay.corners) {
+                const cornerValues = Object.values(overlay.corners);
+                const lats = cornerValues.map(function (c) { return c[0]; });
+                const lons = cornerValues.map(function (c) { return c[1]; });
+                return [
+                    [Math.min.apply(null, lats), Math.min.apply(null, lons)],
+                    [Math.max.apply(null, lats), Math.max.apply(null, lons)]
+                ];
+            }
+            throw new Error('Overlay ohne gültige bounds/corners');
+        }
+
+        function formatPercent(value) {
+            return Math.round(value * 100) + '%';
+        }
+
+        function clamp(value, min, max) {
+            return Math.min(Math.max(value, min), max);
+        }
+
+        function fixLeafletIconPath() {
+            const base = "https://unpkg.com/leaflet@1.9.4/dist/images/";
+            L.Icon.Default.mergeOptions({
+                iconRetinaUrl: base + 'marker-icon-2x.png',
+                iconUrl: base + 'marker-icon.png',
+                shadowUrl: base + 'marker-shadow.png'
+            });
+        }
+
         L.RotatedImageOverlay = L.ImageOverlay.extend({
-            _initImage: function() {
-                var img = L.DomUtil.create('img', 'leaflet-image-layer');
+            _initImage: function () {
+                const img = L.DomUtil.create('img', 'leaflet-image-layer');
                 img.style.position = 'absolute';
                 img.style.willChange = 'transform';
                 img.style.pointerEvents = this.options.interactive ? 'auto' : 'none';
@@ -756,8 +1539,7 @@
                 if (this.options.zIndex) img.style.zIndex = this.options.zIndex;
                 img.src = this._url;
 
-                // Container für Rotation
-                var container = L.DomUtil.create('div', 'leaflet-rotated-container');
+                const container = L.DomUtil.create('div', 'leaflet-rotated-container');
                 container.style.position = 'absolute';
                 container.style.top = '0';
                 container.style.left = '0';
@@ -771,10 +1553,10 @@
                 this._imageContainer = container;
                 this._image.onload = this._onImageLoad.bind(this);
             },
-            _reset: function() {
-                var nw = this._map.latLngToLayerPoint(this._bounds.getNorthWest());
-                var se = this._map.latLngToLayerPoint(this._bounds.getSouthEast());
-                var size = se.subtract(nw);
+            _reset: function () {
+                const nw = this._map.latLngToLayerPoint(this._bounds.getNorthWest());
+                const se = this._map.latLngToLayerPoint(this._bounds.getSouthEast());
+                const size = se.subtract(nw);
 
                 L.DomUtil.setPosition(this._container, nw);
 
@@ -783,27 +1565,26 @@
                 this._image.style.width = Math.abs(size.x) + 'px';
                 this._image.style.height = Math.abs(size.y) + 'px';
 
-                // Rotation um Mittelpunkt
-                var angle = this.options.rotation || 0;
-                var cx = Math.abs(size.x) / 2;
-                var cy = Math.abs(size.y) / 2;
+                const angle = this.options.rotation || 0;
+                const cx = Math.abs(size.x) / 2;
+                const cy = Math.abs(size.y) / 2;
                 this._container.style.transformOrigin = cx + 'px ' + cy + 'px';
                 this._container.style.transform = 'rotate(' + angle + 'deg)';
             },
-            onAdd: function(map) {
+            onAdd: function (map) {
                 this._map = map;
                 if (!this._container) this._initImage();
                 map.getPanes().overlayPane.appendChild(this._container);
                 map.on('zoomend viewreset resize move', this._reset, this);
                 this._reset();
             },
-            onRemove: function(map) {
+            onRemove: function (map) {
                 if (this._container && this._container.parentNode) {
                     this._container.parentNode.removeChild(this._container);
                 }
                 map.off('zoomend viewreset resize move', this._reset, this);
             },
-            setRotation: function(angle) {
+            setRotation: function (angle) {
                 this.options.rotation = angle;
                 this._reset();
             }
@@ -814,22 +1595,6 @@
             options.rotation = rotation || 0;
             return new L.RotatedImageOverlay(url, bounds, options);
         }
-
-        // --- Overlays laden und einfügen ---
-        fetch('assets/data/overlays.json')
-            .then(res => res.json())
-            .then(overlays => {
-                overlays.forEach(function(ov) {
-                    var bounds = ov.bounds;
-                    var rotation = ov.rotation || 0;
-                    var layer = createRotatedImageOverlay(ov.url, bounds, {
-                        opacity: 0.6,
-                        interactive: false,
-                        crossOrigin: 'anonymous'
-                    }, rotation);
-                    layer.addTo(map);
-                });
-            });
     </script>
 </body>
 
