@@ -136,7 +136,7 @@ main {
     display: grid;
     gap: 22px;
     grid-template-columns: 1.2fr .8fr;
-    align-items: center;
+    align-items: start;
     padding: 60px 0;
 }
 
@@ -168,6 +168,7 @@ main {
 --------------------------------------------------------- */
 
 .avatar {
+    align-self: start;
     justify-self: end;
     width: 240px;
     height: 240px;
@@ -190,6 +191,85 @@ main {
 .avatar:hover {
     transform: scale(1.3);
     transition: transform .3s ease;
+}
+
+/* --------------------------------------------------------
+   Timeline
+--------------------------------------------------------- */
+
+.timeline {
+    width: 100%;
+    margin: 2.5rem 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+}
+
+.timeline-item {
+    display: flex;
+    gap: 1.5rem;
+    max-width: 900px;
+}
+
+.timeline-item.left {
+    align-self: flex-start;
+}
+
+.timeline-item.right {
+    align-self: flex-end;
+}
+
+.timeline-content {
+    background: radial-gradient(circle at top left, #111827, var(--surface));
+    border-radius: 1.5rem;
+    padding: 1.25rem 1.5rem;
+    box-shadow: 0 18px 45px rgba(15, 23, 42, 0.6);
+}
+
+.timeline-content h3 {
+    margin: 0 0 0.35rem;
+    font-size: 1.1rem;
+}
+
+.timeline-content p {
+    margin: 0;
+    color: var(--muted);
+    line-height: 1.5;
+    font-size: 0.95rem;
+}
+
+.timeline-media {
+    display: flex;
+    align-items: center;
+}
+
+.avatar-border {
+    padding: 3px;
+    border-radius: 1.5rem;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    display: inline-block;
+}
+
+.avatar-border img {
+    display: block;
+    border-radius: 1.35rem;
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+}
+
+@media (max-width: 768px) {
+    .timeline-item {
+        align-self: stretch;
+        flex-direction: column;
+        max-width: 100%;
+    }
+    .timeline-media {
+        order: -1;
+    }
+    .timeline {
+        margin-top: 2rem;
+    }
 }
 
 
@@ -555,3 +635,246 @@ footer {
     border-radius: 12px;
     box-shadow: 0 10px 24px rgba(0, 0, 0, .18);
 }
+
+
+/* --------------------------------------------------------
+   Projekte page extras (moved from src/projekte.html)
+--------------------------------------------------------- */
+
+        /* ---------- Eleganteres <details>/<summary> ---------- */
+        
+        details {
+            border-radius: 16px;
+            border: 1px solid hsl(0 0% 100% / .08);
+            background: linear-gradient(180deg, hsl(0 0% 100% / .05), hsl(0 0% 100% / .03));
+            box-shadow: 0 1px 0 hsl(0 0% 100% / .08) inset, 0 8px 24px hsl(0 0% 0% / .25);
+            margin: 32px 0;
+            /* etwas mehr Außenabstand */
+            overflow: clip;
+            transition: border-color .25s ease, background .25s ease, box-shadow .25s ease;
+        }
+        
+        details:hover {
+            border-color: hsl(0 0% 100% / .16);
+            box-shadow: 0 1px 0 hsl(0 0% 100% / .12) inset, 0 12px 28px hsl(0 0% 0% / .32);
+        }
+        
+        details[open] {
+            background: linear-gradient(180deg, hsl(0 0% 100% / .06), hsl(0 0% 100% / .04));
+        }
+        /* Summary als Kopfzeile */
+        
+        details>summary {
+            list-style: none;
+            cursor: pointer;
+            padding: 20px 56px 20px 24px;
+            font-weight: 600;
+            letter-spacing: .2px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+            user-select: none;
+        }
+        
+        details>summary::-webkit-details-marker {
+            display: none;
+        }
+        /* Chevron */
+        
+        details>summary::after {
+            content: "";
+            position: absolute;
+            right: 18px;
+            width: 10px;
+            height: 10px;
+            border-right: 2px solid currentColor;
+            border-bottom: 2px solid currentColor;
+            transform: rotate(45deg) translateY(1px);
+            /* öffnet standardmäßig, also nach unten */
+            opacity: .9;
+            transition: transform .25s ease, opacity .25s ease;
+        }
+        
+        details[open]>summary::after {
+            transform: rotate(45deg) translateY(1px);
+            opacity: 1;
+        }
+        
+        details>summary:focus-visible {
+            outline: none;
+            box-shadow: 0 0 0 3px hsl(210 100% 60% / .35) inset;
+            border-radius: 14px;
+        }
+        /* Mehr Innenabstand für die Fläche unter dem Summary */
+        
+        details>.grid,
+        details>div:not(:has(summary)) {
+            padding: 24px 28px 30px;
+            /* ↑ links/rechts unten */
+        }
+        /* Sanfter Slide/Fade für den Inhalt beim Öffnen */
+        
+        details>div,
+        details .grid {
+            animation: details-reveal .35s ease both;
+        }
+        
+        @keyframes details-reveal {
+            from {
+                opacity: 0;
+                transform: translateY(-6px);
+                filter: blur(2px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+                filter: none;
+            }
+        }
+        /* ---------- Karten „vom Stapel“ einfliegen ---------- */
+        
+        details .grid .project {
+            opacity: 0;
+            transform-origin: top left;
+        }
+        
+        details[open] .grid .project {
+            animation: fly-in-stack .6s cubic-bezier(.2, .7, .2, 1) both;
+            animation-delay: calc(var(--i, 0) * 90ms);
+        }
+        
+        @keyframes fly-in-stack {
+            from {
+                opacity: 0;
+                transform: translate(-28px, -28px) rotate(-5deg) scale(.96);
+                filter: blur(1.5px);
+                box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+            }
+            60% {
+                opacity: 1;
+                transform: translate(4px, 4px) rotate(.6deg) scale(1.01);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+                filter: none;
+                box-shadow: 0 10px 24px rgba(0, 0, 0, .25);
+            }
+        }
+        /* Stagger-Index (bis zu 12 Karten) */
+        
+        .grid .project:nth-child(1) {
+            --i: 0
+        }
+        
+        .grid .project:nth-child(2) {
+            --i: 1
+        }
+        
+        .grid .project:nth-child(3) {
+            --i: 2
+        }
+        
+        .grid .project:nth-child(4) {
+            --i: 3
+        }
+        
+        .grid .project:nth-child(5) {
+            --i: 4
+        }
+        
+        .grid .project:nth-child(6) {
+            --i: 5
+        }
+        
+        .grid .project:nth-child(7) {
+            --i: 6
+        }
+        
+        .grid .project:nth-child(8) {
+            --i: 7
+        }
+        
+        .grid .project:nth-child(9) {
+            --i: 8
+        }
+        
+        .grid .project:nth-child(10) {
+            --i: 9
+        }
+        
+        .grid .project:nth-child(11) {
+            --i: 10
+        }
+        
+        .grid .project:nth-child(12) {
+            --i: 11
+        }
+        /* Karten-Optik */
+        
+        .card.project {
+            border-radius: 16px;
+            transition: transform .2s ease, box-shadow .2s ease;
+            will-change: transform;
+            backdrop-filter: saturate(1.1);
+        }
+        
+        .card.project:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 30px rgba(0, 0, 0, .28);
+        }
+        /* Bewegungs-Reduktion */
+        
+        @media (prefers-reduced-motion: reduce) {
+            details>div,
+            details .grid,
+            details[open] .grid .project {
+                animation: none !important;
+            }
+            .card.project,
+            details,
+            details:hover {
+                transition: none !important;
+            }
+        }
+        /* -------------------------------------------
+   Extra Optimierung für Tablets (768px – 1024px)
+-------------------------------------------- */
+        
+        @media (max-width: 1024px) and (min-width: 681px) {
+            .hero {
+                grid-template-columns: 1fr;
+                /* Avatar unter Text */
+                text-align: center;
+            }
+            .avatar {
+                margin: 0 auto;
+                /* Avatar mittig setzen */
+            }
+            .nav {
+                gap: 8px;
+            }
+        }
+        /* -------------------------------------------
+   Smartphones Hochformat (bis 480px)
+-------------------------------------------- */
+        
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 1.6rem;
+            }
+            .hero p {
+                font-size: 1rem;
+            }
+            .chip {
+                font-size: 0.8rem;
+                padding: 4px 8px;
+            }
+            .contact a {
+                flex: 1 1 100%;
+                /* Buttons in voller Breite */
+                text-align: center;
+            }
+        }
+    
