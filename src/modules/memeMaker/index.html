@@ -540,10 +540,58 @@ window.addEventListener('DOMContentLoaded', () => {
     return `https://cdn.jsdelivr.net/gh/${REMOTE.owner}/${REMOTE.repo}@${REMOTE.branch}/${clean}`;
   }
 
+  function jsdelivrUrl() {
+    return `https://data.jsdelivr.com/v1/package/gh/${REMOTE.owner}/${REMOTE.repo}@${REMOTE.branch}/flat`;
+  }
+
+  function listFromFlat(flatFiles, path) {
+    const clean = path ? path.replace(/^\/+/, "") : "";
+    const prefix = clean ? `/${clean.replace(/\/+$/,"")}/` : "/";
+    const seenDirs = new Set();
+    const entries = [];
+
+    for (const f of flatFiles || []) {
+      const name = f.name || "";
+      if (!name.startsWith(prefix)) continue;
+      const rest = name.slice(prefix.length);
+      if (!rest) continue;
+      const parts = rest.split('/');
+      if (parts.length > 1) {
+        const dir = parts[0];
+        if (!seenDirs.has(dir)) {
+          seenDirs.add(dir);
+          entries.push({ name: dir, type: "dir" });
+        }
+      } else {
+        entries.push({ name: parts[0], type: "file" });
+      }
+    }
+
+    return entries;
+  }
+
+  async function jsDelivrList(path) {
+    const cacheKey = `mm_flat_${REMOTE.owner}_${REMOTE.repo}_${REMOTE.branch}`;
+    let flat = cacheGet(cacheKey, LIST_CACHE_MS);
+    if (!flat) {
+      const res = await fetch(jsdelivrUrl(), { cache: "no-store" });
+      if (!res.ok) throw new Error(`jsDelivr Fehler (${res.status})`);
+      const data = await res.json();
+      flat = Array.isArray(data.files) ? data.files : [];
+      cacheSet(cacheKey, flat);
+    }
+    return listFromFlat(flat, path);
+  }
+
   async function ghList(path) {
     const clean = path ? path.replace(/^\/+/, "") : "";
     const url = `https://api.github.com/repos/${REMOTE.owner}/${REMOTE.repo}/contents/${clean}?ref=${REMOTE.branch}`;
-    const res = await fetch(url, { cache: "no-store" });
+    let res;
+    try {
+      res = await fetch(url, { cache: "no-store" });
+    } catch (e) {
+      return await jsDelivrList(clean);
+    }
 
     // Rate limit sichtbar machen
     if (res.status === 403) {
@@ -552,7 +600,9 @@ window.addEventListener('DOMContentLoaded', () => {
       rateWarn.style.display = 'none';
     }
 
-    if (!res.ok) throw new Error(`GitHub API Fehler (${res.status}) bei ${clean || "/"}`);
+    if (!res.ok) {
+      return await jsDelivrList(clean);
+    }
     return await res.json();
   }
 
@@ -599,7 +649,27 @@ window.addEventListener('DOMContentLoaded', () => {
       cacheSet(cacheKey, listing);
     }
 
-    const folderCats = (Array.isArray(listing) ? listing : [])
+    const safeListing = Array.isArray(listing) ? listing : [];
+    const rootImages = safeListing
+      .filter(x => x.type === "file" && isImageFile(x.name))
+      .map(file => {
+        const pathInRepo = joinPath(root, file.name);
+        return {
+          label: file.name,
+          src: cdnUrl(pathInRepo),
+          kind: "repo"
+        };
+      });
+
+    const rootCat = rootImages.length ? {
+      id: "repo:__root__",
+      name: REMOTE.rootPath ? REMOTE.rootPath.split('/').pop() : "Vorlagen",
+      type: "repo-root",
+      path: root,
+      items: rootImages
+    } : null;
+
+    const folderCats = safeListing
       .filter(x => x.type === "dir")
       .map(dir => ({
         id: `repo:${dir.name}`,
@@ -624,7 +694,7 @@ window.addEventListener('DOMContentLoaded', () => {
       items: localItems
     };
 
-    categories = [localCat, ...folderCats];
+    categories = [localCat, ...(rootCat ? [rootCat] : []), ...folderCats];
   }
 
   async function loadCategoryItems(catId) {
@@ -634,6 +704,12 @@ window.addEventListener('DOMContentLoaded', () => {
     // local category
     if (cat.type === "local") {
       renderImageSelect(cat.items);
+      return;
+    }
+
+    if (cat.type === "repo-root") {
+      renderImageSelect(cat.items);
+      setStatus("bereit");
       return;
     }
 
