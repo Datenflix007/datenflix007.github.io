@@ -266,19 +266,66 @@
             gap: 10px;
             margin-bottom: 10px;
         }
+        /* Team pro Unterrichtsstunde */
+
+        .lesson-team-box {
+            margin-top: 12px;
+            padding: 10px;
+            border: 1px solid rgba(255, 255, 255, .12);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, .02);
+        }
+
+        .lesson-team-grid {
+            display: grid;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .lesson-team-row {
+            display: grid;
+            grid-template-columns: minmax(140px, 1fr) auto minmax(160px, 1fr);
+            align-items: center;
+            gap: 10px;
+            padding: 8px 10px;
+            border: 1px solid rgba(255, 255, 255, .1);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, .02);
+        }
+
+        .lesson-team-row.is-absent {
+            opacity: .75;
+            border-color: rgba(255, 122, 122, .35);
+        }
+
+        .lesson-team-name {
+            font-weight: 700;
+            color: #e7ebf4;
+        }
+
+        .attend-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--text);
+            white-space: nowrap;
+        }
+
+        .attend-toggle input {
+            width: auto;
+            transform: translateY(1px);
+        }
+
         /* Issues innerhalb der Unterrichtsstunden */
         
         .issue-head {
             display: flex;
             align-items: flex-start;
             gap: 10px;
-            cursor: pointer;
             padding: 8px 10px;
             border-radius: 10px;
-        }
-        
-        .issue-head:hover {
-            background: rgba(255, 255, 255, .06);
+            background: rgba(255, 255, 255, .04);
         }
         
         .issue-title {
@@ -288,8 +335,40 @@
         .issue-body {
             margin: 8px 0 0 0;
             padding: 8px 10px;
-            border-left: 2px solid rgba(255, 255, 255, .12);
-            display: none;
+            border: 1px solid rgba(255, 255, 255, .1);
+            border-radius: 10px;
+            display: block;
+        }
+
+        .issue-controls {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(220px, 1fr));
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .issue-control {
+            background: rgba(255, 255, 255, .03);
+            border: 1px solid rgba(255, 255, 255, .09);
+            border-radius: 10px;
+            padding: 8px;
+        }
+
+        .issue-control label {
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .issue-add-box {
+            display: grid;
+            grid-template-columns: minmax(240px, 1fr) minmax(200px, 1fr) auto;
+            align-items: end;
+            gap: 10px;
+            margin: 12px 0;
+            padding: 10px;
+            border: 1px solid rgba(255, 255, 255, .1);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, .02);
         }
         /* Ziele (Chips) */
         
@@ -369,6 +448,17 @@
             }
             .inline-form .row {
                 grid-template-columns: 1fr;
+            }
+            .lesson-team-row {
+                grid-template-columns: 1fr;
+                align-items: start;
+            }
+            .issue-controls {
+                grid-template-columns: 1fr;
+            }
+            .issue-add-box {
+                grid-template-columns: 1fr;
+                align-items: stretch;
             }
         }
     </style>
@@ -535,7 +625,7 @@
 
     <script>
         let todos = [];
-        // Stunde: { date:'YYYY-MM-DD', goals:[{text, done, carry?:true}], todos:[{title}], notes:[{time,text}] }
+        // Stunde: { date:'YYYY-MM-DD', goals:[{text, done, carry?:true}], todos:[{title,addedBy}], notes:[{time,text}], participants:[{name,present,role}] }
         let sprints = [];
         let logbook = [];
 
@@ -582,6 +672,79 @@
             if (selected) return selected;
             const firstMember = getTeamMembers()[0] || '';
             return firstMember || fallback || 'Unbekannt';
+        }
+
+        const roleLabel = role => ({
+            coding: 'Coding',
+            doku: 'Doku'
+        })[role] || 'Keine Aufgabe';
+
+        function buildLessonParticipants() {
+            return getTeamMembers().map(name => ({
+                name,
+                present: false,
+                role: ''
+            }));
+        }
+
+        function normalizeLessonParticipants(sprint) {
+            const members = getTeamMembers();
+            const old = Array.isArray(sprint.participants) ? sprint.participants : [];
+            const oldByName = new Map(old
+                .filter(p => p && typeof p.name === 'string')
+                .map(p => [p.name, {
+                    name: p.name,
+                    present: !!p.present,
+                    role: p.role === 'coding' || p.role === 'doku' ? p.role : ''
+                }]));
+            sprint.participants = members.map(name => oldByName.get(name) || {
+                name,
+                present: false,
+                role: ''
+            });
+        }
+
+        function lessonPeopleSummary(sprint) {
+            const participants = Array.isArray(sprint.participants) ? sprint.participants : [];
+            const total = participants.length;
+            const present = participants.filter(p => p.present).length;
+            const coding = participants.filter(p => p.present && p.role === 'coding').length;
+            const doku = participants.filter(p => p.present && p.role === 'doku').length;
+            return `Anwesend: ${present}/${total} • Coding: ${coding} • Doku: ${doku}`;
+        }
+
+        function setLessonParticipant(sprintIndex, participantIndex) {
+            const sprint = sprints[sprintIndex];
+            if (!sprint) return;
+            normalizeLessonParticipants(sprint);
+            const participant = sprint.participants[participantIndex];
+            if (!participant) return;
+
+            const presentEl = document.getElementById(`lessonPresent-${sprintIndex}-${participantIndex}`);
+            const roleEl = document.getElementById(`lessonRole-${sprintIndex}-${participantIndex}`);
+            if (!presentEl || !roleEl) return;
+
+            const prevPresent = !!participant.present;
+            const prevRole = participant.role || '';
+            const nextPresent = !!presentEl.checked;
+            const nextRole = nextPresent ? (roleEl.value || '') : '';
+
+            participant.present = nextPresent;
+            participant.role = nextRole;
+
+            roleEl.disabled = !nextPresent;
+            if (!nextPresent) roleEl.value = '';
+
+            const row = document.getElementById(`lessonParticipantRow-${sprintIndex}-${participantIndex}`);
+            if (row) row.classList.toggle('is-absent', !nextPresent);
+
+            const stat = document.getElementById(`lessonPeopleStat-${sprintIndex}`);
+            if (stat) stat.textContent = lessonPeopleSummary(sprint);
+
+            if (prevPresent !== nextPresent || prevRole !== nextRole) {
+                const suffix = nextPresent ? `, Aufgabe: ${roleLabel(nextRole)}` : '';
+                logEvent('Stunden-Team', `Stunde ${sprintIndex + 1}: ${participant.name} ${nextPresent ? 'anwesend' : 'abwesend'}${suffix}`);
+            }
         }
 
         function logEvent(type, info) {
@@ -819,7 +982,7 @@
       if(!date){ alert('Bitte ein Datum für die Stunde wählen.'); return; }
 
       // neue Stunde
-      const sprint = { date, goals: draftGoals.slice(), todos: [], notes: [] };
+      const sprint = { date, goals: draftGoals.slice(), todos: [], notes: [], participants: buildLessonParticipants() };
 
       // carry-over: unerledigte Ziele der letzten Stunde übernehmen
       if(sprints.length){
@@ -859,16 +1022,6 @@
       }
     }
 
-    // Issue-Body ein/aus
-    sprintContainer.addEventListener('click', (e)=>{
-      const head = e.target.closest('.issue-head');
-      if(!head) return;
-      const s = head.getAttribute('data-sprint');
-      const t = head.getAttribute('data-todoindex');
-      const body = document.getElementById(`issue-body-${s}-${t}`);
-      if(body) body.style.display = (body.style.display === 'none' || !body.style.display) ? 'block' : 'none';
-    });
-
     // immer nur eine Stunde geöffnet
     sprintContainer.addEventListener('toggle', (e)=>{
       const d = e.target;
@@ -880,8 +1033,10 @@
     function renderSprints(){
       sprintContainer.innerHTML = '';
       sprints.forEach((sprint, sprintIndex) => {
+        normalizeLessonParticipants(sprint);
         const totalGoals = (sprint.goals || []).length;
         const doneGoals  = (sprint.goals || []).filter(g=>g.done).length;
+        const peopleSummary = lessonPeopleSummary(sprint);
 
         // wählbare TODOs (noch nicht in dieser Stunde) – mit globaler Nummer
         const options = todos
@@ -889,12 +1044,30 @@
           .filter(({todo}) => !sprint.todos.some(st => st.title === todo.title))
           .map(({todo, idx}) => `<option value="${esc(todo.title)}">#${idx+1} ${esc(todo.title)}</option>`)
           .join('');
+        const hasOpenTodos = !!options;
+        const todoOptionsHtml = options || '<option value="">Keine offenen TODOs verfügbar</option>';
 
         // Ziele-Liste visualisieren – mit Nummern der Stunde
         const goalsHtml = (sprint.goals || []).map((g,gi)=>`
             <span class="goal-chip ${g.done?'goal-done':'goal-open'}" title="${g.done?'Erledigt':'Unerledigt'}${g.carry?' • übernommen':''}">
               <span class="dot"></span><span>#${gi+1} ${esc(g.text)}</span>
             </span>`).join('') || '<span class="hint">Noch keine Ziele.</span>';
+
+        const participantsHtml = (sprint.participants || []).length
+          ? sprint.participants.map((p,pi)=>`
+              <div class="lesson-team-row ${p.present?'':'is-absent'}" id="lessonParticipantRow-${sprintIndex}-${pi}">
+                <div class="lesson-team-name">${esc(p.name)}</div>
+                <label class="attend-toggle">
+                  <input type="checkbox" id="lessonPresent-${sprintIndex}-${pi}" ${p.present?'checked':''} onchange="setLessonParticipant(${sprintIndex}, ${pi})">
+                  Anwesend
+                </label>
+                <select id="lessonRole-${sprintIndex}-${pi}" onchange="setLessonParticipant(${sprintIndex}, ${pi})" ${p.present?'':'disabled'}>
+                  <option value="" ${!p.role?'selected':''}>Keine Aufgabe</option>
+                  <option value="coding" ${p.role==='coding'?'selected':''}>Coding</option>
+                  <option value="doku" ${p.role==='doku'?'selected':''}>Doku</option>
+                </select>
+              </div>`).join('')
+          : '<div class="hint">Keine Teammitglieder angelegt.</div>';
 
         // Issue-Liste
         const issues = sprint.todos.map(stTodo => {
@@ -906,28 +1079,35 @@
           // Dropdown der noch offenen Ziele dieser Stunde – mit Zielnummern
           const openGoals = (sprint.goals || []).map((g,idx)=>({g,idx})).filter(x=>!x.g.done);
           const goalSelect = openGoals.length
-            ? `<select id="goalSelect-${sprintIndex}-${todoIndex}">
-                ${openGoals.map(({g,idx})=>`<option value="${idx}">#${idx+1} ${esc(g.text)}</option>`).join('')}
-               </select>
-               <button class="button" type="button" onclick="markGoalDone(${sprintIndex}, ${todoIndex})">Ziel als erledigt markieren</button>`
+            ? `<div class="actions">
+                 <select id="goalSelect-${sprintIndex}-${todoIndex}">
+                   ${openGoals.map(({g,idx})=>`<option value="${idx}">#${idx+1} ${esc(g.text)}</option>`).join('')}
+                 </select>
+                 <button class="button" type="button" onclick="markGoalDone(${sprintIndex}, ${todoIndex})">Ziel abhaken</button>
+               </div>`
             : `<span class="hint">Alle Ziele dieser Stunde sind erledigt.</span>`;
 
           return `
             <li class="todo-item">
-              <div class="issue-head" data-sprint="${sprintIndex}" data-todoindex="${todoIndex}">
+              <div class="issue-head">
                 <span class="status-circle ${mainTodo.status}"></span>
                 <span class="issue-title">#${num} ${esc(mainTodo.title)}</span>
               </div>
               <div class="issue-body" id="${bodyId}">
                 <div class="todo-desc">${esc(mainTodo.description)}</div>
-                <div class="comment-section" style="margin-top:10px;">
-                  <div class="hint" style="margin-bottom:6px;">Stundenziel erfüllen:</div>
-                  <div class="actions" style="margin-bottom:10px;">
+                <div class="issue-controls">
+                  <div class="issue-control">
+                    <label for="issueActor-${sprintIndex}-${todoIndex}">Schüler</label>
                     <select id="issueActor-${sprintIndex}-${todoIndex}">
                       ${teamMemberOptionsHtml(stTodo.addedBy || mainTodo.assignee || '')}
                     </select>
+                  </div>
+                  <div class="issue-control">
+                    <label>Stundenziel</label>
                     ${goalSelect}
                   </div>
+                </div>
+                <div class="comment-section" style="margin-top:10px;">
                   <label><b>Kommentare:</b></label>
                   <ul class="todo-list">
                     ${(mainTodo.comments || []).map(c => `<li class="comment">${esc(c)}</li>`).join('')}
@@ -958,7 +1138,10 @@
           <summary>
             <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
               <div><b>Unterrichtsstunde ${sprintIndex + 1}</b> • <span>${esc(sprint.date || '')}</span></div>
-              <div class="hint">Ziele erledigt: ${doneGoals}/${totalGoals}</div>
+              <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;">
+                <div class="hint">Ziele erledigt: ${doneGoals}/${totalGoals}</div>
+                <div class="hint" id="lessonPeopleStat-${sprintIndex}">${peopleSummary}</div>
+              </div>
             </div>
           </summary>
           <div class="lesson-body" style="padding-top:12px;">
@@ -968,14 +1151,25 @@
               <div class="goals-list">${goalsHtml}</div>
             </div>
 
-            <div class="actions" style="margin:12px 0;">
-              <select id="todoDropdown-${sprintIndex}">
-                ${options}
-              </select>
-              <select id="todoActionMember-${sprintIndex}">
-                ${teamMemberOptionsHtml('')}
-              </select>
-              <button class="button outline" onclick="addTodoToSprint(${sprintIndex})">Issue hinzufügen</button>
+            <div class="lesson-team-box">
+              <div class="hint">Anwesenheit und Aufgabe pro Schüler:</div>
+              <div class="lesson-team-grid">${participantsHtml}</div>
+            </div>
+
+            <div class="issue-add-box">
+              <div>
+                <label for="todoDropdown-${sprintIndex}">TODO auswählen</label>
+                <select id="todoDropdown-${sprintIndex}">
+                  ${todoOptionsHtml}
+                </select>
+              </div>
+              <div>
+                <label for="todoActionMember-${sprintIndex}">Schüler</label>
+                <select id="todoActionMember-${sprintIndex}">
+                  ${teamMemberOptionsHtml('')}
+                </select>
+              </div>
+              <button class="button outline" onclick="addTodoToSprint(${sprintIndex})" ${hasOpenTodos?'':'disabled'}>Issue hinzufügen</button>
             </div>
 
             <ul id="sprintTodos-${sprintIndex}" class="todo-list">
@@ -1134,7 +1328,12 @@
           if (typeof st === 'string') return { title: st, addedBy: '' };
           return { title: st.title || '', addedBy: st.addedBy || '' };
         }) : [];
-        return { date: s.date || '', goals: goalsArr, todos: sprintTodos, notes: Array.isArray(s.notes)? s.notes: [] };
+        const sprintParticipants = Array.isArray(s.participants) ? s.participants.map(p => ({
+          name: p.name || '',
+          present: !!p.present,
+          role: p.role === 'coding' || p.role === 'doku' ? p.role : ''
+        })).filter(p => p.name) : [];
+        return { date: s.date || '', goals: goalsArr, todos: sprintTodos, notes: Array.isArray(s.notes)? s.notes: [], participants: sprintParticipants };
       });
 
       logbook = Array.isArray(data.logbook) ? data.logbook : [];
