@@ -422,6 +422,32 @@
         .log-msg {
             flex: 1;
         }
+
+        /* Code-Versionen */
+
+        .version-toolbar {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+
+        .version-meta {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(180px, 1fr));
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .version-tag {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, .16);
+            background: rgba(255, 255, 255, .05);
+            font-size: 12px;
+            color: #dfe4ee;
+        }
         
         footer {
             display: flex;
@@ -459,6 +485,9 @@
             .issue-add-box {
                 grid-template-columns: 1fr;
                 align-items: stretch;
+            }
+            .version-meta {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -568,6 +597,8 @@
                         <button type="button" class="button" onclick="saveProject()">Projekt speichern</button>
                         <button type="button" class="button" onclick="loadProject()">Projekt öffnen</button>
                         <button type="button" class="button" onclick="exportToPDF()">PDF-Report-Export</button>
+                        <button type="button" class="button outline" id="chooseWorkspaceBtn" onclick="chooseWorkspaceFolder()">Coding-Workspace wählen</button>
+                        <button type="button" class="button outline" id="createSnapshotBtn" onclick="createCodeSnapshot()" disabled>Code-Stand speichern</button>
                         <input type="file" id="fileInput" style="display:none" accept=".json">
                     </div>
                 </form>
@@ -618,6 +649,17 @@
             <ul id="logList" class="todo-list"></ul>
         </div>
 
+        <div class="section" id="codeVersions">
+            <details open>
+                <summary><label style="font-size:20px;"><b>Versionübersicht (Code)</b></label></summary>
+            </details>
+            <div id="workspaceStatus" class="hint">Kein Coding-Workspace ausgewählt.</div>
+            <div class="version-toolbar" style="margin-top:8px;">
+                <button type="button" class="button outline" onclick="downloadAllSnapshots()">Alle Versionen herunterladen</button>
+            </div>
+            <ul id="snapshotList" class="todo-list"></ul>
+        </div>
+
         <footer>
             <a id="footerLink" href="https://datenflix007.github.io/" target="_blank" rel="noopener">© <span id="year"></span> Felix Staacke</a>
         </footer>
@@ -628,6 +670,18 @@
         // Stunde: { date:'YYYY-MM-DD', goals:[{text, done, carry?:true}], todos:[{title,addedBy}], notes:[{time,text,by}], participants:[{name,present,role}] }
         let sprints = [];
         let logbook = [];
+        let sourceSnapshots = [];
+        let workspaceDirectoryHandle = null;
+        let snapshotBusy = false;
+
+        const SNAPSHOT_SKIP_DIRS = new Set(['.git', 'node_modules', '.next', 'dist', 'build', 'venv', '.venv', '__pycache__']);
+        const TEXT_LIKE_EXTENSIONS = new Set([
+            '.txt', '.md', '.markdown', '.json', '.yaml', '.yml', '.toml', '.xml', '.csv',
+            '.html', '.css', '.js', '.mjs', '.cjs', '.ts', '.tsx', '.jsx',
+            '.py', '.java', '.cs', '.cpp', '.c', '.h', '.hpp', '.go', '.rs',
+            '.sh', '.ps1', '.bat', '.ini', '.cfg', '.conf', '.env', '.sql', '.php'
+        ]);
+        const MAX_SNAPSHOT_FILE_BYTES = 750000;
 
         document.getElementById('year').textContent = new Date().getFullYear();
 
@@ -649,6 +703,13 @@
         const getTeamMembers = () => Array.from(document.querySelectorAll('.team-member-input'))
             .map(input => input.value.trim())
             .filter(Boolean);
+        const formatBytes = bytes => {
+            const num = Number(bytes) || 0;
+            if (num < 1024) return `${num} B`;
+            if (num < 1024 * 1024) return `${(num / 1024).toFixed(1)} KB`;
+            return `${(num / (1024 * 1024)).toFixed(1)} MB`;
+        };
+        const safeFilePart = val => String(val || 'projekt').replace(/[^\w.-]+/g, '_').replace(/^_+|_+$/g, '') || 'projekt';
 
         function teamMemberOptionsHtml(preferred = '') {
             const members = getTeamMembers();
@@ -672,6 +733,242 @@
             if (selected) return selected;
             const firstMember = getTeamMembers()[0] || '';
             return firstMember || fallback || 'Unbekannt';
+        }
+
+        function downloadJsonFile(filename, data) {
+            const blob = new Blob([JSON.stringify(data, null, 2)], {
+                type: 'application/json'
+            });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = filename;
+            a.click();
+        }
+
+        function snapshotStamp(iso) {
+            const d = new Date(iso || Date.now());
+            return `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}_${String(d.getHours()).padStart(2,'0')}${String(d.getMinutes()).padStart(2,'0')}${String(d.getSeconds()).padStart(2,'0')}`;
+        }
+
+        function setSnapshotBusy(isBusy) {
+            snapshotBusy = isBusy;
+            const btn = document.getElementById('createSnapshotBtn');
+            if (!btn) return;
+            btn.textContent = isBusy ? 'Code-Stand wird gelesen ...' : 'Code-Stand speichern';
+            btn.disabled = isBusy || !workspaceDirectoryHandle;
+        }
+
+        function updateWorkspaceUI() {
+            const status = document.getElementById('workspaceStatus');
+            const chooseBtn = document.getElementById('chooseWorkspaceBtn');
+            const snapshotBtn = document.getElementById('createSnapshotBtn');
+            if (status) {
+                status.textContent = workspaceDirectoryHandle ?
+                    `Workspace: ${workspaceDirectoryHandle.name}` :
+                    'Kein Coding-Workspace ausgewählt.';
+            }
+            if (chooseBtn) {
+                chooseBtn.disabled = !('showDirectoryPicker' in window);
+                if (!('showDirectoryPicker' in window)) {
+                    chooseBtn.title = 'Nicht unterstützt: bitte aktuellen Chromium/Edge verwenden.';
+                }
+            }
+            if (snapshotBtn && !snapshotBusy) {
+                snapshotBtn.disabled = !workspaceDirectoryHandle;
+            }
+        }
+
+        function isProbablyBinary(bytes, filePath) {
+            const lower = filePath.toLowerCase();
+            const dot = lower.lastIndexOf('.');
+            const ext = dot >= 0 ? lower.slice(dot) : '';
+            if (TEXT_LIKE_EXTENSIONS.has(ext)) return false;
+            const sample = bytes.subarray(0, Math.min(bytes.length, 8192));
+            let suspicious = 0;
+            for (let i = 0; i < sample.length; i++) {
+                const b = sample[i];
+                if (b === 0) return true;
+                if (b < 7 || (b > 14 && b < 32)) suspicious++;
+            }
+            return sample.length > 0 && (suspicious / sample.length) > 0.3;
+        }
+
+        async function readSnapshotFile(fileHandle, relativePath) {
+            const file = await fileHandle.getFile();
+            if (file.size > MAX_SNAPSHOT_FILE_BYTES) {
+                return {
+                    path: relativePath,
+                    size: file.size,
+                    lastModified: file.lastModified,
+                    omitted: true,
+                    reason: `Datei größer als ${formatBytes(MAX_SNAPSHOT_FILE_BYTES)}`
+                };
+            }
+            const buffer = await file.arrayBuffer();
+            const bytes = new Uint8Array(buffer);
+            if (isProbablyBinary(bytes, relativePath)) {
+                return {
+                    path: relativePath,
+                    size: file.size,
+                    lastModified: file.lastModified,
+                    omitted: true,
+                    reason: 'Binary-Datei'
+                };
+            }
+            const content = new TextDecoder('utf-8', {
+                fatal: false
+            }).decode(bytes);
+            return {
+                path: relativePath,
+                size: file.size,
+                lastModified: file.lastModified,
+                content
+            };
+        }
+
+        async function collectWorkspaceFiles(dirHandle, prefix = '') {
+            const files = [];
+            for await (const [name, handle] of dirHandle.entries()) {
+                if (handle.kind === 'directory') {
+                    if (SNAPSHOT_SKIP_DIRS.has(name)) continue;
+                    const nested = await collectWorkspaceFiles(handle, `${prefix}${name}/`);
+                    files.push(...nested);
+                    continue;
+                }
+                const fileEntry = await readSnapshotFile(handle, `${prefix}${name}`);
+                files.push(fileEntry);
+            }
+            return files;
+        }
+
+        function normalizeSnapshot(raw, index) {
+            if (!raw || typeof raw !== 'object') return null;
+            const rawFiles = Array.isArray(raw.files) ? raw.files : [];
+            const files = rawFiles.map(file => ({
+                path: String(file.path || ''),
+                size: Number(file.size) || 0,
+                lastModified: Number(file.lastModified) || 0,
+                content: typeof file.content === 'string' ? file.content : '',
+                omitted: !!file.omitted,
+                reason: String(file.reason || '')
+            })).filter(file => file.path);
+            const totalBytes = files.reduce((sum, file) => sum + (file.size || 0), 0);
+            return {
+                id: String(raw.id || `v${index + 1}`),
+                time: raw.time || new Date().toISOString(),
+                workspaceName: String(raw.workspaceName || ''),
+                fileCount: Number(raw.fileCount) || files.length,
+                totalBytes: Number(raw.totalBytes) || totalBytes,
+                files
+            };
+        }
+
+        function renderSnapshots() {
+            const list = document.getElementById('snapshotList');
+            if (!list) return;
+            if (!sourceSnapshots.length) {
+                list.innerHTML = '<li class="todo-item"><span class="hint">Noch keine Code-Stände gespeichert.</span></li>';
+                return;
+            }
+            const items = sourceSnapshots
+                .map((snap, index) => ({
+                    snap,
+                    index
+                }))
+                .slice()
+                .reverse()
+                .map(({
+                    snap,
+                    index
+                }) => `
+          <li class="todo-item">
+            <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center;">
+              <div>
+                <span class="version-tag">${esc(snap.id)}</span>
+                <span class="hint" style="margin-left:8px;">${fmt(snap.time)}</span>
+              </div>
+              <button type="button" class="button outline" onclick="downloadSnapshot(${index})">Version herunterladen</button>
+            </div>
+            <div class="version-meta">
+              <div class="hint">Ordner: ${esc(snap.workspaceName || '-')}</div>
+              <div class="hint">Dateien: ${snap.fileCount} • Größe: ${formatBytes(snap.totalBytes)}</div>
+            </div>
+          </li>`).join('');
+            list.innerHTML = items;
+        }
+
+        async function chooseWorkspaceFolder() {
+            if (!('showDirectoryPicker' in window)) {
+                alert('Diese Browser-Version unterstützt keinen Ordnerzugriff. Bitte Chromium/Edge verwenden.');
+                return;
+            }
+            try {
+                workspaceDirectoryHandle = await window.showDirectoryPicker({
+                    mode: 'read'
+                });
+                updateWorkspaceUI();
+                logEvent('Workspace gewählt', workspaceDirectoryHandle?.name || 'Unbekannt');
+            } catch (err) {
+                if (err && err.name === 'AbortError') return;
+                console.error(err);
+                alert('Workspace konnte nicht ausgewählt werden.');
+            }
+        }
+
+        async function createCodeSnapshot() {
+            if (!workspaceDirectoryHandle) {
+                alert('Bitte zuerst einen Coding-Workspace auswählen.');
+                return;
+            }
+            if (snapshotBusy) return;
+            try {
+                setSnapshotBusy(true);
+                const files = await collectWorkspaceFiles(workspaceDirectoryHandle);
+                files.sort((a, b) => a.path.localeCompare(b.path));
+                const now = new Date().toISOString();
+                const versionNumber = sourceSnapshots.length + 1;
+                const snapshot = {
+                    id: `v${versionNumber}`,
+                    time: now,
+                    workspaceName: workspaceDirectoryHandle.name || '',
+                    fileCount: files.length,
+                    totalBytes: files.reduce((sum, f) => sum + (f.size || 0), 0),
+                    files
+                };
+                sourceSnapshots.push(snapshot);
+                renderSnapshots();
+                logEvent('Code-Stand gespeichert', `${snapshot.id} • ${snapshot.fileCount} Dateien aus ${snapshot.workspaceName}`);
+            } catch (err) {
+                console.error(err);
+                alert('Code-Stand konnte nicht erstellt werden.');
+            } finally {
+                setSnapshotBusy(false);
+            }
+        }
+
+        function downloadSnapshot(index) {
+            const snapshot = sourceSnapshots[index];
+            if (!snapshot) return;
+            const title = document.getElementById("projectTitle").value.trim();
+            const filename = `${safeFilePart(title)}_${snapshot.id}_${snapshotStamp(snapshot.time)}.json`;
+            downloadJsonFile(filename, snapshot);
+            logEvent('Code-Version exportiert', `${snapshot.id} als ${filename}`);
+        }
+
+        function downloadAllSnapshots() {
+            if (!sourceSnapshots.length) {
+                alert('Es sind noch keine Code-Versionen vorhanden.');
+                return;
+            }
+            const title = document.getElementById("projectTitle").value.trim();
+            const payload = {
+                projectTitle: title || 'Ohne Titel',
+                exportedAt: new Date().toISOString(),
+                versions: sourceSnapshots
+            };
+            const filename = `${safeFilePart(title)}_code_versionen_${snapshotStamp(new Date().toISOString())}.json`;
+            downloadJsonFile(filename, payload);
+            logEvent('Code-Versionen exportiert', filename);
         }
 
         function normalizeComment(comment) {
@@ -1325,7 +1622,7 @@
         if(!start || !end){ alert("Bitte Start- und Enddatum angeben."); return; }
         if(new Date(start) > new Date(end)){ alert("Das Startdatum darf nicht nach dem Enddatum liegen."); return; }
 
-        const project = { title, description:desc, startDate:start, endDate:end, teamMembers:members, todos, sprints, logbook };
+        const project = { title, description:desc, startDate:start, endDate:end, teamMembers:members, todos, sprints, logbook, sourceSnapshots };
         const json = JSON.stringify(project, null, 2);
         const d = new Date();
         const fname = `${title.replace(/\s+/g,'_')}_${d.getFullYear()}${(d.getMonth()+1+'').padStart(2,'0')}${(d.getDate()+'').padStart(2,'0')}_${(d.getHours()+'' ).padStart(2,'0')}${(d.getMinutes()+'' ).padStart(2,'0')}.json`;
@@ -1399,8 +1696,11 @@
       });
 
       logbook = Array.isArray(data.logbook) ? data.logbook : [];
+      sourceSnapshots = Array.isArray(data.sourceSnapshots) ? data.sourceSnapshots.map(normalizeSnapshot).filter(Boolean) : [];
       updateNewTodoMemberSelect();
       renderLogbook();
+      renderSnapshots();
+      updateWorkspaceUI();
       updateTodoList();
       renderSprints();
       logEvent('Projekt geladen', data.title || 'Ohne Titel');
@@ -1415,7 +1715,7 @@
     }
 
     // Initial
-    updateTodoList(); renderLogbook(); calculateDaysLeft();
+    updateTodoList(); renderLogbook(); renderSnapshots(); updateWorkspaceUI(); calculateDaysLeft();
     </script>
 </body>
 
