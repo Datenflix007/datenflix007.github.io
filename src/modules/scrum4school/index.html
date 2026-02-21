@@ -457,6 +457,10 @@
                                         <label for="newTodoDesc">Beschreibung</label>
                                         <textarea id="newTodoDesc" placeholder="Beschreibung"></textarea>
                                     </div>
+                                    <div class="row-full">
+                                        <label for="newTodoMember">Teammitglied</label>
+                                        <select id="newTodoMember"></select>
+                                    </div>
                                     <div class="actions">
                                         <button type="button" class="button" id="createTodoBtn">Hinzufügen</button>
                                         <button type="button" class="button outline" id="cancelTodoBtn">Abbrechen</button>
@@ -552,6 +556,33 @@
         })[s] || s;
         const fmt = iso => new Date(iso).toLocaleString();
         const todoNum = idx => (idx >= 0 ? idx + 1 : '?'); // globale TODO-Nummer
+        const getTeamMembers = () => Array.from(document.querySelectorAll('.team-member-input'))
+            .map(input => input.value.trim())
+            .filter(Boolean);
+
+        function teamMemberOptionsHtml(preferred = '') {
+            const members = getTeamMembers();
+            if (!members.length) {
+                return '<option value="">Bitte Teammitglied anlegen</option>';
+            }
+            const selected = members.includes(preferred) ? preferred : members[0];
+            return members.map(member => `<option value="${esc(member)}" ${member===selected?'selected':''}>${esc(member)}</option>`).join('');
+        }
+
+        function updateNewTodoMemberSelect(preferred = '') {
+            const select = document.getElementById('newTodoMember');
+            if (!select) return;
+            const members = getTeamMembers();
+            select.innerHTML = teamMemberOptionsHtml(preferred || select.value || '');
+            select.disabled = members.length === 0;
+        }
+
+        function resolveActionMember(selectId, fallback = '') {
+            const selected = (document.getElementById(selectId)?.value || '').trim();
+            if (selected) return selected;
+            const firstMember = getTeamMembers()[0] || '';
+            return firstMember || fallback || 'Unbekannt';
+        }
 
         function logEvent(type, info) {
             const entry = {
@@ -600,9 +631,15 @@
 
         // ===== Team =====
         function attachTeamMemberLogging(inputEl) {
-            inputEl.addEventListener('change', () => logEvent('Teammitglied', inputEl.value));
+            inputEl.addEventListener('change', () => {
+                logEvent('Teammitglied', inputEl.value);
+                updateNewTodoMemberSelect();
+                updateTodoList();
+                renderSprints();
+            });
         }
         attachTeamMemberLogging(document.getElementById("team-member-input"));
+        updateNewTodoMemberSelect();
 
         function addTeamMember() {
             const container = document.getElementById("teamMembersContainer");
@@ -611,6 +648,9 @@
             div.innerHTML = '<input type="text" class="team-member-input" placeholder="Mitgliedsname">';
             container.appendChild(div);
             attachTeamMemberLogging(div.querySelector('input'));
+            updateNewTodoMemberSelect();
+            updateTodoList();
+            renderSprints();
             logEvent('Teammitglied-Feld hinzugefügt', 'Neuer Eintrag');
         }
 
@@ -632,22 +672,29 @@
             document.getElementById('newTodoTitle').value = '';
             document.getElementById('newTodoDesc').value = '';
             document.getElementById('newTodoStatus').value = 'status-red';
+            updateNewTodoMemberSelect();
         });
         createTodoBtn.addEventListener('click', () => {
             const title = document.getElementById('newTodoTitle').value.trim();
             const description = document.getElementById('newTodoDesc').value.trim();
             const status = document.getElementById('newTodoStatus').value;
+            const member = document.getElementById('newTodoMember').value.trim();
             if (!title || !description) {
                 alert('Bitte Titel und Beschreibung angeben.');
+                return;
+            }
+            if (!member) {
+                alert('Bitte ein Teammitglied auswaehlen.');
                 return;
             }
             todos.push({
                 title,
                 description,
                 status,
+                assignee: member,
                 comments: []
             });
-            logEvent('TODO hinzugefügt', `${title} — ${description}`);
+            logEvent('TODO hinzugefügt', `TODO #${todoNum(todos.length-1)} "${title}" von ${member} erstellt`);
             cancelTodoBtn.click();
             updateTodoList();
             renderSprints();
@@ -681,19 +728,23 @@
             <span>#${num} ${esc(t.title)}</span>
           </div>
           <div class="todo-desc">${esc(t.description)}</div>
+          <div class="hint">Verantwortlich: ${esc(t.assignee || 'Nicht zugewiesen')}</div>
 
           <div class="comment-section">
             <label><b>Kommentare:</b></label>
             <ul class="todo-list">${t.comments.map(c=>`<li class="comment">${esc(c)}</li>`).join('')}</ul>
             <textarea id="todoComment-${i}" placeholder="Kommentar schreiben …"></textarea>
             <div class="actions" style="margin-top:6px;">
+              <select id="todoActor-${i}">
+                ${teamMemberOptionsHtml(t.assignee || '')}
+              </select>
               <select id="todoStatus-${i}">
                 <option value="status-red" ${t.status==='status-red'?'selected':''}>Offen</option>
                 <option value="status-yellow" ${t.status==='status-yellow'?'selected':''}>In Bearbeitung</option>
                 <option value="status-green" ${t.status==='status-green'?'selected':''}>Beendet</option>
               </select>
               <button class="button" type="button" onclick="saveTodoMeta(${i})">Speichern</button>
-              <button class="button outline" type="button" onclick="removeTodo(${i})">Entfernen</button>
+              <button class="button outline" type="button" onclick="removeTodo(${i}, 'todoActor-${i}')">Entfernen</button>
             </div>
           </div>`;
         list.appendChild(li);
@@ -704,16 +755,21 @@
       if(index<0 || index>=todos.length) return;
       const cta = document.getElementById(`todoComment-${index}`);
       const sel = document.getElementById(`todoStatus-${index}`);
+      const actor = resolveActionMember(`todoActor-${index}`, todos[index].assignee || '');
       const txt = (cta?.value || '').trim();
       const oldStatus = todos[index].status;
-      if(txt){ todos[index].comments.push(txt); logEvent('Kommentar', `TODO #${todoNum(index)} „${todos[index].title}“ — ${txt}`); }
-      if(sel && sel.value !== oldStatus){ todos[index].status = sel.value; logEvent('Status geändert', `TODO #${todoNum(index)} „${todos[index].title}“: ${statusLabel(oldStatus)} → ${statusLabel(sel.value)}`); }
+      if (actor) {
+        todos[index].assignee = actor;
+      }
+      if(txt){ todos[index].comments.push(txt); logEvent('Kommentar', `TODO #${todoNum(index)} "${todos[index].title}" von ${actor}: ${txt}`); }
+      if(sel && sel.value !== oldStatus){ todos[index].status = sel.value; logEvent('Status geändert', `TODO #${todoNum(index)} "${todos[index].title}" von ${actor}: ${statusLabel(oldStatus)} -> ${statusLabel(sel.value)}`); }
       if(cta) cta.value='';
       updateTodoList(); renderSprints();
     }
-    function removeTodo(index){
+    function removeTodo(index, actorSelectId = ''){
       const title=todos[index]?.title || 'Unbekannt';
-      logEvent('TODO entfernt', `#${todoNum(index)} ${title}`);
+      const actor = resolveActionMember(actorSelectId, todos[index]?.assignee || '');
+      logEvent('TODO entfernt', `#${todoNum(index)} ${title} von ${actor}`);
       todos.splice(index,1);
       updateTodoList(); renderSprints();
     }
@@ -786,12 +842,17 @@
 
     function addTodoToSprint(sprintIndex){
       const dropdown = document.getElementById(`todoDropdown-${sprintIndex}`);
+      const memberSelect = document.getElementById(`todoActionMember-${sprintIndex}`);
+      const actor = resolveActionMember(`todoActionMember-${sprintIndex}`);
       const selectedTitle = dropdown.value;
       const todo = todos.find(t => t.title === selectedTitle);
-      if(todo){
-        sprints[sprintIndex].todos.push({ title: todo.title });
+      if(todo && actor){
+        sprints[sprintIndex].todos.push({ title: todo.title, addedBy: actor });
         const idx = todos.indexOf(todo);
-        logEvent('TODO der Stunde zugeordnet', `Stunde ${sprintIndex+1}: TODO #${todoNum(idx)} ${selectedTitle}`);
+        if (memberSelect && !memberSelect.value && getTeamMembers().length) {
+          memberSelect.value = actor;
+        }
+        logEvent('TODO der Stunde zugeordnet', `Stunde ${sprintIndex+1}: TODO #${todoNum(idx)} ${selectedTitle} von ${actor}`);
         renderSprints();
         const det = sprintContainer.querySelector(`details.lesson[data-index="${sprintIndex}"]`);
         if(det) det.open = true;
@@ -862,6 +923,9 @@
                 <div class="comment-section" style="margin-top:10px;">
                   <div class="hint" style="margin-bottom:6px;">Stundenziel erfüllen:</div>
                   <div class="actions" style="margin-bottom:10px;">
+                    <select id="issueActor-${sprintIndex}-${todoIndex}">
+                      ${teamMemberOptionsHtml(stTodo.addedBy || mainTodo.assignee || '')}
+                    </select>
                     ${goalSelect}
                   </div>
                   <label><b>Kommentare:</b></label>
@@ -908,6 +972,9 @@
               <select id="todoDropdown-${sprintIndex}">
                 ${options}
               </select>
+              <select id="todoActionMember-${sprintIndex}">
+                ${teamMemberOptionsHtml('')}
+              </select>
               <button class="button outline" onclick="addTodoToSprint(${sprintIndex})">Issue hinzufügen</button>
             </div>
 
@@ -932,6 +999,7 @@
     // Issue-Aktion: Ziel als erledigt markieren
     function markGoalDone(sprintIndex, todoIndex){
       const sel = document.getElementById(`goalSelect-${sprintIndex}-${todoIndex}`);
+      const actor = resolveActionMember(`issueActor-${sprintIndex}-${todoIndex}`);
       if(!sel) return;
       const gi = parseInt(sel.value,10);
       const sprint = sprints[sprintIndex];
@@ -939,7 +1007,7 @@
       sprint.goals[gi].done = true;
 
       const issue = todos[todoIndex];
-      logEvent('Stundenziel erledigt', `Stunde ${sprintIndex+1}: Ziel #${gi+1} „${sprint.goals[gi].text}“ via TODO #${todoNum(todoIndex)} „${issue?.title||'–'}“`);
+      logEvent('Stundenziel erledigt', `Stunde ${sprintIndex+1}: Ziel #${gi+1} "${sprint.goals[gi].text}" via TODO #${todoNum(todoIndex)} "${issue?.title||'-'}" von ${actor}`);
       renderSprints();
       updateTodoList();
 
@@ -950,18 +1018,22 @@
     function saveSprintTodo(sprintIndex, todoIndex){
       const commentInput = document.getElementById(`comment-${sprintIndex}-${todoIndex}`);
       const statusSelect = document.getElementById(`status-${sprintIndex}-${todoIndex}`);
+      const actor = resolveActionMember(`issueActor-${sprintIndex}-${todoIndex}`, todos[todoIndex]?.assignee || '');
       const newComment = (commentInput?.value || '').trim();
       const oldStatus = todos[todoIndex]?.status || 'status-red';
       const newStatus = statusSelect?.value || oldStatus;
       if (todoIndex < 0 || todoIndex >= todos.length) return;
+      if (actor) {
+        todos[todoIndex].assignee = actor;
+      }
 
       if (newComment) {
         todos[todoIndex].comments.push(newComment);
-        logEvent('Sprint-Kommentar', `Stunde ${sprintIndex + 1} • TODO #${todoNum(todoIndex)} „${todos[todoIndex].title}“ — ${newComment}`);
+        logEvent('Sprint-Kommentar', `Stunde ${sprintIndex + 1} • TODO #${todoNum(todoIndex)} "${todos[todoIndex].title}" von ${actor}: ${newComment}`);
       }
       if (newStatus !== oldStatus) {
         todos[todoIndex].status = newStatus;
-        logEvent('Status geändert (Stunde)', `TODO #${todoNum(todoIndex)} „${todos[todoIndex].title}“: ${statusLabel(oldStatus)} → ${statusLabel(newStatus)}`);
+        logEvent('Status geändert (Stunde)', `TODO #${todoNum(todoIndex)} "${todos[todoIndex].title}" von ${actor}: ${statusLabel(oldStatus)} -> ${statusLabel(newStatus)}`);
       }
       if(commentInput) commentInput.value = "";
       updateTodoList();
@@ -1042,6 +1114,7 @@
 
       todos = (data.todos || []).map(t => ({
         title: t.title, description: t.description, status: t.status||'status-red',
+        assignee: t.assignee || '',
         comments: Array.isArray(t.comments) ? t.comments : []
       }));
 
@@ -1057,10 +1130,15 @@
         } else {
           goalsArr = [];
         }
-        return { date: s.date || '', goals: goalsArr, todos: s.todos || [], notes: Array.isArray(s.notes)? s.notes: [] };
+        const sprintTodos = Array.isArray(s.todos) ? s.todos.map(st => {
+          if (typeof st === 'string') return { title: st, addedBy: '' };
+          return { title: st.title || '', addedBy: st.addedBy || '' };
+        }) : [];
+        return { date: s.date || '', goals: goalsArr, todos: sprintTodos, notes: Array.isArray(s.notes)? s.notes: [] };
       });
 
       logbook = Array.isArray(data.logbook) ? data.logbook : [];
+      updateNewTodoMemberSelect();
       renderLogbook();
       updateTodoList();
       renderSprints();
