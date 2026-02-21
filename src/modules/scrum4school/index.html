@@ -655,7 +655,7 @@
             </details>
             <div id="workspaceStatus" class="hint">Kein Coding-Workspace ausgewählt.</div>
             <div class="version-toolbar" style="margin-top:8px;">
-                <button type="button" class="button outline" onclick="downloadAllSnapshots()">Alle Versionen herunterladen</button>
+                <button type="button" class="button outline" onclick="downloadAllSnapshots()">Alle Versionen als ZIP herunterladen</button>
             </div>
             <ul id="snapshotList" class="todo-list"></ul>
         </div>
@@ -665,6 +665,7 @@
         </footer>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
     <script>
         let todos = [];
         // Stunde: { date:'YYYY-MM-DD', goals:[{text, done, carry?:true}], todos:[{title,addedBy}], notes:[{time,text,by}], participants:[{name,present,role}] }
@@ -735,14 +736,69 @@
             return firstMember || fallback || 'Unbekannt';
         }
 
-        function downloadJsonFile(filename, data) {
-            const blob = new Blob([JSON.stringify(data, null, 2)], {
-                type: 'application/json'
-            });
+        function downloadBlobFile(filename, blob) {
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
             a.download = filename;
             a.click();
+            setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+        }
+
+        function downloadJsonFile(filename, data) {
+            const blob = new Blob([JSON.stringify(data, null, 2)], {
+                type: 'application/json'
+            });
+            downloadBlobFile(filename, blob);
+        }
+
+        async function ensureZipSupport() {
+            if (window.JSZip) return window.JSZip;
+            alert('ZIP-Export ist nicht verfuegbar (JSZip konnte nicht geladen werden).');
+            return null;
+        }
+
+        function sanitizeZipPath(path) {
+            const normalized = String(path || '').replace(/\\/g, '/');
+            const parts = normalized.split('/').filter(Boolean);
+            const safeParts = [];
+            parts.forEach(part => {
+                if (part === '.' || part === '..') return;
+                safeParts.push(part.replace(/[\x00-\x1f:*?"<>|]/g, '_'));
+            });
+            return safeParts.join('/');
+        }
+
+        function addSnapshotToZip(zip, snapshot, rootFolder, includeMeta = false) {
+            const files = Array.isArray(snapshot.files) ? snapshot.files : [];
+            files.forEach(file => {
+                const safePath = sanitizeZipPath(file.path);
+                if (!safePath) return;
+                const zipPath = `${rootFolder}/${safePath}`;
+                if (file.omitted) {
+                    const reason = file.reason || 'Datei wurde im Snapshot ohne Inhalt gespeichert.';
+                    const note = [
+                        'Hinweis zu ausgelassener Datei',
+                        `Pfad: ${file.path || safePath}`,
+                        `Grund: ${reason}`,
+                        `Groesse: ${formatBytes(file.size || 0)}`,
+                        `Zeit: ${file.lastModified ? new Date(file.lastModified).toISOString() : '-'}`
+                    ].join('\n');
+                    zip.file(`${zipPath}.omitted.txt`, note);
+                    return;
+                }
+                zip.file(zipPath, typeof file.content === 'string' ? file.content : '');
+            });
+
+            if (includeMeta) {
+                const meta = {
+                    id: snapshot.id,
+                    time: snapshot.time,
+                    workspaceName: snapshot.workspaceName,
+                    fileCount: snapshot.fileCount,
+                    totalBytes: snapshot.totalBytes
+                };
+                zip.file(`${rootFolder}/snapshot_meta.json`, JSON.stringify(meta, null, 2));
+            }
         }
 
         function snapshotStamp(iso) {
@@ -887,7 +943,7 @@
                 <span class="version-tag">${esc(snap.id)}</span>
                 <span class="hint" style="margin-left:8px;">${fmt(snap.time)}</span>
               </div>
-              <button type="button" class="button outline" onclick="downloadSnapshot(${index})">Version herunterladen</button>
+              <button type="button" class="button outline" onclick="downloadSnapshot(${index})">Version als ZIP herunterladen</button>
             </div>
             <div class="version-meta">
               <div class="hint">Ordner: ${esc(snap.workspaceName || '-')}</div>
@@ -946,29 +1002,81 @@
             }
         }
 
-        function downloadSnapshot(index) {
+        async function downloadSnapshot(index) {
             const snapshot = sourceSnapshots[index];
             if (!snapshot) return;
+            const JSZipCtor = await ensureZipSupport();
+            if (!JSZipCtor) return;
             const title = document.getElementById("projectTitle").value.trim();
-            const filename = `${safeFilePart(title)}_${snapshot.id}_${snapshotStamp(snapshot.time)}.json`;
-            downloadJsonFile(filename, snapshot);
-            logEvent('Code-Version exportiert', `${snapshot.id} als ${filename}`);
+            const nowStamp = snapshotStamp(snapshot.time || new Date().toISOString());
+            const projectPart = safeFilePart(title || snapshot.workspaceName || 'projekt');
+            const versionPart = safeFilePart(snapshot.id || 'version');
+            const rootFolder = `${projectPart}_${versionPart}`;
+            const filename = `${projectPart}_${versionPart}_${nowStamp}.zip`;
+            try {
+                const zip = new JSZipCtor();
+                addSnapshotToZip(zip, snapshot, rootFolder, true);
+                const blob = await zip.generateAsync({
+                    type: 'blob',
+                    compression: 'DEFLATE',
+                    compressionOptions: {
+                        level: 6
+                    }
+                });
+                downloadBlobFile(filename, blob);
+                logEvent('Code-Version exportiert', `${snapshot.id} als ${filename}`);
+            } catch (err) {
+                console.error(err);
+                alert('ZIP-Datei fuer diese Version konnte nicht erstellt werden.');
+            }
         }
 
-        function downloadAllSnapshots() {
+        async function downloadAllSnapshots() {
             if (!sourceSnapshots.length) {
                 alert('Es sind noch keine Code-Versionen vorhanden.');
                 return;
             }
+            const JSZipCtor = await ensureZipSupport();
+            if (!JSZipCtor) return;
             const title = document.getElementById("projectTitle").value.trim();
-            const payload = {
-                projectTitle: title || 'Ohne Titel',
-                exportedAt: new Date().toISOString(),
-                versions: sourceSnapshots
-            };
-            const filename = `${safeFilePart(title)}_code_versionen_${snapshotStamp(new Date().toISOString())}.json`;
-            downloadJsonFile(filename, payload);
-            logEvent('Code-Versionen exportiert', filename);
+            const exportTime = new Date().toISOString();
+            const stamp = snapshotStamp(exportTime);
+            const projectPart = safeFilePart(title || 'projekt');
+            const exportRoot = `${projectPart}_code_versionen_${stamp}`;
+            const filename = `${exportRoot}.zip`;
+            try {
+                const zip = new JSZipCtor();
+                const summary = {
+                    projectTitle: title || 'Ohne Titel',
+                    exportedAt: exportTime,
+                    versionCount: sourceSnapshots.length,
+                    versions: sourceSnapshots.map(snap => ({
+                        id: snap.id,
+                        time: snap.time,
+                        workspaceName: snap.workspaceName,
+                        fileCount: snap.fileCount,
+                        totalBytes: snap.totalBytes
+                    }))
+                };
+                zip.file(`${exportRoot}/_export_info.json`, JSON.stringify(summary, null, 2));
+                sourceSnapshots.forEach((snap, idx) => {
+                    const versionPart = safeFilePart(snap.id || `v${idx + 1}`);
+                    const folder = `${exportRoot}/${versionPart}_${snapshotStamp(snap.time || exportTime)}`;
+                    addSnapshotToZip(zip, snap, folder, true);
+                });
+                const blob = await zip.generateAsync({
+                    type: 'blob',
+                    compression: 'DEFLATE',
+                    compressionOptions: {
+                        level: 6
+                    }
+                });
+                downloadBlobFile(filename, blob);
+                logEvent('Code-Versionen exportiert', filename);
+            } catch (err) {
+                console.error(err);
+                alert('ZIP-Datei mit allen Versionen konnte nicht erstellt werden.');
+            }
         }
 
         function normalizeComment(comment) {
