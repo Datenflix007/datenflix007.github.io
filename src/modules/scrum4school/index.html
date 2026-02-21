@@ -625,7 +625,7 @@
 
     <script>
         let todos = [];
-        // Stunde: { date:'YYYY-MM-DD', goals:[{text, done, carry?:true}], todos:[{title,addedBy}], notes:[{time,text}], participants:[{name,present,role}] }
+        // Stunde: { date:'YYYY-MM-DD', goals:[{text, done, carry?:true}], todos:[{title,addedBy}], notes:[{time,text,by}], participants:[{name,present,role}] }
         let sprints = [];
         let logbook = [];
 
@@ -672,6 +672,60 @@
             if (selected) return selected;
             const firstMember = getTeamMembers()[0] || '';
             return firstMember || fallback || 'Unbekannt';
+        }
+
+        function normalizeComment(comment) {
+            if (typeof comment === 'string') {
+                return {
+                    text: comment,
+                    by: '',
+                    time: ''
+                };
+            }
+            if (!comment || typeof comment !== 'object') {
+                return {
+                    text: '',
+                    by: '',
+                    time: ''
+                };
+            }
+            return {
+                text: String(comment.text || '').trim(),
+                by: String(comment.by || '').trim(),
+                time: String(comment.time || '')
+            };
+        }
+
+        function renderComments(comments) {
+            const list = (Array.isArray(comments) ? comments : [])
+                .map(normalizeComment)
+                .filter(c => c.text);
+            if (!list.length) {
+                return '<li class="comment"><span class="hint">Noch keine Kommentare.</span></li>';
+            }
+            return list.map(c => `<li class="comment">${c.by ? `<b>${esc(c.by)}:</b> ` : ''}${esc(c.text)}</li>`).join('');
+        }
+
+        function normalizeNote(note) {
+            if (typeof note === 'string') {
+                return {
+                    time: new Date().toISOString(),
+                    text: note,
+                    by: ''
+                };
+            }
+            if (!note || typeof note !== 'object') {
+                return {
+                    time: new Date().toISOString(),
+                    text: '',
+                    by: ''
+                };
+            }
+            return {
+                time: note.time || new Date().toISOString(),
+                text: String(note.text || '').trim(),
+                by: String(note.by || '').trim()
+            };
         }
 
         const roleLabel = role => ({
@@ -895,7 +949,7 @@
 
           <div class="comment-section">
             <label><b>Kommentare:</b></label>
-            <ul class="todo-list">${t.comments.map(c=>`<li class="comment">${esc(c)}</li>`).join('')}</ul>
+            <ul class="todo-list">${renderComments(t.comments)}</ul>
             <textarea id="todoComment-${i}" placeholder="Kommentar schreiben …"></textarea>
             <div class="actions" style="margin-top:6px;">
               <select id="todoActor-${i}">
@@ -924,7 +978,7 @@
       if (actor) {
         todos[index].assignee = actor;
       }
-      if(txt){ todos[index].comments.push(txt); logEvent('Kommentar', `TODO #${todoNum(index)} "${todos[index].title}" von ${actor}: ${txt}`); }
+      if(txt){ todos[index].comments.push({ text: txt, by: actor, time: new Date().toISOString() }); logEvent('Kommentar', `TODO #${todoNum(index)} "${todos[index].title}" von ${actor}: ${txt}`); }
       if(sel && sel.value !== oldStatus){ todos[index].status = sel.value; logEvent('Status geändert', `TODO #${todoNum(index)} "${todos[index].title}" von ${actor}: ${statusLabel(oldStatus)} -> ${statusLabel(sel.value)}`); }
       if(cta) cta.value='';
       updateTodoList(); renderSprints();
@@ -1110,7 +1164,7 @@
                 <div class="comment-section" style="margin-top:10px;">
                   <label><b>Kommentare:</b></label>
                   <ul class="todo-list">
-                    ${(mainTodo.comments || []).map(c => `<li class="comment">${esc(c)}</li>`).join('')}
+                    ${renderComments(mainTodo.comments || [])}
                   </ul>
                   <textarea placeholder="Neuen Kommentar hinzufügen" id="comment-${sprintIndex}-${todoIndex}"></textarea>
                   <div class="actions" style="margin-top:6px;">
@@ -1127,9 +1181,12 @@
         }).join('');
 
         // Anmerkungen HTML
-        const notesHtml = (sprint.notes || []).map(n => `
-          <li class="comment"><b>${fmt(n.time)}:</b> ${esc(n.text)}</li>
-        `).join('') || '<span class="hint">Noch keine Anmerkungen.</span>';
+        const notesHtml = (sprint.notes || []).map(raw => {
+          const n = normalizeNote(raw);
+          if (!n.text) return '';
+          const by = n.by ? ` • ${esc(n.by)}` : '';
+          return `<li class="comment"><b>${fmt(n.time)}${by}:</b> ${esc(n.text)}</li>`;
+        }).join('') || '<span class="hint">Noch keine Anmerkungen.</span>';
 
         const det = document.createElement('details');
         det.className = 'lesson';
@@ -1181,6 +1238,9 @@
               <ul class="todo-list" id="notesList-${sprintIndex}">${notesHtml}</ul>
               <textarea id="noteText-${sprintIndex}" placeholder="Anmerkung eingeben …"></textarea>
               <div class="actions" style="margin-top:6px;">
+                <select id="noteActor-${sprintIndex}">
+                  ${teamMemberOptionsHtml('')}
+                </select>
                 <button class="button outline" type="button" onclick="addLessonNote(${sprintIndex})">Anmerkung hinzufügen</button>
               </div>
             </div>
@@ -1222,7 +1282,7 @@
       }
 
       if (newComment) {
-        todos[todoIndex].comments.push(newComment);
+        todos[todoIndex].comments.push({ text: newComment, by: actor, time: new Date().toISOString() });
         logEvent('Sprint-Kommentar', `Stunde ${sprintIndex + 1} • TODO #${todoNum(todoIndex)} "${todos[todoIndex].title}" von ${actor}: ${newComment}`);
       }
       if (newStatus !== oldStatus) {
@@ -1239,12 +1299,13 @@
     // Manuelle Notizen pro Stunde
     function addLessonNote(sprintIndex){
       const ta = document.getElementById(`noteText-${sprintIndex}`);
+      const actor = resolveActionMember(`noteActor-${sprintIndex}`);
       const text = (ta?.value || '').trim();
       if(!text) return;
       const s = sprints[sprintIndex];
       if(!s.notes) s.notes = [];
-      s.notes.push({ time:new Date().toISOString(), text });
-      logEvent('Stunden-Notiz', `Stunde ${sprintIndex+1}: ${text}`);
+      s.notes.push({ time:new Date().toISOString(), text, by: actor });
+      logEvent('Stunden-Notiz', `Stunde ${sprintIndex+1} von ${actor}: ${text}`);
       if(ta) ta.value = '';
       renderSprints();
       const det = sprintContainer.querySelector(`details.lesson[data-index="${sprintIndex}"]`);
@@ -1333,7 +1394,8 @@
           present: !!p.present,
           role: p.role === 'coding' || p.role === 'doku' ? p.role : ''
         })).filter(p => p.name) : [];
-        return { date: s.date || '', goals: goalsArr, todos: sprintTodos, notes: Array.isArray(s.notes)? s.notes: [], participants: sprintParticipants };
+        const sprintNotes = Array.isArray(s.notes) ? s.notes.map(normalizeNote).filter(n => n.text) : [];
+        return { date: s.date || '', goals: goalsArr, todos: sprintTodos, notes: sprintNotes, participants: sprintParticipants };
       });
 
       logbook = Array.isArray(data.logbook) ? data.logbook : [];
