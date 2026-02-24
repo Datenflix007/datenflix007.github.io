@@ -174,17 +174,39 @@ summary{
   font-weight:650;
 }
 summary::-webkit-details-marker{display:none}
+details[data-item] > summary{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:8px;
+}
+details[data-item] > summary .badge{
+  margin-left:auto;
+}
+details[data-item] > summary .summary-topic{
+  flex:1 1 100%;
+  margin-top:2px;
+  color:var(--muted);
+  font-size:0.9rem;
+  font-weight:500;
+  line-height:1.35;
+}
 details .content{
   padding:10px 12px 14px;
   border-top:1px solid var(--line);
 }
 .box{
-  border:1px solid rgba(255,107,107,0.45);
-  background:rgba(255,107,107,0.08);
+  border:1px solid rgba(255,107,107,0.42);
+  background:linear-gradient(180deg, rgba(255,107,107,0.12), rgba(255,107,107,0.06));
   border-radius:12px;
   padding:12px;
 }
 .box .meta{color:var(--muted); font-size:0.88rem; margin-bottom:8px}
+.box > div[style*="white-space:pre-wrap"]{
+  white-space:normal !important;
+  font-family:var(--serif);
+  line-height:1.72;
+}
 pre.latex{
   white-space:pre-wrap;
   font-family:var(--mono);
