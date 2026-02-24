@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Automaten & Berechenbarkeit</title>
+  <meta name="description" content=""/>
+  <link rel="stylesheet" href="assets/css/style.css"/>
+  <script defer src="assets/js/site.js"></script>
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body>
+<div class="topbar">
+  <div class="inner">
+    <div class="brand">
+      <div class="title">Theoretische Informatik – Trainer</div>
+      <div class="subtitle">lehrbuchartig · interaktiv · formelklar</div>
+    </div>
+    <nav class="nav">
+      <a href="index.html">Start</a>
+      <a href="automaten.html">Automaten & Berechenbarkeit</a>
+      <a href="algods.html">Algorithmen & Datenstrukturen</a>
+      <a href="personen.html">Personen & Meilensteine</a>
+      <a href="rote-boxen.html">Rote Boxen</a>
+    </nav>
+  </div>
+</div>
+<div class="wrap">
+
+<div class="grid2">
+  <aside class="paper toc">
+    <h3>Inhalt</h3>
+    <a href="#vorwort">Vorwort: Zwei Ordnungen</a>
+    <a href="#chomsky">1. Chomsky-Hierarchie</a>
+    <a href="#berechenbarkeit">2. Berechenbarkeit (REC/RE)</a>
+    <a href="#dfa">3. DFA</a>
+    <a href="#nfa">4. NFA</a>
+    <a href="#pda">5. PDA</a>
+    <a href="#tm">6. Turingmaschine</a>
+    <a href="#beweise">Beweise (ausklappbar)</a>
+    <a href="#weiter">Weiterlernen</a>
+    <small>Für Definitionen & Sätze im Wortlaut: <a href="rote-boxen.html">Rote Boxen</a></small>
+  </aside>
+
+  <main class="paper section">
+    <h2 id="vorwort">Vorwort: Zwei Ordnungen<span class="badge">Orientierung</span></h2>
+    <p>
+      In der Theoretischen Informatik ordnen wir Sprachen typischerweise entlang <b>zweier Perspektiven</b>:
+    </p>
+    <ul>
+      <li><b>Automaten-orientiert (Chomsky-Hierarchie):</b> Welche Sprachklasse kann welcher Automaten-Typ erkennen?</li>
+      <li><b>Berechenbarkeits-orientiert:</b> Was ist überhaupt (semi-)entscheidbar? Wie hängen <i>REC</i> und <i>RE</i> zusammen?</li>
+    </ul>
+    <div class="callout">
+      Merke: <b>Chomsky</b> ist „Wie viel Gedächtnis/Struktur braucht die Erkennung?“ – <b>Berechenbarkeit</b> ist „Ist es prinzipiell algorithmisch entscheidbar?“
+    </div>
+
+    <h2 id="chomsky">1. Chomsky-Hierarchie<span class="badge">Sprachklassen</span></h2>
+    <p>
+      Grobe Einordnung (automatennah):<br/>
+      <b>Typ-3</b> regulär (DFA/NFA) ⊊ <b>Typ-2</b> kontextfrei (PDA) ⊊ <b>Typ-1</b> kontextsensitiv (LBA) ⊊ <b>Typ-0</b> rekursiv aufzählbar (TM).
+    </p>
+    <div class="callout">
+      Formale Kurzform (als Orientierung):<br/>
+      $\text{REG} \subsetneq \text{CFL} \subsetneq \text{CSL} \subsetneq \text{RE}$
+    </div>
+
+    <h2 id="berechenbarkeit">2. Berechenbarkeit (REC/RE)<span class="badge">Einordnung</span></h2>
+    <p>
+      Viele Missverständnisse entstehen, wenn man „erkennbar“ und „entscheidbar“ mischt:
+    </p>
+    <ul>
+      <li><b>entscheidbar (REC):</b> eine TM hält auf <i>allen</i> Eingaben und akzeptiert genau die Wörter der Sprache.</li>
+      <li><b>semi-entscheidbar / rekursiv aufzählbar (RE):</b> eine TM akzeptiert Wörter der Sprache, darf aber auf Nicht-Wörtern ggf. nie halten.</li>
+    </ul>
+    <details>
+      <summary>Mini-Check: Was bedeutet „semi-entscheidbar“ wirklich?</summary>
+      <div class="content">
+        <p>
+          „Semi“ heißt: Für <b>Ja-Instanzen</b> gibt’s eine endliche Bestätigung (die Maschine hält und akzeptiert).
+          Für <b>Nein-Instanzen</b> gibt es keine Garantie (sie kann unendlich laufen).
+        </p>
+      </div>
+    </details>
+
+    <h2 id="dfa">3. DFA – Deterministische endliche Automaten</h2>
+    <p>
+      Ein DFA besitzt eine <b>deterministische</b> Übergangsfunktion:
+      $\delta: Q \times \Sigma \to Q$.
+      Aus jedem Zustand und Zeichen gibt es genau <b>einen</b> Folgezustand.
+    </p>
+    <div class="callout">
+      Praxis: Nutze den DFA/NFA-Baukasten (wie bei Flaci) unter <a href="sim/index.html">/sim</a> zum Zusammenklicken und Simulieren.
+    </div>
+
+    <h2 id="nfa">4. NFA – Nichtdeterministische endliche Automaten</h2>
+    <p>
+      Beim NFA gilt:
+      $\delta: Q \times (\Sigma \cup \{\varepsilon\}) \to \mathcal P(Q)$.
+      Ein Schritt kann <b>mehrere</b> Folgezustände liefern – Akzeptanz, wenn <b>mindestens ein Pfad</b> akzeptiert.
+    </p>
+
+    <h2 id="pda">5. PDA – Kellerautomaten</h2>
+    <p>
+      Kellerautomaten erweitern endliche Kontrolle um einen <b>Stack</b> – ideal für geschachtelte Strukturen.
+      Typischerweise: Zustandsmenge, Eingabealphabet, Stackalphabet, Übergänge, Startsymbol des Stacks, akzeptierende Zustände.
+    </p>
+
+    <h2 id="tm">6. Turingmaschine</h2>
+    <p>
+      TMs sind das Standardmodell der Berechenbarkeit.
+      Mit Band (potenziell unendlich), Lese-/Schreibkopf und Zustandskontrolle lassen sich alle „klassisch“ berechenbaren Funktionen modellieren.
+    </p>
+
+    <h2 id="beweise">Beweise (ausklappbar)<span class="badge">lesbar</span></h2>
+    <details>
+      <summary>Beweis-Skizze: NFA → DFA (Potenzmengenkonstruktion)</summary>
+      <div class="content">
+        <p>
+          Idee: Der DFA simuliert die Menge aller möglichen NFA-Zustände nach einem Präfix.
+          Zustände des DFA sind also Teilmengen von $Q$.
+        </p>
+        <div class="callout">
+          Konstruktion (Kernformel): $\delta_D(S,a)=\bigcup_{q\in S}\delta_N(q,a)$
+        </div>
+      </div>
+    </details>
+    <details>
+      <summary>Beweis-Skizze: Pumping Lemma (regulär)</summary>
+      <div class="content">
+        <p>
+          Nutzt die Endlichkeit der Zustandsmenge: bei langen Wörtern muss ein Zustand wiederholt werden → Schleife pumpbar.
+        </p>
+      </div>
+    </details>
+
+    <h2 id="weiter">Weiterlernen</h2>
+    <ul>
+      <li>Als Spickzettel: <a href="rote-boxen.html">Rote Boxen</a> (mit Suche & LaTeX)</li>
+      <li>Als Kontext: <a href="personen.html">Personen & Meilensteine</a></li>
+      <li>Als Brücke: <a href="algods.html">Algorithmen & Datenstrukturen</a></li>
+    </ul>
+  </main>
+</div>
+  <div class="footer">GitHub Pages-ready · statisches Projekt (HTML/CSS/JS) · MathJax für LaTeX</div>
+</div>
+</body>
+</html>
