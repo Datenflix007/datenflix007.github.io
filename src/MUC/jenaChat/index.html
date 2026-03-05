@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>JenaChat – Interaktive Karte</title>
+
+  <link rel="stylesheet" href="css/style.css" />
+
+  <!-- Markdown Renderer (statisch via CDN → GitHub Pages ok) -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+
+<body>
+  <header class="topbar">
+    <div class="topbar__inner">
+      <div class="brand">
+        <span class="brand__dot"></span>
+        <div class="brand__text">
+          <div class="brand__title" style="font-size: 24px;">JenaChat</div>
+
+        </div>
+      </div>
+
+      <nav class="topbar__actions">
+        <button id="btnHelp" class="btn btn--ghost" type="button">Hilfe</button>
+ 
+      </nav>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="card">
+      <div class="card__header">
+        <h1 class="card__title">Karte von Jena</h1>
+        <div class="card__meta">Matthias Seutter, Augsburg nach 1732</div>
+      </div>
+
+      <div class="map-shell" aria-label="Interaktive Karte">
+        <!-- Karte -->
+        <img class="map-img" src="assets/map1.png" alt="Historische Karte" />
+
+        <!-- POI Layer -->
+        <div id="poiLayer" class="poi-layer" aria-hidden="false"></div>
+
+        <!-- kleine HUD-Info -->
+        <div class="map-hud">
+          <div class="hud-pill">
+            <span class="hud-dot"></span>
+            <span id="hudText">Klicke auf einen Pin, um Infos zu öffnen.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card__footer">
+        <div class="hint">
+          <strong>Tipp:</strong> POIs bearbeitest du in <code>data/pois.json</code> (x/y in Prozent).
+          Inhalte liegen als Markdown in <code>md/</code>.
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Overlay / Infofenster -->
+  <div id="overlay" class="overlay" aria-hidden="true">
+    <div class="overlay__backdrop" data-close="true"></div>
+
+    <article class="overlay__panel" role="dialog" aria-modal="true" aria-labelledby="overlayTitle">
+      <header class="overlay__header">
+        <div class="overlay__headerLeft">
+          <div class="badge" id="overlayBadge">POI</div>
+          <h2 id="overlayTitle" class="overlay__title">Titel</h2>
+        </div>
+        <button class="iconbtn" id="btnClose" type="button" aria-label="Schließen">✕</button>
+      </header>
+
+      <div class="overlay__content">
+        <div id="overlayBody" class="md"></div>
+      </div>
+
+      <footer class="overlay__footer">
+        <div class="overlay__footnote" id="overlayFootnote"></div>
+        <button class="btn" id="btnNext" type="button">Nächster POI</button>
+      </footer>
+    </article>
+  </div>
+
+  <!-- Hilfe-Dialog (einfacher Overlay-Usecase) -->
+  <div id="helpOverlay" class="overlay" aria-hidden="true">
+    <div class="overlay__backdrop" data-close="true"></div>
+
+    <article class="overlay__panel" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+      <header class="overlay__header">
+        <div class="overlay__headerLeft">
+          <div class="badge">Hilfe</div>
+          <h2 id="helpTitle" class="overlay__title">So funktioniert’s</h2>
+        </div>
+        <button class="iconbtn" id="btnCloseHelp" type="button" aria-label="Schließen">✕</button>
+      </header>
+
+      <div class="overlay__content">
+        <div class="md">
+          <p><strong>POIs definieren:</strong> In <code>data/pois.json</code> pro POI <code>x</code> und <code>y</code> als Prozentwerte (0–100) setzen.</p>
+          <p><strong>Inhalte:</strong> Jeder POI verweist auf eine Markdown-Datei im Ordner <code>md/</code>.</p>
+          <p><strong>Hosting:</strong> Repo → Settings → Pages → Deploy from branch → <code>main</code> / <code>root</code>.</p>
+          <hr />
+          <p><em>Optional:</em> Du kannst später “POI setzen durch Klick” ergänzen – aktuell ist es bewusst schülerfest &amp; reproduzierbar über JSON.</p>
+        </div>
+      </div>
+
+      <footer class="overlay__footer">
+        <div class="overlay__footnote">JenaChat • Unterrichtseinheit</div>
+        <button class="btn" id="btnCloseHelp2" type="button">Alles klar</button>
+      </footer>
+    </article>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+﻿[
+  {
+    "id": "poi-1",
+    "title": "Gerbergasse: Leder und Geruch",
+    "x": 57.1,
+    "y": 42.0,
+    "label": "Gerbergasse",
+    "markdown": "md/poi-1.md",
+    "badge": "Handwerk"
+  },
+  {
+    "id": "poi-2",
+    "title": "Bauern rund um Jena",
+    "x": 10.0,
+    "y": 65.5,
+    "label": "Bauernhof und Felder",
+    "markdown": "md/poi-2.md",
+    "badge": "Landwirtschaft"
+  }
+]
