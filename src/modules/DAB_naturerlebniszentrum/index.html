@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Der Jenaer Wald und wir</title>
+  <meta name="description" content="Ein digitales Arbeitsblatt fuer einen Workshop zur Geschichte des Jenaer Waldes.">
+  <link rel="icon" type="image/png" href="img/icon.png">
+  <link rel="apple-touch-icon" href="img/icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="notes-drawer" id="notesDrawer" aria-label="Notizblatt">
+      <button class="notes-toggle" id="notesToggle" type="button" aria-expanded="false" aria-controls="notesPanel">
+        Notizen
+      </button>
+      <section class="notes-panel" id="notesPanel">
+        <div class="notes-panel__header">
+          <p class="eyebrow">Eigenes Notizblatt</p>
+          <h2>Beobachtungen sammeln</h2>
+        </div>
+        <label class="notes-label" for="notesInput">Funde, Ortsnamen, Fragen oder Berufsideen</label>
+        <textarea id="notesInput" placeholder="Zum Beispiel: Gibt es in unserer Umgebung Hinweise auf alte Forstberufe oder Ortsnamen mit historischem Bezug?"></textarea>
+        <div class="notes-actions">
+          <button id="saveNotesButton" type="button">Notizen speichern</button>
+          <button id="clearNotesButton" type="button" class="button-secondary">Leeren</button>
+        </div>
+        <p class="notes-hint">Die Notizen werden lokal im Browser gespeichert.</p>
+      </section>
+    </aside>
+
+    <main id="app" class="app" aria-live="polite"></main>
+  </div>
+
+  <template id="dashboardTemplate">
+    <section class="dashboard">
+      <div class="hero-card">
+        <div class="hero-copy">
+          <p class="eyebrow">Digitales Arbeitsblatt</p>
+          <h1>Der Jenaer Wald und wir</h1>
+          <p class="hero-text">
+            Spuren mittelalterlicher Arbeit entdecken, <br />Berufe und ihre Bedeutung für die Umwelt verstehen,<br />Bedeutung für uns selbst verstehen.
+          </p>
+          <div class="hero-actions">
+            <button class="button-primary" data-route="intro">Erkundung starten</button>
+          </div>
+        </div>
+
+        <div class="slides-card">
+          <div class="slides-track" id="slidesTrack">
+            <article class="slide is-active">
+              <img src="img/abbildung-1.svg" alt="Historisch inspirierte Waldlandschaft mit Weg und Siedlung">
+              <div class="slide-caption">
+                <span>Historische Landschaft</span>
+                <strong>Wald, Wege und Siedlungen</strong>
+              </div>
+            </article>
+            <article class="slide">
+              <img src="img/abbildung-2.svg" alt="Illustration eines Koehlers bei der Arbeit im Wald">
+              <div class="slide-caption">
+                <span>Arbeitsalltag</span>
+                <strong>Koehler und Waldwirtschaft</strong>
+              </div>
+            </article>
+            <article class="slide">
+              <img src="img/abbildung-3.svg" alt="Illustration von Steinbrechern bei der Arbeit im Steinbruch">
+              <div class="slide-caption">
+                <span>Berufe im Fokus</span>
+                <strong>Steinbrecher im Steinbruch</strong>
+              </div>
+            </article>
+          </div>
+          <div class="slide-indicators" id="slideIndicators" aria-label="Slide-Auswahl"></div>
+        </div>
+      </div>
+    </section>
+  </template>
+
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,596 @@
+const routes = {
+  dashboard: { id: "dashboard", title: "Start", graphStep: 0 },
+  intro: { id: "intro", title: "Einführung", graphStep: 1, files: ["md/aufgabestellung.md"] },
+  professions: { id: "professions", title: "Berufe entdecken", graphStep: 2, files: ["md/introduction.md"] },
+  professionDetail: { id: "professionDetail", title: "Berufsprofil", graphStep: 3 },
+  poster: { id: "poster", title: "Plakat erstellen", graphStep: 4, files: ["md/plakat.md"] },
+  badWeather: { id: "badWeather", title: "Schlechtwettervariante", graphStep: 6, files: ["md/berufchatverlauf.md"] },
+};
+
+const professions = [
+  { key: "holzfaeller", label: "Holzfäller", file: "md/holzfaeller.md", category: "Wichtige Forstberufe" },
+  { key: "steinhauer", label: "Steinhauer", file: "md/steinhauer.md", category: "Wichtige Forstberufe" },
+  { key: "koehler", label: "Köhler", file: "md/koehler.md", category: "Wichtige Forstberufe" },
+  { key: "glasblaeser", label: "Glasbläser", file: "md/glasblaeser.md", category: "Wichtige Forstberufe" },
+  { key: "winzer", label: "Winzer", file: "md/winzer.md", category: "Weitere Nischenberufe" },
+  { key: "haendler", label: "Händler", file: "md/haendler.md", category: "Weitere Nischenberufe" },
+  { key: "waidsammler", label: "Waidsammler", file: "md/waidsammler.md", category: "Weitere Nischenberufe" },
+];
+
+const graphNodes = [
+  { title: "Station I", subtitle: "Auftrag & Recherche", route: "intro" },
+  { title: "Station IIa", subtitle: "Berufe entdecken", route: "professions" },
+  { title: "Station IIb", subtitle: "Berufsprofil lesen", route: null },
+  { title: "Station III", subtitle: "Ergebnis gestalten", route: "poster" },
+  { title: "Exkursion", subtitle: "Spuren erkunden", route: null },
+  { title: "Schlechtwettervariante", subtitle: "Berufschatverlauf", route: "badWeather" },
+];
+
+const additionalAssets = [
+  { title: "Kreuzworträtsel", description: "Kann später als PDF, Bild oder eigene HTML-Seite im Ordner `assets/` eingebunden werden." },
+  { title: "Bildkarten", description: "Historische Abbildungen oder Berufskarten lassen sich unter `img/` ablegen und direkt in Markdown verwenden." },
+  { title: "Quiz oder Lückentext", description: "Als weitere Station können interaktive Aufgaben in JavaScript leicht ergänzt werden." },
+];
+
+const app = document.getElementById("app");
+const notesDrawer = document.getElementById("notesDrawer");
+const notesToggle = document.getElementById("notesToggle");
+const notesInput = document.getElementById("notesInput");
+const saveNotesButton = document.getElementById("saveNotesButton");
+const clearNotesButton = document.getElementById("clearNotesButton");
+
+const markdownCache = new Map();
+const state = {
+  route: "dashboard",
+  selectedProfession: professions[0],
+  slideIndex: 0,
+  slideTimer: null,
+};
+
+init();
+
+async function init() {
+  bindGlobalEvents();
+  restoreNotes();
+
+  const hashRoute = location.hash.replace("#", "");
+  if (routes[hashRoute]) {
+    state.route = hashRoute;
+  }
+
+  await render();
+}
+
+function bindGlobalEvents() {
+  window.addEventListener("hashchange", async () => {
+    const hashRoute = location.hash.replace("#", "");
+    if (routes[hashRoute]) {
+      state.route = hashRoute;
+      await render();
+    }
+  });
+
+  app.addEventListener("click", (event) => {
+    const routeButton = event.target.closest("[data-route]");
+    if (routeButton && app.contains(routeButton)) {
+      event.preventDefault();
+      navigate(routeButton.dataset.route);
+      return;
+    }
+
+    const professionButton = event.target.closest("[data-profession]");
+    if (professionButton && app.contains(professionButton)) {
+      event.preventDefault();
+      const profession = professions.find((entry) => entry.key === professionButton.dataset.profession);
+      if (profession) {
+        state.selectedProfession = profession;
+        navigate("professionDetail");
+      }
+    }
+  });
+
+  app.addEventListener("change", (event) => {
+    if (event.target.matches(".task-list input[type='checkbox']")) {
+      saveCheckbox(event.target.id, event.target.checked);
+    }
+  });
+
+  notesToggle.addEventListener("click", () => {
+    const isOpen = notesDrawer.classList.toggle("is-open");
+    notesToggle.setAttribute("aria-expanded", String(isOpen));
+  });
+
+  saveNotesButton.addEventListener("click", () => {
+    localStorage.setItem("jenaer-wald-notes", notesInput.value);
+    showStatus("Notizen wurden lokal gespeichert.");
+  });
+
+  clearNotesButton.addEventListener("click", () => {
+    notesInput.value = "";
+    localStorage.removeItem("jenaer-wald-notes");
+    showStatus("Notizen wurden entfernt.");
+  });
+}
+
+async function render() {
+  clearSlideTimer();
+  setRouteClass(state.route);
+
+  if (state.route === "dashboard") {
+    renderDashboard();
+    startSlides();
+    return;
+  }
+
+  const route = routes[state.route];
+  const files = route.files ?? [];
+  const content = await Promise.all(files.map(loadMarkdown));
+
+  if (state.route === "intro") {
+    renderIntro(content);
+    return;
+  }
+
+  if (state.route === "professions") {
+    renderProfessions(content[0]);
+    return;
+  }
+
+  if (state.route === "professionDetail") {
+    const professionContent = await loadMarkdown(state.selectedProfession.file);
+    renderProfessionDetail(professionContent);
+    return;
+  }
+
+  if (state.route === "poster") {
+    renderOutput(content[0], "poster");
+    return;
+  }
+
+  if (state.route === "badWeather") {
+    renderOutput(content[0], "badWeather");
+    restoreCheckboxes();
+  }
+}
+
+function renderDashboard() {
+  const template = document.getElementById("dashboardTemplate");
+  app.innerHTML = "";
+  app.appendChild(template.content.cloneNode(true));
+
+  setupIndicators();
+}
+
+function renderIntro(markdownParts) {
+  const [assignmentMarkdown] = markdownParts;
+
+  app.innerHTML = `
+    <section class="workspace">
+      ${renderGraph(routes.intro.graphStep)}
+      <div class="content-grid">
+        <article class="intro-hero">
+          <div class="intro-hero__copy">
+            <p class="eyebrow">Station I</p>
+            <h1>Spuren im Wald lesen</h1>
+            <p>
+              Stellt euch vor: Ihr lauft durch den Jenaer Wald – oder durch die Straßen der Stadt.
+              Plötzlich fällt euch etwas auf. An einem Berghang fehlt eine ganze Ecke des Felsens –
+              wie abgehackt. Ein Straßenname klingt seltsam altmodisch. Im Wald steht eine alte Mauer,
+              von der niemand mehr weiß, wofür sie einmal stand.
+            </p>
+            <p>
+              Diese Orte und Spuren sind kein Zufall. Sie erzählen von Menschen, die hier gearbeitet haben –
+              lange bevor es Maschinen oder Supermärkte gab. Holz wurde geschlagen, Kohle gebrannt,
+              Steine gebrochen. Euer Auftrag: Diese Spuren der Vergangenheit entdecken und verstehen.
+            </p>
+          </div>
+          <div class="intro-hero__image" aria-hidden="true">
+            <img src="img/abbildung-1.svg" alt="">
+          </div>
+        </article>
+
+        <article class="content-card">
+          <p class="eyebrow">Arbeitsauftrag &amp; Zeitplan</p>
+          <h2>Eure Aufgaben</h2>
+          ${renderChecklist(assignmentMarkdown)}
+        </article>
+
+        <article class="intro-next-card">
+          <div>
+            <p class="eyebrow">Nächster Schritt</p>
+            <h2>Berufe im und am Wald erkunden</h2>
+            <p>Wählt einen Beruf aus, der euch interessiert, und lest das dazugehörige Berufsprofil.</p>
+          </div>
+          <div class="card-actions">
+            <button class="button-primary" data-route="professions">Weiter zu den Berufen</button>
+          </div>
+        </article>
+      </div>
+    </section>
+  `;
+
+  restoreCheckboxes();
+}
+
+function renderProfessions(introductionMarkdown) {
+  const grouped = professions.reduce((map, profession) => {
+    if (!map[profession.category]) {
+      map[profession.category] = [];
+    }
+    map[profession.category].push(profession);
+    return map;
+  }, {});
+
+  app.innerHTML = `
+    <section class="workspace">
+      ${renderGraph(routes.professions.graphStep)}
+      <div class="content-grid">
+        <article class="content-card">
+          <p class="eyebrow">Station IIa</p>
+          <h1>Berufe im und am Wald</h1>
+          ${parseMarkdown(introductionMarkdown)}
+          ${Object.entries(grouped).map(([category, items]) => `
+            <section>
+              <h2>${category}</h2>
+              <div class="profession-grid">
+                ${items.map((profession) => `
+                  <button class="chip-button" type="button" data-profession="${profession.key}">
+                    ${profession.label}
+                  </button>
+                `).join("")}
+              </div>
+            </section>
+          `).join("")}
+          <div class="card-actions">
+            <button class="button-secondary" data-route="intro">Zurück</button>
+            <button class="button-primary" data-route="poster">Zu Station III</button>
+          </div>
+        </article>
+        <aside class="side-card">
+          <p class="eyebrow">Rechercheimpuls</p>
+          <h3>Leitfragen für eure Recherche</h3>
+          <ul>
+            <li>Welche Rohstoffe brauchte euer Beruf – und woher kamen sie?</li>
+            <li>Wer hat diesen Beruf ausgeübt: Männer, Frauen, Kinder?</li>
+            <li>Wie hat dieser Beruf den Jenaer Wald verändert?</li>
+            <li>Welche Spuren sind heute noch sichtbar – in Namen, Orten oder Landschaften?</li>
+          </ul>
+          <p>Klickt auf einen Beruf, um das vollständige Berufsprofil zu öffnen.</p>
+        </aside>
+      </div>
+    </section>
+  `;
+}
+
+function renderProfessionDetail(markdown) {
+  app.innerHTML = `
+    <section class="workspace">
+      ${renderGraph(routes.professionDetail.graphStep)}
+      <div class="content-grid">
+        <article class="content-card">
+          <p class="eyebrow">Station IIb</p>
+          <h1>${state.selectedProfession.label}</h1>
+          ${parseMarkdown(markdown)}
+          <div class="card-actions">
+            <button class="button-secondary" data-route="professions">Weitere Berufe</button>
+            <button class="button-primary" data-route="poster">Weiter zu Station III</button>
+          </div>
+        </article>
+      </div>
+    </section>
+  `;
+}
+
+function renderOutput(markdown, mode) {
+  const isPoster = mode === "poster";
+
+  app.innerHTML = `
+    <section class="workspace">
+      ${renderGraph(routes[mode].graphStep)}
+      <div class="content-grid">
+        <div class="mode-selector">
+          <button class="mode-card ${isPoster ? "is-active" : ""}" type="button" data-route="poster">
+            <strong>Plakat gestalten</strong>
+            <span>Bereitet euren Beruf als Plakat auf und stellt ihn vor</span>
+          </button>
+          <button class="mode-card ${!isPoster ? "is-active" : ""}" type="button" data-route="badWeather">
+            <strong>Schlechtwettervariante</strong>
+            <span>Erstellt einen historischen Berufschatverlauf</span>
+          </button>
+        </div>
+
+        <article class="content-card">
+          <p class="eyebrow">Station III</p>
+          <h1>${isPoster ? "Plakat erstellen" : "Berufschatverlauf erstellen"}</h1>
+          ${isPoster ? parseMarkdown(markdown) : renderChecklist(markdown)}
+          <div class="card-actions">
+            <button class="button-secondary" data-route="professions">Zurück zu den Berufen</button>
+          </div>
+        </article>
+
+        <aside class="asset-card">
+          <p class="eyebrow">Erweiterbare Assets</p>
+          <h3>Weitere Materialien</h3>
+          <p>Die Seite ist so angelegt, dass später weitere Workshop-Bausteine eingebunden werden können.</p>
+          <div class="asset-list">
+            ${additionalAssets.map((asset) => `
+              <div class="asset-item">
+                <strong>${asset.title}</strong>
+                <span>${asset.description}</span>
+              </div>
+            `).join("")}
+          </div>
+        </aside>
+      </div>
+    </section>
+  `;
+}
+
+function renderGraph(activeStep) {
+  return `
+    <aside class="graph-card">
+      <p class="eyebrow">Orientierung</p>
+      <h2>Workshop-Ablauf</h2>
+      <div class="graph">
+        ${graphNodes.map((node, index) => `
+          <div class="graph-node ${activeStep === index + 1 ? "is-active" : ""} ${node.route ? "is-clickable" : ""}"
+               ${node.route ? `data-route="${node.route}"` : ""}>
+            <div class="graph-node__dot">${index + 1}</div>
+            <div class="graph-node__label">
+              <strong>${node.title}</strong>
+              <span>${node.subtitle}</span>
+            </div>
+          </div>
+        `).join("")}
+      </div>
+    </aside>
+  `;
+}
+
+function renderChecklist(markdown) {
+  const lines = markdown.replace(/\r/g, "").split("\n");
+  const html = [];
+  let inList = false;
+  let checkIndex = 0;
+
+  for (const line of lines) {
+    if (line.startsWith("# ")) continue;
+
+    if (line.startsWith("## ")) {
+      if (inList) { html.push("</ul>"); inList = false; }
+      html.push(`<h3 class="checklist-group">${escapeHtml(line.slice(3))}</h3>`);
+      continue;
+    }
+
+    if (line.startsWith("- ")) {
+      if (!inList) { html.push('<ul class="task-list">'); inList = true; }
+      const id = `task-${checkIndex++}`;
+      html.push(`
+        <li class="task-item">
+          <label for="${id}">
+            <input type="checkbox" id="${id}">
+            <span>${formatInlineMarkdown(line.slice(2))}</span>
+          </label>
+        </li>
+      `);
+      continue;
+    }
+
+    if (line.trim() === "") {
+      if (inList) { html.push("</ul>"); inList = false; }
+      continue;
+    }
+
+    if (inList) { html.push("</ul>"); inList = false; }
+    html.push(`<p>${formatInlineMarkdown(line)}</p>`);
+  }
+
+  if (inList) html.push("</ul>");
+  return html.join("");
+}
+
+function saveCheckbox(id, checked) {
+  const saved = JSON.parse(localStorage.getItem("jenaer-wald-tasks") || "{}");
+  saved[id] = checked;
+  localStorage.setItem("jenaer-wald-tasks", JSON.stringify(saved));
+}
+
+function restoreCheckboxes() {
+  const saved = JSON.parse(localStorage.getItem("jenaer-wald-tasks") || "{}");
+  Object.entries(saved).forEach(([id, checked]) => {
+    const el = document.getElementById(id);
+    if (el) el.checked = checked;
+  });
+}
+
+function setRouteClass(route) {
+  document.body.classList.forEach((className) => {
+    if (className.startsWith("route-")) {
+      document.body.classList.remove(className);
+    }
+  });
+
+  document.body.classList.add(`route-${route}`);
+}
+
+async function navigate(route) {
+  if (!routes[route]) {
+    return;
+  }
+
+  state.route = route;
+  if (location.hash.replace("#", "") === route) {
+    await render();
+    return;
+  }
+
+  location.hash = route;
+}
+
+async function loadMarkdown(path) {
+  if (markdownCache.has(path)) {
+    return markdownCache.get(path);
+  }
+
+  const response = await fetch(path);
+  if (!response.ok) {
+    return `# Inhalt fehlt\n\nDie Datei \`${path}\` konnte nicht geladen werden.`;
+  }
+
+  const text = await response.text();
+  markdownCache.set(path, text);
+  return text;
+}
+
+function parseMarkdown(markdown) {
+  const lines = markdown.replace(/\r/g, "").split("\n");
+  const html = [];
+  let inList = false;
+
+  for (const line of lines) {
+    if (line.startsWith("### ")) {
+      closeListIfNeeded();
+      html.push(`<h3>${escapeHtml(line.slice(4))}</h3>`);
+      continue;
+    }
+
+    if (line.startsWith("## ")) {
+      closeListIfNeeded();
+      html.push(`<h2>${escapeHtml(line.slice(3))}</h2>`);
+      continue;
+    }
+
+    if (line.startsWith("# ")) {
+      closeListIfNeeded();
+      html.push(`<h1>${escapeHtml(line.slice(2))}</h1>`);
+      continue;
+    }
+
+    if (line.startsWith("- ")) {
+      if (!inList) {
+        html.push("<ul>");
+        inList = true;
+      }
+      html.push(`<li>${formatInlineMarkdown(line.slice(2))}</li>`);
+      continue;
+    }
+
+    if (line.trim() === "") {
+      closeListIfNeeded();
+      continue;
+    }
+
+    closeListIfNeeded();
+    html.push(`<p>${formatInlineMarkdown(line)}</p>`);
+  }
+
+  closeListIfNeeded();
+  return html.join("");
+
+  function closeListIfNeeded() {
+    if (inList) {
+      html.push("</ul>");
+      inList = false;
+    }
+  }
+}
+
+function stripLeadingHeading(markdown) {
+  return markdown.replace(/\r/g, "").replace(/^# .+(\n+|$)/, "");
+}
+
+function formatInlineMarkdown(text) {
+  const placeholders = [];
+
+  const processed = text
+    .replace(/!\[([^\]]*)\]\(([^)]*)\)/g, (_, alt, url) => {
+      const i = placeholders.length;
+      placeholders.push(`<img src="${url}" alt="${alt}" class="md-img">`);
+      return `\uE000${i}\uE001`;
+    })
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, label, url) => {
+      const i = placeholders.length;
+      placeholders.push(`<a href="${url}" target="_blank" rel="noopener noreferrer">${label}</a>`);
+      return `\uE000${i}\uE001`;
+    });
+
+  const escaped = escapeHtml(processed)
+    .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+    .replace(/\*(.+?)\*/g, "<em>$1</em>")
+    .replace(/`(.+?)`/g, "<code>$1</code>");
+
+  return escaped.replace(/\uE000(\d+)\uE001/g, (_, i) => placeholders[parseInt(i)]);
+}
+
+function escapeHtml(text) {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+function restoreNotes() {
+  notesInput.value = localStorage.getItem("jenaer-wald-notes") ?? "";
+}
+
+function showStatus(message) {
+  const existing = notesDrawer.querySelector(".status-banner");
+  if (existing) {
+    existing.remove();
+  }
+
+  const status = document.createElement("p");
+  status.className = "status-banner";
+  status.textContent = message;
+  notesDrawer.querySelector(".notes-panel").appendChild(status);
+
+  window.setTimeout(() => {
+    status.remove();
+  }, 2400);
+}
+
+function setupIndicators() {
+  const indicators = document.getElementById("slideIndicators");
+  const slides = Array.from(document.querySelectorAll(".slide"));
+
+  indicators.innerHTML = slides.map((_, index) => `
+    <button type="button" data-slide="${index}" aria-label="Slide ${index + 1}"></button>
+  `).join("");
+
+  indicators.querySelectorAll("[data-slide]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.slideIndex = Number(button.dataset.slide);
+      updateSlides();
+    });
+  });
+
+  updateSlides();
+}
+
+function startSlides() {
+  state.slideTimer = window.setInterval(() => {
+    const slides = document.querySelectorAll(".slide");
+    state.slideIndex = (state.slideIndex + 1) % slides.length;
+    updateSlides();
+  }, 3500);
+}
+
+function updateSlides() {
+  const slides = Array.from(document.querySelectorAll(".slide"));
+  const indicators = Array.from(document.querySelectorAll("#slideIndicators button"));
+
+  slides.forEach((slide, index) => {
+    slide.classList.toggle("is-active", index === state.slideIndex);
+  });
+
+  indicators.forEach((indicator, index) => {
+    indicator.classList.toggle("is-active", index === state.slideIndex);
+  });
+}
+
+function clearSlideTimer() {
+  if (state.slideTimer) {
+    window.clearInterval(state.slideTimer);
+    state.slideTimer = null;
+  }
+}
