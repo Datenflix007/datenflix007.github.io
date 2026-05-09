@@ -1,0 +1,1396 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Algorithmen und Datenstrukturen</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Syne:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/java.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/prolog.min.js"></script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+
+    :root {
+      --sidebar-w: 256px;
+      --accent:    #63e6b5;
+      --accent2:   #58b5ff;
+      --bg:        #0d0f14;
+      --sidebar-bg:#090b0f;
+      --surface:   #13161f;
+      --border:    rgba(255,255,255,.07);
+      --muted:     #7d8598;
+      --text:      #dde3f0;
+      --mono:      'JetBrains Mono', monospace;
+      --radius:    12px;
+    }
+
+    html, body {
+      margin: 0; padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Syne', sans-serif;
+    }
+
+    a  { color: inherit; text-decoration: none; }
+    h1, h2, h3 { margin: 0; }
+    button, select { font: inherit; cursor: pointer; }
+    code { font-family: var(--mono); }
+
+    /* ─── LAYOUT ─────────────────────────────────────────── */
+    .layout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* ─── SIDEBAR ────────────────────────────────────────── */
+    #sidebar {
+      width: var(--sidebar-w);
+      min-width: var(--sidebar-w);
+      background: var(--sidebar-bg);
+      border-right: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sidebar-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 18px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .brand-logo {
+      width: 36px; height: 36px;
+      border-radius: 9px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #0a0c10;
+      font-weight: 800;
+      font-size: .85rem;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+    }
+
+    .brand-name { font-weight: 700; font-size: .92rem; line-height: 1.2; }
+    .brand-sub  { color: var(--muted); font-size: .74rem; margin-top: 2px; }
+
+    .nav-section { padding: 4px 0 8px; border-bottom: 1px solid var(--border); }
+    .nav-section:last-child { border-bottom: none; }
+
+    .nav-group-label {
+      padding: 14px 16px 5px;
+      font-size: .68rem;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .nav-link {
+      display: block;
+      padding: 8px 16px;
+      font-size: .9rem;
+      color: #9aa5be;
+      border-left: 3px solid transparent;
+      transition: background .13s, color .13s, border-color .13s;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    .nav-link:hover {
+      background: rgba(255,255,255,.04);
+      color: var(--text);
+    }
+
+    .nav-link.active {
+      background: rgba(99,230,181,.09);
+      border-left-color: var(--accent);
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .nav-link.nav-sub {
+      padding-left: 28px;
+      font-size: .86rem;
+    }
+
+    /* ─── MAIN AREA ──────────────────────────────────────── */
+    #main { flex: 1; min-width: 0; }
+
+    .chapter {
+      display: none;
+      padding: 52px 60px 72px;
+      max-width: 860px;
+      animation: fadein .18s ease;
+    }
+
+    .chapter.active { display: block; }
+
+    @keyframes fadein {
+      from { opacity: 0; transform: translateY(5px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ─── CHAPTER TYPOGRAPHY ─────────────────────────────── */
+    .chapter > h1 {
+      font-size: clamp(1.9rem, 3vw, 2.9rem);
+      letter-spacing: -.04em;
+      color: #edf1ff;
+      margin-bottom: 6px;
+    }
+
+    .chapter-meta {
+      color: var(--muted);
+      font-size: .87rem;
+      margin-bottom: 32px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .chapter-body   { display: grid; gap: 22px; margin-bottom: 40px; }
+
+    .chapter-body p { margin: 0; line-height: 1.9; color: #bec8de; font-size: .97rem; }
+
+    .chapter-body h2 {
+      font-size: 1.2rem;
+      color: #dde3f0;
+      margin-bottom: 6px;
+    }
+
+    .chapter-body h3 {
+      font-size: .74rem;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+
+    .chapter-body ul {
+      margin: 0;
+      padding-left: 1.4em;
+      line-height: 1.95;
+      color: #bec8de;
+      font-size: .97rem;
+    }
+
+    .info-box {
+      background: rgba(99,230,181,.05);
+      border: 1px solid rgba(99,230,181,.18);
+      border-radius: var(--radius);
+      padding: 14px 18px;
+    }
+
+    .info-box p { color: #c2cfdf; }
+
+    /* ─── COMPLEXITY TABLE ───────────────────────────────── */
+    .complexity-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .88rem;
+    }
+
+    .complexity-table th {
+      padding: 8px 14px;
+      text-align: left;
+      color: var(--muted);
+      font-size: .7rem;
+      letter-spacing: .09em;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .complexity-table td {
+      padding: 9px 14px;
+      border-bottom: 1px solid rgba(255,255,255,.04);
+      color: #bec8de;
+    }
+
+    .complexity-table td:last-child {
+      font-family: var(--mono);
+      font-size: .84rem;
+      color: var(--accent2);
+    }
+
+    /* ─── CHAPTER IMAGE ──────────────────────────────────── */
+    .img-wrap { display: grid; gap: 8px; }
+
+    .chapter-img {
+      max-width: 100%;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+    }
+
+    .img-caption {
+      text-align: center;
+      color: var(--muted);
+      font-size: .8rem;
+    }
+
+    /* ─── CODE VIEWER COMPONENT ──────────────────────────── */
+    .code-viewer-label {
+      font-size: .8rem;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .code-viewer {
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .code-viewer-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      background: #161a24;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .dot   { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+    .dot-r { background: #ff5f57; }
+    .dot-y { background: #ffbd2e; }
+    .dot-g { background: #26c281; }
+
+    .viewer-title {
+      font-family: var(--mono);
+      font-size: .8rem;
+      color: var(--muted);
+      margin-left: 6px;
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .lang-select {
+      border: 1px solid rgba(255,255,255,.1);
+      background: rgba(20,24,34,.96);
+      color: #e2e6f0;
+      padding: 4px 10px;
+      border-radius: 7px;
+      font-size: .8rem;
+    }
+
+    .copy-btn {
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.04);
+      color: #b5c0d8;
+      padding: 4px 12px;
+      border-radius: 7px;
+      font-size: .78rem;
+      transition: border-color .18s, color .18s;
+    }
+
+    .copy-btn:hover  { border-color: var(--accent); color: var(--accent); }
+    .copy-btn.copied { border-color: var(--accent); color: var(--accent); }
+
+    .download-btn {
+      border: 1px solid rgba(88,181,255,.2);
+      background: rgba(88,181,255,.05);
+      color: var(--accent2);
+      padding: 4px 12px;
+      border-radius: 7px;
+      font-size: .78rem;
+      text-decoration: none;
+      display: none;
+      align-items: center;
+      gap: 5px;
+      transition: border-color .18s, background .18s;
+    }
+    .download-btn:hover { border-color: var(--accent2); background: rgba(88,181,255,.1); }
+
+    .code-wrap { position: relative; background: #11151f; }
+
+    .code-wrap pre {
+      margin: 0;
+      padding: 20px 24px;
+      overflow-x: auto;
+      font-family: var(--mono);
+      font-size: .87rem;
+      line-height: 1.65;
+      min-height: 100px;
+    }
+
+    .code-wrap code.hljs { display: block; }
+
+    /* code-source divs are data carriers only */
+    .code-source { display: none; }
+
+    /* ─── RESPONSIVE ─────────────────────────────────────── */
+    @media (max-width: 800px) {
+      #sidebar { display: none; }
+      .chapter { padding: 28px 20px 48px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="layout">
+
+  <!-- ═══════════════════════════════════════════════════════
+       SIDEBAR NAVIGATION
+  ═══════════════════════════════════════════════════════ -->
+  <nav id="sidebar">
+
+    <div class="sidebar-brand">
+      <div class="brand-logo">AD</div>
+      <div>
+        <div class="brand-name">Algorithmen und</div>
+        <div class="brand-name">Datenstrukturen</div>
+      </div>
+    </div>
+
+    <!-- 
+    <div class="nav-section">
+      <div class="nav-group-label">KapitelLabel</div>
+      <a class="nav-link active" data-chapter="vorwort">Kapitel Name</a>
+    </div>
+    -->
+
+    <div class="nav-section">
+      <div class="nav-group-label">Allgemein</div>
+      <a class="nav-link active" data-chapter="vorwort">Vorwort</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-group-label">Laufzeitanalyse</div>
+      <a class="nav-link" data-chapter="laufzeitanalyse">Einführung</a>
+      <a class="nav-link" data-chapter="laufzeit-notation">Asymptotische Notation</a>
+      <a class="nav-link" data-chapter="laufzeit-klassen">Laufzeitklassen</a>
+      <a class="nav-link" data-chapter="laufzeit-methode1">Methode 1: Fkt. ineinander überführen</a>
+      <a class="nav-link" data-chapter="laufzeit-methode2">Methode 2: Rekursionsbaum</a>
+      <a class="nav-link" data-chapter="laufzeit-methode3">Methode 3: Master-Theorem</a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-group-label">Algorithmen</div>
+      <a class="nav-link" data-chapter="algorithmen">Überblick</a>
+      <div>
+        <div class="nav-group-label" style="padding-left: 28px">Sortieralgorithmen</div>
+        <a class="nav-link nav-sub" data-chapter="bubblesort">Sortieralgorithmen</a>
+        <a class="nav-link nav-sub" data-chapter="heapsort">Heapsort</a>
+        <a class="nav-link nav-sub" data-chapter="mergesort">Mergesort</a>
+        <a class="nav-link nav-sub" data-chapter="quicksort">Quicksort</a>
+        <a class="nav-link nav-sub" data-chapter="insertionsort">Insertionsort</a>
+        <a class="nav-link nav-sub" data-chapter="selectionsort">Selectionsort</a>
+        <a class="nav-link nav-sub" data-chapter="countingsort">Countingsort</a>
+        <a class="nav-link nav-sub" data-chapter="radixsort">Radixsort</a>
+        <a class="nav-link nav-sub" data-chapter="bucketsort">Weitere Sortieralgorithmen</a>
+      </div>
+      
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-group-label">Datenstrukturen</div>
+      <a class="nav-link" data-chapter="datenstrukturen">Überblick</a>
+      <div>
+        <div class="nav-group-label" style="padding-left: 28px">Heap</div>
+        <a class="nav-link nav-sub" data-chapter="maxheap">MaxHeap</a>
+        <a class="nav-link nav-sub" data-chapter="minheap">MinHeap</a>
+      </div>
+      
+    </div>
+
+  </nav><!-- /sidebar -->
+
+
+  <!-- ═══════════════════════════════════════════════════════
+       MAIN CONTENT
+  ═══════════════════════════════════════════════════════ -->
+  <main id="main">
+
+    <!-- ─── VORWORT ──────────────────────────────────────── -->
+    <section id="ch-vorwort" class="chapter active">
+      <h1>Vorwort</h1>
+      <p class="chapter-meta">Überblick über diesen Kurs und seine Kapitel</p>
+
+      <div class="chapter-body">
+        <p>
+          Dieser Kurs behandelt grundlegende Konzepte der Algorithmik und Datenstrukturen,
+          wie sie im Bachelorstudium Informatik an der FSU Jena gelehrt werden. Die Inhalte
+          orientieren sich am Standardwerk <em>Cormen et al. – Introduction to Algorithms (CLRS)</em>.
+        </p>
+
+        <div>
+          <h2>Themenübersicht</h2>
+          <ul>
+            <li><strong>Laufzeitanalyse</strong> – Asymptotische Notation, O-Kalkül, Komplexitätsklassen</li>
+            <li><strong>Algorithmen</strong> – Heapsort als Beispiel für effiziente, heapbasierte Sortierverfahren</li>
+            <li><strong>Datenstrukturen</strong> – MaxHeap und MinHeap als Array-basierte Baumstrukturen</li>
+          </ul>
+        </div>
+
+        <div>
+          <h2>Aufbau der Kapitel</h2>
+          <p>
+            Jedes Kapitel enthält eine Erklärung als Fließtext, Komplexitätstabellen und einen
+            Code-Viewer mit Implementierungen in Pseudocode, Java, Python und Prolog.
+            Neue Kapitel lassen sich einfach durch ein weiteres
+            <code>&lt;section class="chapter"&gt;</code> im HTML ergänzen.
+          </p>
+        </div>
+
+        <div class="info-box">
+          <p>
+            Den Code-Viewer findest du am Ende jedes Kapitels. Über das Dropdown im
+            Header des Viewers kannst du zwischen Pseudocode und den jeweiligen
+            Programmiersprachen wechseln.
+          </p>
+        </div>
+      </div>
+
+      <p class="code-viewer-label">Code-Beispiel</p>
+      <div class="code-viewer">
+        <div class="code-source" data-lang="Pseudocode">// Vorwort – kein Algorithmus, nur eine Beschreibung
+// Dieses Dokument gibt einen Überblick über den gesamten Kurs.
+
+function Begrüßung()
+  print("Willkommen zu Algorithmen und Datenstrukturen")
+  print("Themen: Laufzeitanalyse · Heapsort · MaxHeap · MinHeap")
+end function</div>
+      </div>
+    </section><!-- /vorwort -->
+
+
+    <!-- ─── LAUFZEITANALYSE ───────────────────────────────── -->
+    <section id="ch-laufzeitanalyse" class="chapter">
+      <h1>Laufzeitanalyse</h1>
+      <p class="chapter-meta">Asymptotische Notation und Komplexitätsbewertung von Algorithmen</p>
+
+      <div class="chapter-body">
+        <p>
+          Die Laufzeitanalyse bewertet, wie sich die Ausführungszeit eines Algorithmus
+          in Abhängigkeit von der Eingabegröße <em>n</em> verhält. Dabei interessiert uns vor
+          allem das <strong>asymptotische Verhalten</strong> – also das Wachstum für große <em>n</em>.
+        </p>
+
+        <div>
+          <h2>O-Notation (Groß-O)</h2>
+          <p>
+            Die O-Notation beschreibt eine <strong>obere Schranke</strong> der Laufzeit.
+            <code>T(n) = O(f(n))</code> bedeutet: <em>T(n)</em> wächst höchstens so schnell wie
+            <em>f(n)</em>, ab einem bestimmten Schwellwert n₀.
+          </p>
+        </div>
+
+        <div>
+          <h3>Häufige Komplexitätsklassen</h3>
+          <table class="complexity-table">
+            <thead>
+              <tr><th>Notation</th><th>Bezeichnung</th><th>Typische Beispiele</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>O(1)</td><td>Konstant</td><td>Array-Zugriff, Heap-Maximum lesen</td></tr>
+              <tr><td>O(log n)</td><td>Logarithmisch</td><td>Binäre Suche, Heap-Einfügen</td></tr>
+              <tr><td>O(n)</td><td>Linear</td><td>Lineare Suche, BuildHeap</td></tr>
+              <tr><td>O(n log n)</td><td>Log-linear</td><td>Heapsort, Mergesort</td></tr>
+              <tr><td>O(n²)</td><td>Quadratisch</td><td>Bubblesort, Insertionsort</td></tr>
+              <tr><td>O(2ⁿ)</td><td>Exponentiell</td><td>Naive Teilmengenproblem</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div>
+          <h2>Weitere Notationen</h2>
+          <ul>
+            <li><strong>Ω-Notation</strong> – untere Schranke: der Algorithmus braucht <em>mindestens</em> so viel Zeit</li>
+            <li><strong>Θ-Notation</strong> – enge Schranke: obere und untere Schranke stimmen überein</li>
+            <li><strong>o-Notation</strong> – echte obere Schranke: strikt kleiner, nicht gleich</li>
+          </ul>
+        </div>
+
+        <div class="info-box">
+          <p>
+            Konstante Faktoren und kleinere Terme werden bei der asymptotischen Analyse ignoriert.
+            <code>T(n) = 3n² + 5n + 7</code> ist daher einfach <strong>O(n²)</strong>.
+          </p>
+        </div>
+      </div>
+
+      <p class="code-viewer-label">Pseudocode-Beispiele</p>
+      <div class="code-viewer">
+        <div class="code-source" data-lang="Pseudocode">// Laufzeitanalyse – Beispiele für verschiedene Komplexitätsklassen
+
+// O(1) – konstant: kein Schleifendurchlauf, direkte Operation
+function Maximum(A)
+  return A[1]           // MaxHeap-Eigenschaft: Maximum immer an Position 1
+end function
+
+// O(n) – linear: einmalige Schleife über alle Elemente
+function Suche(A, key)
+  for i = 1 to length(A) do
+    if A[i] == key then return i
+    end if
+  end for
+  return -1
+end function
+
+// O(n²) – quadratisch: verschachtelte Schleife
+function BubbleSort(A)
+  for i = 1 to length(A) do
+    for j = 1 to length(A) - i do
+      if A[j] > A[j+1] then
+        swap(A[j], A[j+1])
+      end if
+    end for
+  end for
+end function</div>
+        <div class="code-source" data-lang="Java">public class LaufzeitBeispiele {
+
+    // O(1) – konstante Zeit
+    public static int maximum(int[] A) {
+        return A[0]; // MaxHeap: größtes Element immer an Index 0
+    }
+
+    // O(n) – lineares Suchen
+    public static int suche(int[] A, int key) {
+        for (int i = 0; i < A.length; i++) {
+            if (A[i] == key) return i;
+        }
+        return -1;
+    }
+
+    // O(n²) – Bubblesort als Beispiel
+    public static void bubbleSort(int[] A) {
+        for (int i = 0; i < A.length; i++) {
+            for (int j = 0; j < A.length - i - 1; j++) {
+                if (A[j] > A[j + 1]) {
+                    int tmp = A[j]; A[j] = A[j + 1]; A[j + 1] = tmp;
+                }
+            }
+        }
+    }
+}</div>
+        <div class="code-source" data-lang="Python">## O(1) – konstante Zeit
+def maximum(A):
+    return A[0]  # MaxHeap: größtes Element immer an Index 0
+
+## O(n) – lineares Suchen
+def suche(A, key):
+    for i, val in enumerate(A):
+        if val == key:
+            return i
+    return -1
+
+## O(n²) – Bubblesort
+def bubble_sort(A):
+    n = len(A)
+    for i in range(n):
+        for j in range(n - i - 1):
+            if A[j] > A[j + 1]:
+                A[j], A[j + 1] = A[j + 1], A[j]</div>
+      </div>
+    </section><!-- /laufzeitanalyse -->
+
+
+    <!-- ─── ALGORITHMEN ÜBERBLICK ─────────────────────────── -->
+    <section id="ch-algorithmen" class="chapter">
+      <h1>Algorithmen</h1>
+      <p class="chapter-meta">Grundlegende Begriffe und Klassifikation von Algorithmen</p>
+
+      <div class="chapter-body">
+        <p>
+          Ein <strong>Algorithmus</strong> ist eine endliche, präzise Folge von Anweisungen,
+          die ein gegebenes Problem für alle zulässigen Eingaben korrekt löst und terminiert.
+        </p>
+
+        <div>
+          <h2>Wichtige Eigenschaften</h2>
+          <ul>
+            <li><strong>Korrektheit</strong> – Das Ergebnis ist für alle Eingaben richtig.</li>
+            <li><strong>Terminierung</strong> – Der Algorithmus hält nach endlich vielen Schritten an.</li>
+            <li><strong>Effizienz</strong> – Zeit- und Speicherkomplexität sind vertretbar.</li>
+            <li><strong>Determiniertheit</strong> – Gleiche Eingabe liefert immer gleiche Ausgabe.</li>
+          </ul>
+        </div>
+
+        <div>
+          <h2>Klassifikation von Sortieralgorithmen</h2>
+          <table class="complexity-table">
+            <thead>
+              <tr><th>Algorithmus</th><th>Worst Case</th><th>Stabil?</th><th>In-Place?</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Heapsort</td><td>O(n log n)</td><td>Nein</td><td>Ja</td></tr>
+              <tr><td>Mergesort</td><td>O(n log n)</td><td>Ja</td><td>Nein</td></tr>
+              <tr><td>Quicksort</td><td>O(n²)</td><td>Nein</td><td>Ja</td></tr>
+              <tr><td>Insertionsort</td><td>O(n²)</td><td>Ja</td><td>Ja</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div>
+          <h2>In diesem Kurs</h2>
+          <p>
+            Als konkretes Beispiel eines effizienten Sortierverfahrens wird
+            <strong>Heapsort</strong> behandelt. Er garantiert O(n log n) in allen Fällen
+            und benötigt keinen zusätzlichen Speicher (in-place).
+          </p>
+        </div>
+      </div>
+    </section><!-- /algorithmen -->
+
+
+    <!-- ─── HEAPSORT ──────────────────────────────────────── -->
+    <section id="ch-heapsort" class="chapter">
+      <h1>Heapsort</h1>
+      <p class="chapter-meta">Algorithmen › Heapsort &nbsp;·&nbsp; Laufzeit: O(n log n) in allen Fällen</p>
+
+      <div class="chapter-body">
+        <p>
+          Heapsort ist ein vergleichsbasierter Sortieralgorithmus, der auf der Datenstruktur
+          <strong>MaxHeap</strong> aufbaut. Er kombiniert die Vorteile von Insertionsort
+          (in-place) mit denen von Mergesort (O(n log n) garantiert).
+        </p>
+
+        <div>
+          <h2>Ablauf in zwei Phasen</h2>
+          <ul>
+            <li>
+              <strong>Phase 1 – BuildMaxHeap:</strong> Das gesamte Array wird in einen gültigen
+              MaxHeap umgewandelt. Das größte Element steht danach an Stelle A[0].
+              Laufzeit: O(n).
+            </li>
+            <li>
+              <strong>Phase 2 – Sortierschleife:</strong> Das Maximum A[0] wird mit dem letzten
+              unsortierten Element getauscht und ans Ende „gelegt". Die Heapgröße wird um 1
+              verringert und <em>MaxHeapify</em> stellt die Heap-Eigenschaft wieder her.
+              Dieser Schritt wiederholt sich n−1 mal. Laufzeit: O(n log n).
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <h3>Komplexität</h3>
+          <table class="complexity-table">
+            <thead>
+              <tr><th>Fall</th><th>Laufzeit</th><th>Speicher</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Best Case</td><td>O(n log n)</td><td>O(1)</td></tr>
+              <tr><td>Average Case</td><td>O(n log n)</td><td>O(1)</td></tr>
+              <tr><td>Worst Case</td><td>O(n log n)</td><td>O(1)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="info-box">
+          <p>
+            Heapsort ist <strong>in-place</strong> (sortiert ohne zusätzlichen Speicher) und
+            garantiert O(n log n) — unabhängig von der Eingabe. Es ist jedoch
+            <strong>nicht stabil</strong>, d.h. gleiche Elemente können ihre relative
+            Reihenfolge ändern.
+          </p>
+        </div>
+
+        <div>
+          <h2>Voraussetzung: MaxHeap</h2>
+          <p>
+            Heapsort setzt die Operationen <em>BuildMaxHeap</em> und <em>MaxHeapify</em> voraus,
+            die im Kapitel <strong>MaxHeap</strong> (Datenstrukturen) detailliert erklärt werden.
+          </p>
+        </div>
+      </div>
+
+      <p class="code-viewer-label">Implementierung</p>
+      <div class="code-viewer">
+        <div class="code-source" data-lang="Pseudocode" data-file="implemented/pseudocode/Heapsort.txt"></div>
+        <div class="code-source" data-lang="Java" data-file="implemented/java/Heapsort.java"></div>
+        <div class="code-source" data-lang="Python" data-file="implemented/python/Heapsort.py"></div>
+        <div class="code-source" data-lang="Prolog" data-file="implemented/prolog/Heapsort.pl"></div>
+      </div>
+    </section><!-- /heapsort -->
+
+
+    <!-- ─── DATENSTRUKTUREN ÜBERBLICK ─────────────────────── -->
+    <section id="ch-datenstrukturen" class="chapter">
+      <h1>Datenstrukturen</h1>
+      <p class="chapter-meta">Effiziente Organisation und Verwaltung von Daten</p>
+
+      <div class="chapter-body">
+        <p>
+          Eine <strong>Datenstruktur</strong> legt fest, wie Daten im Speicher angeordnet,
+          gespeichert und verwaltet werden. Die Wahl der richtigen Datenstruktur beeinflusst
+          die Laufzeit von Algorithmen erheblich.
+        </p>
+
+        <div>
+          <h2>Binäre Heaps</h2>
+          <p>
+            Ein <strong>binärer Heap</strong> ist ein vollständiger binärer Baum, der
+            als flaches Array gespeichert wird. Für einen Knoten an Index <em>i</em>
+            (0-basiert) gilt:
+          </p>
+          <ul>
+            <li>Linkes Kind: Index <code>2·i + 1</code></li>
+            <li>Rechtes Kind: Index <code>2·i + 2</code></li>
+            <li>Elternknoten: Index <code>⌊(i−1) / 2⌋</code></li>
+          </ul>
+        </div>
+
+        <div class="img-wrap">
+          <img src="image.png" alt="Heap als Baumstruktur und Array-Repräsentation" class="chapter-img" />
+          <p class="img-caption">Heap-Struktur: Baumdarstellung (oben) und Array-Repräsentation (unten)</p>
+        </div>
+
+        <div>
+          <h2>Heap-Varianten in diesem Kurs</h2>
+          <table class="complexity-table">
+            <thead>
+              <tr><th>Typ</th><th>Heap-Eigenschaft</th><th>Wurzel enthält</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>MaxHeap</td><td>A[parent] ≥ A[child]</td><td>Maximum</td></tr>
+              <tr><td>MinHeap</td><td>A[parent] ≤ A[child]</td><td>Minimum</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section><!-- /datenstrukturen -->
+
+
+    <!-- ─── MAXHEAP ───────────────────────────────────────── -->
+    <section id="ch-maxheap" class="chapter">
+      <h1>MaxHeap</h1>
+      <p class="chapter-meta">Datenstrukturen › MaxHeap &nbsp;·&nbsp; Heap-Eigenschaft: A[parent(i)] ≥ A[i]</p>
+
+      <div class="chapter-body">
+        <p>
+          Ein <strong>MaxHeap</strong> ist ein vollständiger binärer Baum (im Array gespeichert),
+          bei dem jeder Elternknoten <strong>größer oder gleich</strong> seinen Kindern ist.
+          Das <strong>Maximum</strong> steht immer an Position A[0] und kann in O(1) abgerufen werden.
+        </p>
+
+        <div>
+          <h2>Operationen und Laufzeiten</h2>
+          <table class="complexity-table">
+            <thead>
+              <tr><th>Operation</th><th>Laufzeit</th><th>Beschreibung</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>BuildMaxHeap</td><td>O(n)</td><td>Array in gültigen MaxHeap umwandeln</td></tr>
+              <tr><td>MaxHeapify</td><td>O(log n)</td><td>Heap-Eigenschaft ab Index i wiederherstellen</td></tr>
+              <tr><td>MaxHeapInsert</td><td>O(log n)</td><td>Neuen Schlüssel einfügen</td></tr>
+              <tr><td>ExtractMax</td><td>O(log n)</td><td>Maximum entfernen und zurückgeben</td></tr>
+              <tr><td>Maximum lesen</td><td>O(1)</td><td>A[0] zurückgeben</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div>
+          <h2>MaxHeapify – Kernoperation</h2>
+          <p>
+            <em>MaxHeapify(A, i)</em> stellt sicher, dass der Teilbaum ab Index <em>i</em>
+            die MaxHeap-Eigenschaft erfüllt. Dazu wird der Knoten bei Bedarf mit dem größeren
+            seiner Kinder getauscht und rekursiv weiter nach unten korrigiert.
+          </p>
+        </div>
+
+        <div>
+          <h2>BuildMaxHeap</h2>
+          <p>
+            Durch Aufruf von <em>MaxHeapify</em> auf allen inneren Knoten (von unten nach oben)
+            wird ein beliebiges Array in einen MaxHeap umgewandelt. Obwohl MaxHeapify einzeln
+            O(log n) kostet, ist die Gesamtlaufzeit von BuildMaxHeap nur <strong>O(n)</strong>.
+          </p>
+        </div>
+
+        <div class="info-box">
+          <p>
+            Der MaxHeap wird von Heapsort als Grundstruktur verwendet.
+            Das Verständnis von <em>MaxHeapify</em> und <em>BuildMaxHeap</em> ist daher
+            Voraussetzung für Heapsort.
+          </p>
+        </div>
+      </div>
+
+      <p class="code-viewer-label">Implementierung</p>
+      <div class="code-viewer">
+        <div class="code-source" data-lang="Pseudocode" data-file="implemented/pseudocode/MaxHeap.txt"></div>
+        <div class="code-source" data-lang="Java" data-file="implemented/java/MaxHeap.java"></div>
+        <div class="code-source" data-lang="Python" data-file="implemented/python/MaxHeap.py"></div>
+        <div class="code-source" data-lang="Prolog" data-file="implemented/prolog/MaxHeap.pl"></div>
+      </div>
+    </section><!-- /maxheap -->
+
+
+    <!-- ─── MINHEAP ───────────────────────────────────────── -->
+    <section id="ch-minheap" class="chapter">
+      <h1>MinHeap</h1>
+      <p class="chapter-meta">Datenstrukturen › MinHeap &nbsp;·&nbsp; Heap-Eigenschaft: A[parent(i)] ≤ A[i]</p>
+
+      <div class="chapter-body">
+        <p>
+          Ein <strong>MinHeap</strong> ist das Gegenstück zum MaxHeap: Jeder Elternknoten
+          ist <strong>kleiner oder gleich</strong> seinen Kindern. Das <strong>Minimum</strong>
+          steht immer an Position A[0] und kann in O(1) abgerufen werden.
+        </p>
+
+        <div>
+          <h2>Unterschied zum MaxHeap</h2>
+          <p>
+            Struktur und Operationen sind identisch zum MaxHeap – lediglich die
+            Vergleichsrichtung ist umgekehrt:
+          </p>
+          <ul>
+            <li>MaxHeap: <code>A[parent] ≥ A[child]</code> → Wurzel = Maximum</li>
+            <li>MinHeap: <code>A[parent] ≤ A[child]</code> → Wurzel = Minimum</li>
+          </ul>
+        </div>
+
+        <div>
+          <h2>Operationen und Laufzeiten</h2>
+          <table class="complexity-table">
+            <thead>
+              <tr><th>Operation</th><th>Laufzeit</th><th>Beschreibung</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>BuildMinHeap</td><td>O(n)</td><td>Array in gültigen MinHeap umwandeln</td></tr>
+              <tr><td>MinHeapify</td><td>O(log n)</td><td>Heap-Eigenschaft ab Index i wiederherstellen</td></tr>
+              <tr><td>MinHeapInsert</td><td>O(log n)</td><td>Neuen Schlüssel einfügen</td></tr>
+              <tr><td>ExtractMin</td><td>O(log n)</td><td>Minimum entfernen und zurückgeben</td></tr>
+              <tr><td>Minimum lesen</td><td>O(1)</td><td>A[0] zurückgeben</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div>
+          <h2>Typische Anwendungsfälle</h2>
+          <ul>
+            <li><strong>Prioritätswarteschlangen</strong> – z.B. im Dijkstra-Algorithmus für kürzeste Wege</li>
+            <li><strong>Scheduling</strong> – immer den Prozess mit kleinster Priorität zuerst</li>
+            <li><strong>K-smallest</strong> – Effizientes Abrufen der k kleinsten Elemente aus einer Menge</li>
+          </ul>
+        </div>
+
+        <div class="info-box">
+          <p>
+            MinHeapInsert beginnt mit dem Wert +∞ an der neuen Position und ruft dann
+            <em>MinHeapDecreaseKey</em> auf, um den tatsächlichen Schlüssel einzusetzen und
+            nach oben zu "sickern" (bubble-up).
+          </p>
+        </div>
+      </div>
+
+      <p class="code-viewer-label">Implementierung</p>
+      <div class="code-viewer">
+        <div class="code-source" data-lang="Pseudocode" data-file="implemented/pseudocode/MinHeap.txt"></div>
+        <div class="code-source" data-lang="Java" data-file="implemented/java/MinHeap.java"></div>
+        <div class="code-source" data-lang="Python" data-file="implemented/python/MinHeap.py"></div>
+        <div class="code-source" data-lang="Prolog" data-file="implemented/prolog/MinHeap.pl"></div>
+      </div>
+    </section><!-- /minheap -->
+
+
+    <!-- ─── LAUFZEIT: ASYMPTOTISCHE NOTATION ─────────────── -->
+    <section id="ch-laufzeit-notation" class="chapter">
+      <h1>Asymptotische Notation</h1>
+      <p class="chapter-meta">Laufzeitanalyse › Asymptotische Notation &nbsp;·&nbsp; O, Ω, Θ, o, ω</p>
+
+      <div class="chapter-body">
+        <p>
+          <!-- TODO: Erklärung der formalen Definitionen von O-, Ω-, Θ-Notation.
+               Grenzwert-Definition, Konstanten c und n₀, formale Beweise. -->
+          Dieser Abschnitt wird noch ausgearbeitet.
+        </p>
+
+        <div class="info-box">
+          <p>Platzhalter – hier kommt die formale Definition der asymptotischen Notationen.</p>
+        </div>
+      </div>
+
+      <p class="code-viewer-label">Beispiel</p>
+      <div class="code-viewer">
+        <div class="code-source" data-lang="Pseudocode">// TODO: Asymptotische Notation – Beispiele folgen</div>
+      </div>
+    </section>
+
+
+    <!-- ─── LAUFZEIT: LAUFZEITKLASSEN ────────────────────── -->
+    <section id="ch-laufzeit-klassen" class="chapter">
+      <h1>Laufzeitklassen</h1>
+      <p class="chapter-meta">Laufzeitanalyse › Laufzeitklassen &nbsp;·&nbsp; O(1), O(log n), O(n), …</p>
+
+      <div class="chapter-body">
+        <p>
+          <!-- TODO: Vergleich der Wachstumsraten, Grafiken, typische Algorithmen je Klasse. -->
+          Dieser Abschnitt wird noch ausgearbeitet.
+        </p>
+
+        <div class="info-box">
+          <p>Platzhalter – hier kommen Wachstumskurven und Beispiele für jede Laufzeitklasse.</p>
+        </div>
+      </div>
+
+      <p class="code-viewer-label">Beispiel</p>
+      <div class="code-viewer">
+        <div class="code-source" data-lang="Pseudocode">// TODO: Laufzeitklassen – Beispiele folgen</div>
+      </div>
+    </section>
+
+
+    <!-- ─── LAUFZEIT: METHODE 1 ───────────────────────────── -->
+    <section id="ch-laufzeit-methode1" class="chapter">
+      <h1>Methode 1: Funktionen ineinander überführen</h1>
+      <p class="chapter-meta">Laufzeitanalyse › Methode 1 &nbsp;·&nbsp; Direkte Abschätzung</p>
+
+      <div class="chapter-body">
+        <p>
+          <!-- TODO: Technik, Laufzeit direkt aus dem Code abzulesen: Schleifen zählen,
+               Schachtelungstiefe bestimmen, dominante Terme isolieren. -->
+          Dieser Abschnitt wird noch ausgearbeitet.
+        </p>
+
+        <div class="info-box">
+          <p>Platzhalter – hier kommt die Methode zum direkten Überführen von Funktionen in Schranken.</p>
+        </div>
+      </div>
+
+      <p class="code-viewer-label">Beispiel</p>
+      <div class="code-viewer">
+        <div class="code-source" data-lang="Pseudocode">// TODO: Methode 1 – Beispiele folgen</div>
+      </div>
+    </section>
+
+
+    <!-- ─── LAUFZEIT: METHODE 2 ───────────────────────────── -->
+    <section id="ch-laufzeit-methode2" class="chapter">
+      <h1>Methode 2: Rekursionsbaum</h1>
+      <p class="chapter-meta">Laufzeitanalyse › Methode 2 &nbsp;·&nbsp; Visualisierung von Rekurrenzgleichungen</p>
+
+      <div class="chapter-body">
+        <p>
+          <!-- TODO: Aufbau des Rekursionsbaums, Summe der Kosten pro Ebene,
+               Blattanzahl bestimmen, Gesamtkosten ablesen. Beispiel: T(n) = 2·T(n/2) + n. -->
+          Dieser Abschnitt wird noch ausgearbeitet.
+        </p>
+
+        <div class="info-box">
+          <p>Platzhalter – hier kommt die Rekursionsbaum-Methode mit Schritt-für-Schritt-Beispiel.</p>
+        </div>
+      </div>
+
+      <p class="code-viewer-label">Beispiel</p>
+      <div class="code-viewer">
+        <div class="code-source" data-lang="Pseudocode">// TODO: Rekursionsbaum – Beispiel folgt
+// Beispiel-Rekurrenz: T(n) = 2·T(n/2) + n  → O(n log n)</div>
+      </div>
+    </section>
+
+
+    <!-- ─── LAUFZEIT: METHODE 3 ───────────────────────────── -->
+    <section id="ch-laufzeit-methode3" class="chapter">
+      <h1>Methode 3: Master-Theorem</h1>
+      <p class="chapter-meta">Laufzeitanalyse › Methode 3 &nbsp;·&nbsp; T(n) = a·T(n/b) + f(n)</p>
+
+      <div class="chapter-body">
+        <p>
+          <!-- TODO: Drei Fälle des Master-Theorems, Bedingungen, Anwendungsbeispiele.
+               Verweis: CLRS Kapitel 4. -->
+          Dieser Abschnitt wird noch ausgearbeitet.
+        </p>
+
+        <div class="info-box">
+          <p>Platzhalter – hier kommen die drei Fälle des Master-Theorems mit Beispielen.</p>
+        </div>
+      </div>
+
+      <p class="code-viewer-label">Beispiel</p>
+      <div class="code-viewer">
+        <div class="code-source" data-lang="Pseudocode">// TODO: Master-Theorem – Beispiele folgen
+// Form: T(n) = a·T(n/b) + f(n)
+// Fall 1: f(n) = O(n^(log_b(a) - ε))  →  T(n) = Θ(n^log_b(a))
+// Fall 2: f(n) = Θ(n^log_b(a))        →  T(n) = Θ(n^log_b(a) · log n)
+// Fall 3: f(n) = Ω(n^(log_b(a) + ε))  →  T(n) = Θ(f(n))</div>
+      </div>
+    </section>
+
+
+    <!-- ─── BUBBLESORT ────────────────────────────────────── -->
+    <section id="ch-bubblesort" class="chapter">
+      <h1>Bubblesort</h1>
+      <p class="chapter-meta">Algorithmen › Sortieralgorithmen › Bubblesort &nbsp;·&nbsp; Laufzeit: O(n²)</p>
+
+      <div class="chapter-body">
+        <p>
+          <!-- TODO: Funktionsprinzip, Vergleiche und Tausche, Best Case O(n) mit Early-Exit. -->
+          Dieser Abschnitt wird noch ausgearbeitet.
+        </p>
+
+        <div class="info-box">
+          <p>Platzhalter – hier kommt die Erklärung von Bubblesort mit Pseudocode und Implementierungen.</p>
+        </div>
+      </div>
+
+      <p class="code-viewer-label">Implementierung</p>
+      <div class="code-viewer">
+        <div class="code-source" data-lang="Pseudocode">// TODO: Bubblesort – Pseudocode folgt</div>
+        <div class="code-source" data-lang="Java">// TODO: Bubblesort – Java-Implementierung folgt</div>
+        <div class="code-source" data-lang="Python">## TODO: Bubblesort – Python-Implementierung folgt</div>
+      </div>
+    </section>
+
+
+    <!-- ─── MERGESORT ─────────────────────────────────────── -->
+    <section id="ch-mergesort" class="chapter">
+      <h1>Mergesort</h1>
+      <p class="chapter-meta">Algorithmen › Sortieralgorithmen › Mergesort &nbsp;·&nbsp; Laufzeit: O(n log n)</p>
+
+      <div class="chapter-body">
+        <p>
+          <!-- TODO: Divide-and-Conquer-Prinzip, Merge-Schritt, Rekurrenz T(n) = 2T(n/2) + n,
+               Stabiles Sortieren, Speicherverbrauch O(n). -->
+          Dieser Abschnitt wird noch ausgearbeitet.
+        </p>
+
+        <div class="info-box">
+          <p>Platzhalter – hier kommt die Erklärung von Mergesort mit Pseudocode und Implementierungen.</p>
+        </div>
+      </div>
+
+      <p class="code-viewer-label">Implementierung</p>
+      <div class="code-viewer">
+        <div class="code-source" data-lang="Pseudocode" data-file="implemented/pseudocode/Mergesort.txt"></div>
+        <div class="code-source" data-lang="Java" data-file="implemented/java/Mergesort.java"></div>
+        <div class="code-source" data-lang="Python" data-file="implemented/python/Mergesort.py"></div>
+        <div class="code-source" data-lang="Prolog" data-file="implemented/prolog/Mergesort.pl"></div>
+      </div>
+    </section>
+
+
+    <!-- ─── QUICKSORT ─────────────────────────────────────── -->
+    <section id="ch-quicksort" class="chapter">
+      <h1>Quicksort</h1>
+      <p class="chapter-meta">Algorithmen › Sortieralgorithmen › Quicksort &nbsp;·&nbsp; Average: O(n log n) · Worst: O(n²)</p>
+
+      <div class="chapter-body">
+        <p>
+          <!-- TODO: Partition-Schritt, Pivot-Wahl, Average vs. Worst Case,
+               Randomisiertes Quicksort, Vergleich mit Mergesort. -->
+          Dieser Abschnitt wird noch ausgearbeitet.
+        </p>
+
+        <div class="info-box">
+          <p>Platzhalter – hier kommt die Erklärung von Quicksort mit Pseudocode und Implementierungen.</p>
+        </div>
+      </div>
+
+      <p class="code-viewer-label">Implementierung</p>
+      <div class="code-viewer">
+        <div class="code-source" data-lang="Pseudocode" data-file="implemented/pseudocode/Quicksort.txt"></div>
+        <div class="code-source" data-lang="Java" data-file="implemented/java/Quicksort.java"></div>
+        <div class="code-source" data-lang="Python" data-file="implemented/python/Quicksort.py"></div>
+        <div class="code-source" data-lang="Prolog" data-file="implemented/prolog/Quicksort.pl"></div>
+      </div>
+    </section>
+
+
+    <!-- ─── INSERTIONSORT ─────────────────────────────────── -->
+    <section id="ch-insertionsort" class="chapter">
+      <h1>Insertionsort</h1>
+      <p class="chapter-meta">Algorithmen › Sortieralgorithmen › Insertionsort &nbsp;·&nbsp; Laufzeit: O(n²) · Best Case: O(n)</p>
+
+      <div class="chapter-body">
+        <p>
+          <!-- TODO: Funktionsprinzip (wie Karten sortieren), stabile Sortierung,
+               effizient für kleine und fast-sortierte Arrays. -->
+          Dieser Abschnitt wird noch ausgearbeitet.
+        </p>
+
+        <div class="info-box">
+          <p>Platzhalter – hier kommt die Erklärung von Insertionsort mit Pseudocode und Implementierungen.</p>
+        </div>
+      </div>
+
+      <p class="code-viewer-label">Implementierung</p>
+      <div class="code-viewer">
+        <div class="code-source" data-lang="Pseudocode">// TODO: Insertionsort – Pseudocode folgt</div>
+        <div class="code-source" data-lang="Java">// TODO: Insertionsort – Java-Implementierung folgt</div>
+        <div class="code-source" data-lang="Python">## TODO: Insertionsort – Python-Implementierung folgt</div>
+      </div>
+    </section>
+
+
+    <!-- ─── SELECTIONSORT ─────────────────────────────────── -->
+    <section id="ch-selectionsort" class="chapter">
+      <h1>Selectionsort</h1>
+      <p class="chapter-meta">Algorithmen › Sortieralgorithmen › Selectionsort &nbsp;·&nbsp; Laufzeit: O(n²)</p>
+
+      <div class="chapter-body">
+        <p>
+          <!-- TODO: Minimum suchen und an den Anfang tauschen, n-1 Durchläufe,
+               nicht stabil, aber minimale Anzahl an Tauschen. -->
+          Dieser Abschnitt wird noch ausgearbeitet.
+        </p>
+
+        <div class="info-box">
+          <p>Platzhalter – hier kommt die Erklärung von Selectionsort mit Pseudocode und Implementierungen.</p>
+        </div>
+      </div>
+
+      <p class="code-viewer-label">Implementierung</p>
+      <div class="code-viewer">
+        <div class="code-source" data-lang="Pseudocode" data-file="implemented/pseudocode/Selectionsort.txt"></div>
+        <div class="code-source" data-lang="Java" data-file="implemented/java/Selectionsort.java"></div>
+        <div class="code-source" data-lang="Python" data-file="implemented/python/Selectionsort.py"></div>
+        <div class="code-source" data-lang="Prolog" data-file="implemented/prolog/Selectionsort.pl"></div>
+      </div>
+    </section>
+
+
+    <!-- ─── COUNTINGSORT ─────────────────────────────────── -->
+    <section id="ch-countingsort" class="chapter">
+      <h1>Countingsort</h1>
+      <p class="chapter-meta">Algorithmen › Sortieralgorithmen › Countingsort &nbsp;·&nbsp; Laufzeit: O(n + k)</p>
+
+      <div class="chapter-body">
+        <p>
+          <!-- TODO: Nicht-vergleichsbasiert, Zählen der Vorkommen, kumulierte Summen,
+               stabile Sortierung, Einschränkung auf ganzzahlige Schlüssel im Bereich [0, k]. -->
+          Dieser Abschnitt wird noch ausgearbeitet.
+        </p>
+
+        <div class="info-box">
+          <p>Platzhalter – hier kommt die Erklärung von Countingsort mit Pseudocode und Implementierungen.</p>
+        </div>
+      </div>
+
+      <p class="code-viewer-label">Implementierung</p>
+      <div class="code-viewer">
+        <div class="code-source" data-lang="Pseudocode" data-file="implemented/pseudocode/Countingsort.txt"></div>
+        <div class="code-source" data-lang="Java" data-file="implemented/java/Countingsort.java"></div>
+        <div class="code-source" data-lang="Python" data-file="implemented/python/Countingsort.py"></div>
+        <div class="code-source" data-lang="Prolog" data-file="implemented/prolog/Countingsort.pl"></div>
+      </div>
+    </section>
+
+
+    <!-- ─── RADIXSORT ─────────────────────────────────────── -->
+    <section id="ch-radixsort" class="chapter">
+      <h1>Radixsort</h1>
+      <p class="chapter-meta">Algorithmen › Sortieralgorithmen › Radixsort &nbsp;·&nbsp; Laufzeit: O(d · (n + k))</p>
+
+      <div class="chapter-body">
+        <p>
+          <!-- TODO: Ziffernweises Sortieren (LSD/MSD), stabile Basisoperationen (Countingsort),
+               d Ziffernstellen, Anwendung bei Zahlen und Strings. -->
+          Dieser Abschnitt wird noch ausgearbeitet.
+        </p>
+
+        <div class="info-box">
+          <p>Platzhalter – hier kommt die Erklärung von Radixsort mit Pseudocode und Implementierungen.</p>
+        </div>
+      </div>
+
+      <p class="code-viewer-label">Implementierung</p>
+      <div class="code-viewer">
+        <div class="code-source" data-lang="Pseudocode" data-file="implemented/pseudocode/Radixsort.txt"></div>
+        <div class="code-source" data-lang="Java" data-file="implemented/java/Radixsort.java"></div>
+        <div class="code-source" data-lang="Python" data-file="implemented/python/Radixsort.py"></div>
+        <div class="code-source" data-lang="Prolog" data-file="implemented/prolog/Radixsort.pl"></div>
+      </div>
+    </section>
+
+
+    <!-- ─── BUCKETSORT / WEITERE SORTIERALGORITHMEN ──────── -->
+    <section id="ch-bucketsort" class="chapter">
+      <h1>Weitere Sortieralgorithmen</h1>
+      <p class="chapter-meta">Algorithmen › Sortieralgorithmen › Bucketsort &amp; mehr &nbsp;·&nbsp; Laufzeit: O(n) avg.</p>
+
+      <div class="chapter-body">
+        <p>
+          <!-- TODO: Bucketsort, Timsort, Shellsort – je nach Kursinhalt auswählen.
+               Bucketsort: gleichmäßig verteilte Eingaben, Elemente in Buckets aufteilen,
+               Buckets sortieren und zusammenführen. -->
+          Dieser Abschnitt wird noch ausgearbeitet.
+        </p>
+
+        <div class="info-box">
+          <p>Platzhalter – hier kommen Bucketsort und weitere Sortierverfahren nach Bedarf.</p>
+        </div>
+      </div>
+
+      <p class="code-viewer-label">Implementierung</p>
+      <div class="code-viewer">
+        <div class="code-source" data-lang="Pseudocode">// TODO: Bucketsort – Pseudocode folgt</div>
+        <div class="code-source" data-lang="Java">// TODO: Bucketsort – Java-Implementierung folgt</div>
+        <div class="code-source" data-lang="Python">## TODO: Bucketsort – Python-Implementierung folgt</div>
+      </div>
+    </section>
+
+
+  </main><!-- /main -->
+</div><!-- /layout -->
+
+
+<script>
+  /* ============================================================
+     CODE VIEWER – wird automatisch aus .code-viewer Divs gebaut.
+
+     Neues Kapitel hinzufügen:
+       1. <section id="ch-meinkapitel" class="chapter"> in #main
+       2. <a class="nav-link" data-chapter="meinkapitel"> im Sidebar
+       3. Im Section ein <div class="code-viewer"> mit
+          <div class="code-source" data-lang="Pseudocode"> ... </div>
+          oder data-file="implemented/java/..." für externe Dateien.
+  ============================================================ */
+
+  const LANG_TO_HLJS = {
+    pseudocode: 'plaintext',
+    java:       'java',
+    python:     'python',
+    prolog:     'prolog',
+  };
+
+  async function fetchText(path) {
+    try {
+      const r = await fetch(path);
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      return await r.text();
+    } catch {
+      return null;
+    }
+  }
+
+  function buildCodeViewer(viewerEl, chapterTitle) {
+    const sources = [...viewerEl.querySelectorAll('.code-source')];
+    if (!sources.length) return;
+
+    const langs = sources.map(s => s.dataset.lang);
+
+    // Build bar
+    const bar = document.createElement('div');
+    bar.className = 'code-viewer-bar';
+
+    const dotsHtml = `<span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span>`;
+    const titleHtml = `<span class="viewer-title">${chapterTitle}</span>`;
+    const selectHtml = langs.length > 1
+      ? `<select class="lang-select">${langs.map(l => `<option value="${l}">${l}</option>`).join('')}</select>`
+      : `<span style="font-family:var(--mono);font-size:.78rem;color:var(--muted);padding:4px 0">${langs[0]}</span>`;
+    const downloadHtml = `<a class="download-btn" download>&#8595; Datei</a>`;
+    const copyHtml = `<button class="copy-btn">kopieren</button>`;
+
+    bar.innerHTML = dotsHtml + titleHtml + selectHtml + downloadHtml + copyHtml;
+
+    const wrap = document.createElement('div');
+    wrap.className = 'code-wrap';
+    const pre  = document.createElement('pre');
+    const code = document.createElement('code');
+    code.className = 'hljs';
+    pre.appendChild(code);
+    wrap.appendChild(pre);
+
+    // Rebuild viewer DOM: bar + wrap + hidden sources
+    viewerEl.innerHTML = '';
+    viewerEl.appendChild(bar);
+    viewerEl.appendChild(wrap);
+    sources.forEach(s => viewerEl.appendChild(s));
+
+    const selectEl   = bar.querySelector('.lang-select');
+    const titleEl    = bar.querySelector('.viewer-title');
+    const copyBtn    = bar.querySelector('.copy-btn');
+    const downloadEl = bar.querySelector('.download-btn');
+
+    async function loadLang(lang) {
+      const src = sources.find(s => s.dataset.lang === lang);
+      if (!src) return;
+
+      let text = src.dataset.file ? await fetchText(src.dataset.file) : null;
+      if (text === null) {
+        text = src.textContent.trim() || `// Kein Inhalt für ${lang} verfügbar.`;
+      }
+
+      const hljsLang = LANG_TO_HLJS[lang.toLowerCase()] ?? 'plaintext';
+      code.textContent = text;
+      code.className   = `hljs language-${hljsLang}`;
+      hljs.highlightElement(code);
+      if (titleEl) titleEl.textContent = `${chapterTitle} – ${lang}`;
+
+      if (src.dataset.file) {
+        downloadEl.href            = src.dataset.file;
+        downloadEl.download        = src.dataset.file.split('/').pop();
+        downloadEl.style.display   = 'inline-flex';
+      } else {
+        downloadEl.style.display   = 'none';
+      }
+    }
+
+    if (selectEl) {
+      selectEl.addEventListener('change', () => loadLang(selectEl.value));
+    }
+
+    copyBtn.addEventListener('click', async () => {
+      await navigator.clipboard.writeText(code.innerText).catch(() => {});
+      copyBtn.textContent = '✓ kopiert';
+      copyBtn.classList.add('copied');
+      setTimeout(() => {
+        copyBtn.textContent = 'kopieren';
+        copyBtn.classList.remove('copied');
+      }, 1800);
+    });
+
+    // Lazy-load: defer until chapter is shown
+    viewerEl._loadLang  = loadLang;
+    viewerEl._firstLang = langs[0];
+    viewerEl._loaded    = false;
+  }
+
+  function activateViewers(chapterEl) {
+    chapterEl.querySelectorAll('.code-viewer').forEach(v => {
+      if (!v._loaded && v._loadLang) {
+        v._loaded = true;
+        v._loadLang(v._firstLang);
+      }
+    });
+  }
+
+  /* ============================================================
+     NAVIGATION
+  ============================================================ */
+  const navLinks = document.querySelectorAll('.nav-link[data-chapter]');
+  const chapters = document.querySelectorAll('.chapter');
+
+  function showChapter(id) {
+    chapters.forEach(ch => {
+      const active = ch.id === `ch-${id}`;
+      ch.classList.toggle('active', active);
+      if (active) activateViewers(ch);
+    });
+    navLinks.forEach(a => a.classList.toggle('active', a.dataset.chapter === id));
+    window.scrollTo(0, 0);
+  }
+
+  navLinks.forEach(a => a.addEventListener('click', () => showChapter(a.dataset.chapter)));
+
+  /* ============================================================
+     INIT
+  ============================================================ */
+  document.querySelectorAll('.code-viewer').forEach(v => {
+    const ch    = v.closest('.chapter');
+    const title = ch ? ch.querySelector('h1').textContent : 'Code';
+    buildCodeViewer(v, title);
+  });
+
+  const activeChapter = document.querySelector('.chapter.active');
+  if (activeChapter) activateViewers(activeChapter);
+</script>
+
+</body>
+</html>
