@@ -29,58 +29,127 @@
     </header>
 
     <main class="container">
+
+        <!-- ── Hero ─────────────────────────────────────────────── -->
         <section class="hero" aria-label="Intro">
             <div>
                 <span class="chip">Lehramt</span>
                 <span class="chip">Informatik</span>
                 <span class="chip">Geschichte</span>
                 <br><br><br>
-
-                <!-- Zitat in zwei Zeilen -->
                 <h1 class="quote-handwritten" id="quote">"Non scholae,</h1>
                 <h1 class="quote-handwritten" id="quote2">&nbsp&nbspsed vitae discimus"</h1>
-
                 <br/><br />
                 <span style="font-size: medium; color: grey;">
                   <span style="cursor:pointer" onclick="window.location.href='https://de.wikipedia.org/wiki/Seneca'">
                     &nbsp&nbsp&nbsp&nbsp
                     Moderne Umkehrung nach: Sen. epist. 106, 11f.
                   </span>
-                <br/>&nbsp&nbsp&nbsp&nbsp z.dt.: „Nicht für die Schule, sondern für das Leben lernen wir“
+                <br/>&nbsp&nbsp&nbsp&nbsp z.dt.: „Nicht für die Schule, sondern für das Leben lernen wir"
                 </span>
-
             </div>
 
             <div class="avatar" aria-hidden="true">
                 <img src="media/avatar.jpg" alt="Porträt von Felix Staacke" loading="eager" />
             </div>
-
-
-
-
-
-
-
-
         </section>
 
+        <!-- ── Category Slider ──────────────────────────────────── -->
+        <section class="cat-section">
+            <p class="section-label">Themenbereiche</p>
+            <div class="slider-wrapper">
+                <button type="button" class="slider-btn" id="catPrev" aria-label="Zurück">&#8592;</button>
+                <div class="slider-track" id="catSlider">
 
+                    <a class="cat-card" href="src/informatikstudium.html">
+                        <div class="cat-card-bg" style="background:
+                            radial-gradient(ellipse at 25% 75%, #0ea5e9 0%, transparent 52%),
+                            radial-gradient(ellipse at 78% 18%, #6366f1 0%, transparent 50%),
+                            linear-gradient(160deg, #0f1729 0%, #1e293b 100%);"></div>
+                        <div class="cat-deco">🎓</div>
+                        <div class="cat-overlay">
+                            <span class="cat-label">Studium</span>
+                            <h3>Aus dem Informatikstudium</h3>
+                            <p>Theorie, Projekte und Erkenntnisse auf dem Weg zum Staatsexamen</p>
+                        </div>
+                    </a>
 
+                    <a class="cat-card" href="src/informatikstudium.html">
+                        <div class="cat-card-bg" style="background:
+                            radial-gradient(ellipse at 25% 75%, #0ea5e9 0%, transparent 52%),
+                            radial-gradient(ellipse at 78% 18%, #6366f1 0%, transparent 50%),
+                            linear-gradient(160deg, #0f1729 0%, #1e293b 100%);"></div>
+                        <div class="cat-deco">🎓</div>
+                        <div class="cat-overlay">
+                            <span class="cat-label">Studium</span>
+                            <h3>Aus dem Geschichtsstudium</h3>
+                            <p>Irgendwas über das Geschichtsstudium</p>
+                        </div>
+                    </a>
 
-         <article class="timeline-item right">
+                    <a class="cat-card" href="src/erstehilfe.html">
+                        <div class="cat-card-bg" style="background:
+                            radial-gradient(ellipse at 25% 75%, #ef4444 0%, transparent 52%),
+                            radial-gradient(ellipse at 78% 18%, #f97316 0%, transparent 50%),
+                            linear-gradient(160deg, #1c0505 0%, #2d0f0f 100%);"></div>
+                        <div class="cat-deco">⚡</div>
+                        <div class="cat-overlay">
+                            <span class="cat-label">Quick Help</span>
+                            <h3>Erste Hilfe</h3>
+                            <p>..</p>
+                        </div>
+                    </a>
+
+                    <a class="cat-card" href="src/llm-ontologie.html">
+                        <div class="cat-card-bg" style="background:
+                            radial-gradient(ellipse at 25% 75%, #a855f7 0%, transparent 52%),
+                            radial-gradient(ellipse at 78% 18%, #ec4899 0%, transparent 50%),
+                            linear-gradient(160deg, #13001f 0%, #1e0035 100%);"></div>
+                        <div class="cat-deco">🧠</div>
+                        <div class="cat-overlay">
+                            <span class="cat-label">KI &amp; Wissen</span>
+                            <h3>LLM &amp; Ontologie</h3>
+                            <p>Sprachmodelle, Wissensgraphen und semantische Technologien</p>
+                        </div>
+                    </a>
+
+                    <a class="cat-card" href="src/weitere-guides.html">
+                        <div class="cat-card-bg" style="background:
+                            radial-gradient(ellipse at 25% 75%, #22c55e 0%, transparent 52%),
+                            radial-gradient(ellipse at 78% 18%, #06b6d4 0%, transparent 50%),
+                            linear-gradient(160deg, #011c0a 0%, #02291a 100%);"></div>
+                        <div class="cat-deco">📚</div>
+                        <div class="cat-overlay">
+                            <span class="cat-label">Tutorials</span>
+                            <h3>Weitere Informatik-Guides</h3>
+                            <p>Tools, Tipps und Anleitungen rund um die Informatik</p>
+                        </div>
+                    </a>
+
+                </div>
+                <button type="button" class="slider-btn" id="catNext" aria-label="Vor">&#8594;</button>
+            </div>
+            <div class="slider-dots" id="catDots"></div>
+        </section>
+
+        <!-- ── Timeline ──────────────────────────────────────────── -->
+        <section class="timeline">
+
+            <article class="timeline-item right">
                 <div class="timeline-media">
                     <div class="avatar-border" style="width: 150px;">
-                        <img src="src/modules/DAB_naturerlebniszentrum/img/icon.png" alt="Icon Naturerlebniszentrum" style="width: 150px;">
+                        <img src="media/projekte/fheap.png" alt="Fibonacci Heap Visualisierung" style="width: 150px;">
                     </div>
                 </div>
                 <div class="timeline-content">
-                    
+                    <h3>AlgoDat-Kurs</h3>
+                    <p>Wintersemester 2025/2026<br /><br /></p>
                     <p>
-                        Ein kurs als Einführung in die <a href="src/modules/AlgoDatCourse/" target="_blank">Algorithmen und Datenstrukturen</a>.
+                        Ein interaktiver Selbstlernkurs zu den Grundlagen der Algorithmen und Datenstrukturen – von Sortierverfahren über Graphentheorie bis hin zu komplexen Heap-Strukturen wie dem Fibonacci-Heap. Alle Konzepte werden mit Visualisierungen, Pseudocode und konkreten Beispielen aufbereitet. Der Kurs richtet sich an Studierende, die die Vorlesungsinhalte vertiefen oder eigenständig einsteigen möchten. <a href="src/modules/AlgoDatCourse/index.html" target="_blank">Zum Kurs</a>.
                     </p>
                 </div>
             </article>
-        <section class="timeline">
+
             <article class="timeline-item left">
                 <div class="timeline-content">
                     <h3>Basic Knowledge Graph</h3>
@@ -95,6 +164,7 @@
                     </div>
                 </div>
             </article>
+
             <article class="timeline-item right">
                 <div class="timeline-media">
                     <div class="avatar-border" style="width: 150px;">
@@ -109,34 +179,37 @@
                     </p>
                 </div>
             </article>
-             <article class="timeline-item left">
+
+            <article class="timeline-item left">
                 <div class="timeline-content">
                     <h3>MySQL-Trainee-Ground</h3>
-                     <p>17.01.2026<br /><br /></p>
+                    <p>17.01.2026<br /><br /></p>
                     <p>
                         Via Docker wird hier die mysql und phpmyadmin Umgebung bereitgestellt, um SQL-Kenntnisse zu erlernen und zu vertiefen. Es sind verschiedene Übungsaufgaben integriert, die das Arbeiten mit Datenbanken erleichtern sollen. Das Projekt ist <a href="https://github.com/Datenflix007/MySQL_TraineeGround">auf Github</a>.
                     </p>
                 </div>
                 <div class="timeline-media">
                     <div class="avatar-border" style="width: 150px;">
-                        <img src="https://www.drwindows.de/news/wp-content/uploads/2020/04/mysql.workbench_pgb.png" alt="Profilbild" style="width: 150px;">
+                        <img src="https://www.drwindows.de/news/wp-content/uploads/2020/04/mysql.workbench_pgb.png" alt="MySQL Workbench" style="width: 150px;">
                     </div>
                 </div>
             </article>
+
             <article class="timeline-item right">
                 <div class="timeline-media">
                     <div class="avatar-border" style="width: 150px;">
-                        <img src="https://github.com/Datenflix007/jenaCraftImages/raw/main/images/header.jpg" style="width: 150px;" alt="Profilbild"/>
+                        <img src="https://github.com/Datenflix007/jenaCraftImages/raw/main/images/header.jpg" style="width: 150px;" alt="JenaCraft"/>
                     </div>
                 </div>
                 <div class="timeline-content">
                     <h3>JenaCraft - Schülerergebnisse</h3>
                     <p>08.01.2026<br /><br /></p>
                     <p>
-                        Im Rahmen der Tätigkeit als wissenschaftliche Hilfskraft in dem DHLabor der Professur Digital-Humanites wurden "Jena-Craft"-Workshops abgehalten. Für das volle Erlebnis der Ergebnispräsentation checken Sie die Webseite <a href="https://4dcity.org/intro">4dcity</a> aus. Für die reine Ergebnissammlung der WOrkshops schauen Sie sich die <a href="https://github.com/Datenflix007/jenaCraftImages">Ergebnisse</a> an.
+                        Im Rahmen der Tätigkeit als wissenschaftliche Hilfskraft in dem DHLabor der Professur Digital-Humanites wurden "Jena-Craft"-Workshops abgehalten. Für das volle Erlebnis der Ergebnispräsentation checken Sie die Webseite <a href="https://4dcity.org/intro">4dcity</a> aus. Für die reine Ergebnissammlung der Workshops schauen Sie sich die <a href="https://github.com/Datenflix007/jenaCraftImages">Ergebnisse</a> an.
                     </p>
                 </div>
             </article>
+
             <article class="timeline-item left">
                 <div class="timeline-content">
                     <h3>PnP: Schatz des Naumburger Meisters</h3>
@@ -147,79 +220,21 @@
                 </div>
                 <div class="timeline-media">
                     <div class="avatar-border" style="width: 150px;">
-                        <img src="https://github.com/Datenflix007/pnp_thesaurusMagistriNaumburgensis/raw/main/images/siegel.png"  style="width: 150px;" alt="Profilbild">
+                        <img src="https://github.com/Datenflix007/pnp_thesaurusMagistriNaumburgensis/raw/main/images/siegel.png" style="width: 150px;" alt="PnP Siegel">
                     </div>
                 </div>
             </article>
+
         </section>
 
-
-
-
-        <!-- Template for Blog
-        <section class="timeline">
-            <article class="timeline-item right">
-                <div class="timeline-media">
-                    <div class="avatar-border">
-                        <img src="dein-bild.jpg" alt="Profilbild">
-                    </div>
-                </div>
-                <div class="timeline-content">
-                    <h3>Rechts orientierter Eintrag</h3>
-                    <p>
-                        Hier steht dein Text. Dieser Block dockt rechts an, das Bild sitzt links im Eintrag.
-                    </p>
-                </div>
-            </article>
-
-            <article class="timeline-item left">
-                <div class="timeline-content">
-                    <h3>Links orientierter Eintrag</h3>
-                    <p>
-                        Hier steht dein Text. Dieser Block dockt links an, das Bild sitzt rechts im Eintrag.
-                    </p>
-                </div>
-                <div class="timeline-media">
-                    <div class="avatar-border">
-                        <img src="dein-bild.jpg" alt="Profilbild">
-                    </div>
-                </div>
-            </article>
-
-            <article class="timeline-item right">
-                <div class="timeline-media">
-                    <div class="avatar-border">
-                        <img src="dein-bild.jpg" alt="Profilbild">
-                    </div>
-                </div>
-                <div class="timeline-content">
-                    <h3>Noch ein Eintrag</h3>
-                    <p>
-                        Einfach weitere <code>.timeline-item left/right</code> Bloecke ergaenzen.
-                    </p>
-                </div>
-            </article>
-        </section>
-
-        -->
-       
     </main>
-    <!-- einziges main schließt -->
-    </main>
-
-
-
-
-
-
 
     <footer>
         <div class="container">© 2025 Felix Staacke</div>
     </footer>
 
-    <!-- Animation Script -->
     <script>
-        // Hilfsfunktion: Text in <span class="char">…</span> zerlegen
+        // ── Quote char-by-char animation ─────────────────────────────
         function buildChars(el, startIndex = 0) {
             const text = el.textContent;
             el.textContent = '';
@@ -236,16 +251,64 @@
         document.addEventListener('DOMContentLoaded', () => {
             const q1 = document.getElementById('quote');
             const q2 = document.getElementById('quote2');
-            if (!q1 || !q2) return;
+            if (q1 && q2) {
+                const len1 = buildChars(q1, 0);
+                buildChars(q2, len1 + 2);
+            }
 
-            // Erste Zeile aufbauen
-            const len1 = buildChars(q1, 0);
+            // ── Category Slider ───────────────────────────────────────
+            const track   = document.getElementById('catSlider');
+            const dotsEl  = document.getElementById('catDots');
+            const btnPrev = document.getElementById('catPrev');
+            const btnNext = document.getElementById('catNext');
+            if (!track) return;
 
-            // Zweite Zeile startet nach der ersten (+ kleine Pause)
-            buildChars(q2, len1 + 2);
+            const cards = Array.from(track.querySelectorAll('.cat-card'));
+            const count = cards.length;
+            let current = 0;
+
+            // Build dot buttons
+            const dots = cards.map((_, i) => {
+                const btn = document.createElement('button');
+                btn.className = 'dot' + (i === 0 ? ' active' : '');
+                btn.setAttribute('aria-label', `Karte ${i + 1}`);
+                btn.addEventListener('click', () => goTo(i));
+                dotsEl.appendChild(btn);
+                return btn;
+            });
+
+            function goTo(idx) {
+                current = (idx + count) % count;
+                const card = cards[current];
+                track.scrollTo({ left: card.offsetLeft - track.offsetLeft - 4, behavior: 'smooth' });
+                dots.forEach((d, i) => d.classList.toggle('active', i === current));
+            }
+
+            // Auto-advance
+            function startAuto() { return setInterval(() => goTo(current + 1), 4500); }
+            let autoTimer = startAuto();
+            track.addEventListener('mouseenter', () => clearInterval(autoTimer));
+            track.addEventListener('touchstart', () => clearInterval(autoTimer), { passive: true });
+            track.addEventListener('mouseleave', () => { autoTimer = startAuto(); });
+
+            btnPrev.addEventListener('click', () => { goTo(current - 1); clearInterval(autoTimer); autoTimer = startAuto(); });
+            btnNext.addEventListener('click', () => { goTo(current + 1); clearInterval(autoTimer); autoTimer = startAuto(); });
+
+            // Sync dots on manual scroll / swipe
+            let scrollTimer;
+            track.addEventListener('scroll', () => {
+                clearTimeout(scrollTimer);
+                scrollTimer = setTimeout(() => {
+                    let closest = 0, minDist = Infinity;
+                    cards.forEach((card, i) => {
+                        const dist = Math.abs(card.offsetLeft - track.offsetLeft - track.scrollLeft);
+                        if (dist < minDist) { minDist = dist; closest = i; }
+                    });
+                    current = closest;
+                    dots.forEach((d, i) => d.classList.toggle('active', i === current));
+                }, 80);
+            });
         });
     </script>
 </body>
-
-
 </html>
