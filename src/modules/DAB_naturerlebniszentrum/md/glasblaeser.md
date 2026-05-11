@@ -2,7 +2,7 @@
 
 Habt ihr schon mal durch eine alte Kirchenfensterscheibe geschaut und bemerkt, dass das Bild leicht verzerrt ist? Das liegt daran, dass das Glas von Hand geblasen wurde – von einem Glasbläser, der mit seinem Atem und einem langen Eisenrohr flüssiges Glas in Form brachte. Heute klingt das wie Magie. Doch hinter diesem Handwerk steckt eine der folgenreichsten Industrien des Mittelalters und der Frühen Neuzeit – eine, die ganze Wälder vernichtete.
 
-!![Glasbläser bei der Arbeit | Ein Glasbläser formt mit dem Blasrohr aus flüssiger Glasmasse ein Gefäß. Die Arbeit musste zügig gehen, bevor das Glas abkühlte und brach. | ](img/glasbläser1.jpg)
+!![Glasbläser bei der Arbeit | Ein Glasbläser formt mit dem Blasrohr aus flüssiger Glasmasse ein Gefäß. Die Arbeit musste zügig gehen, bevor das Glas abkühlte und brach. | ](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/img/glasbl%C3%A4ser1.jpg)
 
 ---
 
@@ -24,7 +24,7 @@ Dann begann die eigentliche Kunst: Der Glasbläser tauchte ein langes Eisenrohr 
 
 Die Pottasche, die für den Schmelzprozess unbedingt gebraucht wurde, mussten eigene Spezialisten herstellen: die **Aschebrenner und Pottaschesieder**. In Erdgruben verbrannten sie Holz, Strauchwerk und Kräuter; aus der Asche gewannen sie durch Auslaugen und Einkochen die Kalilauge. Die Ausbeute war gering: Aus dem Gewicht von zwei Fuhrwerken Strauchwerk entstand nur ein Scheffel Pottasche – gerade 5 bis 10 Prozent des eingesetzten Holzgewichts.[^5] Das zeigt, wie riesig der Rohstoffbedarf war.
 
-![img](../img/glasbläser3.jpg)
+![img](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/img/glasbl%C3%A4ser3.jpg)
 
 ---
 
@@ -44,7 +44,7 @@ Die Wälder Thüringens und des Jenaer Umlandes waren für Glashütten besonders
 
 Die enge Abhängigkeit von Köhlern, Pottaschesiedern und Waldbesitzern zeigt: Die Glasmacher standen in einem dichten Netz wirtschaftlicher Abhängigkeiten. Gab es Holzknappheit, traf das nicht nur die Glashütten, sondern alle, die auf denselben Rohstoff angewiesen waren – und das waren viele.[^13]
 
-![img](../img/glasbläser2.jpg)
+![img](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/img/glasbl%C3%A4ser2.jpg)
 
 ---
 
