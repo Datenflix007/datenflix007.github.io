@@ -1,55 +1,40 @@
 
-# Aufgabenstellung – Tag 1 (30.07.2026)
+# Tagesablauf
 
-## 10:00 Uhr – Ankommen & Einstieg
+## Hinweg: Den Berg hinauf
 
-* Kommt im Naturerlebniszentrum an und macht euch mit dem Raum vertraut.
-* Hört der Begrüßung zu und nennt euren Namen und einen spontanen Gedanken zum Thema  **Wald** .
+- Haltet auf dem Weg die Augen offen: Welche Namen, Schilder oder Spuren seht ihr?
 
-## 10:10 Uhr – Zieltransparenz
+## Ankommen & Einstieg
 
-* Hört zu, wie der Ablauf beider Tage und die Kernfrage vorgestellt werden:
+- Macht euch mit dem Raum und der Umgebung vertraut.
+- Hört der Begrüßung zu und nennt euren Namen sowie einen spontanen Gedanken zum Thema **Wald**.
 
-  *„Was hatten historische Waldberufe mit unserer Umwelt zu tun?"*
-* Schaut euch die kurze Einführung in das Chatformat an.
+## Umfrage 1
 
-## 10:45 Uhr – Einführung in die Berufe
+- Beantwortet die kurze Eingangsfrage – jede Antwort zählt, es gibt kein Richtig oder Falsch.
 
-* Hört der Einführung zu den historischen Berufen im Jenaer Wald aufmerksam zu.
-* Behandelte Berufe:  **Köhler, Förster, Steinhauer, Gerber, Glasmacher** .
-* Notiert euch, welcher Beruf euch am meisten interessiert und warum.
+## Einführung in die Berufe
 
-## 11:15 Uhr – Expertengruppe bilden
+- Hört der Einführung zu den historischen Berufen aufmerksam zu.
+- Behandelte Berufe: **Köhler, Steinhauer, Holzfäller, Glasbläser, Händler, Winzer, Waidsammler**.
+- Notiert euch, welcher Beruf euch am meisten interessiert und warum.
 
-* Findet euch mit anderen zusammen, die denselben Beruf gewählt haben.
-* Ihr seid jetzt die **Expertengruppe** für euren Beruf.
-* Öffnet das digitale Arbeitsblatt – dort findet ihr euren Rechercheauftrag, Hilfsfragen und Bildmaterial.
+## Expertengruppe bilden
 
-## 11:25 Uhr – Recherche & Plakat beginnen
+- Findet euch mit anderen zusammen, die denselben Beruf gewählt haben.
+- Ihr seid jetzt die **Expertengruppe** für euren Beruf.
+- Öffnet das digitale Arbeitsblatt und wählt euren Beruf aus.
 
-* Recherchiert euren Beruf mithilfe des digitalen Arbeitsblatts und der Berufsprofile.
-* Beginnt mit der Gestaltung eures Plakats. Beantwortet dabei folgende Fragen:
-  * **Wer** hat diesen Beruf ausgeübt?
-  * **Welche Rohstoffe** wurden aus dem Wald genutzt?
-  * **Welche Konflikte** entstanden durch die Waldnutzung?
-  * **Welche Spuren** gibt es heute noch?
+## Recherche & Plakat beginnen
 
-## 12:15 Uhr – Mittagspause
+Jede Gruppe erstellt **gemeinsam ein Plakat** zu ihrem Beruf. Lest dafür zuerst das Berufsprofil und beantwortet dann die vier Leitfragen auf eurem Plakat.
 
-## 13:00 Uhr – Plakat fertigstellen
+- Lest das Berufsprofil eures Berufs sorgfältig durch.
+- Folgt der Plakat-Anleitung auf **Station III** – dort steht genau, wie ihr die vier Fragen beantwortet.
 
-* Vervollständigt euer Plakat und holt euch bei Bedarf Feedback von der Lehrperson.
+## Mittagspause
 
-## 13:30 Uhr – Exkursionsvorbereitung
+## Rückweg: den Berg hinunter
 
-* Plant gemeinsam für die Exkursion morgen (Tag 2):
-  * An welchem Ort im Wald möchtet ihr euren Beruf vorstellen?
-  * Was wollt ihr zeigen und erklären?
-  * Welche Spuren eures Berufs könnten im Wald noch sichtbar sein?
-
-## 14:00 Uhr – Tagesabschluss
-
-* Gemeinsame Reflexion im Plenum:
-
-  *„Welche Rolle spielte der Wald für die Menschen früher? Was hat sich verändert?"*
-* Schreibt euer wichtigstes **Key-Learning** auf eine Karte und befestigt sie am Feedback-Plakat.
+- Schaut mit neuen Augen: Entdeckt ihr irgendwo Hinweise auf alte Berufe – Straßennamen, alte Mauern, Ortsbezeichnungen?

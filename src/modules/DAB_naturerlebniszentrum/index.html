@@ -15,9 +15,6 @@
 <body>
   <div class="app-shell">
     <aside class="notes-drawer" id="notesDrawer" aria-label="Notizblatt">
-      <button class="notes-toggle" id="notesToggle" type="button" aria-expanded="false" aria-controls="notesPanel">
-        Notizen
-      </button>
       <section class="notes-panel" id="notesPanel">
         <div class="notes-panel__header">
           <p class="eyebrow">Eigenes Notizblatt</p>
@@ -31,6 +28,9 @@
         </div>
         <p class="notes-hint">Die Notizen werden lokal im Browser gespeichert.</p>
       </section>
+      <button class="notes-toggle" id="notesToggle" type="button" aria-expanded="false" aria-controls="notesPanel">
+        Notizen
+      </button>
     </aside>
 
     <main id="app" class="app" aria-live="polite"></main>
@@ -47,30 +47,31 @@
           </p>
           <div class="hero-actions">
             <button class="button-primary" data-route="intro">Erkundung starten</button>
+            <a href="downloads/verlaufsplan.pdf" class="button-teacher" download>↓ Verlaufsplan für Lehrkräfte</a>
           </div>
         </div>
 
         <div class="slides-card">
           <div class="slides-track" id="slidesTrack">
             <article class="slide is-active">
-              <img src="img/abbildung-1.svg" alt="Historisch inspirierte Waldlandschaft mit Weg und Siedlung">
-              <div class="slide-caption">
-                <span>Historische Landschaft</span>
-                <strong>Wald, Wege und Siedlungen</strong>
-              </div>
-            </article>
-            <article class="slide">
-              <img src="img/abbildung-2.svg" alt="Illustration eines Koehlers bei der Arbeit im Wald">
-              <div class="slide-caption">
-                <span>Arbeitsalltag</span>
-                <strong>Koehler und Waldwirtschaft</strong>
-              </div>
-            </article>
-            <article class="slide">
-              <img src="img/abbildung-3.svg" alt="Illustration von Steinbrechern bei der Arbeit im Steinbruch">
+              <img src="img/köhler1.jpg" alt="Köhler am Meiler im Wald">
               <div class="slide-caption">
                 <span>Berufe im Fokus</span>
-                <strong>Steinbrecher im Steinbruch</strong>
+                <strong>Köhler am Meiler</strong>
+              </div>
+            </article>
+            <article class="slide">
+              <img src="img/glasbläser1.jpg" alt="Glasbläser bei der Arbeit an der Glashütte">
+              <div class="slide-caption">
+                <span>Berufe im Fokus</span>
+                <strong>Glasbläser an der Glashütte</strong>
+              </div>
+            </article>
+            <article class="slide">
+              <img src="img/händler1.jpg" alt="Händler und Kaufleute auf dem mittelalterlichen Markt">
+              <div class="slide-caption">
+                <span>Berufe im Fokus</span>
+                <strong>Händler auf dem Markt</strong>
               </div>
             </article>
           </div>

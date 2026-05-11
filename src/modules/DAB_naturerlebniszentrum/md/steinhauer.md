@@ -1,4 +1,3 @@
-
 # Steinhauer
 
 Schaut euch die Kalksteinklippen um Jena an – habt ihr bemerkt, dass manche Felswände merkwürdig gerade abgebrochen wirken? Das ist kein Zufall. Steinhauer haben dort mit Hammer und Meißel gearbeitet und den harten Stein Stück für Stück aus dem Berghang geschlagen. Und ohne diesen Stein – keine Stadtmauer, keine Kirche, keine Brücke, kein Mörtel. Jeder Meter Jena, den ihr heute seht, wäre ohne sie nicht möglich gewesen.
@@ -20,6 +19,8 @@ Gefährlich war der Beruf trotzdem: Steinstaub schädigte die Lungen, herumflieg
 ### Steinbruch und Quaderherstellung
 
 Mit eisernen Meißeln und schweren Hämmern lösten Steinhauer Kalksteinblöcke aus dem Felsen. Die rohen Blöcke wurden dann zu glatten **Quadern** und **Formsteinen** weiterbearbeitet – für Mauern, Treppen, Fensterrahmen oder Säulen. Qualität und Maßgenauigkeit waren entscheidend: Ein schlecht behauener Stein konnte eine Mauer instabil machen.
+
+![img](../img/steinhauer1.jpg)
 
 ### Kalkbrennen: Stein wird zum Baustoff
 

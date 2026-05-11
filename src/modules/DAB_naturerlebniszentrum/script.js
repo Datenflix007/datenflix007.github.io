@@ -52,13 +52,16 @@ init();
 async function init() {
   bindGlobalEvents();
   restoreNotes();
+  initDefaultChecks();
 
   const hashRoute = location.hash.replace("#", "");
   if (routes[hashRoute]) {
     state.route = hashRoute;
   }
 
+  window.addEventListener("resize", positionNotesDrawer);
   await render();
+  positionNotesDrawer();
 }
 
 function bindGlobalEvents() {
@@ -67,6 +70,7 @@ function bindGlobalEvents() {
     if (routes[hashRoute]) {
       state.route = hashRoute;
       await render();
+      positionNotesDrawer();
     }
   });
 
@@ -173,19 +177,20 @@ function renderIntro(markdownParts) {
             <p class="eyebrow">Station I</p>
             <h1>Spuren im Wald lesen</h1>
             <p>
-              Stellt euch vor: Ihr lauft durch den Jenaer Wald – oder durch die Straßen der Stadt.
-              Plötzlich fällt euch etwas auf. An einem Berghang fehlt eine ganze Ecke des Felsens –
-              wie abgehackt. Ein Straßenname klingt seltsam altmodisch. Im Wald steht eine alte Mauer,
-              von der niemand mehr weiß, wofür sie einmal stand.
+              Auch heute noch kann man ganz oft Hinweise auf Berufe vergangener Zeiten finden –
+              ob bei <strong>Straßennamen</strong> wie „Köhlerweg" oder „Steinbruchstraße",
+              bei <strong>Familiennamen</strong> wie „Holzmann" oder „Kohlrausch",
+              oder an <strong>ehemaligen Gebäuden</strong> und Mauern, von denen niemand mehr weiß,
+              was dort einmal war.
             </p>
             <p>
-              Diese Orte und Spuren sind kein Zufall. Sie erzählen von Menschen, die hier gearbeitet haben –
-              lange bevor es Maschinen oder Supermärkte gab. Holz wurde geschlagen, Kohle gebrannt,
-              Steine gebrochen. Euer Auftrag: Diese Spuren der Vergangenheit entdecken und verstehen.
+              Diese Spuren sind kein Zufall. Sie erzählen von Menschen, die hier jahrhundertelang
+              gearbeitet haben – lange bevor es Maschinen oder Supermärkte gab.
+              Werdet heute zu Detektiven der Geschichte und entdeckt, was von diesen Berufen geblieben ist.
             </p>
           </div>
           <div class="intro-hero__image" aria-hidden="true">
-            <img src="img/abbildung-1.svg" alt="">
+            <img src="img/holzfäller2.jpg" alt="Holzfäller mit gefällten Baumstämmen im Wald">
           </div>
         </article>
 
@@ -269,7 +274,6 @@ function renderProfessionDetail(markdown) {
       <div class="content-grid">
         <article class="content-card">
           <p class="eyebrow">Station IIb</p>
-          <h1>${state.selectedProfession.label}</h1>
           ${parseMarkdown(markdown)}
           <div class="card-actions">
             <button class="button-secondary" data-route="professions">Weitere Berufe</button>
@@ -302,7 +306,7 @@ function renderOutput(markdown, mode) {
         <article class="content-card">
           <p class="eyebrow">Station III</p>
           <h1>${isPoster ? "Plakat erstellen" : "Berufschatverlauf erstellen"}</h1>
-          ${isPoster ? parseMarkdown(markdown) : renderChecklist(markdown)}
+          ${isPoster ? parseMarkdown(stripLeadingHeading(markdown)) : renderChecklist(markdown)}
           <div class="card-actions">
             <button class="button-secondary" data-route="professions">Zurück zu den Berufen</button>
           </div>
@@ -421,6 +425,7 @@ async function navigate(route) {
   state.route = route;
   if (location.hash.replace("#", "") === route) {
     await render();
+    positionNotesDrawer();
     return;
   }
 
@@ -443,56 +448,107 @@ async function loadMarkdown(path) {
 }
 
 function parseMarkdown(markdown) {
-  const lines = markdown.replace(/\r/g, "").split("\n");
+  const rawLines = markdown.replace(/\r/g, "").split("\n");
+
+  // Pass 1: extract footnote definitions
+  const footnotes = new Map();
+  const fnKeys = [];
+  const contentLines = [];
+  let fnKey = null;
+
+  for (const line of rawLines) {
+    const fnMatch = line.match(/^\[\^(\w+)\]:\s*(.*)$/);
+    if (fnMatch) {
+      fnKey = fnMatch[1];
+      footnotes.set(fnKey, fnMatch[2]);
+      fnKeys.push(fnKey);
+      continue;
+    }
+    if (fnKey && (line.startsWith("    ") || line.startsWith("\t"))) {
+      const trimmed = line.trim();
+      if (trimmed) {
+        footnotes.set(fnKey, footnotes.get(fnKey) + " " + trimmed);
+      }
+      continue;
+    }
+    fnKey = null;
+    contentLines.push(line);
+  }
+
+  // Pass 2: render content
   const html = [];
   let inList = false;
 
-  for (const line of lines) {
+  function closeListIfNeeded() {
+    if (inList) { html.push("</ul>"); inList = false; }
+  }
+
+  for (const line of contentLines) {
+    const figureMatch = line.match(/^!!\[([^\]]*)\]\(([^)]*)\)$/);
+    if (figureMatch) {
+      closeListIfNeeded();
+      const parts = figureMatch[1].split("|").map((p) => p.trim());
+      const title = parts[0] || "";
+      const desc = parts[1] || "";
+      const source = parts[2] || "";
+      const src = figureMatch[2].trim();
+      html.push(`<figure class="article-figure">
+        <img src="${src}" alt="${escapeHtml(title)}">
+        <figcaption class="figure-caption">
+          ${title ? `<strong class="figure-title">${escapeHtml(title)}</strong>` : ""}
+          ${desc ? `<span class="figure-desc">${escapeHtml(desc)}</span>` : ""}
+          <span class="figure-source">Quelle: ${source ? `<a href="${escapeHtml(source)}" target="_blank" rel="noopener noreferrer">${escapeHtml(source)}</a>` : "<em>[wird ergänzt]</em>"}</span>
+        </figcaption>
+      </figure>`);
+      continue;
+    }
+
+    if (line.trim() === "---") {
+      closeListIfNeeded();
+      html.push('<hr class="section-divider">');
+      continue;
+    }
     if (line.startsWith("### ")) {
       closeListIfNeeded();
       html.push(`<h3>${escapeHtml(line.slice(4))}</h3>`);
       continue;
     }
-
     if (line.startsWith("## ")) {
       closeListIfNeeded();
       html.push(`<h2>${escapeHtml(line.slice(3))}</h2>`);
       continue;
     }
-
     if (line.startsWith("# ")) {
       closeListIfNeeded();
       html.push(`<h1>${escapeHtml(line.slice(2))}</h1>`);
       continue;
     }
-
-    if (line.startsWith("- ")) {
-      if (!inList) {
-        html.push("<ul>");
-        inList = true;
-      }
-      html.push(`<li>${formatInlineMarkdown(line.slice(2))}</li>`);
+    const listMatch = line.match(/^[-*] (.*)$/);
+    if (listMatch) {
+      if (!inList) { html.push("<ul>"); inList = true; }
+      html.push(`<li>${formatInlineMarkdown(listMatch[1])}</li>`);
       continue;
     }
-
     if (line.trim() === "") {
       closeListIfNeeded();
       continue;
     }
-
     closeListIfNeeded();
     html.push(`<p>${formatInlineMarkdown(line)}</p>`);
   }
 
   closeListIfNeeded();
-  return html.join("");
 
-  function closeListIfNeeded() {
-    if (inList) {
-      html.push("</ul>");
-      inList = false;
+  // Render footnotes list (heading comes from ## Literatur in markdown)
+  if (fnKeys.length > 0) {
+    html.push('<div class="footnotes"><ol class="footnotes__list">');
+    for (const key of fnKeys) {
+      html.push(`<li id="fn-${key}" class="footnote-item"><span>${formatInlineMarkdown(footnotes.get(key) || "")}</span> <a href="#fnref-${key}" class="footnote-back" aria-label="Zurück zum Text">↩</a></li>`);
     }
+    html.push("</ol></div>");
   }
+
+  return html.join("");
 }
 
 function stripLeadingHeading(markdown) {
@@ -503,6 +559,11 @@ function formatInlineMarkdown(text) {
   const placeholders = [];
 
   const processed = text
+    .replace(/\[\^(\w+)\]/g, (_, key) => {
+      const i = placeholders.length;
+      placeholders.push(`<sup><a href="#fn-${key}" id="fnref-${key}" class="footnote-ref">[${key}]</a></sup>`);
+      return `\uE000${i}\uE001`;
+    })
     .replace(/!\[([^\]]*)\]\(([^)]*)\)/g, (_, alt, url) => {
       const i = placeholders.length;
       placeholders.push(`<img src="${url}" alt="${alt}" class="md-img">`);
@@ -593,4 +654,19 @@ function clearSlideTimer() {
     window.clearInterval(state.slideTimer);
     state.slideTimer = null;
   }
+}
+
+function initDefaultChecks() {
+  if (!localStorage.getItem("jenaer-wald-tasks")) {
+    const defaults = {};
+    for (let i = 0; i < 4; i++) { defaults[`task-${i}`] = true; }
+    localStorage.setItem("jenaer-wald-tasks", JSON.stringify(defaults));
+  }
+}
+
+function positionNotesDrawer() {
+  const rect = app.getBoundingClientRect();
+  const toggleW = notesToggle.getBoundingClientRect().width || 52;
+  const rightGap = window.innerWidth - rect.right;
+  notesDrawer.style.right = Math.max(0, rightGap - toggleW) + "px";
 }

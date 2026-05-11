@@ -14,6 +14,8 @@ Der Waidstrauch sieht unscheinbar aus – kleine gelbe Blüten, grüne Blätter.
 
 Das Endprodukt – der **Waidkuchen** – roch entsetzlich, war aber Gold wert. Damit konnten Tuchfärber leuchtend blaue Stoffe herstellen, die von Adligen und Bürgern in ganz Europa begehrt waren.
 
+![img](../img/kiepe2.jpg)
+
 ## Im Jenaer Wald und Umland
 
 Im Jenaer Umland gab es Waidfelder, vor allem im flacheren Thüringer Becken Richtung Erfurt. Die Verarbeitung und der Handel zogen sich bis in die Region um Jena. Wer in Jena Stoffe färben wollte, kaufte seinen Waid bei Händlern aus dem Umland – und der Händler in Jena profitierte davon.

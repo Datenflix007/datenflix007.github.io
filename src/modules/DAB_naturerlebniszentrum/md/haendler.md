@@ -2,6 +2,10 @@
 
 Stellt euch vor: Jede Berufsgruppe im Wald produziert etwas – Holzkohle, Glas, Leder, Wein. Aber wer bringt das alles dahin, wo es gebraucht wird? Wer sorgt dafür, dass der Handwerker in Jena Holzkohle bekommt, der Glasmacher seine Pottasche kaufen kann und der Gerber seine fertigen Häute verkauft? – Der Händler. Er ist das unsichtbare Scharnier der vorindustriellen Wirtschaft: ohne ihn dreht sich das ganze Rad des Waldes nicht.
 
+!![Händler auf dem mittelalterlichen Markt | Händler und Kaufleute beim Warenhandel auf dem Marktplatz. Gewicht, Maß und Ruf waren die Grundlagen jedes Handels. | ](img/händler1.jpg)
+
+![img](../img/händler1.jpg)
+
 ---
 
 ## Wer waren die Händler?
@@ -84,14 +88,25 @@ Der **Jenaer Marktplatz** existiert bis heute und erinnert an Jahrhunderte von M
 ## Literatur
 
 [^1]: Leiniger, Sven: Mittelalterliche Städte in Thüringen. Wien/Köln/Weimar 2021, S. 693–703 (zu Stadtrecht und Marktrecht in thüringischen Kleinstädten).
+    
 [^2]: Ebd., S. 14–15 (zur Bedeutung von Geleit und Zoll im Thüringer Becken).
+    
 [^3]: Ebd., S. 277–279 (Tennstedt), S. 179–181 (Thamsbrück).
+    
 [^4]: Ebd., S. 653 (Herbsleben: Marktprivileg 1331 durch König Ludwig).
+    
 [^5]: Ebd., S. 14–15 (*via regia* / Hohe Straße: Eisenach – Erfurt – Naumburg).
+    
 [^6]: Ebd., S. 14–15 (Waidanbaufläche ca. 2.000–2.500 km² um 1500).
+    
 [^7]: Ebd., S. 14–15 (Waidstädte: Erfurt, Gotha, Tennstedt u.a.).
+    
 [^8]: Leppin, Volker / Hartzsch, Gerhard: Historische Holzberufe. Hrsg. v. Landesbetrieb Forst Brandenburg. Potsdam 2014, S. 35–36 (Fuhrleute und Holztransport).
+    
 [^9]: Ebd., S. 32–34 (Flößer: erste Erwähnung Salzach 1207, Saale 1258; billiger, aber langsamer als Straßentransport).
+    
 [^10]: Ebd., S. 32 (Saaleflößerei erstmals 1258 urkundlich erwähnt).
+    
 [^11]: Leiniger 2021, S. 690–703 (Innungen und politische Partizipation in thüringischen Städten).
+    
 [^12]: Ebd., S. 560–561 (Langensalza: Innungen erreichen Ende 14. Jh. politische Partizipation).

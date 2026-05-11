@@ -2,6 +2,8 @@
 
 Habt ihr schon mal durch eine alte Kirchenfensterscheibe geschaut und bemerkt, dass das Bild leicht verzerrt ist? Das liegt daran, dass das Glas von Hand geblasen wurde – von einem Glasbläser, der mit seinem Atem und einem langen Eisenrohr flüssiges Glas in Form brachte. Heute klingt das wie Magie. Doch hinter diesem Handwerk steckt eine der folgenreichsten Industrien des Mittelalters und der Frühen Neuzeit – eine, die ganze Wälder vernichtete.
 
+!![Glasbläser bei der Arbeit | Ein Glasbläser formt mit dem Blasrohr aus flüssiger Glasmasse ein Gefäß. Die Arbeit musste zügig gehen, bevor das Glas abkühlte und brach. | ](img/glasbläser1.jpg)
+
 ---
 
 ## Wer waren die Glasbläser?
@@ -22,6 +24,8 @@ Dann begann die eigentliche Kunst: Der Glasbläser tauchte ein langes Eisenrohr 
 
 Die Pottasche, die für den Schmelzprozess unbedingt gebraucht wurde, mussten eigene Spezialisten herstellen: die **Aschebrenner und Pottaschesieder**. In Erdgruben verbrannten sie Holz, Strauchwerk und Kräuter; aus der Asche gewannen sie durch Auslaugen und Einkochen die Kalilauge. Die Ausbeute war gering: Aus dem Gewicht von zwei Fuhrwerken Strauchwerk entstand nur ein Scheffel Pottasche – gerade 5 bis 10 Prozent des eingesetzten Holzgewichts.[^5] Das zeigt, wie riesig der Rohstoffbedarf war.
 
+![img](../img/glasbläser3.jpg)
+
 ---
 
 ## Der Wald als Opfer der Glasindustrie
@@ -39,6 +43,8 @@ Staatliche Regulierungsversuche gab es schon früher. Bereits 1790 band ein preu
 Die Wälder Thüringens und des Jenaer Umlandes waren für Glashütten besonders attraktiv: viel Holz, Holzkohle durch die Köhler, Quarzsand in der Umgebung und die Stadt Jena als naher Abnehmer. Historische Quellen belegen Glashütten im Jenaer und Thüringer Umland seit dem Spätmittelalter.[^12]
 
 Die enge Abhängigkeit von Köhlern, Pottaschesiedern und Waldbesitzern zeigt: Die Glasmacher standen in einem dichten Netz wirtschaftlicher Abhängigkeiten. Gab es Holzknappheit, traf das nicht nur die Glashütten, sondern alle, die auf denselben Rohstoff angewiesen waren – und das waren viele.[^13]
+
+![img](../img/glasbläser2.jpg)
 
 ---
 
@@ -71,16 +77,29 @@ Ortsnamen wie **Glashütte**, **Neue Hütte** oder **Hüttengrund** erinnern dar
 ## Literatur
 
 [^1]: Leppin, Volker / Hartzsch, Gerhard: Historische Holzberufe. Hrsg. v. Landesbetrieb Forst Brandenburg. Potsdam 2014, S. 40.
+    
 [^2]: Ebd., S. 40–41.
+    
 [^3]: Ebd., S. 41.
+    
 [^4]: Ebd., S. 40.
+    
 [^5]: Ebd., S. 21 (Kapitel Aschebrenner und Pottaschesieder).
+    
 [^6]: Ebd., S. 41.
+    
 [^7]: Ebd., S. 41.
+    
 [^8]: Ebd., S. 41.
+    
 [^9]: Ebd., S. 41.
+    
 [^10]: Ebd., S. 19 (Zeitleiste: 1790, Preußisches Edikt).
+    
 [^11]: Ebd., S. 40.
+    
 [^12]: Schreg, Rainer: Kahlschlag? Im Urwald? Archäologische Aspekte zu Landesausbau und Rodung im Mittelalter. In: Hirbodian, Sigrid / Scheible, Johanna (Hg.): Wald im Mittelalter. Tübingen 2024, S. 15–34, hier S. 17–18.
+    
 [^13]: Regnath, R. Johanna: Energie – Werkstoffe – Nahrung. Wald als zentrale Rohstoffquelle der Frühen Neuzeit. In: Hirbodian / Scheible 2024, S. 77–96, hier S. 82–84.
+    
 [^14]: Leppin / Hartzsch 2014, S. 41.

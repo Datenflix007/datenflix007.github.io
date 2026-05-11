@@ -12,6 +12,16 @@ Ein Weinberg braucht das ganze Jahr Pflege. Im Frühling wurden die Rebstöcke *
 
 Die Trauben wurden dann gepresst, der Saft in Fässern gelagert und fermentierte zu Wein. Wein war auch deshalb so wichtig, weil Wasser damals oft verschmutzt und gefährlich zu trinken war – ein Becher Wein war manchmal sicherer als das Brunnenwasser.
 
+![img](../img/winzer1.jpg)
+
+![img](../img/winzer2.jpg)
+
+![img](../img/winzer3.jpg)
+
+![img](../img/winzer4.jpg)
+
+![img](../img/winzer5.jpg)
+
 ## Im Jenaer Wald und an der Saale
 
 Die Hänge zwischen Jena und Naumburg sind bis heute ein Weinbaugebiet – das **Saale-Unstrut-Gebiet**, das nördlichste Weinbaugebiet Deutschlands. Im Mittelalter reichte der Weinbau noch weiter nach Norden als heute, weil das Klima wärmer war. Überall um Jena herum erkennt man die terrassenförmig angelegten Hänge, die für Weinberge typisch sind.

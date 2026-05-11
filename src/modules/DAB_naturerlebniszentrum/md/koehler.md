@@ -1,7 +1,10 @@
-
 # Köhler
 
 Monatelang lebten die Köhler allein im Wald. Sie bewachten ihren glühenden Meiler Tag und Nacht – denn wenn der Haufen falsch brannte, war wochenlange Arbeit umsonst. Dunkle Rauchwolken und beißender Geruch wiesen den Weg zu ihren Lagern, weithin sichtbar und weithin gemieden. Köhler waren die unsichtbaren Helden hinter Glas, Metall und Werkzeug – und gleichzeitig die am stärksten gefürchteten Waldnutzer ihrer Zeit.
+
+!![Köhler am Meiler | Ein Köhler überwacht seinen kuppelförmigen Kohlemeiler im Wald. Das langsame Schwelen des Holzes dauerte oft mehrere Tage und Nächte. | ](img/köhler1.jpg)
+
+![img](../img/köhler1.jpg)
 
 ---
 
@@ -26,6 +29,8 @@ Dann wurde der Meiler von innen entzündet und musste nun tagelang, manchmal woc
 Ab Mitte des 16. Jahrhunderts kamen neben den Meilern **massive Teeröfen** hinzu – doppelwandige Steinbauten, die neben Holzkohle auch **Holzteer** erzeugten, der für Schiffbau und Seilerei gebraucht wurde.[^4] Ein einziger Teerofen konnte pro Brennvorgang zwischen 15 und 100 Raummeter Holz verarbeiten. Bei den erlaubten **acht Bränden pro Jahr** ergibt das einen Jahresbedarf von etwa  **600 Raummetern Holz pro Teerofen** .[^5]
 
 Das Verhältnis von Einsatz zu Ertrag: Aus einem Raummeter Klobenholz entstanden etwa **120 Kilogramm Holzkohle** und rund  **10 Liter Holzteer** .[^6] Letzterer wurde in einer Rinne aufgefangen. Holzkohle selbst war das mengenmäßig größte Endprodukt – Teer war wertvoll, aber die Kohle war das, worauf alle warteten.
+
+![img](../img/köhler3.jpg)
 
 ---
 
