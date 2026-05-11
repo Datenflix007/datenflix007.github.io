@@ -12,15 +12,15 @@ Ein Weinberg braucht das ganze Jahr Pflege. Im Frühling wurden die Rebstöcke *
 
 Die Trauben wurden dann gepresst, der Saft in Fässern gelagert und fermentierte zu Wein. Wein war auch deshalb so wichtig, weil Wasser damals oft verschmutzt und gefährlich zu trinken war – ein Becher Wein war manchmal sicherer als das Brunnenwasser.
 
-![img](../img/winzer1.jpg)
+![img](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/img/winzer1.jpg)
 
-![img](../img/winzer2.jpg)
+![img](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/img/winzer2.jpg)
 
-![img](../img/winzer3.jpg)
+![img](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/img/winzer3.jpg)
 
-![img](../img/winzer4.jpg)
+![img](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/img/winzer4.jpg)
 
-![img](../img/winzer5.jpg)
+![img](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/img/winzer5.jpg)
 
 ## Im Jenaer Wald und an der Saale
 
