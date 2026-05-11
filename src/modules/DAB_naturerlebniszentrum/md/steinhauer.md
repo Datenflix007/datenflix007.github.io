@@ -20,7 +20,7 @@ Gefährlich war der Beruf trotzdem: Steinstaub schädigte die Lungen, herumflieg
 
 Mit eisernen Meißeln und schweren Hämmern lösten Steinhauer Kalksteinblöcke aus dem Felsen. Die rohen Blöcke wurden dann zu glatten **Quadern** und **Formsteinen** weiterbearbeitet – für Mauern, Treppen, Fensterrahmen oder Säulen. Qualität und Maßgenauigkeit waren entscheidend: Ein schlecht behauener Stein konnte eine Mauer instabil machen.
 
-![img](../img/steinhauer1.jpg)
+![img](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/img/steinhauer1.jpg)
 
 ### Kalkbrennen: Stein wird zum Baustoff
 
