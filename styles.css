@@ -361,6 +361,10 @@ section {
     font-weight: 600;
 }
 
+.empty-hint {
+    color: grey;
+}
+
 footer {
     padding: 40px 0 60px;
     color: var(--muted);
