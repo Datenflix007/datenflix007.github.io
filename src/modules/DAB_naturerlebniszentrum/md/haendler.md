@@ -2,9 +2,9 @@
 
 Stellt euch vor: Jede Berufsgruppe im Wald produziert etwas – Holzkohle, Glas, Leder, Wein. Aber wer bringt das alles dahin, wo es gebraucht wird? Wer sorgt dafür, dass der Handwerker in Jena Holzkohle bekommt, der Glasmacher seine Pottasche kaufen kann und der Gerber seine fertigen Häute verkauft? – Der Händler. Er ist das unsichtbare Scharnier der vorindustriellen Wirtschaft: ohne ihn dreht sich das ganze Rad des Waldes nicht.
 
-!![Händler auf dem mittelalterlichen Markt | Händler und Kaufleute beim Warenhandel auf dem Marktplatz. Gewicht, Maß und Ruf waren die Grundlagen jedes Handels. | ](img/händler1.jpg)
 
-![img](../img/händler1.jpg)
+
+![img](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/img/h%C3%A4ndler1.jpg)
 
 ---
 
