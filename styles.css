@@ -105,6 +105,7 @@ header {
     gap: 12px;
     align-items: center;
     font-weight: 700;
+    cursor: pointer;
 }
 
 .brand .logo {
@@ -812,6 +813,18 @@ footer {
     inset: 0;
     opacity: 0.22;
 }
+
+.page-hero-bg--guides {
+    background:
+        radial-gradient(ellipse at 25% 75%, #22c55e 0%, transparent 52%),
+        radial-gradient(ellipse at 78% 18%, #06b6d4 0%, transparent 50%),
+        linear-gradient(160deg, #011c0a 0%, #02291a 100%);
+}
+
+.thumb--github  { background: linear-gradient(135deg, #090b0f, #13161f); }
+.thumb--green   { background: linear-gradient(135deg, #011c0a, #02291a); }
+.thumb--purple  { background: linear-gradient(135deg, #13001f, #1e0035); }
+.thumb--blue    { background: linear-gradient(135deg, #0f1729, #1e293b); }
 
 .page-hero-content {
     position: relative;
