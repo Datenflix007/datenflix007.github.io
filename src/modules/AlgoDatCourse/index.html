@@ -404,8 +404,9 @@
         <div class="nav-group-label" style="padding-left: 28px">Heap</div>
         <a class="nav-link nav-sub" data-chapter="maxheap">MaxHeap</a>
         <a class="nav-link nav-sub" data-chapter="minheap">MinHeap</a>
+        <a class="nav-link nav-sub" data-chapter="priorityqueue">PriorityQueue</a>
       </div>
-      
+
     </div>
 
   </nav><!-- /sidebar -->
@@ -899,6 +900,137 @@ def bubble_sort(A):
     </section><!-- /minheap -->
 
 
+    <!-- ─── PRIORITYQUEUE ──────────────────────────────────── -->
+    <section id="ch-priorityqueue" class="chapter">
+      <h1>PriorityQueue</h1>
+      <p class="chapter-meta">Datenstrukturen › PriorityQueue &nbsp;·&nbsp; Aufbauend auf dem Heap</p>
+
+      <div class="chapter-body">
+        <p>
+          Eine <strong>Prioritätswarteschlange</strong> (Priority Queue) ist ein abstrakter
+          Datentyp, bei dem jedes Element eine numerische <em>Priorität</em> trägt. Im Gegensatz
+          zur gewöhnlichen FIFO-Warteschlange wird stets das Element mit der
+          <strong>höchsten</strong> (Max-PQ) oder <strong>niedrigsten</strong> (Min-PQ) Priorität
+          als nächstes entnommen – unabhängig von der Einfügereihenfolge.
+        </p>
+
+        <div>
+          <h2>Heap als natürliche Implementierung</h2>
+          <p>
+            Der binäre Heap ist die kanonische Implementierung einer Prioritätswarteschlange:
+            <em>Insert</em> läuft in O(log n), <em>ExtractMax/Min</em> entnimmt die Wurzel in
+            O(log n), und das Maximum bzw. Minimum ist in O(1) lesbar. Eine sortierte Liste oder
+            ein unsortiertes Array wären für mindestens eine der beiden Operationen langsamer.
+          </p>
+        </div>
+
+        <div>
+          <h3>Komplexität im Vergleich</h3>
+          <table class="complexity-table">
+            <thead>
+              <tr><th>Implementierung</th><th>Insert</th><th>ExtractMax/Min</th><th>Peek</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Binärer Heap</td><td>O(log n)</td><td>O(log n)</td><td>O(1)</td></tr>
+              <tr><td>Sortiertes Array</td><td>O(n)</td><td>O(1)</td><td>O(1)</td></tr>
+              <tr><td>Unsortiertes Array</td><td>O(1)</td><td>O(n)</td><td>O(n)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div>
+          <h2>Variante 1 – Manuell: TaskMaxHeap</h2>
+          <p>
+            <code>TaskMaxHeap</code> ist eine händisch implementierte MaxHeap-basierte
+            Prioritätswarteschlange für <code>TaskManual</code>-Objekte. Das Element mit der
+            <strong>höchsten Priorität</strong> steht stets an der Wurzel (Index&nbsp;0) und
+            wird von <em>extractMax()</em> als erstes entnommen. Nach jedem <em>Insert</em>
+            stellt ein Bubble-up, nach jeder Entnahme ein <em>Heapify-down</em> die
+            Heap-Eigenschaft wieder her. Diese Variante macht den Mechanismus explizit sichtbar
+            und zeigt, was hinter jeder fertigen Bibliotheksklasse steckt.
+          </p>
+        </div>
+
+        <div>
+          <h2>Variante 2 – Java-Standard: <code>java.util.PriorityQueue</code></h2>
+          <p>
+            Javas eingebaute <code>PriorityQueue&lt;E&gt;</code> ist intern als
+            <strong>binärer MinHeap</strong> implementiert – standardmäßig wird also das
+            Element mit der <em>niedrigsten</em> Priorität zuerst entnommen (natürliche Ordnung
+            via <code>Comparable</code>). Um eine Max-PQ zu erhalten, muss ein umgekehrter
+            Comparator übergeben werden:
+          </p>
+          <p>
+            <code>new PriorityQueue&lt;&gt;(Comparator.comparingInt((Task t) -&gt; t.priority).reversed())</code>
+          </p>
+          <p>
+            <code>TaskManager</code> zeigt diese Variante: Nach außen verhält sie sich identisch
+            zur manuellen Implementierung, nutzt intern jedoch die Laufzeitbibliothek.
+            In der Praxis ist dies der bevorzugte Weg.
+          </p>
+        </div>
+
+        <div class="info-box">
+          <p>
+            <strong>Faustregel:</strong> In realen Projekten wird fast immer
+            <code>java.util.PriorityQueue</code> eingesetzt. Die manuelle Implementierung
+            dient dem Verständnis der Heap-Mechanik und verdeutlicht, was intern abläuft.
+          </p>
+        </div>
+
+        <div>
+          <h2>Exkurs: Stack und Heap im Betriebssystem</h2>
+          <p>
+            Die Begriffe <em>Stack</em> und <em>Heap</em> bezeichnen im Kontext des
+            Betriebssystems zwei <strong>unterschiedliche Arbeitsspeicherbereiche</strong> –
+            nicht zu verwechseln mit den gleichnamigen Datenstrukturen.
+          </p>
+          <p>
+            Der <strong>Call Stack</strong> ist ein fester, bei Programmstart dimensionierter
+            Speicherbereich, der Funktionsaufrufe, Rücksprungadressen und lokale Variablen
+            verwaltet. Er arbeitet strikt nach dem LIFO-Prinzip: Beim Aufruf einer Funktion
+            wird ein neuer <em>Stack Frame</em> aufgelegt, beim Rücksprung wieder entfernt.
+            Diese Struktur ist <strong>sehr schnell</strong> – Allokation ist ein einzelner
+            Zeigerarithmetik-Schritt – jedoch <strong>starr</strong>: Die maximale Tiefe ist
+            begrenzt, und zu tiefe Rekursion führt zu einem <em>StackOverflowError</em>.
+          </p>
+          <p>
+            Der <strong>Heap-Speicher</strong> (dynamischer Speicher) ist der deutlich größere,
+            flexible Bereich, in dem Objekte zur Laufzeit allokiert werden. In Java landen alle
+            per <code>new</code> erzeugten Objekte im Heap. Er wächst und schrumpft dynamisch;
+            ein <em>Garbage Collector</em> gibt nicht mehr erreichbare Objekte frei.
+            Heap-Allokation ist langsamer als Stack-Allokation, bietet aber nahezu unbegrenzte
+            Kapazität und ermöglicht, Daten über Funktionsgrenzen hinweg zu halten.
+          </p>
+          <table class="complexity-table">
+            <thead>
+              <tr><th>Eigenschaft</th><th>Call Stack</th><th>Heap-Speicher</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Größe</td><td>Fest (typ. 512 KB – 8 MB)</td><td>Dynamisch (GB-Bereich)</td></tr>
+              <tr><td>Allokationsgeschwindigkeit</td><td>O(1), sehr schnell</td><td>Langsamer (GC-Overhead)</td></tr>
+              <tr><td>Zugriffsmuster</td><td>LIFO (Stack Frames)</td><td>Beliebig</td></tr>
+              <tr><td>Überlaufrisiko</td><td>StackOverflowError</td><td>OutOfMemoryError</td></tr>
+              <tr><td>Lebensdauer</td><td>An Funktionsaufruf gebunden</td><td>Bis GC freigibt</td></tr>
+            </tbody>
+          </table>
+          <p>
+            <strong>Terminologischer Hinweis:</strong> Der „Heap" als OS-Speicherbereich und
+            der „Heap" als Datenstruktur (MaxHeap, MinHeap) sind konzeptuell
+            <em>unabhängig</em> – die Namensgleichheit ist historisch bedingt und eine häufige
+            Quelle von Verwirrung.
+          </p>
+        </div>
+      </div>
+
+      <p class="code-viewer-label">Implementierung – manuell vs. Java-Standard</p>
+      <div class="code-viewer">
+        <div class="code-source" data-lang="Manuell" data-file="implemented/java/TaskMaxHeap.java"></div>
+        <div class="code-source" data-lang="Java-Standard" data-file="implemented/java/TaskManager.java"></div>
+      </div>
+    </section><!-- /priorityqueue -->
+
+
     <!-- ─── LAUFZEIT: ASYMPTOTISCHE NOTATION ─────────────── -->
     <section id="ch-laufzeit-notation" class="chapter">
       <h1>Asymptotische Notation</h1>
@@ -1253,10 +1385,12 @@ def bubble_sort(A):
   ============================================================ */
 
   const LANG_TO_HLJS = {
-    pseudocode: 'plaintext',
-    java:       'java',
-    python:     'python',
-    prolog:     'prolog',
+    pseudocode:      'plaintext',
+    java:            'java',
+    python:          'python',
+    prolog:          'prolog',
+    'manuell':       'java',
+    'java-standard': 'java',
   };
 
   async function fetchText(path) {
