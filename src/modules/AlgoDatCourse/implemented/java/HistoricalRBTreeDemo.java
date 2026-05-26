@@ -1,4 +1,5 @@
 import javax.swing.BorderFactory;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -11,8 +12,12 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.border.EmptyBorder;
+import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -20,6 +25,8 @@ import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Polygon;
+import java.awt.RenderingHints;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
@@ -28,6 +35,15 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class HistoricalRBTreeDemo {
+    private static final Color BG = new Color(246, 248, 251);
+    private static final Color PANEL = Color.WHITE;
+    private static final Color BORDER = new Color(221, 226, 234);
+    private static final Color TEXT = new Color(31, 41, 55);
+    private static final Color MUTED = new Color(107, 114, 128);
+    private static final Color RED = new Color(190, 18, 60);
+    private static final Color GREEN = new Color(132, 204, 22);
+    private static final Color GREEN_DARK = new Color(77, 124, 15);
+
     /*
      * TreeMap ist in Java als Rot-Schwarz-Baum implementiert.
      * Die UI arbeitet also auf einer echten sortierten Baumstruktur.
@@ -65,10 +81,25 @@ public class HistoricalRBTreeDemo {
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
+            configureLookAndFeel();
             HistoricalRBTreeDemo database = seededDatabase();
             HistoricalDatabaseFrame frame = new HistoricalDatabaseFrame(database);
             frame.setVisible(true);
         });
+    }
+
+    private static void configureLookAndFeel() {
+        UIManager.put("Panel.background", BG);
+        UIManager.put("Label.foreground", TEXT);
+        UIManager.put("Button.background", new Color(17, 24, 39));
+        UIManager.put("Button.foreground", Color.WHITE);
+        UIManager.put("Button.focus", new Color(17, 24, 39));
+        UIManager.put("TextField.background", Color.WHITE);
+        UIManager.put("TextField.foreground", TEXT);
+        UIManager.put("TextArea.background", Color.WHITE);
+        UIManager.put("TextArea.foreground", TEXT);
+        UIManager.put("List.background", Color.WHITE);
+        UIManager.put("List.foreground", TEXT);
     }
 
     private static HistoricalRBTreeDemo seededDatabase() {
@@ -99,8 +130,16 @@ public class HistoricalRBTreeDemo {
         ));
 
         db.add(new HistoricalEntry(
+                LocalDate.of(1793, 9, 5),
+                LocalDate.of(1794, 7, 27),
+                "Schreckensherrschaft",
+                List.of("Maximilien Robespierre", "Wohlfahrtsausschuss"),
+                List.of("docs/terror_period_sources.pdf")
+        ));
+
+        db.add(new HistoricalEntry(
                 LocalDate.of(1799, 11, 9),
-                LocalDate.of(1799, 11, 10),
+                LocalDate.of(1799, 11, 9),
                 "Staatsstreich des 18. Brumaire",
                 List.of("Napoleon Bonaparte", "Emmanuel Joseph Sieyes"),
                 List.of("docs/brumaire_notes.pdf")
@@ -119,22 +158,26 @@ public class HistoricalRBTreeDemo {
         HistoricalEntry(LocalDate startDate, LocalDate endDate, String title,
                         List<String> people, List<String> documents) {
             this.startDate = startDate;
-            this.endDate = endDate;
+            this.endDate = endDate.isBefore(startDate) ? startDate : endDate;
             this.title = title;
             this.people = List.copyOf(people);
             this.documents = List.copyOf(documents);
         }
 
+        boolean isEvent() {
+            return startDate.equals(endDate);
+        }
+
         @Override
         public String toString() {
-            String span = startDate.equals(endDate)
-                    ? startDate.toString()
-                    : startDate + " bis " + endDate;
-            return span + "  |  " + title;
+            String kind = isEvent() ? "Ereignis" : "Prozess";
+            String span = isEvent() ? startDate.toString() : startDate + " bis " + endDate;
+            return kind + "  |  " + span + "  |  " + title;
         }
 
         String details() {
             return title + "\n"
+                    + "Typ: " + (isEvent() ? "Ereignis" : "Prozess") + "\n"
                     + "Zeitraum: " + startDate + " bis " + endDate + "\n"
                     + "Personen: " + String.join(", ", people) + "\n"
                     + "Dokumente: " + String.join(", ", documents);
@@ -161,15 +204,18 @@ public class HistoricalRBTreeDemo {
             this.database = database;
 
             setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            setSize(980, 680);
+            setSize(1120, 720);
+            setMinimumSize(new Dimension(980, 620));
             setLocationRelativeTo(null);
-            setLayout(new BorderLayout(12, 12));
+            setLayout(new BorderLayout(14, 14));
+            getContentPane().setBackground(BG);
 
-            add(buildQueryPanel(), BorderLayout.NORTH);
+            add(buildHeader(), BorderLayout.NORTH);
             add(buildMainPanel(), BorderLayout.CENTER);
             add(buildInputPanel(), BorderLayout.SOUTH);
 
             entryList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+            entryList.setCellRenderer(new EntryRenderer());
             entryList.addListSelectionListener(event -> {
                 HistoricalEntry entry = entryList.getSelectedValue();
                 detailsArea.setText(entry == null ? "" : entry.details());
@@ -178,52 +224,70 @@ public class HistoricalRBTreeDemo {
             refreshResults();
         }
 
-        private JPanel buildQueryPanel() {
-            JPanel panel = new JPanel(new GridBagLayout());
-            panel.setBorder(BorderFactory.createEmptyBorder(12, 12, 0, 12));
+        private JPanel buildHeader() {
+            JPanel panel = cardPanel(new BorderLayout(16, 10));
+            panel.setBorder(new EmptyBorder(18, 20, 18, 20));
 
+            JPanel titlePanel = new JPanel(new BorderLayout(2, 2));
+            titlePanel.setOpaque(false);
+            JLabel title = new JLabel("Historische Datenbank");
+            title.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 24));
+            JLabel subtitle = new JLabel("Rot-Schwarz-Baum: Ereignisse als Fahnen, Prozesse als Zeitbalken");
+            subtitle.setForeground(MUTED);
+            titlePanel.add(title, BorderLayout.NORTH);
+            titlePanel.add(subtitle, BorderLayout.SOUTH);
+            panel.add(titlePanel, BorderLayout.WEST);
+
+            JPanel query = new JPanel(new GridBagLayout());
+            query.setOpaque(false);
             GridBagConstraints c = constraints();
-            panel.add(new JLabel("Von"), c);
+            query.add(smallLabel("Von"), c);
             c.gridx++;
-            panel.add(fromField, c);
+            query.add(styledField(fromField), c);
             c.gridx++;
-            panel.add(new JLabel("Bis"), c);
+            query.add(smallLabel("Bis"), c);
             c.gridx++;
-            panel.add(toField, c);
+            query.add(styledField(toField), c);
             c.gridx++;
 
-            JButton searchButton = new JButton("Bereich suchen");
+            JButton searchButton = primaryButton("Bereich suchen");
             searchButton.addActionListener(event -> refreshResults());
-            panel.add(searchButton, c);
+            query.add(searchButton, c);
             c.gridx++;
 
-            JButton nextButton = new JButton("Nächster Eintrag");
+            JButton nextButton = secondaryButton("Nächster Eintrag");
             nextButton.addActionListener(event -> showNextEntry());
-            panel.add(nextButton, c);
+            query.add(nextButton, c);
+            panel.add(query, BorderLayout.EAST);
 
             return panel;
         }
 
         private JPanel buildMainPanel() {
-            JPanel panel = new JPanel(new BorderLayout(12, 12));
-            panel.setBorder(BorderFactory.createEmptyBorder(0, 12, 0, 12));
+            JPanel panel = new JPanel(new BorderLayout(14, 14));
+            panel.setOpaque(false);
+            panel.setBorder(new EmptyBorder(0, 16, 0, 16));
 
             JScrollPane listScroll = new JScrollPane(entryList);
-            listScroll.setPreferredSize(new Dimension(360, 240));
-            listScroll.setBorder(BorderFactory.createTitledBorder("Gefundene Einträge"));
+            listScroll.setPreferredSize(new Dimension(390, 260));
+            listScroll.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(BORDER), "Einträge"));
             panel.add(listScroll, BorderLayout.WEST);
 
-            JPanel center = new JPanel(new BorderLayout(8, 8));
-            timelinePanel.setBorder(BorderFactory.createTitledBorder("Zeitstrahl"));
-            center.add(timelinePanel, BorderLayout.CENTER);
+            JPanel center = new JPanel(new BorderLayout(12, 12));
+            center.setOpaque(false);
+            JPanel timelineCard = cardPanel(new BorderLayout());
+            timelineCard.setBorder(new EmptyBorder(12, 12, 12, 12));
+            timelineCard.add(timelinePanel, BorderLayout.CENTER);
+            center.add(timelineCard, BorderLayout.CENTER);
 
             detailsArea.setEditable(false);
             detailsArea.setLineWrap(true);
             detailsArea.setWrapStyleWord(true);
             detailsArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 13));
+            detailsArea.setBorder(new EmptyBorder(10, 12, 10, 12));
             JScrollPane detailsScroll = new JScrollPane(detailsArea);
-            detailsScroll.setPreferredSize(new Dimension(300, 120));
-            detailsScroll.setBorder(BorderFactory.createTitledBorder("Details"));
+            detailsScroll.setPreferredSize(new Dimension(300, 128));
+            detailsScroll.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(BORDER), "Details"));
             center.add(detailsScroll, BorderLayout.SOUTH);
 
             panel.add(center, BorderLayout.CENTER);
@@ -231,47 +295,94 @@ public class HistoricalRBTreeDemo {
         }
 
         private JPanel buildInputPanel() {
-            JPanel panel = new JPanel(new GridBagLayout());
-            panel.setBorder(BorderFactory.createTitledBorder("Neuen Eintrag einfügen"));
+            JPanel panel = cardPanel(new GridBagLayout());
+            panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(BORDER), "Neuen Eintrag einfügen"));
 
             GridBagConstraints c = constraints();
-            panel.add(new JLabel("Start"), c);
+            panel.add(smallLabel("Start"), c);
             c.gridx++;
-            panel.add(startField, c);
+            panel.add(styledField(startField), c);
             c.gridx++;
-            panel.add(new JLabel("Ende"), c);
+            panel.add(smallLabel("Ende"), c);
             c.gridx++;
-            panel.add(endField, c);
+            panel.add(styledField(endField), c);
             c.gridx++;
-            panel.add(new JLabel("Titel"), c);
+            panel.add(smallLabel("Titel"), c);
             c.gridx++;
-            panel.add(titleField, c);
+            panel.add(styledField(titleField), c);
 
             c.gridx = 0;
             c.gridy = 1;
-            panel.add(new JLabel("Personen"), c);
+            panel.add(smallLabel("Personen"), c);
             c.gridx++;
             c.gridwidth = 3;
-            panel.add(peopleField, c);
+            panel.add(styledField(peopleField), c);
             c.gridx += 3;
             c.gridwidth = 1;
-            panel.add(new JLabel("Dokumente"), c);
+            panel.add(smallLabel("Dokumente"), c);
             c.gridx++;
-            panel.add(docsField, c);
+            panel.add(styledField(docsField), c);
             c.gridx++;
 
-            JButton addButton = new JButton("Einfügen");
+            JButton addButton = primaryButton("Einfügen");
             addButton.addActionListener(event -> addEntryFromForm());
             panel.add(addButton, c);
 
+            JPanel outer = new JPanel(new BorderLayout());
+            outer.setOpaque(false);
+            outer.setBorder(new EmptyBorder(0, 16, 16, 16));
+            outer.add(panel, BorderLayout.CENTER);
+            return outer;
+        }
+
+        private JPanel cardPanel(java.awt.LayoutManager layout) {
+            JPanel panel = new JPanel(layout);
+            panel.setBackground(PANEL);
+            panel.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(BORDER),
+                    new EmptyBorder(10, 12, 10, 12)
+            ));
             return panel;
+        }
+
+        private JLabel smallLabel(String text) {
+            JLabel label = new JLabel(text);
+            label.setForeground(MUTED);
+            label.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 12));
+            return label;
+        }
+
+        private JTextField styledField(JTextField field) {
+            field.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(BORDER),
+                    new EmptyBorder(7, 9, 7, 9)
+            ));
+            return field;
+        }
+
+        private JButton primaryButton(String text) {
+            JButton button = new JButton(text);
+            button.setBackground(new Color(17, 24, 39));
+            button.setForeground(Color.WHITE);
+            button.setFocusPainted(false);
+            button.setBorder(new EmptyBorder(8, 14, 8, 14));
+            return button;
+        }
+
+        private JButton secondaryButton(String text) {
+            JButton button = new JButton(text);
+            button.setBackground(new Color(238, 242, 247));
+            button.setForeground(TEXT);
+            button.setFocusPainted(false);
+            button.setBorder(new EmptyBorder(8, 14, 8, 14));
+            return button;
         }
 
         private GridBagConstraints constraints() {
             GridBagConstraints c = new GridBagConstraints();
             c.gridx = 0;
             c.gridy = 0;
-            c.insets = new Insets(4, 6, 4, 6);
+            c.insets = new Insets(5, 6, 5, 6);
             c.fill = GridBagConstraints.HORIZONTAL;
             return c;
         }
@@ -339,13 +450,28 @@ public class HistoricalRBTreeDemo {
         }
     }
 
+    static class EntryRenderer extends DefaultListCellRenderer {
+        @Override
+        public Component getListCellRendererComponent(JList<?> list, Object value, int index,
+                                                      boolean isSelected, boolean cellHasFocus) {
+            JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+            HistoricalEntry entry = (HistoricalEntry) value;
+            label.setBorder(new EmptyBorder(10, 12, 10, 12));
+            label.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 13));
+            label.setText((entry.isEvent() ? "⚑ " : "▬ ") + entry);
+            label.setForeground(isSelected ? Color.WHITE : TEXT);
+            label.setBackground(isSelected ? new Color(31, 41, 55) : Color.WHITE);
+            return label;
+        }
+    }
+
     static class TimelinePanel extends JPanel {
         private LocalDate from = LocalDate.of(1789, 1, 1);
         private LocalDate to = LocalDate.of(1800, 1, 1);
         private List<HistoricalEntry> entries = List.of();
 
         TimelinePanel() {
-            setPreferredSize(new Dimension(520, 360));
+            setPreferredSize(new Dimension(620, 420));
             setBackground(Color.WHITE);
         }
 
@@ -360,33 +486,159 @@ public class HistoricalRBTreeDemo {
         protected void paintComponent(Graphics graphics) {
             super.paintComponent(graphics);
             Graphics2D g = (Graphics2D) graphics;
-            int left = 50;
-            int right = getWidth() - 30;
-            int top = 40;
-            int rowHeight = 46;
+            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
+            int left = 64;
+            int right = getWidth() - 36;
+            int axisY = 126;
             long totalDays = Math.max(1, to.toEpochDay() - from.toEpochDay());
 
-            g.setColor(new Color(40, 40, 40));
-            g.drawLine(left, top, right, top);
-            g.drawString(from.toString(), left, top - 10);
-            g.drawString(to.toString(), Math.max(left, right - 90), top - 10);
+            drawHeader(g, left, right, axisY);
+            drawTicks(g, left, right, axisY, totalDays);
 
-            for (int i = 0; i < entries.size(); i++) {
-                HistoricalEntry entry = entries.get(i);
-                int y = top + 32 + i * rowHeight;
+            List<HistoricalEntry> events = new ArrayList<>();
+            List<HistoricalEntry> processes = new ArrayList<>();
+            for (HistoricalEntry entry : entries) {
+                if (entry.isEvent()) {
+                    events.add(entry);
+                } else {
+                    processes.add(entry);
+                }
+            }
+
+            drawEvents(g, events, left, right, axisY, totalDays);
+            drawProcesses(g, processes, left, right, axisY, totalDays);
+            drawLegend(g, left, getHeight() - 54);
+        }
+
+        private void drawHeader(Graphics2D g, int left, int right, int axisY) {
+            g.setColor(TEXT);
+            g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 20));
+            g.drawString("Zeitstrahl historischer Einträge", left, 34);
+
+            g.setColor(MUTED);
+            g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 12));
+            g.drawString("TreeMap / Rot-Schwarz-Baum sortiert nach Startdatum", left, 54);
+
+            g.setColor(new Color(17, 24, 39));
+            g.setStroke(new BasicStroke(3f));
+            g.drawLine(left, axisY, right, axisY);
+
+            g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 12));
+            g.drawString(from.toString(), left, axisY + 28);
+            g.drawString(to.toString(), Math.max(left, right - 86), axisY + 28);
+        }
+
+        private void drawTicks(Graphics2D g, int left, int right, int axisY, long totalDays) {
+            g.setStroke(new BasicStroke(1f));
+            for (int i = 0; i <= 8; i++) {
+                int x = left + (i * (right - left)) / 8;
+                g.setColor(new Color(203, 213, 225));
+                g.drawLine(x, axisY - 10, x, getHeight() - 78);
+                g.setColor(new Color(75, 85, 99));
+                g.drawLine(x, axisY - 18, x, axisY + 18);
+
+                LocalDate tickDate = from.plusDays((totalDays * i) / 8);
+                g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 11));
+                g.drawString(String.valueOf(tickDate.getYear()), x - 14, axisY + 44);
+            }
+        }
+
+        private void drawEvents(Graphics2D g, List<HistoricalEntry> events,
+                                int left, int right, int axisY, long totalDays) {
+            int[] lanes = {34, 58, 82};
+            for (int i = 0; i < events.size(); i++) {
+                HistoricalEntry entry = events.get(i);
+                int x = position(entry.startDate, left, right, totalDays);
+                int top = lanes[i % lanes.length];
+
+                g.setColor(new Color(31, 41, 55));
+                g.setStroke(new BasicStroke(1.6f));
+                g.drawLine(x, top + 24, x, axisY);
+
+                g.setColor(RED);
+                Polygon flag = new Polygon(
+                        new int[]{x, x, x + 12, x},
+                        new int[]{top, top + 24, top + 12, top},
+                        4
+                );
+                g.fillPolygon(flag);
+
+                g.setColor(RED);
+                g.fillRoundRect(x + 5, top - 4, Math.min(190, textWidth(g, entry.title) + 12), 21, 4, 4);
+                g.setColor(Color.WHITE);
+                g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 11));
+                g.drawString(shorten(entry.title, 26), x + 11, top + 11);
+
+                g.setColor(TEXT);
+                g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 11));
+                g.drawString(entry.startDate.toString(), x + 8, top + 31);
+            }
+        }
+
+        private void drawProcesses(Graphics2D g, List<HistoricalEntry> processes,
+                                   int left, int right, int axisY, long totalDays) {
+            int rowHeight = 42;
+            int startY = axisY + 76;
+            for (int i = 0; i < processes.size(); i++) {
+                HistoricalEntry entry = processes.get(i);
+                int y = startY + i * rowHeight;
                 int x1 = position(entry.startDate, left, right, totalDays);
                 int x2 = position(entry.endDate, left, right, totalDays);
+                int width = Math.max(32, x2 - x1);
 
-                g.setColor(new Color(178, 34, 34));
-                g.fillRoundRect(Math.min(x1, x2), y - 8, Math.max(8, Math.abs(x2 - x1) + 8), 12, 8, 8);
-                g.setColor(new Color(25, 25, 25));
-                g.drawString(entry.title, left, y + 16);
+                g.setColor(GREEN);
+                g.fillRoundRect(x1, y, width, 26, 8, 8);
+                g.setColor(new Color(101, 163, 13));
+                g.drawRoundRect(x1, y, width, 26, 8, 8);
+                g.setColor(Color.WHITE);
+                g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 12));
+                g.drawString(shorten(entry.title, Math.max(10, width / 7)), x1 + 10, y + 18);
+
+                g.setColor(GREEN_DARK);
+                g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 10));
+                g.drawString(entry.startDate + " -> " + entry.endDate, x1, y + 39);
             }
+        }
+
+        private void drawLegend(Graphics2D g, int x, int y) {
+            g.setColor(new Color(248, 250, 252));
+            g.fillRoundRect(x, y, 250, 38, 10, 10);
+            g.setColor(BORDER);
+            g.drawRoundRect(x, y, 250, 38, 10, 10);
+
+            g.setColor(RED);
+            Polygon flag = new Polygon(
+                    new int[]{x + 14, x + 14, x + 26, x + 14},
+                    new int[]{y + 10, y + 27, y + 18, y + 10},
+                    4
+            );
+            g.fillPolygon(flag);
+            g.setColor(TEXT);
+            g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 12));
+            g.drawString("Ereignis", x + 34, y + 24);
+
+            g.setColor(GREEN);
+            g.fillRoundRect(x + 120, y + 12, 34, 14, 6, 6);
+            g.setColor(TEXT);
+            g.drawString("Prozess", x + 164, y + 24);
         }
 
         private int position(LocalDate date, int left, int right, long totalDays) {
             long offset = Math.max(0, Math.min(totalDays, date.toEpochDay() - from.toEpochDay()));
             return left + (int) ((offset * (right - left)) / totalDays);
+        }
+
+        private int textWidth(Graphics2D g, String text) {
+            return g.getFontMetrics(new Font(Font.SANS_SERIF, Font.BOLD, 11)).stringWidth(shorten(text, 26));
+        }
+
+        private String shorten(String text, int maxLength) {
+            if (text.length() <= maxLength) {
+                return text;
+            }
+            return text.substring(0, Math.max(1, maxLength - 1)) + "…";
         }
     }
 }
