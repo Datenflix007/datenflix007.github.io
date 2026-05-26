@@ -1202,6 +1202,37 @@ def bubble_sort(A):
         </div>
       </div>
 
+      <div class="chapter-body" style="margin-top: 34px">
+        <div>
+          <h2>UI-Demo und Rot-Schwarz-Baum-Nutzung</h2>
+          <p>
+            Die historische Datenbank-Demo nutzt in Java <code>TreeMap</code>. Diese Klasse ist
+            intern als <strong>Rot-Schwarz-Baum</strong> umgesetzt. Die Einträge werden dabei nach
+            dem Startdatum sortiert gespeichert; mehrere Einträge mit gleichem Datum liegen als
+            Liste im Knotenwert. Dadurch können Bereichsanfragen wie „alle Einträge zwischen
+            1789 und 1817", der nächste Eintrag nach einem Datum oder die Baumansicht effizient
+            aus der sortierten Struktur abgeleitet werden.
+          </p>
+          <p>
+            Der Vorteil gegenüber einer einfachen Liste ist die garantierte logarithmische Höhe:
+            Suchen, Einfügen und Nachbarabfragen bleiben auch bei vielen historischen Einträgen
+            <strong>O(log n)</strong>. Für eine Timeline oder historische Datenbank ist das
+            besonders nützlich, weil neue Quellen, Ereignisse und Prozesse ständig eingefügt
+            werden können, ohne dass die Struktur zu einer langsamen linearen Suche degeneriert.
+          </p>
+        </div>
+
+        <div class="img-wrap">
+          <img src="img/RBT_HistDB0.png" alt="Historische Datenbank mit Timeline-Ansicht" class="chapter-img" />
+          <p class="img-caption">Timeline-Ansicht: Ereignisse als rote Fahnen, Prozesse als grüne Balken</p>
+        </div>
+
+        <div class="img-wrap">
+          <img src="img/RBT_HistDB1.png" alt="Historische Datenbank mit Rot-Schwarz-Baum-Ansicht" class="chapter-img" />
+          <p class="img-caption">Baumansicht: Datensätze als Rot-Schwarz-Baum nach Startdatum und Titel</p>
+        </div>
+      </div>
+
       <p class="code-viewer-label">Basic Demo: Historische Datenbank</p>
       <div class="code-viewer">
         <div class="code-source" data-lang="Java" data-file="implemented/java/HistoricalRBTreeDemo.java"></div>

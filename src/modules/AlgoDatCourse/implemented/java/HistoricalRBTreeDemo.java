@@ -19,6 +19,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.HyperlinkEvent;
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
@@ -105,6 +106,14 @@ public class HistoricalRBTreeDemo {
         return null;
     }
 
+    public List<HistoricalEntry> rbInorderEntries() {
+        List<HistoricalEntry> entries = new ArrayList<>();
+        for (List<HistoricalEntry> nodeValues : redBlackTreeByStartDate.values()) {
+            entries.addAll(nodeValues);
+        }
+        return entries;
+    }
+
     public List<HistoricalEntry> relatedEventsFor(HistoricalEntry process) {
         List<HistoricalEntry> events = new ArrayList<>();
         if (process.isEvent()) {
@@ -182,6 +191,206 @@ public class HistoricalRBTreeDemo {
                 List.of("docs/brumaire_notes.pdf")
         ));
 
+        db.rbInsert(new HistoricalEntry(
+                LocalDate.of(1801, 7, 15),
+                LocalDate.of(1801, 7, 15),
+                "Konkordat von 1801",
+                List.of("Napoleon Bonaparte", "Papst Pius VII."),
+                List.of("docs/concordat_1801.pdf")
+        ));
+
+        db.rbInsert(new HistoricalEntry(
+                LocalDate.of(1803, 5, 18),
+                LocalDate.of(1815, 11, 20),
+                "Napoleonische Kriege",
+                List.of("Napoleon Bonaparte", "Arthur Wellesley", "Gebhard Leberecht von Blücher"),
+                List.of("docs/napoleonic_wars_overview.pdf")
+        ));
+
+        db.rbInsert(new HistoricalEntry(
+                LocalDate.of(1805, 12, 2),
+                LocalDate.of(1805, 12, 2),
+                "Schlacht bei Austerlitz",
+                List.of("Napoleon Bonaparte", "Franz II.", "Alexander I."),
+                List.of("docs/austerlitz.pdf")
+        ));
+
+        db.rbInsert(new HistoricalEntry(
+                LocalDate.of(1806, 7, 12),
+                LocalDate.of(1813, 10, 19),
+                "Rheinbundzeit",
+                List.of("Napoleon Bonaparte", "Deutsche Mittelstaaten"),
+                List.of("docs/confederation_rhine.md")
+        ));
+
+        db.rbInsert(new HistoricalEntry(
+                LocalDate.of(1804, 12, 2),
+                LocalDate.of(1804, 12, 2),
+                "Krönung Napoleons",
+                List.of("Napoleon Bonaparte", "Josephine de Beauharnais"),
+                List.of("docs/coronation.pdf")
+        ));
+
+        db.rbInsert(new HistoricalEntry(
+                LocalDate.of(1812, 6, 24),
+                LocalDate.of(1812, 12, 14),
+                "Russlandfeldzug",
+                List.of("Napoleon Bonaparte", "Alexander I."),
+                List.of("docs/russian_campaign.md")
+        ));
+
+        db.rbInsert(new HistoricalEntry(
+                LocalDate.of(1815, 6, 18),
+                LocalDate.of(1815, 6, 18),
+                "Schlacht bei Waterloo",
+                List.of("Napoleon Bonaparte", "Arthur Wellesley", "Gebhard Leberecht von Blücher"),
+                List.of("docs/waterloo_sources.pdf")
+        ));
+
+        db.rbInsert(new HistoricalEntry(
+                LocalDate.of(1848, 3, 18),
+                LocalDate.of(1849, 7, 23),
+                "Deutsche Revolution 1848/49",
+                List.of("Frankfurter Nationalversammlung", "Friedrich Wilhelm IV."),
+                List.of("docs/revolution_1848.pdf")
+        ));
+
+        db.rbInsert(new HistoricalEntry(
+                LocalDate.of(1849, 3, 28),
+                LocalDate.of(1849, 3, 28),
+                "Paulskirchenverfassung",
+                List.of("Frankfurter Nationalversammlung"),
+                List.of("docs/paulskirche_constitution.pdf")
+        ));
+
+        db.rbInsert(new HistoricalEntry(
+                LocalDate.of(1864, 2, 1),
+                LocalDate.of(1871, 1, 18),
+                "Drei deutsche Einigungskriege",
+                List.of("Otto von Bismarck", "Wilhelm I.", "Helmuth von Moltke"),
+                List.of("docs/einigungskriege_overview.pdf")
+        ));
+
+        db.rbInsert(new HistoricalEntry(
+                LocalDate.of(1864, 2, 1),
+                LocalDate.of(1864, 10, 30),
+                "Deutsch-Dänischer Krieg",
+                List.of("Preußen", "Österreich", "Dänemark"),
+                List.of("docs/danish_war_1864.pdf")
+        ));
+
+        db.rbInsert(new HistoricalEntry(
+                LocalDate.of(1866, 7, 3),
+                LocalDate.of(1866, 7, 3),
+                "Schlacht bei Königgrätz",
+                List.of("Preußen", "Österreich"),
+                List.of("docs/koeniggraetz.pdf")
+        ));
+
+        db.rbInsert(new HistoricalEntry(
+                LocalDate.of(1866, 6, 14),
+                LocalDate.of(1866, 8, 23),
+                "Deutscher Krieg",
+                List.of("Preußen", "Österreich", "Deutscher Bund"),
+                List.of("docs/austro_prussian_war.pdf")
+        ));
+
+        db.rbInsert(new HistoricalEntry(
+                LocalDate.of(1870, 7, 19),
+                LocalDate.of(1871, 5, 10),
+                "Deutsch-Französischer Krieg",
+                List.of("Preußen", "Frankreich", "Norddeutscher Bund"),
+                List.of("docs/franco_prussian_war.pdf")
+        ));
+
+        db.rbInsert(new HistoricalEntry(
+                LocalDate.of(1871, 1, 18),
+                LocalDate.of(1871, 1, 18),
+                "Deutsche Reichsgründung",
+                List.of("Wilhelm I.", "Otto von Bismarck"),
+                List.of("docs/reichsgruendung_1871.pdf")
+        ));
+
+        db.rbInsert(new HistoricalEntry(
+                LocalDate.of(1884, 11, 15),
+                LocalDate.of(1885, 2, 26),
+                "Berliner Kongokonferenz",
+                List.of("Otto von Bismarck", "Europäische Kolonialmächte"),
+                List.of("docs/berlin_conference.pdf")
+        ));
+
+        db.rbInsert(new HistoricalEntry(
+                LocalDate.of(1914, 7, 28),
+                LocalDate.of(1918, 11, 11),
+                "Erster Weltkrieg",
+                List.of("Deutsches Reich", "Österreich-Ungarn", "Entente"),
+                List.of("docs/ww1_overview.pdf")
+        ));
+
+        db.rbInsert(new HistoricalEntry(
+                LocalDate.of(1914, 6, 28),
+                LocalDate.of(1914, 6, 28),
+                "Attentat von Sarajevo",
+                List.of("Franz Ferdinand", "Gavrilo Princip"),
+                List.of("docs/sarajevo_assassination.pdf")
+        ));
+
+        db.rbInsert(new HistoricalEntry(
+                LocalDate.of(1916, 2, 21),
+                LocalDate.of(1916, 12, 18),
+                "Schlacht um Verdun",
+                List.of("Deutsches Reich", "Frankreich"),
+                List.of("docs/verdun.pdf")
+        ));
+
+        db.rbInsert(new HistoricalEntry(
+                LocalDate.of(1918, 11, 11),
+                LocalDate.of(1918, 11, 11),
+                "Waffenstillstand von Compiègne",
+                List.of("Matthias Erzberger", "Ferdinand Foch"),
+                List.of("docs/compiegne_armistice.pdf")
+        ));
+
+        db.rbInsert(new HistoricalEntry(
+                LocalDate.of(1939, 9, 1),
+                LocalDate.of(1945, 9, 2),
+                "Zweiter Weltkrieg",
+                List.of("Alliierte", "Achsenmächte"),
+                List.of("docs/ww2_overview.pdf")
+        ));
+
+        db.rbInsert(new HistoricalEntry(
+                LocalDate.of(1939, 9, 1),
+                LocalDate.of(1939, 9, 1),
+                "Überfall auf Polen",
+                List.of("Deutsches Reich", "Polen"),
+                List.of("docs/invasion_poland.pdf")
+        ));
+
+        db.rbInsert(new HistoricalEntry(
+                LocalDate.of(1941, 6, 22),
+                LocalDate.of(1941, 6, 22),
+                "Unternehmen Barbarossa",
+                List.of("Deutsches Reich", "Sowjetunion"),
+                List.of("docs/barbarossa.pdf")
+        ));
+
+        db.rbInsert(new HistoricalEntry(
+                LocalDate.of(1944, 6, 6),
+                LocalDate.of(1944, 6, 6),
+                "D-Day",
+                List.of("Alliierte Streitkräfte", "Deutsches Reich"),
+                List.of("docs/d_day.pdf")
+        ));
+
+        db.rbInsert(new HistoricalEntry(
+                LocalDate.of(1945, 5, 8),
+                LocalDate.of(1945, 5, 8),
+                "Kapitulation der Wehrmacht",
+                List.of("Wilhelm Keitel", "Alliierte"),
+                List.of("docs/german_surrender.pdf")
+        ));
+
         return db;
     }
 
@@ -218,10 +427,14 @@ public class HistoricalRBTreeDemo {
         private final DefaultListModel<HistoricalEntry> listModel = new DefaultListModel<>();
         private final JList<HistoricalEntry> entryList = new JList<>(listModel);
         private final TimelinePanel timelinePanel = new TimelinePanel();
+        private final RBTreePanel rbTreePanel = new RBTreePanel();
+        private final CardLayout centerCards = new CardLayout();
+        private final JPanel centerCardPanel = new JPanel(centerCards);
         private final JEditorPane detailsPane = new JEditorPane("text/html", "");
+        private boolean treeViewVisible = false;
 
         private final JTextField fromField = new JTextField("1789-01-01", 10);
-        private final JTextField toField = new JTextField("1800-01-01", 10);
+        private final JTextField toField = new JTextField("1950-01-01", 10);
         private final JTextField startField = new JTextField("1804-12-02", 10);
         private final JTextField endField = new JTextField("1804-12-02", 10);
         private final JTextField titleField = new JTextField("Krönung Napoleons", 18);
@@ -256,6 +469,7 @@ public class HistoricalRBTreeDemo {
                 toField.setText(to.toString());
                 refreshResults(false);
             });
+            rbTreePanel.setEntrySelectionListener(this::selectEntry);
 
             detailsPane.setEditable(false);
             detailsPane.setOpaque(false);
@@ -310,6 +524,11 @@ public class HistoricalRBTreeDemo {
             JButton newButton = primaryButton("Neuer Eintrag");
             newButton.addActionListener(event -> showNewEntryOverlay());
             query.add(newButton, c);
+            c.gridx++;
+
+            JButton viewButton = secondaryButton("Baumansicht");
+            viewButton.addActionListener(event -> toggleCenterView(viewButton));
+            query.add(viewButton, c);
             panel.add(query, BorderLayout.EAST);
 
             return panel;
@@ -329,12 +548,17 @@ public class HistoricalRBTreeDemo {
             JPanel timelineCard = cardPanel(new BorderLayout());
             timelineCard.setBorder(new EmptyBorder(12, 12, 12, 12));
             timelineCard.add(timelinePanel, BorderLayout.CENTER);
+            JPanel treeCard = cardPanel(new BorderLayout());
+            treeCard.setBorder(new EmptyBorder(12, 12, 12, 12));
+            treeCard.add(new JScrollPane(rbTreePanel), BorderLayout.CENTER);
+            centerCardPanel.add(timelineCard, "timeline");
+            centerCardPanel.add(treeCard, "tree");
 
             JScrollPane detailsScroll = new JScrollPane(detailsPane);
             detailsScroll.setPreferredSize(new Dimension(300, 150));
             detailsScroll.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(BORDER), "Description"));
 
-            JSplitPane verticalSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, timelineCard, detailsScroll);
+            JSplitPane verticalSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, centerCardPanel, detailsScroll);
             verticalSplit.setResizeWeight(0.72);
             verticalSplit.setContinuousLayout(true);
             verticalSplit.setBorder(null);
@@ -404,6 +628,18 @@ public class HistoricalRBTreeDemo {
             );
             if (result == JOptionPane.OK_OPTION) {
                 addEntryFromForm();
+            }
+        }
+
+        private void toggleCenterView(JButton viewButton) {
+            treeViewVisible = !treeViewVisible;
+            if (treeViewVisible) {
+                rbTreePanel.setEntries(database.rbInorderEntries());
+                centerCards.show(centerCardPanel, "tree");
+                viewButton.setText("Timeline");
+            } else {
+                centerCards.show(centerCardPanel, "timeline");
+                viewButton.setText("Baumansicht");
             }
         }
 
@@ -512,6 +748,7 @@ public class HistoricalRBTreeDemo {
                     listModel.addElement(entry);
                 }
                 timelinePanel.setRange(from, to, entries);
+                rbTreePanel.setEntries(database.rbInorderEntries());
 
                 if (selected != null && entries.contains(selected)) {
                     selectEntry(selected);
@@ -547,6 +784,7 @@ public class HistoricalRBTreeDemo {
             entryList.setSelectedValue(entry, true);
             showDetails(entry);
             timelinePanel.setSelectedEntry(entry);
+            rbTreePanel.setSelectedEntry(entry);
         }
 
         private void showDetails(HistoricalEntry entry) {
@@ -603,6 +841,348 @@ public class HistoricalRBTreeDemo {
             label.setForeground(isSelected ? Color.WHITE : TEXT);
             label.setBackground(isSelected ? new Color(31, 41, 55) : Color.WHITE);
             return label;
+        }
+    }
+
+    static class RBTreePanel extends JPanel {
+        private static final boolean NODE_RED = true;
+        private static final boolean NODE_BLACK = false;
+        private static final int LEGEND_SPACE = 118;
+        private final List<TreeNodeHitBox> hitBoxes = new ArrayList<>();
+        private RBVisualNode root;
+        private EntrySelectionListener entrySelectionListener;
+        private HistoricalEntry selectedEntry;
+        private int inorderIndex;
+        private double zoom = 1.0;
+
+        RBTreePanel() {
+            setPreferredSize(new Dimension(650, 450));
+            setBackground(Color.WHITE);
+            setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+            MouseAdapter mouse = new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent event) {
+                    for (TreeNodeHitBox hitBox : hitBoxes) {
+                        if (hitBox.bounds.contains(event.getPoint())) {
+                            selectedEntry = hitBox.node.entry;
+                            if (entrySelectionListener != null) {
+                                entrySelectionListener.entrySelected(hitBox.node.entry);
+                            }
+                            repaint();
+                            return;
+                        }
+                    }
+                }
+
+                @Override
+                public void mouseMoved(MouseEvent event) {
+                    for (TreeNodeHitBox hitBox : hitBoxes) {
+                        if (hitBox.bounds.contains(event.getPoint())) {
+                            setToolTipText(toTooltip(hitBox.node.entry));
+                            return;
+                        }
+                    }
+                    setToolTipText(null);
+                }
+
+                @Override
+                public void mouseWheelMoved(MouseWheelEvent event) {
+                    zoom = Math.max(0.45, Math.min(2.4, zoom * (event.getWheelRotation() < 0 ? 1.12 : 0.88)));
+                    updatePreferredSize();
+                    revalidate();
+                    repaint();
+                }
+            };
+            addMouseListener(mouse);
+            addMouseMotionListener(mouse);
+            addMouseWheelListener(mouse);
+        }
+
+        void setEntrySelectionListener(EntrySelectionListener listener) {
+            this.entrySelectionListener = listener;
+        }
+
+        void setSelectedEntry(HistoricalEntry entry) {
+            this.selectedEntry = entry;
+            repaint();
+        }
+
+        void setEntries(List<HistoricalEntry> entries) {
+            root = null;
+            for (HistoricalEntry entry : entries) {
+                rbInsertVisualNode(entry);
+            }
+            updatePreferredSize();
+            revalidate();
+            repaint();
+        }
+
+        private void updatePreferredSize() {
+            int nodeCount = Math.max(1, countNodes(root));
+            int height = Math.max(1, treeHeight(root));
+            setPreferredSize(new Dimension(
+                    (int) (Math.max(650, nodeCount * 92) * zoom),
+                    (int) (Math.max(450, height * 86 + LEGEND_SPACE + 70) * zoom)
+            ));
+        }
+
+        private void rbInsertVisualNode(HistoricalEntry entry) {
+            RBVisualNode z = new RBVisualNode(entry);
+            RBVisualNode y = null;
+            RBVisualNode x = root;
+            while (x != null) {
+                y = x;
+                x = compareEntries(z.entry, x.entry) < 0 ? x.left : x.right;
+            }
+            z.parent = y;
+            if (y == null) {
+                root = z;
+            } else if (compareEntries(z.entry, y.entry) < 0) {
+                y.left = z;
+            } else {
+                y.right = z;
+            }
+            z.color = NODE_RED;
+            rbInsertFixup(z);
+        }
+
+        private void rbInsertFixup(RBVisualNode z) {
+            while (colorOf(parentOf(z)) == NODE_RED) {
+                if (parentOf(z) == parentOf(parentOf(z)).left) {
+                    RBVisualNode uncle = parentOf(parentOf(z)).right;
+                    if (colorOf(uncle) == NODE_RED) {
+                        parentOf(z).color = NODE_BLACK;
+                        uncle.color = NODE_BLACK;
+                        parentOf(parentOf(z)).color = NODE_RED;
+                        z = parentOf(parentOf(z));
+                    } else {
+                        if (z == parentOf(z).right) {
+                            z = parentOf(z);
+                            leftRotate(z);
+                        }
+                        parentOf(z).color = NODE_BLACK;
+                        parentOf(parentOf(z)).color = NODE_RED;
+                        rightRotate(parentOf(parentOf(z)));
+                    }
+                } else {
+                    RBVisualNode uncle = parentOf(parentOf(z)).left;
+                    if (colorOf(uncle) == NODE_RED) {
+                        parentOf(z).color = NODE_BLACK;
+                        uncle.color = NODE_BLACK;
+                        parentOf(parentOf(z)).color = NODE_RED;
+                        z = parentOf(parentOf(z));
+                    } else {
+                        if (z == parentOf(z).left) {
+                            z = parentOf(z);
+                            rightRotate(z);
+                        }
+                        parentOf(z).color = NODE_BLACK;
+                        parentOf(parentOf(z)).color = NODE_RED;
+                        leftRotate(parentOf(parentOf(z)));
+                    }
+                }
+            }
+            root.color = NODE_BLACK;
+        }
+
+        private void leftRotate(RBVisualNode x) {
+            RBVisualNode y = x.right;
+            x.right = y.left;
+            if (y.left != null) {
+                y.left.parent = x;
+            }
+            y.parent = x.parent;
+            if (x.parent == null) {
+                root = y;
+            } else if (x == x.parent.left) {
+                x.parent.left = y;
+            } else {
+                x.parent.right = y;
+            }
+            y.left = x;
+            x.parent = y;
+        }
+
+        private void rightRotate(RBVisualNode y) {
+            RBVisualNode x = y.left;
+            y.left = x.right;
+            if (x.right != null) {
+                x.right.parent = y;
+            }
+            x.parent = y.parent;
+            if (y.parent == null) {
+                root = x;
+            } else if (y == y.parent.right) {
+                y.parent.right = x;
+            } else {
+                y.parent.left = x;
+            }
+            x.right = y;
+            y.parent = x;
+        }
+
+        private RBVisualNode parentOf(RBVisualNode node) {
+            return node == null ? null : node.parent;
+        }
+
+        private boolean colorOf(RBVisualNode node) {
+            return node == null ? NODE_BLACK : node.color;
+        }
+
+        @Override
+        protected void paintComponent(Graphics graphics) {
+            super.paintComponent(graphics);
+            hitBoxes.clear();
+            Graphics2D g = (Graphics2D) graphics;
+            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
+            g.setColor(TEXT);
+            g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 20));
+            g.drawString("Rot-Schwarz-Baum der historischen Datensätze", 34, 34);
+            g.setColor(MUTED);
+            g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 12));
+            g.drawString("Knoten sind nach <Startdatum, Titel> eingefügt. Hover zeigt Info, Linksklick öffnet Description.", 34, 54);
+
+            if (root == null) {
+                g.drawString("Keine Datensätze vorhanden.", 34, 94);
+                return;
+            }
+
+            inorderIndex = 0;
+            int logicalWidth = (int) (getWidth() / zoom);
+            layoutInorder(root, LEGEND_SPACE, Math.max(78, (logicalWidth - 104) / Math.max(1, countNodes(root))));
+            drawEdges(g, root);
+            drawNodes(g, root);
+        }
+
+        private void layoutInorder(RBVisualNode node, int top, int gap) {
+            if (node == null) {
+                return;
+            }
+            layoutInorder(node.left, top + 74, gap);
+            node.x = 52 + inorderIndex * gap;
+            node.y = top;
+            inorderIndex++;
+            layoutInorder(node.right, top + 74, gap);
+        }
+
+        private int countNodes(RBVisualNode node) {
+            if (node == null) {
+                return 0;
+            }
+            return 1 + countNodes(node.left) + countNodes(node.right);
+        }
+
+        private int treeHeight(RBVisualNode node) {
+            if (node == null) {
+                return 0;
+            }
+            return 1 + Math.max(treeHeight(node.left), treeHeight(node.right));
+        }
+
+        private void drawEdges(Graphics2D g, RBVisualNode node) {
+            if (node == null) {
+                return;
+            }
+            g.setColor(new Color(148, 163, 184));
+            g.setStroke(new BasicStroke(1.4f));
+            if (node.left != null) {
+                g.drawLine(sx(node.x), sy(node.y), sx(node.left.x), sy(node.left.y));
+                drawEdges(g, node.left);
+            }
+            if (node.right != null) {
+                g.drawLine(sx(node.x), sy(node.y), sx(node.right.x), sy(node.right.y));
+                drawEdges(g, node.right);
+            }
+        }
+
+        private void drawNodes(Graphics2D g, RBVisualNode node) {
+            if (node == null) {
+                return;
+            }
+            drawNodes(g, node.left);
+            Rectangle bounds = new Rectangle(sx(node.x - 42), sy(node.y - 23), sw(84), sw(46));
+            hitBoxes.add(new TreeNodeHitBox(bounds, node));
+
+            if (node.entry == selectedEntry) {
+                g.setColor(new Color(219, 234, 254));
+                g.fillRoundRect(bounds.x - 7, bounds.y - 7, bounds.width + 14, bounds.height + 14, 18, 18);
+            }
+
+            g.setColor(node.color == NODE_RED ? new Color(185, 28, 28) : new Color(17, 24, 39));
+            g.fillRoundRect(bounds.x, bounds.y, bounds.width, bounds.height, 14, 14);
+            g.setColor(Color.WHITE);
+            g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 10));
+            g.drawString(node.entry.startDate.toString(), bounds.x + sw(8), bounds.y + sw(17));
+            g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 10));
+            g.drawString(shorten(node.entry.title, 13), bounds.x + sw(8), bounds.y + sw(33));
+            drawNodes(g, node.right);
+        }
+
+        private int sx(int value) {
+            return (int) Math.round(value * zoom);
+        }
+
+        private int sy(int value) {
+            return (int) Math.round(value * zoom);
+        }
+
+        private int sw(int value) {
+            return Math.max(1, (int) Math.round(value * zoom));
+        }
+
+        private String toTooltip(HistoricalEntry entry) {
+            return "<html><b>" + escape(entry.title) + "</b><br>"
+                    + (entry.isEvent() ? "Ereignis" : "Prozess") + "<br>"
+                    + entry.startDate + " bis " + entry.endDate + "</html>";
+        }
+
+        private String shorten(String text, int maxLength) {
+            if (text.length() <= maxLength) {
+                return text;
+            }
+            return text.substring(0, Math.max(1, maxLength - 1)) + "…";
+        }
+
+        private String escape(String value) {
+            return value
+                    .replace("&", "&amp;")
+                    .replace("<", "&lt;")
+                    .replace(">", "&gt;");
+        }
+
+        private int compareEntries(HistoricalEntry a, HistoricalEntry b) {
+            int dateCompare = a.startDate.compareTo(b.startDate);
+            if (dateCompare != 0) {
+                return dateCompare;
+            }
+            return a.title.compareTo(b.title);
+        }
+    }
+
+    static class RBVisualNode {
+        final HistoricalEntry entry;
+        boolean color;
+        RBVisualNode left;
+        RBVisualNode right;
+        RBVisualNode parent;
+        int x;
+        int y;
+
+        RBVisualNode(HistoricalEntry entry) {
+            this.entry = entry;
+        }
+    }
+
+    static class TreeNodeHitBox {
+        final Rectangle bounds;
+        final RBVisualNode node;
+
+        TreeNodeHitBox(Rectangle bounds, RBVisualNode node) {
+            this.bounds = bounds;
+            this.node = node;
         }
     }
 
