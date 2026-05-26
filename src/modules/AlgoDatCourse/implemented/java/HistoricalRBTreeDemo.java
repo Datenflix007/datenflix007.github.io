@@ -241,7 +241,6 @@ public class HistoricalRBTreeDemo {
 
             add(buildHeader(), BorderLayout.NORTH);
             add(buildMainPanel(), BorderLayout.CENTER);
-            add(buildInputPanel(), BorderLayout.SOUTH);
 
             entryList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             entryList.setCellRenderer(new EntryRenderer());
@@ -306,6 +305,11 @@ public class HistoricalRBTreeDemo {
             JButton nextButton = secondaryButton("Nächster Eintrag");
             nextButton.addActionListener(event -> showNextEntry());
             query.add(nextButton, c);
+            c.gridx++;
+
+            JButton newButton = primaryButton("Neuer Eintrag");
+            newButton.addActionListener(event -> showNewEntryOverlay());
+            query.add(newButton, c);
             panel.add(query, BorderLayout.EAST);
 
             return panel;
@@ -386,15 +390,21 @@ public class HistoricalRBTreeDemo {
             panel.add(chooseFilesButton, c);
             c.gridx++;
 
-            JButton addButton = primaryButton("Einfügen");
-            addButton.addActionListener(event -> addEntryFromForm());
-            panel.add(addButton, c);
+            return panel;
+        }
 
-            JPanel outer = new JPanel(new BorderLayout());
-            outer.setOpaque(false);
-            outer.setBorder(new EmptyBorder(0, 16, 16, 16));
-            outer.add(panel, BorderLayout.CENTER);
-            return outer;
+        private void showNewEntryOverlay() {
+            JPanel form = buildInputPanel();
+            int result = JOptionPane.showConfirmDialog(
+                    this,
+                    form,
+                    "Neuer Eintrag",
+                    JOptionPane.OK_CANCEL_OPTION,
+                    JOptionPane.PLAIN_MESSAGE
+            );
+            if (result == JOptionPane.OK_OPTION) {
+                addEntryFromForm();
+            }
         }
 
         private void chooseFiles() {
