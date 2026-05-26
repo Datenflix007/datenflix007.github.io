@@ -1455,8 +1455,8 @@ def bubble_sort(A):
       const r = await fetch(path);
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
       return await r.text();
-    } catch {
-      return null;
+    } catch (e) {
+      return { error: e.message || 'Netzwerkfehler', path };
     }
   }
 
@@ -1503,15 +1503,29 @@ def bubble_sort(A):
       const src = sources.find(s => s.dataset.lang === lang);
       if (!src) return;
 
-      let text = src.dataset.file ? await fetchText(src.dataset.file) : null;
-      if (text === null) {
+      let text;
+      if (src.dataset.file) {
+        code.textContent = '// Lädt …';
+        code.className   = 'hljs';
+        const result = await fetchText(src.dataset.file);
+        if (result && typeof result === 'object' && result.error) {
+          const isFile = location.protocol === 'file:';
+          text = isFile
+            ? `// Datei konnte nicht geladen werden (file://-Protokoll).\n//\n// → quickstart.bat ausführen und\n//   http://localhost:8000 im Browser öffnen.\n//\n// Pfad: ${result.path}`
+            : `// Datei konnte nicht geladen werden (${result.error}).\n// Pfad: ${result.path}`;
+        } else if (result === null) {
+          text = src.textContent.trim() || `// Kein Inhalt für ${lang} verfügbar.`;
+        } else {
+          text = result;
+        }
+      } else {
         text = src.textContent.trim() || `// Kein Inhalt für ${lang} verfügbar.`;
       }
 
       const hljsLang = LANG_TO_HLJS[lang.toLowerCase()] ?? 'plaintext';
       code.textContent = text;
       code.className   = `hljs language-${hljsLang}`;
-      hljs.highlightElement(code);
+      try { hljs.highlightElement(code); } catch { code.className = 'hljs'; }
       if (titleEl) titleEl.textContent = `${chapterTitle} – ${lang}`;
 
       if (src.dataset.file) {
