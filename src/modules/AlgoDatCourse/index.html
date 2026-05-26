@@ -13,6 +13,10 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/java.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/prolog.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/c.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/cpp.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/csharp.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/php.min.js"></script>
 
   <style>
     *, *::before, *::after { box-sizing: border-box; }
@@ -426,25 +430,23 @@
         <p>
           Dieser Kurs behandelt grundlegende Konzepte der Algorithmik und Datenstrukturen,
           wie sie im Bachelorstudium Informatik an der FSU Jena gelehrt werden. Die Inhalte
-          orientieren sich am Standardwerk <em>Cormen et al. – Introduction to Algorithms (CLRS)</em>.
+          orientieren sich am Standardwerk <a href="https://www.cs.mcgill.ca/~akroit/math/compsci/Cormen%20Introduction%20to%20Algorithms.pdf" target="_blank"><em>Cormen et al. – Introduction to Algorithms (CLRS)</em></a>.
         </p>
 
         <div>
           <h2>Themenübersicht</h2>
           <ul>
-            <li><strong>Laufzeitanalyse</strong> – Asymptotische Notation, O-Kalkül, Komplexitätsklassen</li>
-            <li><strong>Algorithmen</strong> – Heapsort als Beispiel für effiziente, heapbasierte Sortierverfahren</li>
-            <li><strong>Datenstrukturen</strong> – MaxHeap und MinHeap als Array-basierte Baumstrukturen</li>
+            <li><strong>Laufzeitanalyse</strong> – Asymptotische Notation, Komplexitätsklassen</li>
+            <li><strong>Algorithmen</strong> – Sortieralgorithmen, Suchalgorithmen</li>
+            <li><strong>Datenstrukturen</strong> – Heaps, Suchbäume</li>
           </ul>
         </div>
 
         <div>
           <h2>Aufbau der Kapitel</h2>
           <p>
-            Jedes Kapitel enthält eine Erklärung als Fließtext, Komplexitätstabellen und einen
-            Code-Viewer mit Implementierungen in Pseudocode, Java, Python und Prolog.
-            Neue Kapitel lassen sich einfach durch ein weiteres
-            <code>&lt;section class="chapter"&gt;</code> im HTML ergänzen.
+            Jedes Kapitel enthält sowohl eine fachliche Definition, Erklärungen und Beispiele als auch einen Code-Viewer mit Implementierungen in verschiedenen Programmier- und Pseudosprachen. So kannst du die Konzepte sowohl theoretisch verstehen, als auch so manche Anwendungsfälle nachvollziehen.
+         
           </p>
         </div>
 
@@ -979,54 +981,99 @@ def bubble_sort(A):
         </div>
 
         <div>
-          <h2>Exkurs: Stack und Heap im Betriebssystem</h2>
+          <h2>Exkurs: Stack und Heap im virtuellen Adressraum</h2>
           <p>
-            Die Begriffe <em>Stack</em> und <em>Heap</em> bezeichnen im Kontext des
-            Betriebssystems zwei <strong>unterschiedliche Arbeitsspeicherbereiche</strong> –
-            nicht zu verwechseln mit den gleichnamigen Datenstrukturen.
+            Das Betriebssystem teilt den <strong>virtuellen Adressraum</strong> eines Prozesses
+            in mehrere Segmente auf. Zwei davon – <em>Stack</em> und <em>Heap</em> – wachsen
+            dynamisch und liegen an gegenüberliegenden Enden des Speichers. Wichtig: Diese
+            Speicherbereiche sind <strong>unabhängig</strong> von den gleichnamigen Datenstrukturen.
           </p>
+
+          <div class="img-wrap">
+            <img src="img/memory-layout.png" alt="Virtueller Adressraum eines Prozesses: text, data, bss, heap, stack" class="chapter-img" />
+            <p class="img-caption">Virtueller Adressraum – Segmente von low address (0x0000) bis high address</p>
+          </div>
+
+          <div>
+            <h3>Segmente im Überblick</h3>
+            <table class="complexity-table">
+              <thead>
+                <tr><th>Segment</th><th>Inhalt</th><th>Charakteristik</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>text</td><td>Maschinencode des Programms</td><td>Read-only, von Disk geladen</td></tr>
+                <tr><td>data</td><td>Initialisierte globale / statische Variablen</td><td>Von Disk geladen</td></tr>
+                <tr><td>bss</td><td>Nicht-initialisierte globale / statische Variablen</td><td>Beim Programmstart auf 0 gesetzt</td></tr>
+                <tr><td>heap</td><td>Dynamisch allokierte Objekte (<code>new</code>)</td><td>Wächst nach oben ↑, GC-verwaltet (Java) / manuell (C/C++)</td></tr>
+                <tr><td>stack</td><td>Funktionsaufrufe, lokale Variablen, Rücksprungadressen</td><td>Wächst nach unten ↓, LIFO, feste Größe</td></tr>
+              </tbody>
+            </table>
+          </div>
+
           <p>
-            Der <strong>Call Stack</strong> ist ein fester, bei Programmstart dimensionierter
-            Speicherbereich, der Funktionsaufrufe, Rücksprungadressen und lokale Variablen
-            verwaltet. Er arbeitet strikt nach dem LIFO-Prinzip: Beim Aufruf einer Funktion
-            wird ein neuer <em>Stack Frame</em> aufgelegt, beim Rücksprung wieder entfernt.
-            Diese Struktur ist <strong>sehr schnell</strong> – Allokation ist ein einzelner
-            Zeigerarithmetik-Schritt – jedoch <strong>starr</strong>: Die maximale Tiefe ist
-            begrenzt, und zu tiefe Rekursion führt zu einem <em>StackOverflowError</em>.
+            Wie das Diagramm zeigt, liegen Stack und Heap am <strong>gegenüberliegenden Enden</strong>
+            des dynamisch allokierten Bereichs und wachsen <em>aufeinander zu</em>: der Heap wächst
+            von der niedrigen Adresse nach oben (↑), der Stack von der hohen Adresse nach unten (↓).
+            Dazwischen liegt der aktuell ungenutzte Speicher, der je nach Bedarf beansprucht wird.
           </p>
+
           <p>
-            Der <strong>Heap-Speicher</strong> (dynamischer Speicher) ist der deutlich größere,
-            flexible Bereich, in dem Objekte zur Laufzeit allokiert werden. In Java landen alle
-            per <code>new</code> erzeugten Objekte im Heap. Er wächst und schrumpft dynamisch;
-            ein <em>Garbage Collector</em> gibt nicht mehr erreichbare Objekte frei.
-            Heap-Allokation ist langsamer als Stack-Allokation, bietet aber nahezu unbegrenzte
-            Kapazität und ermöglicht, Daten über Funktionsgrenzen hinweg zu halten.
+            Der <strong>Call Stack</strong> verwaltet Funktionsaufrufe nach dem LIFO-Prinzip.
+            Bei jedem Aufruf wird ein neuer <em>Stack Frame</em> obenauf gelegt (enthält lokale
+            Variablen, Parameter, Rücksprungadresse); beim Rücksprung wird er entfernt.
+            Diese Struktur ist extrem schnell – Allokation ist ein einziger Zeigerarithmetik-Schritt –
+            aber <strong>starr</strong>: Überschreitet die Rekursionstiefe das verfügbare Segment,
+            folgt ein <em>StackOverflowError</em> (Java) bzw. eine Segmentation Fault (C/C++).
           </p>
+
+          <p>
+            Der <strong>Heap-Speicher</strong> allokiert Objekte dynamisch zur Laufzeit.
+            In Java landen alle per <code>new</code> erzeugten Objekte hier; der Garbage Collector
+            gibt nicht mehr erreichbare Objekte frei. In C/C++ liegt die Verwaltung beim
+            Programmierer (<code>malloc</code>/<code>free</code>). Heap-Allokation ist langsamer,
+            bietet aber nahezu unbegrenzte Kapazität und lebt über Funktionsgrenzen hinaus.
+          </p>
+
           <table class="complexity-table">
             <thead>
               <tr><th>Eigenschaft</th><th>Call Stack</th><th>Heap-Speicher</th></tr>
             </thead>
             <tbody>
+              <tr><td>Wachstumsrichtung</td><td>↓ hohe → niedrige Adresse</td><td>↑ niedrige → hohe Adresse</td></tr>
               <tr><td>Größe</td><td>Fest (typ. 512 KB – 8 MB)</td><td>Dynamisch (GB-Bereich)</td></tr>
-              <tr><td>Allokationsgeschwindigkeit</td><td>O(1), sehr schnell</td><td>Langsamer (GC-Overhead)</td></tr>
+              <tr><td>Allokationsgeschwindigkeit</td><td>O(1), sehr schnell</td><td>Langsamer (GC / malloc-Overhead)</td></tr>
               <tr><td>Zugriffsmuster</td><td>LIFO (Stack Frames)</td><td>Beliebig</td></tr>
-              <tr><td>Überlaufrisiko</td><td>StackOverflowError</td><td>OutOfMemoryError</td></tr>
-              <tr><td>Lebensdauer</td><td>An Funktionsaufruf gebunden</td><td>Bis GC freigibt</td></tr>
+              <tr><td>Überlaufrisiko</td><td>StackOverflowError / Segfault</td><td>OutOfMemoryError</td></tr>
+              <tr><td>Lebensdauer</td><td>An Funktionsaufruf gebunden</td><td>Bis GC / free() freigibt</td></tr>
             </tbody>
           </table>
-          <p>
-            <strong>Terminologischer Hinweis:</strong> Der „Heap" als OS-Speicherbereich und
-            der „Heap" als Datenstruktur (MaxHeap, MinHeap) sind konzeptuell
-            <em>unabhängig</em> – die Namensgleichheit ist historisch bedingt und eine häufige
-            Quelle von Verwirrung.
-          </p>
+
+          <div class="info-box">
+            <p>
+              <strong>Terminologischer Hinweis:</strong> Der „Heap-Speicher" (Segment im virtuellen
+              Adressraum) und der „Heap" als Datenstruktur (MaxHeap, MinHeap, binärer Heap) sind
+              konzeptuell <em>vollständig unabhängig</em>. Die Namensgleichheit ist historisch
+              bedingt und eine häufige Quelle von Verwirrung.
+            </p>
+          </div>
         </div>
       </div>
 
-      <p class="code-viewer-label">Implementierung – manuell vs. Java-Standard</p>
+      <p class="code-viewer-label">Implementierungen – manuell &amp; Standard-Bibliothek</p>
       <div class="code-viewer">
-        <div class="code-source" data-lang="Manuell" data-file="implemented/java/TaskMaxHeap.java"></div>
-        <div class="code-source" data-lang="Java-Standard" data-file="implemented/java/TaskManager.java"></div>
+        <div class="code-source" data-lang="Java"        data-file="implemented/java/TaskMaxHeap.java"></div>
+        <div class="code-source" data-lang="Java PQ"     data-file="implemented/java/TaskManager.java"></div>
+        <div class="code-source" data-lang="Python"      data-file="implemented/python/TaskMaxHeap.py"></div>
+        <div class="code-source" data-lang="Python PQ"   data-file="implemented/python/TaskManager.py"></div>
+        <div class="code-source" data-lang="Prolog"      data-file="implemented/prolog/PriorityQueue.pl"></div>
+        <div class="code-source" data-lang="C"           data-file="implemented/c/TaskMaxHeap.c"></div>
+        <div class="code-source" data-lang="C++"         data-file="implemented/cpp/TaskMaxHeap.cpp"></div>
+        <div class="code-source" data-lang="C++ PQ"      data-file="implemented/cpp/TaskManager.cpp"></div>
+        <div class="code-source" data-lang="C#"          data-file="implemented/csharp/TaskMaxHeap.cs"></div>
+        <div class="code-source" data-lang="C# PQ"       data-file="implemented/csharp/TaskManager.cs"></div>
+        <div class="code-source" data-lang="PHP"         data-file="implemented/php/TaskMaxHeap.php"></div>
+        <div class="code-source" data-lang="PHP PQ"      data-file="implemented/php/TaskManager.php"></div>
+        <div class="code-source" data-lang="JavaScript"  data-file="implemented/javascript/TaskMaxHeap.js"></div>
       </div>
     </section><!-- /priorityqueue -->
 
@@ -1387,9 +1434,19 @@ def bubble_sort(A):
   const LANG_TO_HLJS = {
     pseudocode:      'plaintext',
     java:            'java',
+    'java pq':       'java',
     python:          'python',
+    'python pq':     'python',
     prolog:          'prolog',
-    'manuell':       'java',
+    'c':             'c',
+    'c++':           'cpp',
+    'c++ pq':        'cpp',
+    'c#':            'csharp',
+    'c# pq':         'csharp',
+    php:             'php',
+    'php pq':        'php',
+    javascript:      'javascript',
+    manuell:         'java',
     'java-standard': 'java',
   };
 
