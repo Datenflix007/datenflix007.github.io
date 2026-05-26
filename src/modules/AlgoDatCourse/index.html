@@ -410,6 +410,10 @@
         <a class="nav-link nav-sub" data-chapter="minheap">MinHeap</a>
         <a class="nav-link nav-sub" data-chapter="priorityqueue">PriorityQueue</a>
       </div>
+      <div>
+        <div class="nav-group-label" style="padding-left: 28px">Suchbäume</div>
+        <a class="nav-link nav-sub" data-chapter="rbtree">Rot-Schwarz-Baum</a>
+      </div>
 
     </div>
 
@@ -765,6 +769,20 @@ def bubble_sort(A):
             </tbody>
           </table>
         </div>
+
+        <div>
+          <h2>Suchbäume</h2>
+          <p>
+            Suchbäume speichern Schlüssel so, dass links kleinere und rechts größere Schlüssel
+            liegen. Damit werden Suchen, Einfügen, Löschen und Bereichsanfragen strukturell
+            unterstützt. Ab einem gewissen Punkt lassen sich die einzelnen Methoden selbst nicht
+            mehr asymptotisch effizienter formulieren: Eine Suche muss dem Vergleichspfad folgen,
+            ein Einfügen muss die Einfügeposition finden, ein Löschen muss die Ordnung erhalten.
+            Die Verbesserung liegt dann nicht mehr in einer „clevereren" Methode, sondern in der
+            <strong>Optimierung der Datenstruktur</strong>. Balancierte Suchbäume halten ihre Höhe
+            klein und verhindern, dass ein Baum zur linearen Liste degeneriert.
+          </p>
+        </div>
       </div>
     </section><!-- /datenstrukturen -->
 
@@ -1076,6 +1094,112 @@ def bubble_sort(A):
         <div class="code-source" data-lang="JavaScript"  data-file="implemented/javascript/TaskMaxHeap.js"></div>
       </div>
     </section><!-- /priorityqueue -->
+
+
+    <section id="ch-rbtree" class="chapter">
+      <h1>Rot-Schwarz-Baum</h1>
+      <p class="chapter-meta">Datenstrukturen › Suchbäume &nbsp;·&nbsp; Balancierter binärer Suchbaum</p>
+
+      <div class="chapter-body">
+        <p>
+          Ein <strong>Rot-Schwarz-Baum</strong> ist ein binärer Suchbaum, der zusätzlich jeden
+          Knoten rot oder schwarz färbt. Die Farben erzwingen eine kontrollierte Baumhöhe:
+          Kein Pfad wird mehr als doppelt so lang wie ein anderer. Dadurch bleiben
+          <em>Search</em>, <em>Insert</em> und <em>Delete</em> auch im schlechtesten Fall bei
+          <strong>O(log n)</strong>.
+        </p>
+
+        <div class="info-box">
+          <p>
+            Bei Suchbäumen ist der zentrale Punkt: Die elementaren Methoden können den
+            Vergleichspfad nicht überspringen. Wenn ein normaler Suchbaum entartet, werden die
+            Methoden langsam, obwohl ihr Code korrekt ist. Rot-Schwarz-Bäume optimieren deshalb
+            die Struktur selbst: Nach Einfügen und Löschen wird der Baum durch Umfärben und
+            Rotationen wieder balanciert.
+          </p>
+        </div>
+
+        <div>
+          <h2>Eigenschaften</h2>
+          <ul>
+            <li>Jeder Knoten ist rot oder schwarz.</li>
+            <li>Die Wurzel ist schwarz.</li>
+            <li>Alle NIL-Blätter gelten als schwarz.</li>
+            <li>Ein roter Knoten hat keine roten Kinder.</li>
+            <li>Auf jedem Pfad von einem Knoten zu einem NIL-Blatt liegen gleich viele schwarze Knoten.</li>
+          </ul>
+        </div>
+
+        <div>
+          <h2>Operationen und Laufzeiten</h2>
+          <table class="complexity-table">
+            <thead>
+              <tr><th>Operation</th><th>Laufzeit</th><th>Beschreibung</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Search</td><td>O(log n)</td><td>Schlüssel entlang der Suchbaumordnung finden</td></tr>
+              <tr><td>Minimum / Maximum</td><td>O(log n)</td><td>Ganz links bzw. ganz rechts absteigen</td></tr>
+              <tr><td>Successor / Predecessor</td><td>O(log n)</td><td>Nächsten bzw. vorherigen Schlüssel bestimmen</td></tr>
+              <tr><td>Insert</td><td>O(log n)</td><td>Wie BST einfügen, danach Farben reparieren</td></tr>
+              <tr><td>Delete</td><td>O(log n)</td><td>Wie BST löschen, danach Schwarz-Höhe reparieren</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div>
+          <h2>Die drei Einfüge-Fälle</h2>
+          <p>
+            Ein neuer Knoten wird zunächst wie in einem normalen binären Suchbaum eingefügt und
+            rot gefärbt. Nur wenn sein Elternknoten ebenfalls rot ist, entsteht ein Konflikt.
+            Dann unterscheidet man die Farbe und Lage des Onkels:
+          </p>
+          <ul>
+            <li><strong>Roter Onkel:</strong> Elternknoten und Onkel werden schwarz, der Großelternknoten rot. Danach wird beim Großelternknoten weitergeprüft.</li>
+            <li><strong>Schwarzer Onkel, gerade Linie:</strong> Knoten, Elternknoten und Großelternknoten liegen links-links oder rechts-rechts. Eine einfache Rotation am Großelternknoten genügt.</li>
+            <li><strong>Schwarzer Onkel, Knick:</strong> Knoten liegt links-rechts oder rechts-links. Erst wird am Elternknoten rotiert, danach entsteht der gerade Fall und es folgt die zweite Rotation.</li>
+          </ul>
+        </div>
+
+        <div>
+          <h2>Anwendungen</h2>
+          <ul>
+            <li><strong>Scheduling-Systeme:</strong> Aufgaben werden nach Zeitstempel oder Priorität sortiert gehalten.</li>
+            <li><strong>Versionsverwaltung:</strong> GitHub kann vereinfacht als System betrachtet werden, das Commits, Branches, Pull Requests und Zeitpunkte effizient auffindbar verwaltet.</li>
+            <li><strong>Leaderboards:</strong> Punktestände bleiben sortiert, sodass Rangnachbarn und Top-Bereiche schnell abfragbar sind.</li>
+            <li><strong>Intervallsuche:</strong> Öffnungszeiten, Buchungen oder Zeitfenster lassen sich nach Start- und Endpunkten durchsuchen.</li>
+            <li><strong>Netzwerk-Routing-Tabellen:</strong> Präfixe oder Bereiche werden geordnet gespeichert, um passende Routen schnell zu finden.</li>
+            <li><strong>Textindex:</strong> Wörter oder Tokens werden mit Positionen verknüpft und für Suche, Autocomplete oder Konkordanzen genutzt.</li>
+          </ul>
+        </div>
+
+        <div>
+          <h2>Beispiel: Historische Datenbank</h2>
+          <p>
+            Eine historische Datenbank kann Datumswerte als Schlüssel speichern, etwa
+            <code>&lt;Jahr, Monat, Tag&gt;</code>. Zu jedem Datum hängen Listen von Ereignissen,
+            Personen, Entwicklungen über einen Zeitraum und Dateien. Ein Rot-Schwarz-Baum eignet
+            sich hier, weil Einträge nicht nur exakt gesucht werden: Man möchte alle Ereignisse
+            zwischen 1789-07-14 und 1799-11-09, den nächsten bekannten Eintrag nach einem Datum
+            oder alle Quellen in einem Jahrhundert effizient finden.
+          </p>
+          <p>
+            Zeiträume können über Startdatum und Enddatum modelliert werden. Der Baum ordnet nach
+            Startdatum; in den Knoten liegen zusätzlich Metadaten wie Titel, beteiligte Personen,
+            Tags, Quellenpfade und optionale Enddaten. Für Intervallfragen kann man die Knoten um
+            ein Feld <code>maxEndDate</code> erweitern. Dann überspringt die Suche ganze Teilbäume,
+            deren spätestes Enddatum vor dem gesuchten Zeitraum liegt.
+          </p>
+        </div>
+      </div>
+
+      <p class="code-viewer-label">Implementierung</p>
+      <div class="code-viewer">
+        <div class="code-source" data-lang="Pseudocode" data-file="implemented/pseudocode/RBTree.txt"></div>
+        <div class="code-source" data-lang="Java" data-file="implemented/java/RBTree.java"></div>
+        <div class="code-source" data-lang="Python" data-file="implemented/python/RBTree.py"></div>
+        <div class="code-source" data-lang="Prolog" data-file="implemented/prolog/RBTree.pl"></div>
+      </div>
+    </section><!-- /rbtree -->
 
 
     <!-- ─── LAUFZEIT: ASYMPTOTISCHE NOTATION ─────────────── -->
