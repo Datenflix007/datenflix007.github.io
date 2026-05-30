@@ -891,6 +891,17 @@ footer {
     transform: scale(1.04);
 }
 
+.blog-thumb--placeholder {
+    background: linear-gradient(135deg, #0f1729, #1e293b);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.blog-thumb--placeholder .blog-thumb-icon {
+    font-size: 2.5rem;
+}
+
 .blog-body {
     padding: 20px 22px 24px;
     flex: 1;

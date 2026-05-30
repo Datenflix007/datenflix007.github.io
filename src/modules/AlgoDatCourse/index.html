@@ -35,6 +35,28 @@
       --radius:    12px;
     }
 
+    [data-theme="light"] {
+      --bg:        #f5f7fa;
+      --sidebar-bg:#eaedf3;
+      --surface:   #ffffff;
+      --border:    rgba(0,0,0,.09);
+      --muted:     #6b7585;
+      --text:      #1e2535;
+    }
+
+    [data-theme="light"] .nav-link { color: #4b5470; }
+    [data-theme="light"] .nav-link:hover { background: rgba(0,0,0,.05); color: #1e2535; }
+    [data-theme="light"] .nav-link.active { background: rgba(99,230,181,.12); }
+    [data-theme="light"] .chapter > h1 { color: #1a2040; }
+    [data-theme="light"] .chapter-body p,
+    [data-theme="light"] .chapter-body ul { color: #374060; }
+    [data-theme="light"] .chapter-body h2 { color: #1e2535; }
+    [data-theme="light"] .complexity-table td { color: #374060; }
+    [data-theme="light"] .info-box { background: rgba(99,230,181,.07); }
+    [data-theme="light"] .info-box p { color: #374060; }
+    [data-theme="light"] .chapter-meta { color: #6b7585; }
+    [data-theme="light"] .img-caption { color: #6b7585; }
+
     html, body {
       margin: 0; padding: 0;
       background: var(--bg);
@@ -338,6 +360,23 @@
     /* code-source divs are data carriers only */
     .code-source { display: none; }
 
+    /* ─── THEME TOGGLE ──────────────────────────────────────── */
+    .theme-toggle {
+      margin-left: auto;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      width: 30px; height: 30px;
+      border-radius: 7px;
+      display: grid;
+      place-items: center;
+      font-size: 1.05rem;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: color .15s, border-color .15s;
+    }
+    .theme-toggle:hover { color: var(--text); border-color: var(--accent); }
+
     /* ─── RESPONSIVE ─────────────────────────────────────── */
     @media (max-width: 800px) {
       #sidebar { display: none; }
@@ -360,6 +399,7 @@
         <div class="brand-name">Algorithmen und</div>
         <div class="brand-name">Datenstrukturen</div>
       </div>
+      <button type="button" class="theme-toggle" id="themeToggle" title="Dark/Light umschalten">☀</button>
     </div>
 
     <!-- 
@@ -415,6 +455,11 @@
         <a class="nav-link nav-sub" data-chapter="rbtree">Rot-Schwarz-Baum</a>
       </div>
 
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-group-label">Tools</div>
+      <a class="nav-link" href="DatastructureLab.html" target="_blank">DatastructureLab ↗</a>
     </div>
 
   </nav><!-- /sidebar -->
@@ -1757,6 +1802,22 @@ def bubble_sort(A):
 
   const activeChapter = document.querySelector('.chapter.active');
   if (activeChapter) activateViewers(activeChapter);
+
+  /* ============================================================
+     DARK / LIGHT TOGGLE
+  ============================================================ */
+  const themeBtn = document.getElementById('themeToggle');
+  const root     = document.documentElement;
+  const saved    = localStorage.getItem('theme') || 'dark';
+  root.dataset.theme = saved;
+  themeBtn.textContent = saved === 'dark' ? '☀' : '☽';
+
+  themeBtn.addEventListener('click', () => {
+    const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+    root.dataset.theme = next;
+    localStorage.setItem('theme', next);
+    themeBtn.textContent = next === 'dark' ? '☀' : '☽';
+  });
 </script>
 
 </body>
