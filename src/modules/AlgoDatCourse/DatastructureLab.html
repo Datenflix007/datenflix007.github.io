@@ -154,7 +154,7 @@ main{flex:1;position:relative;overflow:hidden}
   <div class="menu-group">
     <button class="menu-btn">FILE</button>
     <div class="dropdown">
-      <button onclick="cmdNew()">✚&nbsp; Neuer Baum</button>
+      <button onclick="cmdNew()">✚&nbsp; Neue Datenstruktur</button>
       <button onclick="cmdSave()">💾&nbsp; Speichern</button>
       <button onclick="cmdLoad()">📂&nbsp; Laden</button>
     </div>
@@ -534,6 +534,136 @@ class MaxHeap extends MinHeap {
 }
 
 // ══════════════════════════════════════════════════════════════
+//  BINOMIAL HEAP
+// ══════════════════════════════════════════════════════════════
+class BinomialHeap {
+  constructor() {
+    this.roots  = [];   // roots[k] = root of B_k tree, or null
+    this._cnt   = 0;
+    this._idSeq = 0;
+  }
+
+  _node(key, value) {
+    return { key, value, degree: 0, children: [], _id: this._idSeq++ };
+  }
+
+  // Make y a child of z (caller ensures z.key ≤ y.key)
+  _link(y, z) { z.children.push(y); z.degree++; }
+
+  // Union two root-arrays (indexed by degree) into one
+  _union(a, b) {
+    const len = Math.max(a.length, b.length) + 1;
+    const res  = [];
+    let carry  = null;
+    for (let k = 0; k < len; k++) {
+      const ak = (k < a.length) ? a[k] : null;
+      const bk = (k < b.length) ? b[k] : null;
+      const ts = [ak, bk, carry].filter(Boolean);
+      carry = null;
+      if      (ts.length === 0) res[k] = null;
+      else if (ts.length === 1) res[k] = ts[0];
+      else {
+        res[k] = ts.length === 3 ? ts[0] : null;
+        const [t1, t2] = ts.length === 3 ? ts.slice(1) : ts;
+        if (t1.key <= t2.key) { this._link(t2, t1); carry = t1; }
+        else                  { this._link(t1, t2); carry = t2; }
+      }
+    }
+    while (res.length && !res[res.length - 1]) res.pop();
+    return res;
+  }
+
+  insert(key, value) {
+    this.roots = this._union(this.roots, [this._node(key, value)]);
+    this._cnt++;
+  }
+
+  peek() {
+    let min = null;
+    for (const r of this.roots)
+      if (r && (min === null || r.key < min.key)) min = r;
+    return min ? { key: min.key, value: min.value } : null;
+  }
+
+  extractMin() {
+    if (!this.roots.length) return null;
+    let mi = -1;
+    for (let i = 0; i < this.roots.length; i++)
+      if (this.roots[i] && (mi < 0 || this.roots[i].key < this.roots[mi].key)) mi = i;
+    const minNode = this.roots[mi];
+    const rest = this.roots.map((r, i) => i === mi ? null : r);
+    while (rest.length && !rest[rest.length - 1]) rest.pop();
+    // Children are B_0..B_{k-1} — place them by their degree
+    const childRoots = [];
+    for (const c of minNode.children) childRoots[c.degree] = c;
+    this.roots = this._union(rest, childRoots);
+    this._cnt--;
+    return { key: minNode.key, value: minNode.value };
+  }
+
+  search(key) {
+    const go = n => {
+      if (!n) return null;
+      if (n.key === key) return n.value;
+      for (const c of n.children) { const r = go(c); if (r !== null) return r; }
+      return null;
+    };
+    for (const r of this.roots) { const v = go(r); if (v !== null) return v; }
+    return null;
+  }
+
+  delete(key) {
+    const all = this._allNodes();
+    const idx = all.findIndex(n => n.key === key);
+    if (idx < 0) return false;
+    all.splice(idx, 1);
+    this._rebuildFrom(all);
+    return true;
+  }
+
+  updateValue(key, newVal) {
+    const go = n => {
+      if (!n) return false;
+      if (n.key === key) { n.value = newVal; return true; }
+      for (const c of n.children) if (go(c)) return true;
+      return false;
+    };
+    for (const r of this.roots) if (go(r)) return true;
+    return false;
+  }
+
+  merge(other) {
+    this.roots  = this._union(this.roots, other.roots);
+    this._cnt  += other._cnt;
+  }
+
+  _allNodes() {
+    const all = [];
+    const go = n => { if (!n) return; all.push({ key: n.key, value: n.value }); n.children.forEach(go); };
+    this.roots.forEach(go);
+    return all;
+  }
+
+  _rebuildFrom(nodes) {
+    this.roots = []; this._cnt = 0; this._idSeq = 0;
+    for (const { key, value } of nodes) this.insert(key, value);
+  }
+
+  isEmpty() { return this._cnt === 0; }
+  size()    { return this._cnt; }
+
+  toJSON() {
+    return { type: 'BinomialHeap', nodes: this._allNodes().map(({ key: k, value: v }) => ({ k, v })) };
+  }
+
+  static fromJSON(d) {
+    const h = new BinomialHeap();
+    for (const { k, v } of (d.nodes || [])) h.insert(Number(k), v);
+    return h;
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
 //  APP STATE
 // ══════════════════════════════════════════════════════════════
 let structure  = null;        // current data structure
@@ -557,10 +687,9 @@ const LEVELH = 100;
 // ══════════════════════════════════════════════════════════════
 function computeLayout() {
   const W = canvas.width;
-  if (!structure || (structure instanceof RBTree ? structure.isEmpty() : structure.isEmpty()))
-    return { nodes:[], edges:[], nilNodes:[] };
-
-  if (structType === 'RBTree') return layoutRBTree(W);
+  if (!structure || structure.isEmpty()) return { nodes:[], edges:[], nilNodes:[] };
+  if (structType === 'RBTree')        return layoutRBTree(W);
+  if (structType === 'BinomialHeap')  return layoutBinomialHeap(W);
   return layoutHeap(W);
 }
 
@@ -580,6 +709,52 @@ function layoutRBTree(W) {
   }
   calc(root, W/2, 50, W/4);
   return {nodes,edges,nilNodes};
+}
+
+function layoutBinomialHeap(W) {
+  const nodes = [], edges = [];
+  const trees = structure.roots.filter(r => r !== null);
+  if (!trees.length) return { nodes, edges, nilNodes: [] };
+
+  const BASE = 80, GAP = 50;
+
+  // Assign stable per-frame layout IDs
+  let lid = 0;
+  const assignIds = n => { n._lid = lid++; n.children.forEach(assignIds); };
+  trees.forEach(assignIds);
+
+  const treeW = n => n.children.length ? n.children.reduce((s,c) => s + treeW(c), 0) : BASE;
+
+  const widths = trees.map(treeW);
+  const totalW = widths.reduce((s,w) => s + w, 0) + GAP * (trees.length - 1);
+  let cx0 = Math.max(GAP, (W - totalW) / 2);
+
+  const minNode = (() => {
+    let m = null;
+    for (const r of structure.roots) if (r && (!m || r.key < m.key)) m = r;
+    return m;
+  })();
+
+  const layoutNode = (node, cx, y) => {
+    nodes.push({ id: node._lid, x: cx, y, key: node.key, value: node.value,
+                 isRed: false, degree: node.degree, isMin: node === minNode });
+    if (!node.children.length) return;
+    const cws  = node.children.map(treeW);
+    const totC = cws.reduce((s,w) => s+w, 0);
+    let x0     = cx - totC / 2;
+    for (let i = 0; i < node.children.length; i++) {
+      const child = node.children[i], childCx = x0 + cws[i] / 2;
+      edges.push({ fromId: node._lid, toId: child._lid, fromX: cx, fromY: y, toX: childCx, toY: y + LEVELH });
+      layoutNode(child, childCx, y + LEVELH);
+      x0 += cws[i];
+    }
+  };
+
+  for (let i = 0; i < trees.length; i++) {
+    layoutNode(trees[i], cx0 + widths[i] / 2, 50);
+    cx0 += widths[i] + GAP;
+  }
+  return { nodes, edges, nilNodes: [] };
 }
 
 function layoutHeap(W) {
@@ -634,8 +809,10 @@ function draw() {
     nilText:     dm ? 'rgba(140,155,180,.9)'    : 'rgba(80,100,130,.9)',
     nodeFillBlk: dm ? '#1e2636'                 : '#2d4060',
     nodeFillRed: dm ? '#b82828'                 : '#cc2222',
+    nodeFillMin: dm ? '#1c3020'                 : '#14401e',
     nodeBordBlk: dm ? '#3a4a60'                 : '#4a6080',
     nodeBordRed: dm ? '#e05050'                 : '#e03030',
+    nodeBordMin: dm ? '#4ade80'                 : '#16a34a',
     rbLabelRed:  dm ? 'rgba(255,120,120,.85)'   : 'rgba(180,0,0,.9)',
     rbLabelBlk:  dm ? 'rgba(140,160,190,.75)'   : 'rgba(50,80,120,.9)',
     valLabel:    dm ? 'rgba(100,150,210,.9)'    : 'rgba(30,100,200,.9)',
@@ -658,7 +835,7 @@ function draw() {
     ctx.font = '18px "Segoe UI",system-ui,sans-serif';
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.fillText(
-      structure ? 'Leer  •  DICTIONARY > Insert' : 'Kein Baum  •  FILE > Neu',
+      structure ? 'Leer  •  HEAP > Insert' : 'Keine Struktur  •  FILE > Neu',
       canvas.width/2, canvas.height/2
     );
     requestAnimationFrame(draw); return;
@@ -714,10 +891,10 @@ function draw() {
     ctx.fillStyle = 'rgba(0,0,0,.35)';
     ctx.beginPath(); ctx.arc(x+3,y+4,RADIUS,0,Math.PI*2); ctx.fill();
 
-    ctx.fillStyle = n.isRed ? C.nodeFillRed : C.nodeFillBlk;
+    ctx.fillStyle = n.isRed ? C.nodeFillRed : (n.isMin ? C.nodeFillMin : C.nodeFillBlk);
     ctx.beginPath(); ctx.arc(x,y,RADIUS,0,Math.PI*2); ctx.fill();
 
-    ctx.strokeStyle = n.isRed ? C.nodeBordRed : C.nodeBordBlk;
+    ctx.strokeStyle = n.isRed ? C.nodeBordRed : (n.isMin ? C.nodeBordMin : C.nodeBordBlk);
     ctx.lineWidth = 2.2;
     ctx.beginPath(); ctx.arc(x,y,RADIUS,0,Math.PI*2); ctx.stroke();
 
@@ -732,6 +909,13 @@ function draw() {
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.fillText(String(n.key), x, y);
 
+    // Degree badge (BinomialHeap)
+    if (structType === 'BinomialHeap') {
+      ctx.fillStyle = n.isMin ? C.nodeBordMin : 'rgba(140,180,220,.85)';
+      ctx.font = 'bold 9px "Segoe UI",system-ui,sans-serif';
+      ctx.fillText(`B${n.degree}`, x, y + RADIUS + 13);
+    }
+
     // R / B badge
     if (structType==='RBTree' && settings.showRB) {
       ctx.fillStyle = n.isRed ? C.rbLabelRed : C.rbLabelBlk;
@@ -744,8 +928,8 @@ function draw() {
       const tv = truncateVal(n.value, 12);
       ctx.fillStyle = C.valLabel;
       ctx.font = '9px "Segoe UI",system-ui,sans-serif';
-      const rbOffset = (structType==='RBTree' && settings.showRB) ? 26 : 15;
-      ctx.fillText(tv, x, y+RADIUS+rbOffset);
+      const hasBadge = (structType==='RBTree' && settings.showRB) || structType==='BinomialHeap';
+      ctx.fillText(tv, x, y + RADIUS + (hasBadge ? 26 : 15));
     }
   }
 
@@ -835,13 +1019,16 @@ function openValueEditor(nodeId) {
   if (!structure) return;
   let currentKey, currentVal;
   if (structure instanceof RBTree) {
-    currentKey=nodeId; currentVal=structure.search(nodeId)||'';
+    currentKey = nodeId; currentVal = structure.search(nodeId) || '';
+  } else if (structure instanceof BinomialHeap) {
+    const ln = layout.nodes.find(n => n.id === nodeId); if (!ln) return;
+    currentKey = ln.key; currentVal = ln.value || '';
   } else {
-    const d=structure.data[nodeId]; if(!d) return;
-    currentKey=d.key; currentVal=d.value||'';
+    const d = structure.data[nodeId]; if (!d) return;
+    currentKey = d.key; currentVal = d.value || '';
   }
 
-  const safe=currentVal.replace(/"/g,'&quot;').replace(/</g,'&lt;');
+  const safe = currentVal.replace(/"/g,'&quot;').replace(/</g,'&lt;');
   showDialog('Value bearbeiten', `
     <div class="dialog-field">
       <label>Key</label>
@@ -854,13 +1041,14 @@ function openValueEditor(nodeId) {
         <button class="browse-btn" onclick="pickFile('editVal')" title="Datei">📁</button>
       </div>
     </div>`, () => {
-    const v=document.getElementById('editVal').value.trim();
+    const v = document.getElementById('editVal').value.trim();
     if (!v) return;
-    if (structure instanceof RBTree) structure.insert(currentKey, v);
-    else structure.data[nodeId].value=v;
+    if      (structure instanceof RBTree)       structure.insert(currentKey, v);
+    else if (structure instanceof BinomialHeap) structure.updateValue(currentKey, v);
+    else                                         structure.data[nodeId].value = v;
     setStatus(`✓ Key ${currentKey} → ${v.length>40?v.slice(0,40)+'…':v}`);
   });
-  setTimeout(()=>document.getElementById('editVal')?.focus(),50);
+  setTimeout(() => document.getElementById('editVal')?.focus(), 50);
 }
 
 function pickFile(inputId) {
@@ -880,8 +1068,9 @@ function buildOpsMenu() {
   drop.innerHTML='';
   document.getElementById('structBadge').textContent=structType;
 
-  const isRBT = structType==='RBTree';
-  const isMin = structType==='MinHeap';
+  const isRBT  = structType === 'RBTree';
+  const isBinom = structType === 'BinomialHeap';
+  const isMin   = structType === 'MinHeap';
   btn.textContent = isRBT ? 'DICTIONARY' : 'HEAP';
 
   const items = isRBT ? [
@@ -894,12 +1083,21 @@ function buildOpsMenu() {
     ['➡  Successor',    cmdSuccessor],
     ['⬅  Predecessor',  cmdPredecessor],
     null,
-    ['🟡  greaterThan', ()=>cmdCount(true)],
-    ['🟡  lessThan',    ()=>cmdCount(false)],
+    ['🟡  greaterThan', () => cmdCount(true)],
+    ['🟡  lessThan',    () => cmdCount(false)],
+  ] : isBinom ? [
+    ['➕  Insert',       cmdInsert],
+    ['⬇  Extract Min',  cmdExtract],
+    ['⬇  Peek Min',     cmdPeek],
+    null,
+    ['🔍  Search',       cmdSearch],
+    ['❌  Delete',       cmdDelete],
+    null,
+    ['🔗  Merge',        cmdMerge],
   ] : [
-    ['➕  Insert',                         cmdInsert],
-    [isMin?'⬇  Extract Min':'⬆  Extract Max', cmdExtract],
-    [isMin?'⬇  Peek Min'   :'⬆  Peek Max',    cmdPeek],
+    ['➕  Insert',                              cmdInsert],
+    [isMin ? '⬇  Extract Min' : '⬆  Extract Max', cmdExtract],
+    [isMin ? '⬇  Peek Min'    : '⬆  Peek Max',    cmdPeek],
     null,
     ['🔍  Search', cmdSearch],
     ['❌  Delete', cmdDelete],
@@ -966,12 +1164,15 @@ function cmdDelete() {
 
 function cmdSearch() {
   if (!need()) return;
-  askKey('Search', k=>{
+  askKey('Search', k => {
     highlighted.clear();
-    const v=structure.search(k);
-    if (v!==null) {
-      const id = structure instanceof RBTree ? k : structure.data.findIndex(d=>d.key===k);
-      if(id>=0) highlighted.add(id);
+    const v = structure.search(k);
+    if (v !== null) {
+      let id;
+      if      (structure instanceof RBTree)       id = k;
+      else if (structure instanceof BinomialHeap) id = layout.nodes.find(n => n.key === k)?.id ?? -1;
+      else                                         id = structure.data.findIndex(d => d.key === k);
+      if (id >= 0) highlighted.add(id);
       setStatus(`✓ <b>${k}</b> → ${v}`);
     } else setStatus(`✗ ${k} nicht gefunden`);
   });
@@ -979,8 +1180,16 @@ function cmdSearch() {
 
 function cmdMin() {
   if (!need()) return; highlighted.clear();
-  const k = structure instanceof RBTree ? structure.getMin() : structure.peek()?.key;
-  if (k!=null) { highlighted.add(structure instanceof RBTree?k:0); setStatus(`Minimum: <b>${k}</b>`); }
+  let k, id;
+  if (structure instanceof RBTree) {
+    k = structure.getMin(); id = k;
+  } else if (structure instanceof BinomialHeap) {
+    const p = structure.peek(); k = p?.key;
+    id = layout.nodes.find(n => n.key === k)?.id ?? -1;
+  } else {
+    k = structure.peek()?.key; id = 0;
+  }
+  if (k != null && id >= 0) { highlighted.add(id); setStatus(`Minimum: <b>${k}</b>`); }
   else setStatus('Struktur ist leer');
 }
 
@@ -1026,17 +1235,42 @@ function cmdCount(isGreater) {
   });
 }
 
+function cmdMerge() {
+  if (!need()) return;
+  showDialog('Merge — zweiten BinomialHeap erstellen', `
+    <div class="dialog-field">
+      <label>Keys (kommagetrennte Ganzzahlen)</label>
+      <input type="text" id="_mk" placeholder="z.B. 3, 7, 11, 30">
+    </div>`, () => {
+    const keys = document.getElementById('_mk').value
+                   .split(/[\s,]+/).map(Number).filter(n => !isNaN(n) && Number.isInteger(n));
+    if (!keys.length) return;
+    const other = new BinomialHeap();
+    keys.forEach(k => other.insert(k, 'Value_' + k));
+    structure.merge(other);
+    highlighted.clear();
+    setStatus(`✓ Merge: ${keys.length} Knoten eingefügt (${keys.join(', ')})`);
+  });
+  setTimeout(() => document.getElementById('_mk')?.focus(), 50);
+}
+
 function cmdExtract() {
   if (!need()) return; highlighted.clear();
-  const r=structure.extractTop();
-  setStatus(r?`✓ Extracted: <b>${r.key}</b> → ${r.value}`:'Heap ist leer');
+  const r = structure instanceof BinomialHeap ? structure.extractMin() : structure.extractTop();
+  setStatus(r ? `✓ Extracted: <b>${r.key}</b> → ${r.value}` : 'Heap ist leer');
 }
 
 function cmdPeek() {
   if (!need()) return; highlighted.clear();
-  const r=structure.peek();
-  if(r){highlighted.add(0);setStatus(`${structType==='MinHeap'?'Min':'Max'}: <b>${r.key}</b> → ${r.value}`);}
-  else setStatus('Heap ist leer');
+  const r = structure.peek();
+  if (r) {
+    const id = structure instanceof BinomialHeap
+      ? (layout.nodes.find(n => n.key === r.key)?.id ?? -1)
+      : 0;
+    if (id >= 0) highlighted.add(id);
+    const label = structType === 'MaxHeap' ? 'Max' : 'Min';
+    setStatus(`${label}: <b>${r.key}</b> → ${r.value}`);
+  } else setStatus('Heap ist leer');
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -1063,6 +1297,9 @@ function cmdNew() {
         <div class="struct-tile" id="tile-MaxHeap" onclick="_pickTile('MaxHeap')">
           <div class="tile-icon">⬆</div><div class="tile-name">MaxHeap</div>
         </div>
+        <div class="struct-tile" id="tile-BinomialHeap" onclick="_pickTile('BinomialHeap')">
+          <div class="tile-icon">🔗</div><div class="tile-name">BinomialHeap</div>
+        </div>
       </div>
     </div>
     <div class="dialog-field">
@@ -1077,11 +1314,12 @@ function cmdNew() {
     const SMALL=[10,5,15,3,8,12,20];
     const MED  =[15,10,20,8,12,17,25,5,11,14,16,22,27];
     const keys = smp==='s'?SMALL:smp==='m'?MED:[];
-    structType=chosen; highlighted.clear(); wobble.clear();
-    if      (structType==='MinHeap') structure=new MinHeap();
-    else if (structType==='MaxHeap') structure=new MaxHeap();
-    else                             structure=new RBTree();
-    keys.forEach(k=>structure.insert(k,'Value_'+k));
+    structType = chosen; highlighted.clear(); wobble.clear();
+    if      (structType === 'MinHeap')      structure = new MinHeap();
+    else if (structType === 'MaxHeap')      structure = new MaxHeap();
+    else if (structType === 'BinomialHeap') structure = new BinomialHeap();
+    else                                    structure = new RBTree();
+    keys.forEach(k => structure.insert(k, 'Value_' + k));
     buildOpsMenu();
     setStatus(`✓ Neuer ${structType} erstellt${keys.length?' mit '+keys.length+' Beispielknoten':''}`);
   });
@@ -1103,10 +1341,11 @@ function cmdLoad() {
         const d=JSON.parse(e.target.result);
         highlighted.clear(); wobble.clear();
         structType=d.type;
-        if      (structType==='RBTree')  structure=RBTree.fromJSON(d);
-        else if (structType==='MinHeap') structure=MinHeap.fromJSON(d);
-        else if (structType==='MaxHeap') structure=MaxHeap.fromJSON(d);
-        else throw new Error('Unknown type: '+structType);
+        if      (structType === 'RBTree')        structure = RBTree.fromJSON(d);
+        else if (structType === 'MinHeap')       structure = MinHeap.fromJSON(d);
+        else if (structType === 'MaxHeap')       structure = MaxHeap.fromJSON(d);
+        else if (structType === 'BinomialHeap')  structure = BinomialHeap.fromJSON(d);
+        else throw new Error('Unknown type: ' + structType);
         buildOpsMenu();
         setStatus(`✓ Geladen: ${f.name}`);
       } catch(err) { setStatus('✗ Fehler beim Laden: '+err.message); }
