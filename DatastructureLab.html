@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DatastructureLab</title>
+<style>
+/* ── RESET & THEME ───────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0b0d10;--surface:#111418;--surface2:#181d26;
+  --border:#232c3a;--text:#e2e8f4;--muted:#8892a6;
+  --accent:#7dd3fc;--accent2:#a78bfa;
+  --red:#e05050;--red2:#ff6b6b;
+  --green:#4ade80;--yellow:#fbbf24;--orange:#fb923c;
+  --radius:8px;
+}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--text);
+  font-family:'Segoe UI',system-ui,sans-serif;
+  display:flex;flex-direction:column}
+
+/* ── MENU BAR ────────────────────────────────────────────── */
+.menubar{
+  display:flex;align-items:center;gap:4px;
+  background:var(--surface);border-bottom:1px solid var(--border);
+  height:38px;padding:0 14px;flex-shrink:0;user-select:none;z-index:200
+}
+.app-title{
+  font-size:13px;font-weight:800;color:var(--accent);
+  letter-spacing:.06em;margin-right:12px;white-space:nowrap
+}
+.menu-group{position:relative}
+.menu-btn{
+  background:none;border:none;color:var(--text);
+  font-size:12px;font-weight:700;padding:5px 10px;
+  cursor:pointer;border-radius:5px;letter-spacing:.05em;
+  transition:background .12s,color .12s
+}
+.menu-btn:hover,.menu-group:focus-within .menu-btn{
+  background:var(--surface2);color:var(--accent)
+}
+.dropdown{
+  display:none;position:absolute;top:calc(100% + 2px);left:0;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);min-width:190px;padding:4px;
+  z-index:500;box-shadow:0 8px 28px rgba(0,0,0,.5)
+}
+.menu-group:hover .dropdown,.menu-group:focus-within .dropdown{display:block}
+.dropdown button{
+  display:block;width:100%;text-align:left;background:none;border:none;
+  color:var(--text);font-size:13px;padding:7px 12px;
+  cursor:pointer;border-radius:5px;transition:background .1s,color .1s
+}
+.dropdown button:hover{background:var(--surface2);color:var(--accent)}
+.dropdown hr{border:none;border-top:1px solid var(--border);margin:4px 2px}
+.struct-badge{
+  font-size:11px;background:var(--accent2);color:#fff;
+  border-radius:5px;padding:2px 9px;font-weight:700;
+  letter-spacing:.06em;margin-left:auto
+}
+
+/* ── CANVAS ──────────────────────────────────────────────── */
+main{flex:1;position:relative;overflow:hidden}
+#canvas{width:100%;height:100%;display:block}
+
+/* ── STATUS BAR ──────────────────────────────────────────── */
+.statusbar{
+  height:30px;background:var(--surface);border-top:1px solid var(--border);
+  display:flex;align-items:center;padding:0 16px;flex-shrink:0
+}
+#status{font-size:12px;color:var(--muted)}
+
+/* ── TOOLTIP ─────────────────────────────────────────────── */
+#tooltip{
+  position:fixed;display:none;
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:7px;padding:7px 11px;font-size:12px;color:var(--text);
+  pointer-events:none;z-index:600;max-width:320px;
+  word-break:break-all;line-height:1.5;
+  box-shadow:0 6px 20px rgba(0,0,0,.4)
+}
+
+/* ── MODAL OVERLAY ───────────────────────────────────────── */
+.overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.6);
+  display:flex;align-items:center;justify-content:center;z-index:1000
+}
+.overlay.hidden{display:none}
+.dialog-box{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:12px;padding:26px 28px;min-width:340px;max-width:500px;
+  box-shadow:0 20px 60px rgba(0,0,0,.55)
+}
+.dialog-box h3{margin-bottom:18px;color:var(--accent);font-size:15px;font-weight:700}
+.dialog-field{margin-bottom:13px}
+.dialog-field label{
+  display:block;font-size:11px;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px
+}
+.dialog-field input,.dialog-field select{
+  width:100%;background:var(--surface2);border:1px solid var(--border);
+  color:var(--text);font-size:13px;padding:9px 11px;
+  border-radius:7px;outline:none;font-family:inherit
+}
+.dialog-field input:focus,.dialog-field select:focus{border-color:var(--accent)}
+.input-row{display:flex;gap:6px}
+.input-row input{flex:1}
+.browse-btn{
+  background:var(--surface2);border:1px solid var(--border);
+  color:var(--text);padding:0 11px;border-radius:7px;
+  cursor:pointer;font-size:15px;transition:border-color .1s
+}
+.browse-btn:hover{border-color:var(--accent)}
+.dialog-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:22px}
+.btn-ok{
+  background:var(--accent);color:#000;border:none;
+  padding:9px 22px;border-radius:7px;font-weight:700;
+  cursor:pointer;font-size:13px;transition:opacity .1s
+}
+.btn-ok:hover{opacity:.85}
+.btn-cancel{
+  background:none;border:1px solid var(--border);color:var(--muted);
+  padding:9px 22px;border-radius:7px;cursor:pointer;font-size:13px;
+  transition:border-color .1s,color .1s
+}
+.btn-cancel:hover{border-color:var(--text);color:var(--text)}
+
+/* Structure type tiles */
+.struct-tiles{display:flex;gap:10px;margin-bottom:2px}
+.struct-tile{
+  flex:1;padding:13px 8px;border:2px solid var(--border);
+  border-radius:9px;cursor:pointer;text-align:center;transition:all .15s
+}
+.struct-tile:hover{border-color:var(--accent)}
+.struct-tile.selected{border-color:var(--accent);background:rgba(125,211,252,.07)}
+.tile-icon{font-size:22px;margin-bottom:5px}
+.tile-name{font-size:11px;font-weight:700;color:var(--muted)}
+.struct-tile.selected .tile-name{color:var(--accent)}
+</style>
+</head>
+<body>
+
+<header class="menubar">
+  <span class="app-title">DatastructureLab</span>
+
+  <div class="menu-group">
+    <button class="menu-btn">FILE</button>
+    <div class="dropdown">
+      <button onclick="cmdNew()">✚&nbsp; Neuer Baum</button>
+      <button onclick="cmdSave()">💾&nbsp; Speichern</button>
+      <button onclick="cmdLoad()">📂&nbsp; Laden</button>
+    </div>
+  </div>
+
+  <div class="menu-group">
+    <button class="menu-btn" id="menuBtnOps">DICTIONARY</button>
+    <div class="dropdown" id="dropdownOps"></div>
+  </div>
+
+  <span class="struct-badge" id="structBadge">RBTree</span>
+</header>
+
+<main>
+  <canvas id="canvas"></canvas>
+</main>
+
+<footer class="statusbar">
+  <span id="status">Bereit &nbsp;·&nbsp; Klick auf Knoten: Value bearbeiten &nbsp;·&nbsp; Halten + Ziehen: wackeln lassen</span>
+</footer>
+
+<div class="overlay hidden" id="overlay">
+  <div class="dialog-box">
+    <h3 id="dlgTitle"></h3>
+    <div id="dlgContent"></div>
+    <div class="dialog-actions">
+      <button class="btn-cancel" id="dlgCancel" onclick="closeDialog()">Abbrechen</button>
+      <button class="btn-ok" id="dlgOK">OK</button>
+    </div>
+  </div>
+</div>
+
+<div id="tooltip"></div>
+<input type="file" id="fileInput" accept=".json" style="display:none">
+
+<script>
+'use strict';
+
+// ══════════════════════════════════════════════════════════════
+//  UTILITIES
+// ══════════════════════════════════════════════════════════════
+const statusEl = document.getElementById('status');
+function setStatus(html) { statusEl.innerHTML = html; }
+
+function closeDialog() {
+  document.getElementById('overlay').classList.add('hidden');
+}
+
+function showDialog(title, html, onOK, { hideCancel=false }={}) {
+  document.getElementById('dlgTitle').textContent = title;
+  document.getElementById('dlgContent').innerHTML = html;
+  document.getElementById('dlgCancel').style.display = hideCancel ? 'none' : '';
+  const btn = document.getElementById('dlgOK');
+  btn.onclick = () => { onOK(); closeDialog(); };
+  document.getElementById('overlay').classList.remove('hidden');
+}
+
+document.addEventListener('keydown', e => {
+  const ov = document.getElementById('overlay');
+  if (!ov.classList.contains('hidden')) {
+    if (e.key === 'Enter') { e.preventDefault(); document.getElementById('dlgOK').click(); }
+    if (e.key === 'Escape') closeDialog();
+  }
+});
+
+function downloadJSON(name, obj) {
+  const a = Object.assign(document.createElement('a'), {
+    href: URL.createObjectURL(new Blob([JSON.stringify(obj,null,2)],{type:'application/json'})),
+    download: name
+  });
+  a.click(); URL.revokeObjectURL(a.href);
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  if (ctx.roundRect) { ctx.roundRect(x, y, w, h, r); }
+  else {
+    r = Math.min(r, w/2, h/2);
+    ctx.moveTo(x+r, y);
+    ctx.arcTo(x+w,y, x+w,y+h, r);
+    ctx.arcTo(x+w,y+h, x,y+h, r);
+    ctx.arcTo(x,y+h, x,y, r);
+    ctx.arcTo(x,y, x+w,y, r);
+    ctx.closePath();
+  }
+}
+
+function truncateVal(v, max) {
+  if (!v) return '';
+  let d = v;
+  if (/[\\\/]/.test(d) && !d.startsWith('http')) d = d.replace(/\\/g,'/').split('/').pop();
+  else if (/^https?:\/\//.test(d)) d = d.replace(/^https?:\/\//,'').split('/')[0];
+  return d.length > max ? d.slice(0, max-2)+'..' : d;
+}
+
+// ══════════════════════════════════════════════════════════════
+//  RED-BLACK TREE
+// ══════════════════════════════════════════════════════════════
+class RBTree {
+  constructor() {
+    this.NIL = { key:null, value:null, color:'BLACK', size:0 };
+    this.NIL.left = this.NIL.right = this.NIL.parent = this.NIL;
+    this.root = this.NIL;
+  }
+
+  _find(key) {
+    let x = this.root;
+    while (x !== this.NIL && key !== x.key) x = key < x.key ? x.left : x.right;
+    return x;
+  }
+
+  search(key)    { const n = this._find(key); return n === this.NIL ? null : n.value; }
+  isRed(key)     { const n = this._find(key); return n !== this.NIL && n.color === 'RED'; }
+  getRoot()      { return this.root === this.NIL ? null : this.root.key; }
+  leftOf(key)    { const n = this._find(key); return n !== this.NIL && n.left  !== this.NIL ? n.left.key  : null; }
+  rightOf(key)   { const n = this._find(key); return n !== this.NIL && n.right !== this.NIL ? n.right.key : null; }
+
+  _min(node=this.root) { while (node !== this.NIL && node.left !== this.NIL) node = node.left; return node; }
+  _max(node=this.root) { while (node !== this.NIL && node.right!== this.NIL) node = node.right; return node; }
+  getMin() { const n = this._min(); return n === this.NIL ? null : n.key; }
+  getMax() { const n = this._max(); return n === this.NIL ? null : n.key; }
+
+  successor(key) {
+    const n = this._find(key); if (n === this.NIL) return null;
+    if (n.right !== this.NIL) return this._min(n.right).key;
+    let y = n.parent, x = n;
+    while (y !== this.NIL && x === y.right) { x=y; y=y.parent; }
+    return y === this.NIL ? null : y.key;
+  }
+
+  predecessor(key) {
+    const n = this._find(key); if (n === this.NIL) return null;
+    if (n.left !== this.NIL) return this._max(n.left).key;
+    let y = n.parent, x = n;
+    while (y !== this.NIL && x === y.left) { x=y; y=y.parent; }
+    return y === this.NIL ? null : y.key;
+  }
+
+  _upd(n) { if (n !== this.NIL) n.size = 1 + n.left.size + n.right.size; }
+
+  _rotL(x) {
+    const y = x.right; x.right = y.left;
+    if (y.left !== this.NIL) y.left.parent = x;
+    y.parent = x.parent;
+    if (x.parent === this.NIL) this.root = y;
+    else if (x === x.parent.left) x.parent.left = y; else x.parent.right = y;
+    y.left = x; x.parent = y; this._upd(x); this._upd(y);
+  }
+
+  _rotR(y) {
+    const x = y.left; y.left = x.right;
+    if (x.right !== this.NIL) x.right.parent = y;
+    x.parent = y.parent;
+    if (y.parent === this.NIL) this.root = x;
+    else if (y === y.parent.right) y.parent.right = x; else y.parent.left = x;
+    x.right = y; y.parent = x; this._upd(y); this._upd(x);
+  }
+
+  insert(key, value) {
+    const z = { key, value, color:'RED', size:1,
+                 left:this.NIL, right:this.NIL, parent:this.NIL };
+    let y = this.NIL, x = this.root;
+    while (x !== this.NIL) {
+      y = x;
+      if (key < x.key) x = x.left;
+      else if (key > x.key) x = x.right;
+      else { x.value = value; return; }
+    }
+    z.parent = y;
+    if      (y === this.NIL)  this.root  = z;
+    else if (key < y.key)     y.left     = z;
+    else                      y.right    = z;
+    for (let t=y; t !== this.NIL; t=t.parent) this._upd(t);
+    this._fixIns(z);
+  }
+
+  _fixIns(z) {
+    while (z.parent.color === 'RED') {
+      if (z.parent === z.parent.parent.left) {
+        const u = z.parent.parent.right;
+        if (u.color === 'RED') {
+          z.parent.color = u.color = 'BLACK';
+          z.parent.parent.color = 'RED'; z = z.parent.parent;
+        } else {
+          if (z === z.parent.right) { z = z.parent; this._rotL(z); }
+          z.parent.color = 'BLACK'; z.parent.parent.color = 'RED'; this._rotR(z.parent.parent);
+        }
+      } else {
+        const u = z.parent.parent.left;
+        if (u.color === 'RED') {
+          z.parent.color = u.color = 'BLACK';
+          z.parent.parent.color = 'RED'; z = z.parent.parent;
+        } else {
+          if (z === z.parent.left) { z = z.parent; this._rotR(z); }
+          z.parent.color = 'BLACK'; z.parent.parent.color = 'RED'; this._rotL(z.parent.parent);
+        }
+      }
+    }
+    this.root.color = 'BLACK';
+  }
+
+  _trans(u, v) {
+    if      (u.parent === this.NIL) this.root = v;
+    else if (u === u.parent.left)   u.parent.left = v;
+    else                            u.parent.right = v;
+    v.parent = u.parent;
+  }
+
+  delete(key) {
+    const z = this._find(key); if (z === this.NIL) return false;
+    let y=z, yc=y.color, x;
+    if      (z.left === this.NIL)  { x=z.right; this._trans(z,z.right); }
+    else if (z.right=== this.NIL)  { x=z.left;  this._trans(z,z.left); }
+    else {
+      y=this._min(z.right); yc=y.color; x=y.right;
+      if (y.parent === z) x.parent=y;
+      else { this._trans(y,y.right); y.right=z.right; y.right.parent=y; }
+      this._trans(z,y); y.left=z.left; y.left.parent=y; y.color=z.color;
+    }
+    if (yc === 'BLACK') this._fixDel(x);
+    return true;
+  }
+
+  _fixDel(x) {
+    while (x !== this.root && x.color === 'BLACK') {
+      if (x === x.parent.left) {
+        let w = x.parent.right;
+        if (w.color==='RED') { w.color='BLACK'; x.parent.color='RED'; this._rotL(x.parent); w=x.parent.right; }
+        if (w.left.color==='BLACK' && w.right.color==='BLACK') { w.color='RED'; x=x.parent; }
+        else {
+          if (w.right.color==='BLACK') { w.left.color='BLACK'; w.color='RED'; this._rotR(w); w=x.parent.right; }
+          w.color=x.parent.color; x.parent.color='BLACK'; w.right.color='BLACK'; this._rotL(x.parent); x=this.root;
+        }
+      } else {
+        let w = x.parent.left;
+        if (w.color==='RED') { w.color='BLACK'; x.parent.color='RED'; this._rotR(x.parent); w=x.parent.left; }
+        if (w.right.color==='BLACK' && w.left.color==='BLACK') { w.color='RED'; x=x.parent; }
+        else {
+          if (w.left.color==='BLACK') { w.right.color='BLACK'; w.color='RED'; this._rotL(w); w=x.parent.left; }
+          w.color=x.parent.color; x.parent.color='BLACK'; w.left.color='BLACK'; this._rotR(x.parent); x=this.root;
+        }
+      }
+    }
+    x.color='BLACK';
+  }
+
+  inorder() {
+    const r=[]; const go=n=>{ if(n===this.NIL)return; go(n.left); r.push(n.key); go(n.right); };
+    go(this.root); return r;
+  }
+
+  greaterThan(x) {
+    const c=n=>{ if(n===this.NIL)return 0; return n.key>x ? 1+n.right.size+c(n.left) : c(n.right); };
+    return c(this.root);
+  }
+  lessThan(x) {
+    const c=n=>{ if(n===this.NIL)return 0; return n.key<x ? 1+n.left.size+c(n.right) : c(n.left); };
+    return c(this.root);
+  }
+  keysGreaterThan(x) {
+    const r=[]; const go=n=>{ if(n===this.NIL)return; if(n.key>x){go(n.left);r.push(n.key);go(n.right);}else go(n.right); };
+    go(this.root); return r;
+  }
+  keysLessThan(x) {
+    const r=[]; const go=n=>{ if(n===this.NIL)return; if(n.key<x){go(n.left);r.push(n.key);go(n.right);}else go(n.left); };
+    go(this.root); return r;
+  }
+
+  isEmpty() { return this.root === this.NIL; }
+
+  toJSON() {
+    return { type:'RBTree', nodes: this.inorder().map(k => ({k, v: this.search(k)})) };
+  }
+  static fromJSON(d) {
+    const t = new RBTree();
+    for (const {k,v} of (d.nodes||[])) t.insert(Number(k), v);
+    return t;
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  MIN HEAP
+// ══════════════════════════════════════════════════════════════
+class MinHeap {
+  constructor() { this.data = []; }
+
+  _lt(i,j) { return this.data[i].key < this.data[j].key; }
+  _swap(i,j) { [this.data[i],this.data[j]] = [this.data[j],this.data[i]]; }
+
+  insert(key, value) {
+    this.data.push({key,value}); this._up(this.data.length-1);
+  }
+
+  _up(i) {
+    while (i>0) { const p=((i-1)/2)|0; if(this._lt(i,p)){this._swap(i,p);i=p;}else break; }
+  }
+
+  _down(i) {
+    const n=this.data.length;
+    while (true) {
+      let b=i,l=2*i+1,r=2*i+2;
+      if(l<n&&this._lt(l,b))b=l;
+      if(r<n&&this._lt(r,b))b=r;
+      if(b===i)break; this._swap(i,b); i=b;
+    }
+  }
+
+  extractTop() {
+    if(!this.data.length) return null;
+    const top=this.data[0], last=this.data.pop();
+    if(this.data.length){this.data[0]=last;this._down(0);}
+    return top;
+  }
+
+  peek() { return this.data[0]||null; }
+  size() { return this.data.length; }
+  isEmpty() { return !this.data.length; }
+
+  search(key) { const n=this.data.find(x=>x.key===key); return n?n.value:null; }
+
+  delete(key) {
+    const i=this.data.findIndex(x=>x.key===key); if(i<0) return false;
+    const last=this.data.pop();
+    if(i<this.data.length){ this.data[i]=last; this._up(i); this._down(i); }
+    return true;
+  }
+
+  _label() { return 'MinHeap'; }
+
+  toJSON() { return { type:this._label(), nodes:this.data.map(({key:k,value:v})=>({k,v})) }; }
+  static fromJSON(d,Cls=MinHeap) {
+    const h=new Cls(); h.data=(d.nodes||[]).map(({k,v})=>({key:Number(k),value:v})); return h;
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  MAX HEAP
+// ══════════════════════════════════════════════════════════════
+class MaxHeap extends MinHeap {
+  _lt(i,j) { return this.data[i].key > this.data[j].key; }
+  _label()  { return 'MaxHeap'; }
+  extractMax() { return this.extractTop(); }
+  getMax()     { return this.peek(); }
+  static fromJSON(d) { return MinHeap.fromJSON(d, MaxHeap); }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  APP STATE
+// ══════════════════════════════════════════════════════════════
+let structure  = null;        // current data structure
+let structType = 'RBTree';
+let highlighted = new Set();  // highlighted node IDs
+
+// Physics
+const wobble = new Map();     // id → [offX, offY, velX, velY]
+let drag = null;              // {id, startX, startY, initOX, initOY, moved}
+
+// Layout cache
+let layout = { nodes:[], edges:[], nilNodes:[] };
+
+const canvas = document.getElementById('canvas');
+const ctx    = canvas.getContext('2d');
+const RADIUS = 30;
+const LEVELH = 100;
+
+// ══════════════════════════════════════════════════════════════
+//  LAYOUT ENGINE
+// ══════════════════════════════════════════════════════════════
+function computeLayout() {
+  const W = canvas.width;
+  if (!structure || (structure instanceof RBTree ? structure.isEmpty() : structure.isEmpty()))
+    return { nodes:[], edges:[], nilNodes:[] };
+
+  if (structType === 'RBTree') return layoutRBTree(W);
+  return layoutHeap(W);
+}
+
+function layoutRBTree(W) {
+  const nodes=[], edges=[], nilNodes=[];
+  const root = structure.getRoot();
+  if (root === null) return {nodes,edges,nilNodes};
+
+  function calc(key, x, y, off) {
+    nodes.push({ id:key, x, y, key, value:structure.search(key), isRed:structure.isRed(key) });
+    const co = Math.max(off/2, 35);
+    const L=structure.leftOf(key), R=structure.rightOf(key);
+    if (L!==null) { edges.push({fromId:key,toId:L,fromX:x,fromY:y,toX:x-off,toY:y+LEVELH}); calc(L,x-off,y+LEVELH,co); }
+    else nilNodes.push({x:x-off, y:y+LEVELH, parentId:key});
+    if (R!==null) { edges.push({fromId:key,toId:R,fromX:x,fromY:y,toX:x+off,toY:y+LEVELH}); calc(R,x+off,y+LEVELH,co); }
+    else nilNodes.push({x:x+off, y:y+LEVELH, parentId:key});
+  }
+  calc(root, W/2, 50, W/4);
+  return {nodes,edges,nilNodes};
+}
+
+function layoutHeap(W) {
+  const nodes=[], edges=[], n=structure.size();
+  if (!n) return {nodes,edges,nilNodes:[]};
+  function calc(i, x, y, off) {
+    if (i>=n) return;
+    const d=structure.data[i];
+    nodes.push({id:i, x, y, key:d.key, value:d.value, isRed:false});
+    const co=Math.max(off/2,35), li=2*i+1, ri=2*i+2;
+    if(li<n){edges.push({fromId:i,toId:li,fromX:x,fromY:y,toX:x-off,toY:y+LEVELH});calc(li,x-off,y+LEVELH,co);}
+    if(ri<n){edges.push({fromId:i,toId:ri,fromX:x,fromY:y,toX:x+off,toY:y+LEVELH});calc(ri,x+off,y+LEVELH,co);}
+  }
+  calc(0, W/2, 50, W/4);
+  return {nodes,edges,nilNodes:[]};
+}
+
+// ══════════════════════════════════════════════════════════════
+//  PHYSICS
+// ══════════════════════════════════════════════════════════════
+function wx(id) { const s=wobble.get(id); return s?s[0]:0; }
+function wy(id) { const s=wobble.get(id); return s?s[1]:0; }
+
+function stepPhysics() {
+  for (const [id,s] of wobble) {
+    if (drag && drag.id===id) continue;
+    s[2]=s[2]*.88 - s[0]*.10;
+    s[3]=s[3]*.88 - s[1]*.10;
+    s[0]+=s[2]; s[1]+=s[3];
+    if (Math.abs(s[0])<.08&&Math.abs(s[1])<.08&&Math.abs(s[2])<.08&&Math.abs(s[3])<.08)
+      wobble.delete(id);
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  RENDERER
+// ══════════════════════════════════════════════════════════════
+function draw() {
+  // sync canvas resolution
+  if (canvas.width!==canvas.clientWidth||canvas.height!==canvas.clientHeight) {
+    canvas.width=canvas.clientWidth; canvas.height=canvas.clientHeight;
+  }
+
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  // subtle dot-grid background
+  ctx.fillStyle='rgba(255,255,255,0.025)';
+  const gs=40;
+  for(let x=gs;x<canvas.width;x+=gs) for(let y=gs;y<canvas.height;y+=gs) {
+    ctx.beginPath(); ctx.arc(x,y,1,0,Math.PI*2); ctx.fill();
+  }
+
+  stepPhysics();
+  layout = computeLayout();
+
+  if (!layout.nodes.length) {
+    ctx.fillStyle='#8892a6';
+    ctx.font='18px "Segoe UI",system-ui,sans-serif';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(
+      structure ? 'Leer  •  DICTIONARY > Insert' : 'Kein Baum  •  FILE > Neu',
+      canvas.width/2, canvas.height/2
+    );
+    requestAnimationFrame(draw); return;
+  }
+
+  const nodeMap = new Map(layout.nodes.map(n=>[n.id,n]));
+
+  // ── solid edges ────────────────────────────────────────────
+  ctx.strokeStyle='#2a3a4e'; ctx.lineWidth=2.5; ctx.setLineDash([]);
+  for (const e of layout.edges) {
+    const fn=nodeMap.get(e.fromId), tn=nodeMap.get(e.toId); if(!fn||!tn) continue;
+    ctx.beginPath();
+    ctx.moveTo(fn.x+wx(e.fromId), fn.y+wy(e.fromId)+RADIUS);
+    ctx.lineTo(tn.x+wx(e.toId),  tn.y+wy(e.toId) -RADIUS);
+    ctx.stroke();
+  }
+
+  // ── NIL nodes (RBTree only) ─────────────────────────────────
+  for (const nil of layout.nilNodes) {
+    const par=nodeMap.get(nil.parentId);
+    if (par) {
+      ctx.strokeStyle='rgba(42,58,74,.55)'; ctx.lineWidth=1.2;
+      ctx.setLineDash([4,4]);
+      ctx.beginPath();
+      ctx.moveTo(par.x+wx(nil.parentId), par.y+wy(nil.parentId)+RADIUS);
+      ctx.lineTo(nil.x, nil.y-7); ctx.stroke();
+    }
+    ctx.setLineDash([]);
+    // shadow
+    ctx.fillStyle='rgba(0,0,0,.18)';
+    roundRect(ctx, nil.x-13, nil.y-7+2, 26, 14, 4); ctx.fill();
+    // box
+    ctx.fillStyle='rgba(35,44,60,.85)';
+    roundRect(ctx, nil.x-13, nil.y-7, 26, 14, 4); ctx.fill();
+    ctx.strokeStyle='rgba(70,90,120,.6)'; ctx.lineWidth=1;
+    roundRect(ctx, nil.x-13, nil.y-7, 26, 14, 4); ctx.stroke();
+    // label
+    ctx.fillStyle='rgba(140,155,180,.9)';
+    ctx.font='bold 8px "Segoe UI",system-ui,sans-serif';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText('NIL', nil.x, nil.y);
+  }
+  ctx.setLineDash([]);
+
+  // ── nodes ──────────────────────────────────────────────────
+  for (const n of layout.nodes) {
+    const x=n.x+wx(n.id), y=n.y+wy(n.id);
+
+    // glow for highlighted
+    if (highlighted.has(n.id)) {
+      const g=ctx.createRadialGradient(x,y,RADIUS,x,y,RADIUS+24);
+      g.addColorStop(0,'rgba(251,191,36,.40)');
+      g.addColorStop(1,'rgba(251,191,36,0)');
+      ctx.fillStyle=g;
+      ctx.beginPath(); ctx.arc(x,y,RADIUS+24,0,Math.PI*2); ctx.fill();
+    }
+
+    // shadow
+    ctx.fillStyle='rgba(0,0,0,.35)';
+    ctx.beginPath(); ctx.arc(x+3,y+4,RADIUS,0,Math.PI*2); ctx.fill();
+
+    // fill
+    ctx.fillStyle=n.isRed ? '#b82828' : '#1e2636';
+    ctx.beginPath(); ctx.arc(x,y,RADIUS,0,Math.PI*2); ctx.fill();
+
+    // border
+    ctx.strokeStyle=n.isRed ? '#e05050' : '#3a4a60';
+    ctx.lineWidth=2.2;
+    ctx.beginPath(); ctx.arc(x,y,RADIUS,0,Math.PI*2); ctx.stroke();
+
+    // inner gloss
+    const gl=ctx.createRadialGradient(x-8,y-8,2,x,y,RADIUS);
+    gl.addColorStop(0,'rgba(255,255,255,.12)');
+    gl.addColorStop(1,'rgba(255,255,255,0)');
+    ctx.fillStyle=gl;
+    ctx.beginPath(); ctx.arc(x,y,RADIUS,0,Math.PI*2); ctx.fill();
+
+    // key text
+    ctx.fillStyle='#fff';
+    ctx.font='bold 14px "Segoe UI",system-ui,sans-serif';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(String(n.key), x, y);
+
+    // R / B badge (RBTree only)
+    if (structType==='RBTree') {
+      ctx.fillStyle=n.isRed?'rgba(255,120,120,.85)':'rgba(140,160,190,.75)';
+      ctx.font='bold 9px "Segoe UI",system-ui,sans-serif';
+      ctx.fillText(n.isRed?'R':'B', x, y+RADIUS+13);
+    }
+
+    // value label
+    if (n.value) {
+      const tv=truncateVal(n.value,12);
+      ctx.fillStyle='rgba(100,150,210,.9)';
+      ctx.font='9px "Segoe UI",system-ui,sans-serif';
+      ctx.fillText(tv, x, y+RADIUS+(structType==='RBTree'?26:15));
+    }
+  }
+
+  requestAnimationFrame(draw);
+}
+
+// ══════════════════════════════════════════════════════════════
+//  HIT TEST
+// ══════════════════════════════════════════════════════════════
+function nodeAt(mx, my) {
+  for (const n of layout.nodes) {
+    const dx=mx-n.x-wx(n.id), dy=my-n.y-wy(n.id);
+    if (dx*dx+dy*dy<=RADIUS*RADIUS) return n;
+  }
+  return null;
+}
+
+// ══════════════════════════════════════════════════════════════
+//  MOUSE  –  drag / click / wobble
+// ══════════════════════════════════════════════════════════════
+canvas.addEventListener('mousedown', e => {
+  if (e.button!==0) return;
+  const r=canvas.getBoundingClientRect(), mx=e.clientX-r.left, my=e.clientY-r.top;
+  const n=nodeAt(mx,my); if(!n) return;
+  const s=wobble.get(n.id)||[0,0,0,0];
+  wobble.set(n.id,s); s[2]=0; s[3]=0;
+  drag={id:n.id, startX:mx, startY:my, initOX:s[0], initOY:s[1], moved:false};
+});
+
+canvas.addEventListener('mousemove', e => {
+  const r=canvas.getBoundingClientRect(), mx=e.clientX-r.left, my=e.clientY-r.top;
+
+  // drag
+  if (drag) {
+    const dx=mx-drag.startX, dy=my-drag.startY;
+    if (!drag.moved && dx*dx+dy*dy>25) drag.moved=true;
+    if (drag.moved) {
+      const s=wobble.get(drag.id)||[0,0,0,0];
+      wobble.set(drag.id,s);
+      s[0]=drag.initOX+dx; s[1]=drag.initOY+dy;
+    }
+    canvas.style.cursor='grabbing';
+  } else {
+    canvas.style.cursor=nodeAt(mx,my)?'grab':'default';
+  }
+
+  // tooltip
+  const tip=document.getElementById('tooltip');
+  const n=nodeAt(mx,my);
+  if (n) {
+    tip.style.display='block';
+    tip.style.left=(e.clientX+14)+'px';
+    tip.style.top =(e.clientY+14)+'px';
+    const val=(n.value||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    tip.innerHTML=`<b>Key:</b> ${n.key}<br><b>Value:</b> ${val||'<em style="color:var(--muted)">leer</em>'}`;
+  } else {
+    tip.style.display='none';
+  }
+});
+
+canvas.addEventListener('mouseup', e => {
+  if (!drag) return;
+  if (drag.moved) {
+    const s=wobble.get(drag.id);
+    if (s) { s[2]=s[0]*.06; s[3]=s[1]*.06; }
+  } else {
+    wobble.delete(drag.id);
+    const id=drag.id;
+    setTimeout(()=>openValueEditor(id),10);
+  }
+  drag=null;
+});
+
+canvas.addEventListener('mouseleave', () => {
+  document.getElementById('tooltip').style.display='none';
+  if (drag?.moved) {
+    const s=wobble.get(drag.id);
+    if (s) { s[2]=s[0]*.06; s[3]=s[1]*.06; }
+  }
+  drag=null;
+});
+
+// ══════════════════════════════════════════════════════════════
+//  VALUE EDITOR  (click on node)
+// ══════════════════════════════════════════════════════════════
+function openValueEditor(nodeId) {
+  if (!structure) return;
+  let currentKey, currentVal;
+  if (structure instanceof RBTree) {
+    currentKey=nodeId; currentVal=structure.search(nodeId)||'';
+  } else {
+    const d=structure.data[nodeId]; if(!d) return;
+    currentKey=d.key; currentVal=d.value||'';
+  }
+
+  const safe=currentVal.replace(/"/g,'&quot;').replace(/</g,'&lt;');
+  showDialog('Value bearbeiten', `
+    <div class="dialog-field">
+      <label>Key</label>
+      <input type="text" value="${currentKey}" readonly style="opacity:.5;cursor:default">
+    </div>
+    <div class="dialog-field">
+      <label>Value (Text, URL oder Dateipfad)</label>
+      <div class="input-row">
+        <input type="text" id="editVal" value="${safe}" placeholder="Text, URL …">
+        <button class="browse-btn" onclick="pickFile('editVal')" title="Datei">📁</button>
+      </div>
+    </div>`, () => {
+    const v=document.getElementById('editVal').value.trim();
+    if (!v) return;
+    if (structure instanceof RBTree) structure.insert(currentKey, v);
+    else structure.data[nodeId].value=v;
+    setStatus(`✓ Key ${currentKey} → ${v.length>40?v.slice(0,40)+'…':v}`);
+  });
+  setTimeout(()=>document.getElementById('editVal')?.focus(),50);
+}
+
+function pickFile(inputId) {
+  const inp=document.createElement('input'); inp.type='file';
+  inp.onchange=()=>{
+    if(inp.files[0]) document.getElementById(inputId).value=inp.files[0].name;
+  };
+  inp.click();
+}
+
+// ══════════════════════════════════════════════════════════════
+//  OPS MENU  (dynamic per structure type)
+// ══════════════════════════════════════════════════════════════
+function buildOpsMenu() {
+  const drop=document.getElementById('dropdownOps');
+  const btn =document.getElementById('menuBtnOps');
+  drop.innerHTML='';
+  document.getElementById('structBadge').textContent=structType;
+
+  const isRBT = structType==='RBTree';
+  const isMin = structType==='MinHeap';
+  btn.textContent = isRBT ? 'DICTIONARY' : 'HEAP';
+
+  const items = isRBT ? [
+    ['➕  Insert',      cmdInsert],
+    ['❌  Delete',      cmdDelete],
+    ['🔍  Search',      cmdSearch],
+    null,
+    ['⬇  Min',          cmdMin],
+    ['⬆  Max',          cmdMax],
+    ['➡  Successor',    cmdSuccessor],
+    ['⬅  Predecessor',  cmdPredecessor],
+    null,
+    ['🟡  greaterThan', ()=>cmdCount(true)],
+    ['🟡  lessThan',    ()=>cmdCount(false)],
+  ] : [
+    ['➕  Insert',                         cmdInsert],
+    [isMin?'⬇  Extract Min':'⬆  Extract Max', cmdExtract],
+    [isMin?'⬇  Peek Min'   :'⬆  Peek Max',    cmdPeek],
+    null,
+    ['🔍  Search', cmdSearch],
+    ['❌  Delete', cmdDelete],
+  ];
+
+  for (const item of items) {
+    if (!item) { drop.appendChild(document.createElement('hr')); continue; }
+    const b=document.createElement('button');
+    b.textContent=item[0]; b.onclick=item[1];
+    drop.appendChild(b);
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  COMMANDS
+// ══════════════════════════════════════════════════════════════
+function need() {
+  if (!structure) { setStatus('⚠ FILE > Neu — Struktur erstellen'); return false; }
+  return true;
+}
+
+function askKey(title, cb) {
+  showDialog(title, `
+    <div class="dialog-field">
+      <label>Key (Ganzzahl)</label>
+      <input type="number" id="_k" step="1">
+    </div>`, () => {
+    const v=parseInt(document.getElementById('_k').value);
+    if (!isNaN(v)) cb(v);
+  });
+  setTimeout(()=>document.getElementById('_k')?.focus(),50);
+}
+
+function cmdInsert() {
+  if (!need()) return;
+  showDialog('Insert', `
+    <div class="dialog-field">
+      <label>Key (Ganzzahl)</label>
+      <input type="number" id="_ik" step="1">
+    </div>
+    <div class="dialog-field">
+      <label>Value (Text, URL oder Dateipfad)</label>
+      <div class="input-row">
+        <input type="text" id="_iv" placeholder="Text, URL …">
+        <button class="browse-btn" onclick="pickFile('_iv')" title="Datei">📁</button>
+      </div>
+    </div>`, () => {
+    const k=parseInt(document.getElementById('_ik').value);
+    const v=document.getElementById('_iv').value.trim()||('Value_'+k);
+    if (isNaN(k)) return;
+    highlighted.clear(); structure.insert(k,v);
+    setStatus(`✓ ${k} → ${v.length>40?v.slice(0,40)+'…':v}`);
+  });
+  setTimeout(()=>document.getElementById('_ik')?.focus(),50);
+}
+
+function cmdDelete() {
+  if (!need()) return;
+  askKey('Delete', k=>{
+    highlighted.clear();
+    setStatus(structure.delete(k) ? `✓ ${k} gelöscht` : `✗ ${k} nicht gefunden`);
+  });
+}
+
+function cmdSearch() {
+  if (!need()) return;
+  askKey('Search', k=>{
+    highlighted.clear();
+    const v=structure.search(k);
+    if (v!==null) {
+      const id = structure instanceof RBTree ? k : structure.data.findIndex(d=>d.key===k);
+      if(id>=0) highlighted.add(id);
+      setStatus(`✓ <b>${k}</b> → ${v}`);
+    } else setStatus(`✗ ${k} nicht gefunden`);
+  });
+}
+
+function cmdMin() {
+  if (!need()) return; highlighted.clear();
+  const k = structure instanceof RBTree ? structure.getMin() : structure.peek()?.key;
+  if (k!=null) { highlighted.add(structure instanceof RBTree?k:0); setStatus(`Minimum: <b>${k}</b>`); }
+  else setStatus('Struktur ist leer');
+}
+
+function cmdMax() {
+  if (!need()) return; highlighted.clear();
+  if (structure instanceof RBTree) {
+    const k=structure.getMax();
+    if(k!=null){highlighted.add(k);setStatus(`Maximum: <b>${k}</b>`);}
+    else setStatus('Baum ist leer');
+  }
+}
+
+function cmdSuccessor() {
+  if (!need()) return;
+  askKey('Successor', k=>{ highlighted.clear();
+    const s=structure.successor(k);
+    if(s!=null){highlighted.add(s);setStatus(`Successor von ${k}: <b>${s}</b>`);}
+    else setStatus('Kein Successor');
+  });
+}
+
+function cmdPredecessor() {
+  if (!need()) return;
+  askKey('Predecessor', k=>{ highlighted.clear();
+    const p=structure.predecessor(k);
+    if(p!=null){highlighted.add(p);setStatus(`Predecessor von ${k}: <b>${p}</b>`);}
+    else setStatus('Kein Predecessor');
+  });
+}
+
+function cmdCount(isGreater) {
+  if (!need()) return;
+  askKey(isGreater?'greaterThan':'lessThan', x=>{ highlighted.clear();
+    if (isGreater) {
+      const count=structure.greaterThan(x);
+      structure.keysGreaterThan(x).forEach(k=>highlighted.add(k));
+      setStatus(`<span style="font-size:1.5em;font-weight:800;color:#fb923c">${count}</span>&nbsp; Knoten greaterThan(<b>${x}</b>)`);
+    } else {
+      const count=structure.lessThan(x);
+      structure.keysLessThan(x).forEach(k=>highlighted.add(k));
+      setStatus(`<span style="font-size:1.5em;font-weight:800;color:#fb923c">${count}</span>&nbsp; Knoten lessThan(<b>${x}</b>)`);
+    }
+  });
+}
+
+function cmdExtract() {
+  if (!need()) return; highlighted.clear();
+  const r=structure.extractTop();
+  setStatus(r?`✓ Extracted: <b>${r.key}</b> → ${r.value}`:'Heap ist leer');
+}
+
+function cmdPeek() {
+  if (!need()) return; highlighted.clear();
+  const r=structure.peek();
+  if(r){highlighted.add(0);setStatus(`${structType==='MinHeap'?'Min':'Max'}: <b>${r.key}</b> → ${r.value}`);}
+  else setStatus('Heap ist leer');
+}
+
+// ══════════════════════════════════════════════════════════════
+//  FILE OPERATIONS
+// ══════════════════════════════════════════════════════════════
+function cmdNew() {
+  let chosen='RBTree';
+  window._pickTile=t=>{
+    chosen=t;
+    document.querySelectorAll('.struct-tile').forEach(el=>el.classList.remove('selected'));
+    document.getElementById('tile-'+t).classList.add('selected');
+  };
+
+  showDialog('Neue Struktur', `
+    <div class="dialog-field">
+      <label>Typ</label>
+      <div class="struct-tiles">
+        <div class="struct-tile selected" id="tile-RBTree" onclick="_pickTile('RBTree')">
+          <div class="tile-icon">🌳</div><div class="tile-name">RBTree</div>
+        </div>
+        <div class="struct-tile" id="tile-MinHeap" onclick="_pickTile('MinHeap')">
+          <div class="tile-icon">⬇</div><div class="tile-name">MinHeap</div>
+        </div>
+        <div class="struct-tile" id="tile-MaxHeap" onclick="_pickTile('MaxHeap')">
+          <div class="tile-icon">⬆</div><div class="tile-name">MaxHeap</div>
+        </div>
+      </div>
+    </div>
+    <div class="dialog-field">
+      <label>Beispielwerte</label>
+      <select id="_smp">
+        <option value="">Leere Struktur</option>
+        <option value="s">Klein (7 Knoten)</option>
+        <option value="m">Mittel (13 Knoten)</option>
+      </select>
+    </div>`, () => {
+    const smp=document.getElementById('_smp').value;
+    const SMALL=[10,5,15,3,8,12,20];
+    const MED  =[15,10,20,8,12,17,25,5,11,14,16,22,27];
+    const keys = smp==='s'?SMALL:smp==='m'?MED:[];
+    structType=chosen; highlighted.clear(); wobble.clear();
+    if      (structType==='MinHeap') structure=new MinHeap();
+    else if (structType==='MaxHeap') structure=new MaxHeap();
+    else                             structure=new RBTree();
+    keys.forEach(k=>structure.insert(k,'Value_'+k));
+    buildOpsMenu();
+    setStatus(`✓ Neuer ${structType} erstellt${keys.length?' mit '+keys.length+' Beispielknoten':''}`);
+  });
+}
+
+function cmdSave() {
+  if (!need()) return;
+  downloadJSON(`${structType}_${Date.now()}.json`, structure.toJSON());
+  setStatus('✓ Gespeichert');
+}
+
+function cmdLoad() {
+  const inp=document.getElementById('fileInput');
+  inp.onchange=()=>{
+    const f=inp.files[0]; if(!f) return;
+    const reader=new FileReader();
+    reader.onload=e=>{
+      try {
+        const d=JSON.parse(e.target.result);
+        highlighted.clear(); wobble.clear();
+        structType=d.type;
+        if      (structType==='RBTree')  structure=RBTree.fromJSON(d);
+        else if (structType==='MinHeap') structure=MinHeap.fromJSON(d);
+        else if (structType==='MaxHeap') structure=MaxHeap.fromJSON(d);
+        else throw new Error('Unknown type: '+structType);
+        buildOpsMenu();
+        setStatus(`✓ Geladen: ${f.name}`);
+      } catch(err) { setStatus('✗ Fehler beim Laden: '+err.message); }
+    };
+    reader.readAsText(f); inp.value='';
+  };
+  inp.click();
+}
+
+// ══════════════════════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════════════════════
+structure = new RBTree();
+[15,10,20,8,12,17,25,5,11,14,16,22,27].forEach(k=>structure.insert(k,'Value_'+k));
+buildOpsMenu();
+draw();
+</script>
+</body>
+</html>
