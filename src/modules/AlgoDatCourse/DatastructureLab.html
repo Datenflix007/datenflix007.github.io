@@ -285,14 +285,14 @@ main{flex:1;position:relative;overflow:hidden}
 //  ANZEIGE SETTINGS
 // ══════════════════════════════════════════════════════════════
 const settings = {
-  darkMode:   true,
+  darkMode:   false,
   showRB:     JSON.parse(localStorage.getItem('lab-showRB')    || 'false'),
   showValues: JSON.parse(localStorage.getItem('lab-showValues')|| 'false'),
 };
 
 function applySettings() {
   document.documentElement.dataset.theme = settings.darkMode ? 'dark' : 'light';
-  document.getElementById('ck-darkMode').textContent   = settings.darkMode   ? '✓' : ' ';
+  document.getElementById('ck-darkMode').textContent   = settings.darkMode ? '✓' : ' ';
   document.getElementById('ck-showRB').textContent     = settings.showRB     ? '✓' : ' ';
   document.getElementById('ck-showValues').textContent = settings.showValues ? '✓' : ' ';
 }
