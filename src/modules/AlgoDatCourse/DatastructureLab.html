@@ -932,7 +932,10 @@ function layoutBinomialHeap(W) {
     layoutNode(trees[i], cx0 + widths[i] / 2, 50);
     cx0 += widths[i] + GAP;
   }
-  return { nodes, edges, nilNodes: [] };
+  const rootListEdges = [];
+  for (let i = 0; i < trees.length - 1; i++)
+    rootListEdges.push({ fromId: trees[i]._lid, toId: trees[i + 1]._lid });
+  return { nodes, edges, nilNodes: [], rootListEdges };
 }
 
 function layoutFibHeap(W) {
@@ -977,7 +980,10 @@ function layoutFibHeap(W) {
     layoutNode(trees[i], cx0 + widths[i] / 2, 50);
     cx0 += widths[i] + GAP;
   }
-  return { nodes, edges, nilNodes: [] };
+  const rootListEdges = [];
+  for (let i = 0; i < trees.length - 1; i++)
+    rootListEdges.push({ fromId: trees[i]._lid, toId: trees[i + 1]._lid });
+  return { nodes, edges, nilNodes: [], rootListEdges };
 }
 
 function layoutHeap(W) {
@@ -1074,6 +1080,28 @@ function draw() {
     ctx.moveTo(fn.x+wx(e.fromId), fn.y+wy(e.fromId)+RADIUS);
     ctx.lineTo(tn.x+wx(e.toId),  tn.y+wy(e.toId)  -RADIUS);
     ctx.stroke();
+  }
+
+  // ── root list arrows (BinomialHeap / FibHeap) ────────────
+  if (layout.rootListEdges && layout.rootListEdges.length) {
+    const rlColor = dm ? 'rgba(125,211,252,0.65)' : 'rgba(2,132,199,0.65)';
+    ctx.strokeStyle = rlColor; ctx.lineWidth = 1.8; ctx.setLineDash([]);
+    for (const e of layout.rootListEdges) {
+      const fn = nodeMap.get(e.fromId), tn = nodeMap.get(e.toId);
+      if (!fn || !tn) continue;
+      const x1 = fn.x + wx(e.fromId) + RADIUS;
+      const y1 = fn.y + wy(e.fromId);
+      const x2 = tn.x + wx(e.toId)  - RADIUS;
+      const y2 = tn.y + wy(e.toId);
+      ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+      const ang = Math.atan2(y2 - y1, x2 - x1), aLen = 9, aW = 0.38;
+      ctx.fillStyle = rlColor;
+      ctx.beginPath();
+      ctx.moveTo(x2, y2);
+      ctx.lineTo(x2 - aLen * Math.cos(ang - aW), y2 - aLen * Math.sin(ang - aW));
+      ctx.lineTo(x2 - aLen * Math.cos(ang + aW), y2 - aLen * Math.sin(ang + aW));
+      ctx.closePath(); ctx.fill();
+    }
   }
 
   // ── NIL nodes ──────────────────────────────────────────────
