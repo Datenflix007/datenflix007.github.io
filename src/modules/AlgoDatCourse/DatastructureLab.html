@@ -144,6 +144,18 @@ main{flex:1;position:relative;overflow:hidden}
 .tile-icon{font-size:22px;margin-bottom:5px}
 .tile-name{font-size:11px;font-weight:700;color:var(--muted)}
 .struct-tile.selected .tile-name{color:var(--accent)}
+
+/* ── OP LOG ──────────────────────────────────────────────────── */
+#opLog{
+  min-height:54px;max-height:120px;overflow-y:auto;
+  background:var(--surface);border-top:1px solid var(--border);
+  padding:5px 16px 7px;flex-shrink:0;
+  font-family:'Segoe UI',system-ui,sans-serif;font-size:11.5px;line-height:1.7;
+}
+.log-header{color:var(--accent);font-weight:700;display:block;margin-bottom:1px}
+.log-step{color:var(--muted);display:block}
+.log-step b{color:var(--text)}
+.log-hint{color:var(--muted);font-style:italic;font-size:11px}
 </style>
 </head>
 <body>
@@ -181,6 +193,8 @@ main{flex:1;position:relative;overflow:hidden}
 <main>
   <canvas id="canvas"></canvas>
 </main>
+
+<div id="opLog"><span class="log-hint">Führe eine Operation aus — hier erscheint die Schritt-für-Schritt-Erklärung.</span></div>
 
 <footer class="statusbar">
   <span id="status">Bereit &nbsp;·&nbsp; Klick auf Knoten: Value bearbeiten &nbsp;·&nbsp; Halten + Ziehen: wackeln lassen</span>
@@ -283,6 +297,22 @@ function truncateVal(v, max) {
 }
 
 // ══════════════════════════════════════════════════════════════
+//  OPERATION LOG
+// ══════════════════════════════════════════════════════════════
+let _opLog = [];
+let _logging = false;
+function _log(msg) { if (_logging) _opLog.push(msg); }
+function _startLog(header) { _opLog = [header]; _logging = true; }
+function _endLog() {
+  _logging = false;
+  const el = document.getElementById('opLog');
+  if (!el) return;
+  const steps = _opLog.slice(1);
+  el.innerHTML = `<span class="log-header">${_opLog[0] || ''}</span>` +
+    steps.map(s => `<span class="log-step">▸ ${s}</span>`).join('');
+}
+
+// ══════════════════════════════════════════════════════════════
 //  RED-BLACK TREE
 // ══════════════════════════════════════════════════════════════
 class RBTree {
@@ -353,38 +383,51 @@ class RBTree {
       y = x;
       if (key < x.key) x = x.left;
       else if (key > x.key) x = x.right;
-      else { x.value = value; return; }
+      else { _log(`<b>${key}</b> bereits vorhanden → Value aktualisiert, kein Fixup`); x.value = value; return; }
     }
     z.parent = y;
-    if      (y === this.NIL)  this.root  = z;
-    else if (key < y.key)     y.left     = z;
-    else                      y.right    = z;
+    if      (y === this.NIL)  { this.root = z; _log(`<b>${key}</b> als neue Wurzel eingefügt (rot)`); }
+    else if (key < y.key)     { y.left    = z; _log(`<b>${key}</b> als linkes Kind von <b>${y.key}</b> eingefügt (rot)`); }
+    else                      { y.right   = z; _log(`<b>${key}</b> als rechtes Kind von <b>${y.key}</b> eingefügt (rot)`); }
     for (let t=y; t !== this.NIL; t=t.parent) this._upd(t);
     this._fixIns(z);
   }
 
   _fixIns(z) {
+    let fixed = false;
     while (z.parent.color === 'RED') {
+      fixed = true;
       if (z.parent === z.parent.parent.left) {
         const u = z.parent.parent.right;
         if (u.color === 'RED') {
+          _log(`<b>Roter Onkelfall:</b> Vater <b>${z.parent.key}</b> + Onkel <b>${u.key}</b> → schwarz; Großvater <b>${z.parent.parent.key}</b> → rot, weiter oben`);
           z.parent.color = u.color = 'BLACK';
           z.parent.parent.color = 'RED'; z = z.parent.parent;
         } else {
-          if (z === z.parent.right) { z = z.parent; this._rotL(z); }
+          if (z === z.parent.right) {
+            _log(`<b>Schwarzer Onkel, Knick (RL):</b> Linksrotation bei <b>${z.parent.key}</b> → begradigt zu LL-Fall`);
+            z = z.parent; this._rotL(z);
+          }
+          _log(`<b>Schwarzer Onkel, LL-Fall:</b> Vater <b>${z.parent.key}</b> → schwarz, Großvater <b>${z.parent.parent.key}</b> → rot + Rechtsrotation → fertig`);
           z.parent.color = 'BLACK'; z.parent.parent.color = 'RED'; this._rotR(z.parent.parent);
         }
       } else {
         const u = z.parent.parent.left;
         if (u.color === 'RED') {
+          _log(`<b>Roter Onkelfall:</b> Vater <b>${z.parent.key}</b> + Onkel <b>${u.key}</b> → schwarz; Großvater <b>${z.parent.parent.key}</b> → rot, weiter oben`);
           z.parent.color = u.color = 'BLACK';
           z.parent.parent.color = 'RED'; z = z.parent.parent;
         } else {
-          if (z === z.parent.left) { z = z.parent; this._rotR(z); }
+          if (z === z.parent.left) {
+            _log(`<b>Schwarzer Onkel, Knick (LR):</b> Rechtsrotation bei <b>${z.parent.key}</b> → begradigt zu RR-Fall`);
+            z = z.parent; this._rotR(z);
+          }
+          _log(`<b>Schwarzer Onkel, RR-Fall:</b> Vater <b>${z.parent.key}</b> → schwarz, Großvater <b>${z.parent.parent.key}</b> → rot + Linksrotation → fertig`);
           z.parent.color = 'BLACK'; z.parent.parent.color = 'RED'; this._rotL(z.parent.parent);
         }
       }
     }
+    if (!fixed) _log('Elter ist schwarz → kein Fixup nötig');
     this.root.color = 'BLACK';
   }
 
@@ -398,15 +441,17 @@ class RBTree {
   delete(key) {
     const z = this._find(key); if (z === this.NIL) return false;
     let y=z, yc=y.color, x;
-    if      (z.left === this.NIL)  { x=z.right; this._trans(z,z.right); }
-    else if (z.right=== this.NIL)  { x=z.left;  this._trans(z,z.left); }
+    if      (z.left === this.NIL)  { _log(`<b>${key}</b> hat kein linkes Kind → ersetzen durch rechtes Kind`); x=z.right; this._trans(z,z.right); }
+    else if (z.right=== this.NIL)  { _log(`<b>${key}</b> hat kein rechtes Kind → ersetzen durch linkes Kind`); x=z.left;  this._trans(z,z.left); }
     else {
       y=this._min(z.right); yc=y.color; x=y.right;
+      _log(`<b>${key}</b> hat zwei Kinder → Inorder-Nachfolger <b>${y.key}</b> übernimmt Position`);
       if (y.parent === z) x.parent=y;
       else { this._trans(y,y.right); y.right=z.right; y.right.parent=y; }
       this._trans(z,y); y.left=z.left; y.left.parent=y; y.color=z.color;
     }
-    if (yc === 'BLACK') this._fixDel(x);
+    if (yc === 'BLACK') { _log('Entfernter/ersetzter Knoten war <b>schwarz</b> → Doppelschwarz-Fixup nötig'); this._fixDel(x); }
+    else _log('Entfernter/ersetzter Knoten war <b>rot</b> → kein Fixup nötig');
     return true;
   }
 
@@ -414,18 +459,36 @@ class RBTree {
     while (x !== this.root && x.color === 'BLACK') {
       if (x === x.parent.left) {
         let w = x.parent.right;
-        if (w.color==='RED') { w.color='BLACK'; x.parent.color='RED'; this._rotL(x.parent); w=x.parent.right; }
-        if (w.left.color==='BLACK' && w.right.color==='BLACK') { w.color='RED'; x=x.parent; }
-        else {
-          if (w.right.color==='BLACK') { w.left.color='BLACK'; w.color='RED'; this._rotR(w); w=x.parent.right; }
+        if (w.color==='RED') {
+          _log(`<b>Fall 1:</b> Geschwister <b>${w.key}</b> ist rot → Linksrotation + Umfärbung, neues Geschwister suchen`);
+          w.color='BLACK'; x.parent.color='RED'; this._rotL(x.parent); w=x.parent.right;
+        }
+        if (w.left.color==='BLACK' && w.right.color==='BLACK') {
+          _log(`<b>Fall 2:</b> Geschwister <b>${w.key}</b> + beide Kinder schwarz → Geschwister rot, Doppelschwarz nach oben schieben`);
+          w.color='RED'; x=x.parent;
+        } else {
+          if (w.right.color==='BLACK') {
+            _log(`<b>Fall 3:</b> Geschwister <b>${w.key}</b>, linkes Kind rot → Rechtsrotation + Umfärbung → weiter mit Fall 4`);
+            w.left.color='BLACK'; w.color='RED'; this._rotR(w); w=x.parent.right;
+          }
+          _log(`<b>Fall 4:</b> Geschwister <b>${w.key}</b>, rechtes Kind rot → Linksrotation + Umfärbung → fertig`);
           w.color=x.parent.color; x.parent.color='BLACK'; w.right.color='BLACK'; this._rotL(x.parent); x=this.root;
         }
       } else {
         let w = x.parent.left;
-        if (w.color==='RED') { w.color='BLACK'; x.parent.color='RED'; this._rotR(x.parent); w=x.parent.left; }
-        if (w.right.color==='BLACK' && w.left.color==='BLACK') { w.color='RED'; x=x.parent; }
-        else {
-          if (w.left.color==='BLACK') { w.right.color='BLACK'; w.color='RED'; this._rotL(w); w=x.parent.left; }
+        if (w.color==='RED') {
+          _log(`<b>Fall 1:</b> Geschwister <b>${w.key}</b> ist rot → Rechtsrotation + Umfärbung, neues Geschwister suchen`);
+          w.color='BLACK'; x.parent.color='RED'; this._rotR(x.parent); w=x.parent.left;
+        }
+        if (w.right.color==='BLACK' && w.left.color==='BLACK') {
+          _log(`<b>Fall 2:</b> Geschwister <b>${w.key}</b> + beide Kinder schwarz → Geschwister rot, Doppelschwarz nach oben schieben`);
+          w.color='RED'; x=x.parent;
+        } else {
+          if (w.left.color==='BLACK') {
+            _log(`<b>Fall 3:</b> Geschwister <b>${w.key}</b>, rechtes Kind rot → Linksrotation + Umfärbung → weiter mit Fall 4`);
+            w.right.color='BLACK'; w.color='RED'; this._rotL(w); w=x.parent.left;
+          }
+          _log(`<b>Fall 4:</b> Geschwister <b>${w.key}</b>, linkes Kind rot → Rechtsrotation + Umfärbung → fertig`);
           w.color=x.parent.color; x.parent.color='BLACK'; w.left.color='BLACK'; this._rotR(x.parent); x=this.root;
         }
       }
@@ -477,11 +540,20 @@ class MinHeap {
   _swap(i,j) { [this.data[i],this.data[j]] = [this.data[j],this.data[i]]; }
 
   insert(key, value) {
-    this.data.push({key,value}); this._up(this.data.length-1);
+    this.data.push({key,value});
+    _log(`<b>${key}</b> an letzter Position ${this.data.length-1} eingefügt (Blatt)`);
+    this._up(this.data.length-1);
   }
 
   _up(i) {
-    while (i>0) { const p=((i-1)/2)|0; if(this._lt(i,p)){this._swap(i,p);i=p;}else break; }
+    while (i>0) {
+      const p=((i-1)/2)|0;
+      if(this._lt(i,p)){
+        _log(`Heap-Up: <b>${this.data[i].key}</b> ↑ tauscht mit Elter <b>${this.data[p].key}</b>`);
+        this._swap(i,p); i=p;
+      } else break;
+    }
+    if (i===0||!this._lt(i,((i-1)/2)|0)) _log(`Position ${i} korrekt → Heap-Eigenschaft erfüllt`);
   }
 
   _down(i) {
@@ -490,14 +562,21 @@ class MinHeap {
       let b=i,l=2*i+1,r=2*i+2;
       if(l<n&&this._lt(l,b))b=l;
       if(r<n&&this._lt(r,b))b=r;
-      if(b===i)break; this._swap(i,b); i=b;
+      if(b===i)break;
+      _log(`Heap-Down: <b>${this.data[i].key}</b> ↓ tauscht mit Kind <b>${this.data[b].key}</b>`);
+      this._swap(i,b); i=b;
     }
   }
 
   extractTop() {
     if(!this.data.length) return null;
     const top=this.data[0], last=this.data.pop();
-    if(this.data.length){this.data[0]=last;this._down(0);}
+    if(this.data.length){
+      _log(`Wurzel <b>${top.key}</b> entfernt, letztes Element <b>${last.key}</b> → Wurzel, Heap-Down`);
+      this.data[0]=last; this._down(0);
+    } else {
+      _log(`Letztes Element <b>${top.key}</b> entfernt, Heap ist jetzt leer`);
+    }
     return top;
   }
 
@@ -510,7 +589,12 @@ class MinHeap {
   delete(key) {
     const i=this.data.findIndex(x=>x.key===key); if(i<0) return false;
     const last=this.data.pop();
-    if(i<this.data.length){ this.data[i]=last; this._up(i); this._down(i); }
+    if(i<this.data.length){
+      _log(`<b>${key}</b> an Index ${i} entfernt, letztes Element <b>${last.key}</b> übernimmt Position ${i}`);
+      this.data[i]=last; this._up(i); this._down(i);
+    } else {
+      _log(`<b>${key}</b> war letztes Element → einfach entfernt`);
+    }
     return true;
   }
 
@@ -565,8 +649,8 @@ class BinomialHeap {
       else {
         res[k] = ts.length === 3 ? ts[0] : null;
         const [t1, t2] = ts.length === 3 ? ts.slice(1) : ts;
-        if (t1.key <= t2.key) { this._link(t2, t1); carry = t1; }
-        else                  { this._link(t1, t2); carry = t2; }
+        if (t1.key <= t2.key) { _log(`B<sub>${k}</sub>+B<sub>${k}</sub>→B<sub>${k+1}</sub>: <b>${t2.key}</b> wird Kind von <b>${t1.key}</b> (${t1.key}≤${t2.key})`); this._link(t2, t1); carry = t1; }
+        else                  { _log(`B<sub>${k}</sub>+B<sub>${k}</sub>→B<sub>${k+1}</sub>: <b>${t1.key}</b> wird Kind von <b>${t2.key}</b> (${t2.key}<${t1.key})`); this._link(t1, t2); carry = t2; }
       }
     }
     while (res.length && !res[res.length - 1]) res.pop();
@@ -574,6 +658,7 @@ class BinomialHeap {
   }
 
   insert(key, value) {
+    _log(`Neuer B<sub>0</sub>-Baum {<b>${key}</b>} in Wurzelliste eingestellt`);
     this.roots = this._union(this.roots, [this._node(key, value)]);
     this._cnt++;
   }
@@ -591,9 +676,13 @@ class BinomialHeap {
     for (let i = 0; i < this.roots.length; i++)
       if (this.roots[i] && (mi < 0 || this.roots[i].key < this.roots[mi].key)) mi = i;
     const minNode = this.roots[mi];
+    _log(`Minimum <b>${minNode.key}</b> in B<sub>${mi}</sub> gefunden und entfernt`);
+    if (minNode.children.length)
+      _log(`${minNode.children.length} Kinder [<b>${minNode.children.map(c=>c.key).join(', ')}</b>] werden neue Wurzeln → Union`);
+    else
+      _log('Keine Kinder → direkt Union mit restlicher Wurzelliste');
     const rest = this.roots.map((r, i) => i === mi ? null : r);
     while (rest.length && !rest[rest.length - 1]) rest.pop();
-    // Children are B_0..B_{k-1} — place them by their degree
     const childRoots = [];
     for (const c of minNode.children) childRoots[c.degree] = c;
     this.roots = this._union(rest, childRoots);
@@ -633,6 +722,7 @@ class BinomialHeap {
   }
 
   merge(other) {
+    _log(`Wurzellisten zusammenführen (${other._cnt} neue Bäume) → Union`);
     this.roots  = this._union(this.roots, other.roots);
     this._cnt  += other._cnt;
   }
@@ -699,6 +789,7 @@ class FibHeap {
 
   insert(key, value) {
     const n = this._node(key, value);
+    _log(`<b>${key}</b> lazy in Wurzelliste eingefügt (kein Restructuring)`);
     this._rootInsert(n);
     this._size++;
   }
@@ -707,11 +798,15 @@ class FibHeap {
 
   merge(other) {
     if (!other.min) return;
-    if (!this.min) { this.min = other.min; this._size += other._size; other.min = null; other._size = 0; return; }
+    if (!this.min) {
+      _log('Erster Heap war leer → zweiten Heap übernehmen');
+      this.min = other.min; this._size += other._size; other.min = null; other._size = 0; return;
+    }
+    _log(`Lazy Merge: Wurzellisten zusammenfügen (${other._size} neue Knoten), kein Restructuring`);
     const tl = this.min.left, ol = other.min.left;
     tl.right = other.min; other.min.left = tl;
     ol.right = this.min;  this.min.left  = ol;
-    if (other.min.key < this.min.key) this.min = other.min;
+    if (other.min.key < this.min.key) { _log(`Neues Minimum: <b>${other.min.key}</b>`); this.min = other.min; }
     this._size += other._size;
     other.min = null; other._size = 0;
   }
@@ -719,19 +814,21 @@ class FibHeap {
   extractMin() {
     const z = this.min; if (!z) return null;
     if (z.child) {
-      // Splice child list into root list between z.left and z
       const ch = this._listArr(z.child);
+      _log(`Minimum <b>${z.key}</b> entfernt; ${ch.length} Kind${ch.length>1?'er':''} [<b>${ch.map(c=>c.key).join(', ')}</b>] in Wurzelliste verschoben`);
       for (const c of ch) { c.parent = null; c.mark = false; }
       const first = z.child, last = z.child.left;
       const prevZ = z.left;
       prevZ.right = first; first.left = prevZ;
       last.right  = z;     z.left     = last;
       z.child = null;
+    } else {
+      _log(`Minimum <b>${z.key}</b> entfernt (keine Kinder)`);
     }
     z.left.right = z.right; z.right.left = z.left;
     const res = { key: z.key, value: z.value };
     if (z === z.right) { this.min = null; }
-    else               { this.min = z.right; this._consolidate(); }
+    else { _log('Konsolidierung: Bäume gleichen Grads zusammenführen'); this.min = z.right; this._consolidate(); }
     this._size--;
     return res;
   }
@@ -745,6 +842,7 @@ class FibHeap {
       while (A[d]) {
         let y = A[d];
         if (w.key > y.key) { [w, y] = [y, w]; }
+        _log(`Grad ${d}: <b>${w.key}</b> und <b>${y.key}</b> → <b>${y.key}</b> wird Kind von <b>${w.key}</b> (Grad ${d+1})`);
         this._link(y, w);
         A[d++] = undefined;
       }
@@ -774,8 +872,13 @@ class FibHeap {
     if (!n || newKey > n.key) return false;
     n.key = newKey;
     const p = n.parent;
-    if (p && n.key < p.key) { this._cut(n, p); this._cascadingCut(p); }
-    if (n.key < this.min.key) this.min = n;
+    if (p && n.key < p.key) {
+      _log(`Heap-Eigenschaft verletzt: <b>${newKey}</b> < Elter <b>${p.key}</b> → Schnitt von <b>${newKey}</b>`);
+      this._cut(n, p); this._cascadingCut(p);
+    } else {
+      _log(`Heap-Eigenschaft OK (<b>${newKey}</b>${p?` ≥ Elter <b>${p.key}</b>` : ', Wurzel'}) → kein Schnitt`);
+    }
+    if (n.key < this.min.key) { _log(`Neues Minimum: <b>${n.key}</b>`); this.min = n; }
     return true;
   }
 
@@ -792,7 +895,15 @@ class FibHeap {
 
   _cascadingCut(n) {
     const p = n.parent;
-    if (p) { if (!n.mark) { n.mark = true; } else { this._cut(n, p); this._cascadingCut(p); } }
+    if (p) {
+      if (!n.mark) {
+        _log(`Knoten <b>${n.key}</b> markiert (hat ein Kind verloren, bleibt in Baum)`);
+        n.mark = true;
+      } else {
+        _log(`Knoten <b>${n.key}</b> bereits markiert → Cascading Cut: weiterer Schnitt`);
+        this._cut(n, p); this._cascadingCut(p);
+      }
+    }
   }
 
   _findNode(key) {
@@ -1444,7 +1555,10 @@ function cmdInsert() {
     const k=parseInt(document.getElementById('_ik').value);
     const v=document.getElementById('_iv').value.trim()||('Value_'+k);
     if (isNaN(k)) return;
-    highlighted.clear(); structure.insert(k,v);
+    highlighted.clear();
+    _startLog(`${structType} — Insert(${k})`);
+    structure.insert(k,v);
+    _endLog();
     setStatus(`✓ ${k} → ${v.length>40?v.slice(0,40)+'…':v}`);
   });
   setTimeout(()=>document.getElementById('_ik')?.focus(),50);
@@ -1454,7 +1568,10 @@ function cmdDelete() {
   if (!need()) return;
   askKey('Delete', k=>{
     highlighted.clear();
-    setStatus(structure.delete(k) ? `✓ ${k} gelöscht` : `✗ ${k} nicht gefunden`);
+    _startLog(`${structType} — Delete(${k})`);
+    const ok = structure.delete(k);
+    _endLog();
+    setStatus(ok ? `✓ ${k} gelöscht` : `✗ ${k} nicht gefunden`);
   });
 }
 
@@ -1548,11 +1665,14 @@ function cmdDecreaseKey() {
     if (isNaN(oldK) || isNaN(newK)) return;
     if (newK >= oldK) { setStatus('⚠ Neuer Key muss kleiner als alter Key sein'); return; }
     highlighted.clear();
+    _startLog(`FibHeap — DecreaseKey(${oldK} → ${newK})`);
     if (structure.decreaseKey(oldK, newK)) {
       const ln = layout.nodes.find(n => n.key === newK);
       if (ln) highlighted.add(ln.id);
+      _endLog();
       setStatus(`✓ Decrease Key: ${oldK} → ${newK}`);
     } else {
+      _endLog();
       setStatus(`✗ Key ${oldK} nicht gefunden`);
     }
   });
@@ -1571,7 +1691,9 @@ function cmdMerge() {
     if (!keys.length) return;
     const other = structure instanceof FibHeap ? new FibHeap() : new BinomialHeap();
     keys.forEach(k => other.insert(k, 'Value_' + k));
+    _startLog(`${structType} — Merge (${keys.length} Knoten: ${keys.join(', ')})`);
     structure.merge(other);
+    _endLog();
     highlighted.clear();
     setStatus(`✓ Merge: ${keys.length} Knoten eingefügt (${keys.join(', ')})`);
   });
@@ -1580,7 +1702,9 @@ function cmdMerge() {
 
 function cmdExtract() {
   if (!need()) return; highlighted.clear();
+  _startLog(`${structType} — Extract Min`);
   const r = (structure instanceof BinomialHeap || structure instanceof FibHeap) ? structure.extractMin() : structure.extractTop();
+  _endLog();
   setStatus(r ? `✓ Extracted: <b>${r.key}</b> → ${r.value}` : 'Heap ist leer');
 }
 
