@@ -1762,7 +1762,7 @@ function draw() {
     ctx.fillStyle = '#fff';
     ctx.font = 'bold 14px "Segoe UI",system-ui,sans-serif';
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.fillText(String(n.key), x, y);
+    ctx.fillText(_nodeLabel(n), x, y);
 
     // Degree badge (BinomialHeap / FibHeap)
     if (structType === 'BinomialHeap' || structType === 'FibHeap') {
@@ -1792,7 +1792,7 @@ function draw() {
 
     // value label
     if (n.value && settings.showValues) {
-      const tv = truncateVal(n.value, 12);
+      const tv = _shortVal(n.value);
       ctx.fillStyle = C.valLabel;
       ctx.font = '9px "Segoe UI",system-ui,sans-serif';
       const hasBadge = (structType==='RBTree' && settings.showRB) || structType==='BinomialHeap';
@@ -1850,8 +1850,19 @@ canvas.addEventListener('mousemove', e => {
     tip.style.display='block';
     tip.style.left=(e.clientX+14)+'px';
     tip.style.top =(e.clientY+14)+'px';
-    const val=(n.value||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    tip.innerHTML=`<b>Key:</b> ${n.key}<br><b>Value:</b> ${val||'<em style="color:var(--muted)">leer</em>'}`;
+    let dispKey = n.key, dispVal = '';
+    const obj = _parseVal(n.value);
+    if (_dataMode === 'hist' && obj) {
+      dispKey = obj.date || _fmtHistKey(n.key);
+      dispVal = `<b>${(obj.title||'').replace(/</g,'&lt;')}</b>`;
+      if (obj.desc) dispVal += `<br><span style="font-size:11px;opacity:.8">${obj.desc.replace(/\*\*/g,'').replace(/\*/g,'').replace(/</g,'&lt;').slice(0,120)}…</span>`;
+    } else if (_dataMode === 'git' && obj) {
+      dispVal = `<b>${(obj.msg||'').replace(/</g,'&lt;')}</b>`;
+      if (obj.diff) dispVal += `<br><code style="font-size:10px;opacity:.75;display:block;margin-top:3px;white-space:pre">${obj.diff.replace(/</g,'&lt;').slice(0,160)}</code>`;
+    } else {
+      dispVal = (n.value||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+    tip.innerHTML=`<b>Key:</b> ${dispKey}<br>${dispVal||'<em style="color:var(--muted)">leer</em>'}`;
   } else {
     tip.style.display='none';
   }
@@ -1895,6 +1906,73 @@ function openValueEditor(nodeId) {
     currentKey = d.key; currentVal = d.value || '';
   }
 
+  const _save = v => {
+    if      (structure instanceof RBTree)         structure.insert(currentKey, v);
+    else if (structure instanceof BinomialHeap || structure instanceof FibHeap)
+                                                 structure.updateValue(currentKey, v);
+    else                                         structure.data[nodeId].value = v;
+    const label = _dataMode==='hist' ? _fmtHistKey(currentKey) : currentKey;
+    setStatus(`✓ Key ${label} → ${v.length>40?v.slice(0,40)+'…':v}`);
+  };
+
+  // ── Historischer Modus ──────────────────────────────────────
+  if (_dataMode === 'hist') {
+    let obj = _parseVal(currentVal) || {};
+    const dispKey = obj.date || _fmtHistKey(currentKey);
+    const safeT = (obj.title||'').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+    const rawD  = obj.desc || '';
+    showDialog('Historischer Eintrag', `
+      <div class="dialog-field">
+        <label>Datum</label>
+        <input type="text" value="${dispKey}" readonly style="opacity:.5;cursor:default">
+      </div>
+      <div class="dialog-field">
+        <label>Titel</label>
+        <input type="text" id="_vTitle" value="${safeT}">
+      </div>
+      <div class="dialog-field">
+        <label>Beschreibung (Markdown – **fett**, *kursiv*, ![alt](url), > Zitat)</label>
+        <textarea id="_vDesc" rows="5" style="width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:8px;border-radius:7px;resize:vertical;font-family:monospace;font-size:11.5px" oninput="document.getElementById('_mdPrev').innerHTML=_md2html(this.value)">${rawD.replace(/</g,'&lt;')}</textarea>
+      </div>
+      <div class="dialog-field">
+        <label>Vorschau</label>
+        <div id="_mdPrev" style="min-height:48px;padding:8px;background:var(--surface2);border:1px solid var(--border);border-radius:7px;font-size:12px;line-height:1.6;overflow-y:auto;max-height:120px">${_md2html(rawD)}</div>
+      </div>`, () => {
+      const title = document.getElementById('_vTitle').value.trim();
+      const desc  = document.getElementById('_vDesc').value;
+      _save(JSON.stringify({ title, date: dispKey, desc }));
+    });
+    setTimeout(() => document.getElementById('_vTitle')?.focus(), 50);
+    return;
+  }
+
+  // ── Git-Modus ───────────────────────────────────────────────
+  if (_dataMode === 'git') {
+    let obj = _parseVal(currentVal) || {};
+    const safeM = (obj.msg||'').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+    const rawDiff = obj.diff || '';
+    showDialog('Commit bearbeiten', `
+      <div class="dialog-field">
+        <label>Commit-Hash (Dezimal)</label>
+        <input type="text" value="${currentKey}" readonly style="opacity:.5;cursor:default">
+      </div>
+      <div class="dialog-field">
+        <label>Commit-Message</label>
+        <input type="text" id="_vMsg" value="${safeM}">
+      </div>
+      <div class="dialog-field">
+        <label>Code-Diff (- entfernt &nbsp;/&nbsp; + hinzugefügt)</label>
+        <textarea id="_vDiff" rows="7" style="width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:8px;border-radius:7px;resize:vertical;font-family:monospace;font-size:11px">${rawDiff.replace(/</g,'&lt;')}</textarea>
+      </div>`, () => {
+      const msg  = document.getElementById('_vMsg').value.trim();
+      const diff = document.getElementById('_vDiff').value;
+      _save(JSON.stringify({ msg, diff }));
+    });
+    setTimeout(() => document.getElementById('_vMsg')?.focus(), 50);
+    return;
+  }
+
+  // ── Standard-Modus ──────────────────────────────────────────
   const safe = currentVal.replace(/"/g,'&quot;').replace(/</g,'&lt;');
   showDialog('Value bearbeiten', `
     <div class="dialog-field">
@@ -1910,11 +1988,7 @@ function openValueEditor(nodeId) {
     </div>`, () => {
     const v = document.getElementById('editVal').value.trim();
     if (!v) return;
-    if      (structure instanceof RBTree)         structure.insert(currentKey, v);
-    else if (structure instanceof BinomialHeap || structure instanceof FibHeap)
-                                                 structure.updateValue(currentKey, v);
-    else                                         structure.data[nodeId].value = v;
-    setStatus(`✓ Key ${currentKey} → ${v.length>40?v.slice(0,40)+'…':v}`);
+    _save(v);
   });
   setTimeout(() => document.getElementById('editVal')?.focus(), 50);
 }
@@ -2248,6 +2322,7 @@ function cmdNew() {
       smp==='hist' ? SAMPLE_HIST  :
       smp==='git'  ? SAMPLE_GIT   :
       smp==='prime'? SAMPLE_PRIME : [];
+    _dataMode = smp==='hist' ? 'hist' : smp==='git' ? 'git' : 'default';
     structType = chosen; highlighted.clear(); wobble.clear();
     if      (structType === 'MinHeap')      structure = new MinHeap();
     else if (structType === 'MaxHeap')      structure = new MaxHeap();
@@ -2295,26 +2370,43 @@ function cmdLoad() {
 //  EXPERIMENTAL SAMPLE DATA
 // ══════════════════════════════════════════════════════════════
 const SAMPLE_HIST = [
-  {k:1066, v:'Normannische Eroberung Englands'},
-  {k:1215, v:'Magna Carta unterzeichnet'},
-  {k:1347, v:'Schwarzer Tod erreicht Europa'},
-  {k:1453, v:'Fall von Konstantinopel'},
-  {k:1492, v:'Kolumbus entdeckt Amerika'},
-  {k:1687, v:'Newton: Principia Mathematica'},
-  {k:1789, v:'Beginn der Französischen Revolution'},
-  {k:1969, v:'Mondlandung – Apollo 11'},
-  {k:1989, v:'Mauerfall in Berlin'},
+  {k:10661014, v:JSON.stringify({title:'Normannische Eroberung', date:'14.10.1066',
+    desc:'Wilhelm der Eroberer besiegt **König Harald II.** bei der **Schlacht von Hastings**.\n\nEngland wird normannisch regiert – Beginn des Feudalsystems auf der Insel.'})},
+  {k:12150615, v:JSON.stringify({title:'Magna Carta', date:'15.06.1215',
+    desc:'König **Johann Ohneland** unterzeichnet die *Magna Carta* bei Runnymede.\n\n> "No free man shall be seized or imprisoned except by lawful judgment."\n\nErste rechtliche Beschränkung der Königsmacht.'})},
+  {k:13471001, v:JSON.stringify({title:'Schwarzer Tod in Europa', date:'01.10.1347',
+    desc:'Die **Pest** erreicht Sizilien – innerhalb von 5 Jahren stirbt ein Drittel der europäischen Bevölkerung.\n\nAuslöser tiefgreifender sozialer, wirtschaftlicher und religiöser Umwälzungen.'})},
+  {k:14531029, v:JSON.stringify({title:'Fall von Konstantinopel', date:'29.05.1453',
+    desc:'**Sultan Mehmed II.** erobert Konstantinopel – Ende des Oströmischen Reiches.\n\nViele byzantinische Gelehrte fliehen nach Westeuropa und beflügeln die **Renaissance**.'})},
+  {k:14921012, v:JSON.stringify({title:'Kolumbus entdeckt Amerika', date:'12.10.1492',
+    desc:'**Christoph Kolumbus** landet auf Guanahani (Bahamas) und glaubt, Indien erreicht zu haben.\n\nBeginn der **europäischen Kolonisierung Amerikas** – weltgeschichtliche Zäsur.'})},
+  {k:16870705, v:JSON.stringify({title:'Principia Mathematica', date:'05.07.1687',
+    desc:'**Isaac Newton** veröffentlicht die *Philosophiæ Naturalis Principia Mathematica*.\n\nGravitationsgesetz und die drei Bewegungsgesetze legen die Grundlage der **klassischen Mechanik**.'})},
+  {k:17890714, v:JSON.stringify({title:'Sturm auf die Bastille', date:'14.07.1789',
+    desc:'Pariser Bürger stürmen die **Bastille** – Startschuss der **Französischen Revolution**.\n\nDer 14. Juli (*Quatorze Juillet*) ist bis heute Frankreichs Nationalfeiertag.'})},
+  {k:19690720, v:JSON.stringify({title:'Mondlandung – Apollo 11', date:'20.07.1969',
+    desc:'**Neil Armstrong** betritt als erster Mensch den Mond.\n\n> *"That\'s one small step for man, one giant leap for mankind."*\n\nErfüllung von Kennedys Ziel aus dem Jahr 1961.'})},
+  {k:19891109, v:JSON.stringify({title:'Mauerfall in Berlin', date:'09.11.1989',
+    desc:'Die **Berliner Mauer** fällt nach 28 Jahren.\n\nEin Kommunikationsfehler von Günter Schabowski löst den Ansturm aus. *"Wir sind das Volk!"*\n\nBeginn der deutschen Wiedervereinigung.'})},
 ];
 
 const SAMPLE_GIT = [
-  {k:0x3a5f, v:'fix: resolve race condition in auth'},
-  {k:0x1b2c, v:'feat: add dark mode toggle'},
-  {k:0x9d4e, v:'refactor: extract ApiClient class'},
-  {k:0x6f10, v:'docs: update README examples'},
-  {k:0xc823, v:'test: add integration tests for login'},
-  {k:0x4a71, v:'chore: bump dependency versions'},
-  {k:0xe53b, v:'fix: null pointer in user profile view'},
-  {k:0x2d96, v:'feat: export data to CSV'},
+  {k:163, v:JSON.stringify({msg:'fix: race condition in auth middleware',
+    diff:'- await lock.acquire()\n- const user = await db.getUser(id)\n+ const [, user] = await Promise.all([\n+   mutex.tryLock(5000), db.getUser(id)\n+ ])' })},
+  {k:434, v:JSON.stringify({msg:'feat: add dark mode toggle',
+    diff:'+ const toggle = document.getElementById("theme-btn")\n+ toggle.addEventListener("click", () =>\n+   document.body.classList.toggle("dark"))' })},
+  {k:723, v:JSON.stringify({msg:'refactor: extract ApiClient class',
+    diff:'- fetch("/api/users/" + id).then(r => r.json())\n+ const client = new ApiClient(BASE_URL)\n+ client.getUser(id)' })},
+  {k:891, v:JSON.stringify({msg:'docs: update README examples',
+    diff:'- npm run build && node server.js\n+ npm start   # runs build + server' })},
+  {k:1204, v:JSON.stringify({msg:'test: add integration tests for login',
+    diff:'+ describe("POST /login", () => {\n+   it("returns 200 on valid creds", async () => {\n+     const res = await request(app).post("/login")\n+       .send({ user: "alice", pass: "s3cr3t" })\n+     expect(res.status).toBe(200)\n+   })\n+ })' })},
+  {k:1547, v:JSON.stringify({msg:'chore: bump dependency versions',
+    diff:'- "express": "^4.17.1"\n+ "express": "^4.18.2"\n- "jest": "^27.0.0"\n+ "jest": "^29.5.0"' })},
+  {k:1863, v:JSON.stringify({msg:'fix: null pointer in user profile view',
+    diff:'- const name = user.profile.name\n+ const name = user?.profile?.name ?? "Unbekannt"' })},
+  {k:2501, v:JSON.stringify({msg:'feat: export data to CSV',
+    diff:'+ function exportCSV(rows) {\n+   const header = Object.keys(rows[0]).join(",")\n+   const body   = rows.map(r => Object.values(r).join(","))\n+   return [header, ...body].join("\\n")\n+ }' })},
 ];
 
 const SAMPLE_PRIME = [
@@ -2323,6 +2415,44 @@ const SAMPLE_PRIME = [
   {k:17,v:'Primzahl'},{k:19,v:'Primzahl'},{k:23,v:'Primzahl'},
   {k:29,v:'Primzahl'},{k:31,v:'Primzahl'},
 ];
+
+// ── Data-mode helpers ─────────────────────────────────────────
+let _dataMode = 'default'; // 'default' | 'hist' | 'git'
+
+function _fmtHistKey(k) {
+  const s = String(k).padStart(8, '0');
+  return `${s.slice(6)}.${s.slice(4, 6)}.${s.slice(0, 4)}`;
+}
+
+function _nodeLabel(n) {
+  if (_dataMode === 'hist') return String(Math.floor(n.key / 10000)); // Jahr
+  return String(n.key);
+}
+
+function _parseVal(v) {
+  try { return JSON.parse(v); } catch (e) { return null; }
+}
+
+function _shortVal(rawVal) {
+  const obj = _parseVal(rawVal);
+  if (obj) return truncateVal(obj.title || obj.msg || '', 12);
+  return truncateVal(rawVal, 12);
+}
+
+function _md2html(md) {
+  if (!md) return '';
+  return md
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img alt="$1" src="$2" style="max-width:100%;border-radius:4px;margin:4px 0">')
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
+    .replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>')
+    .replace(/\*([^*]+)\*/g,     '<em>$1</em>')
+    .replace(/^&gt; (.+)$/gm,    '<blockquote>$1</blockquote>')
+    .replace(/^## (.+)$/gm,      '<h4 style="margin:6px 0 2px">$1</h4>')
+    .replace(/^# (.+)$/gm,       '<h3 style="margin:6px 0 2px">$1</h3>')
+    .replace(/\n\n/g, '<br><br>')
+    .replace(/\n/g, '<br>');
+}
 
 // ══════════════════════════════════════════════════════════════
 //  INIT

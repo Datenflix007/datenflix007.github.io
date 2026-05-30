@@ -50,8 +50,12 @@
 ---
 
 ## Feature: Experimentelle Datensätze (in "Neue Struktur"-Dialog)
-- [x] 🗓 Historische Jahreszahlen – Schlüssel = Jahr, Wert = Ereignis (9 Einträge)
-- [x] 🔑 Git-Commit-Hashes – Schlüssel = Hex als Int, Wert = Commit-Message (8 Einträge)
+- [x] Light-Mode als Standard (darkMode: false)
+- [x] 🗓 Historische Daten – Schlüssel = YYYYMMDD (zeigt Jahr im Knoten), Wert = JSON {title, date DD.MM.YYYY, desc Markdown}
+- [x] 🔑 Git-Commits – Schlüssel = kleine Dezimalzahl, Wert = JSON {msg, diff} mit Code-Änderungen
+- [x] _dataMode (default/hist/git), _nodeLabel, _fmtHistKey, _shortVal, _md2html
+- [x] Tooltip parst JSON-Werte für hist/git und zeigt Titel + Vorschau
+- [x] Value-Editor: hist → Titel + Markdown-Textarea mit Live-Preview; git → Message + Diff-Textarea
 - [x] 📐 Primzahlen – Schlüssel = Primzahl, Wert = "Primzahl" (11 Einträge)
 
 ## Feature: Pseudocode-Fenster (ANZEIGE-Menü)
