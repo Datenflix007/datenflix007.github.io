@@ -241,14 +241,14 @@ class RBTreePanel extends JPanel {
                 canvasPanel.clearHighlight();
                 canvasPanel.highlightNodes(nodes);
                 canvasPanel.repaint();
-                resultLabel.setText("greaterThan(" + x + ") = " + count + " 🟨");
+                resultLabel.setText("<html><font size='5' color='#d06000'><b>" + count + "</b></font>&nbsp;Knoten greaterThan(<b>" + x + "</b>)</html>");
             } else {
                 int count = tree.lessThan(x);
                 List<Integer> nodes = tree.getLessThan(x);
                 canvasPanel.clearHighlight();
                 canvasPanel.highlightNodes(nodes);
                 canvasPanel.repaint();
-                resultLabel.setText("lessThan(" + x + ") = " + count + " 🟨");
+                resultLabel.setText("<html><font size='5' color='#d06000'><b>" + count + "</b></font>&nbsp;Knoten lessThan(<b>" + x + "</b>)</html>");
             }
         } catch (NumberFormatException ex) {
             resultLabel.setText("✗ Ungültige Eingabe");
@@ -310,32 +310,113 @@ class RBTreePanel extends JPanel {
 class TreeCanvasPanel extends JPanel {
     private RBTree<Integer, String> tree;
     private Set<Integer> highlightedNodes;
-    private Map<Integer, Double> wobbleOffsets;
     private static final int NODE_RADIUS = 30;
     private static final int LEVEL_HEIGHT = 100;
     private javax.swing.Timer animationTimer;
-    private long animationStartTime;
-    
+    // physics state per node: [offsetX, offsetY, velX, velY]
+    private final Map<Integer, double[]> wobbleState = new HashMap<>();
+    private final List<int[]> nilPositions = new ArrayList<>(); // {nilX, nilY, parentKey}
+    private Integer draggingKey = null;
+    private boolean wasDragged = false;
+    private int dragStartMouseX, dragStartMouseY;
+    private double dragInitOffX, dragInitOffY;
+
     public TreeCanvasPanel(RBTree<Integer, String> tree) {
         this.tree = tree;
         this.highlightedNodes = new HashSet<>();
-        this.wobbleOffsets = new HashMap<>();
         setBackground(new Color(245, 247, 250));
         setToolTipText("");
 
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if (e.getButton() == MouseEvent.BUTTON1) {
+                    Integer key = getNodeAtPoint(e.getX(), e.getY());
+                    if (key != null) {
+                        draggingKey = key;
+                        wasDragged = false;
+                        double[] s = wobbleState.computeIfAbsent(key, k -> new double[4]);
+                        dragStartMouseX = e.getX();
+                        dragStartMouseY = e.getY();
+                        dragInitOffX = s[0];
+                        dragInitOffY = s[1];
+                        s[2] = 0; s[3] = 0;
+                    }
+                }
+            }
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (draggingKey != null) {
+                    if (wasDragged) {
+                        double[] s = wobbleState.get(draggingKey);
+                        if (s != null) {
+                            s[2] = s[0] * 0.06;
+                            s[3] = s[1] * 0.06;
+                        }
+                    } else {
+                        wobbleState.remove(draggingKey);
+                        final Integer clickedKey = draggingKey;
+                        SwingUtilities.invokeLater(() -> showValueEditor(clickedKey));
+                    }
+                    draggingKey = null;
+                }
+            }
+        });
+
+        addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                if (draggingKey != null) {
+                    int dx = e.getX() - dragStartMouseX;
+                    int dy = e.getY() - dragStartMouseY;
+                    if (!wasDragged && dx * dx + dy * dy > 25) wasDragged = true;
+                    if (wasDragged) {
+                        double[] s = wobbleState.computeIfAbsent(draggingKey, k -> new double[4]);
+                        s[0] = dragInitOffX + dx;
+                        s[1] = dragInitOffY + dy;
+                    }
+                }
+            }
+        });
+
         startAnimation();
     }
-    
+
     private void startAnimation() {
-        animationStartTime = System.currentTimeMillis();
-        animationTimer = new javax.swing.Timer(30, e -> {
+        animationTimer = new javax.swing.Timer(20, e -> {
+            stepPhysics();
             repaint();
         });
         animationTimer.start();
     }
-    
+
+    private void stepPhysics() {
+        wobbleState.entrySet().removeIf(entry -> {
+            if (draggingKey != null && draggingKey.equals(entry.getKey())) return false;
+            double[] s = entry.getValue();
+            s[2] = s[2] * 0.88 - s[0] * 0.10;
+            s[3] = s[3] * 0.88 - s[1] * 0.10;
+            s[0] += s[2];
+            s[1] += s[3];
+            return Math.abs(s[0]) < 0.08 && Math.abs(s[1]) < 0.08
+                && Math.abs(s[2]) < 0.08 && Math.abs(s[3]) < 0.08;
+        });
+    }
+
+    private Integer getNodeAtPoint(int mx, int my) {
+        Map<Integer, NodePosition> positions = calculateTreePositions();
+        for (NodePosition np : positions.values()) {
+            int nx = (int)(np.x + getWobbleX(np.value));
+            int ny = (int)(np.y + getWobbleY(np.value));
+            int dx = mx - nx, dy = my - ny;
+            if (dx * dx + dy * dy <= NODE_RADIUS * NODE_RADIUS) return np.value;
+        }
+        return null;
+    }
+
     public void setTree(RBTree<Integer, String> newTree) {
         this.tree = newTree;
+        wobbleState.clear();
     }
     
     public void highlightNodes(List<Integer> nodes) {
@@ -366,51 +447,50 @@ class TreeCanvasPanel extends JPanel {
         
         Map<Integer, NodePosition> positions = calculateTreePositions();
         drawEdges(g2d, positions);
+        drawNilNodes(g2d, positions);
         drawNodes(g2d, positions);
     }
     
     private Map<Integer, NodePosition> calculateTreePositions() {
+        nilPositions.clear();
         Map<Integer, NodePosition> positions = new HashMap<>();
         if (tree.inorderKeys().isEmpty()) return positions;
-        
-        int width = getWidth();
-        int startX = width / 2;
-        int startY = 40;
-        
+
+        int startX = getWidth() / 2;
         Integer root = tree.getRoot();
-        if (root != null) {
-            calculatePosition(positions, root, startX, startY, width / 4);
-        }
+        if (root != null) calculatePosition(positions, root, startX, 40, getWidth() / 4);
         return positions;
     }
-    
+
     private void calculatePosition(Map<Integer, NodePosition> positions, Integer key, int x, int y, int offset) {
         if (key == null) return;
-        
-        boolean isRed = tree.isNodeRed(key);
-        positions.put(key, new NodePosition(key, x, y, isRed, tree.search(key)));
-        
+
+        positions.put(key, new NodePosition(key, x, y, tree.isNodeRed(key), tree.search(key)));
+
         Integer left = tree.getLeftChild(key);
         Integer right = tree.getRightChild(key);
-        
+        int childOff = Math.max(offset / 2, 30);
+
         if (left != null) {
-            calculatePosition(positions, left, x - offset, y + LEVEL_HEIGHT, Math.max(offset / 2, 30));
+            calculatePosition(positions, left, x - offset, y + LEVEL_HEIGHT, childOff);
+        } else {
+            nilPositions.add(new int[]{x - offset, y + LEVEL_HEIGHT, key});
         }
         if (right != null) {
-            calculatePosition(positions, right, x + offset, y + LEVEL_HEIGHT, Math.max(offset / 2, 30));
+            calculatePosition(positions, right, x + offset, y + LEVEL_HEIGHT, childOff);
+        } else {
+            nilPositions.add(new int[]{x + offset, y + LEVEL_HEIGHT, key});
         }
     }
     
     private double getWobbleX(int nodeKey) {
-        double t = (System.currentTimeMillis() - animationStartTime) / 1000.0;
-        double phase = (nodeKey * 137.508) % (2 * Math.PI);
-        return Math.sin(t * 0.6 + phase) * 3.5;
+        double[] s = wobbleState.get(nodeKey);
+        return s != null ? s[0] : 0;
     }
 
     private double getWobbleY(int nodeKey) {
-        double t = (System.currentTimeMillis() - animationStartTime) / 1000.0;
-        double phase = (nodeKey * 137.508) % (2 * Math.PI);
-        return Math.sin(t * 0.8 + phase + 1.0) * 3.5;
+        double[] s = wobbleState.get(nodeKey);
+        return s != null ? s[1] : 0;
     }
     
     private void drawEdges(Graphics2D g2d, Map<Integer, NodePosition> positions) {
@@ -489,6 +569,37 @@ class TreeCanvasPanel extends JPanel {
         }
     }
 
+    private void drawNilNodes(Graphics2D g2d, Map<Integer, NodePosition> positions) {
+        int nw = 22, nh = 13;
+        float[] dash = {4f, 4f};
+        Stroke dashed = new BasicStroke(1.2f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 0, dash, 0);
+        Stroke solid  = new BasicStroke(1f);
+
+        for (int[] nil : nilPositions) {
+            int nx = nil[0], ny = nil[1];
+            NodePosition parent = positions.get(nil[2]);
+            if (parent != null) {
+                int px = (int)(parent.x + getWobbleX(parent.value));
+                int py = (int)(parent.y + getWobbleY(parent.value));
+                g2d.setColor(new Color(170, 185, 200, 90));
+                g2d.setStroke(dashed);
+                g2d.drawLine(px, py + NODE_RADIUS, nx, ny - nh / 2);
+            }
+            g2d.setStroke(solid);
+            g2d.setColor(new Color(0, 0, 0, 12));
+            g2d.fillRoundRect(nx - nw / 2 + 2, ny - nh / 2 + 2, nw, nh, 5, 5);
+            g2d.setColor(new Color(110, 110, 110, 70));
+            g2d.fillRoundRect(nx - nw / 2, ny - nh / 2, nw, nh, 5, 5);
+            g2d.setColor(new Color(85, 85, 85, 130));
+            g2d.drawRoundRect(nx - nw / 2, ny - nh / 2, nw, nh, 5, 5);
+            g2d.setColor(new Color(165, 165, 165));
+            g2d.setFont(new Font("Segoe UI", Font.BOLD, 8));
+            FontMetrics fm = g2d.getFontMetrics();
+            g2d.drawString("NIL", nx - fm.stringWidth("NIL") / 2, ny + fm.getAscent() / 2 - 1);
+        }
+        g2d.setStroke(new BasicStroke(2.5f));
+    }
+
     @Override
     public String getToolTipText(MouseEvent event) {
         Map<Integer, NodePosition> positions = calculateTreePositions();
@@ -507,6 +618,40 @@ class TreeCanvasPanel extends JPanel {
             }
         }
         return null;
+    }
+
+    private void showValueEditor(Integer key) {
+        String current = tree.search(key);
+
+        JPanel panel = new JPanel(new BorderLayout(5, 8));
+        JLabel keyLabel = new JLabel("Key: " + key);
+        keyLabel.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        JLabel valLabel = new JLabel("Value:");
+        JTextField valueField = new JTextField(current != null ? current : "", 24);
+        JButton browseBtn = new JButton("📁");
+        browseBtn.setToolTipText("Datei auswählen");
+        browseBtn.addActionListener(ev -> {
+            JFileChooser fc = new JFileChooser();
+            fc.setDialogTitle("Datei auswählen");
+            if (fc.showOpenDialog(TreeCanvasPanel.this) == JFileChooser.APPROVE_OPTION)
+                valueField.setText(fc.getSelectedFile().getAbsolutePath());
+        });
+        JPanel inputRow = new JPanel(new BorderLayout(4, 0));
+        inputRow.add(valueField, BorderLayout.CENTER);
+        inputRow.add(browseBtn, BorderLayout.EAST);
+        panel.add(keyLabel, BorderLayout.NORTH);
+        panel.add(valLabel, BorderLayout.WEST);
+        panel.add(inputRow, BorderLayout.CENTER);
+
+        int res = JOptionPane.showConfirmDialog(TreeCanvasPanel.this, panel,
+            "Value bearbeiten", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        if (res == JOptionPane.OK_OPTION) {
+            String newVal = valueField.getText().trim();
+            if (!newVal.isEmpty()) {
+                tree.insert(key, newVal);
+                repaint();
+            }
+        }
     }
 
     private String truncateValue(String value, int maxLen) {
