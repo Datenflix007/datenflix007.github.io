@@ -1,5 +1,7 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 class RBTree<K extends Comparable<K>, V> {
     private static final boolean RED = true;
@@ -424,37 +426,55 @@ class RBTree<K extends Comparable<K>, V> {
         List<K> keys = inorderKeys();
         for (int i = 0; i < keys.size(); i++) {
             if (i > 0) sb.append(",");
-            sb.append(keys.get(i));
+            V val = search(keys.get(i));
+            String valStr = val != null ? jsonEscape(val.toString()) : "";
+            sb.append("{\"k\":").append(keys.get(i))
+              .append(",\"v\":\"").append(valStr).append("\"}");
         }
         sb.append("]");
         return sb.toString();
     }
 
+    private static String jsonEscape(String s) {
+        return s.replace("\\", "\\\\")
+                .replace("\"", "\\\"")
+                .replace("\n", "\\n")
+                .replace("\r", "\\r")
+                .replace("\t", "\\t");
+    }
+
     // JSON Deserialisierung
-    public static <K extends Comparable<K>> RBTree<K, String> fromJSON(String json) {
-        RBTree<K, String> tree = new RBTree<>();
-        
+    public static RBTree<Integer, String> fromJSON(String json) {
+        RBTree<Integer, String> tree = new RBTree<>();
         json = json.trim();
-        if (!json.startsWith("[") || !json.endsWith("]")) {
-            return tree;
-        }
-        
+        if (!json.startsWith("[") || !json.endsWith("]")) return tree;
+
         String content = json.substring(1, json.length() - 1).trim();
-        if (content.isEmpty()) {
-            return tree;
-        }
-        
-        String[] values = content.split(",");
-        for (String val : values) {
-            try {
-                @SuppressWarnings("unchecked")
-                K key = (K) Integer.valueOf(val.trim());
-                tree.insert(key, "Value_" + key);
-            } catch (NumberFormatException e) {
-                // Ignoriere ungültige Werte
+        if (content.isEmpty()) return tree;
+
+        if (content.startsWith("{")) {
+            // New format: [{"k":15,"v":"some value"},...]
+            Pattern p = Pattern.compile("\\{\"k\":(\\d+),\"v\":\"((?:[^\"\\\\]|\\\\.)*)\"\\}");
+            Matcher m = p.matcher(content);
+            while (m.find()) {
+                try {
+                    int key = Integer.parseInt(m.group(1));
+                    String value = m.group(2)
+                        .replace("\\\"", "\"").replace("\\\\", "\\")
+                        .replace("\\n", "\n").replace("\\r", "\r");
+                    tree.insert(key, value);
+                } catch (NumberFormatException e) { /* skip */ }
+            }
+        } else {
+            // Legacy format: [1,2,3,...]
+            for (String val : content.split(",")) {
+                try {
+                    int key = Integer.valueOf(val.trim());
+                    tree.insert(key, "Value_" + key);
+                } catch (NumberFormatException e) { /* skip */ }
             }
         }
-        
+
         return tree;
     }
 
