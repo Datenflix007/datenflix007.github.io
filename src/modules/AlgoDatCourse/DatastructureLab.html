@@ -935,7 +935,8 @@ function layoutBinomialHeap(W) {
   const rootListEdges = [];
   for (let i = 0; i < trees.length - 1; i++)
     rootListEdges.push({ fromId: trees[i]._lid, toId: trees[i + 1]._lid });
-  return { nodes, edges, nilNodes: [], rootListEdges };
+  const rootListStart = trees.length ? trees[0]._lid : null;
+  return { nodes, edges, nilNodes: [], rootListEdges, rootListStart };
 }
 
 function layoutFibHeap(W) {
@@ -983,7 +984,8 @@ function layoutFibHeap(W) {
   const rootListEdges = [];
   for (let i = 0; i < trees.length - 1; i++)
     rootListEdges.push({ fromId: trees[i]._lid, toId: trees[i + 1]._lid });
-  return { nodes, edges, nilNodes: [], rootListEdges };
+  const rootListStart = trees.length ? trees[0]._lid : null;
+  return { nodes, edges, nilNodes: [], rootListEdges, rootListStart };
 }
 
 function layoutHeap(W) {
@@ -1100,6 +1102,25 @@ function draw() {
       ctx.moveTo(x2, y2);
       ctx.lineTo(x2 - aLen * Math.cos(ang - aW), y2 - aLen * Math.sin(ang - aW));
       ctx.lineTo(x2 - aLen * Math.cos(ang + aW), y2 - aLen * Math.sin(ang + aW));
+      ctx.closePath(); ctx.fill();
+    }
+  }
+
+  // ── root list start pointer ──────────────────────────────
+  if (layout.rootListStart != null) {
+    const fn = nodeMap.get(layout.rootListStart);
+    if (fn) {
+      const rlColor = dm ? 'rgba(125,211,252,0.65)' : 'rgba(2,132,199,0.65)';
+      const nx = fn.x + wx(fn.id), ny = fn.y + wy(fn.id);
+      const x1 = nx - RADIUS - 38, x2 = nx - RADIUS;
+      ctx.strokeStyle = rlColor; ctx.lineWidth = 1.8; ctx.setLineDash([]);
+      ctx.beginPath(); ctx.moveTo(x1, ny); ctx.lineTo(x2, ny); ctx.stroke();
+      const aLen = 9, aW = 0.38;
+      ctx.fillStyle = rlColor;
+      ctx.beginPath();
+      ctx.moveTo(x2, ny);
+      ctx.lineTo(x2 - aLen * Math.cos(-aW), ny - aLen * Math.sin(-aW));
+      ctx.lineTo(x2 - aLen * Math.cos(+aW), ny - aLen * Math.sin(+aW));
       ctx.closePath(); ctx.fill();
     }
   }
