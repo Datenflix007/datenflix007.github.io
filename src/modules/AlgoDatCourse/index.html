@@ -360,35 +360,47 @@
     /* code-source divs are data carriers only */
     .code-source { display: none; }
 
-    /* ─── THEME TOGGLE ──────────────────────────────────────── */
-    .sidebar-footer {
-      margin-top: auto;
-      border-top: 1px solid var(--border);
-      padding: 10px 12px;
-    }
-
-    .theme-toggle-btn {
-      width: 100%;
+    /* ─── ANZEIGE SETTINGS ───────────────────────────────────── */
+    .setting-row {
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 9px 14px;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      background: transparent;
-      color: var(--muted);
-      font-size: .88rem;
+      justify-content: space-between;
+      padding: 8px 16px;
       cursor: pointer;
-      transition: color .15s, border-color .15s, background .15s;
+      font-size: .88rem;
+      color: #9aa5be;
+      -webkit-user-select: none;
+      user-select: none;
+      transition: background .13s, color .13s;
     }
+    .setting-row:hover { background: rgba(255,255,255,.04); color: var(--text); }
 
-    .theme-toggle-btn:hover {
-      color: var(--text);
-      border-color: var(--accent);
-      background: rgba(99,230,181,.06);
+    [data-theme="light"] .setting-row { color: #4b5470; }
+    [data-theme="light"] .setting-row:hover { background: rgba(0,0,0,.04); color: #1e2535; }
+
+    .switch {
+      width: 34px; height: 19px;
+      border-radius: 10px;
+      background: rgba(255,255,255,.1);
+      position: relative;
+      flex-shrink: 0;
+      transition: background .2s;
+      pointer-events: none;
     }
+    .switch::after {
+      content: '';
+      position: absolute;
+      top: 3px; left: 3px;
+      width: 13px; height: 13px;
+      border-radius: 50%;
+      background: var(--muted);
+      transition: transform .2s, background .2s;
+    }
+    .switch.on { background: rgba(99,230,181,.28); }
+    .switch.on::after { transform: translateX(15px); background: var(--accent); }
 
-    #themeIcon { font-size: 1rem; }
+    [data-theme="light"] .switch { background: rgba(0,0,0,.12); }
+    [data-theme="light"] .switch.on { background: rgba(99,230,181,.35); }
 
     /* ─── RESPONSIVE ─────────────────────────────────────── */
     @media (max-width: 800px) {
@@ -474,11 +486,24 @@
       <a class="nav-link" href="DatastructureLab.html" target="_blank">DatastructureLab ↗</a>
     </div>
 
-    <div class="sidebar-footer">
-      <button type="button" id="themeToggle" class="theme-toggle-btn">
-        <span id="themeIcon">☀</span>
-        <span id="themeLabel">Hellmodus</span>
-      </button>
+    <div class="nav-section">
+      <div class="nav-group-label">Anzeige</div>
+
+      <div class="setting-row" id="row-theme" title="Zwischen Dunkel- und Hellmodus wechseln">
+        <span>Dunkelmodus</span>
+        <span class="switch on" id="sw-theme"></span>
+      </div>
+
+      <div class="setting-row" id="row-colors" title="R / B Farbbeschriftung an Knoten einblenden">
+        <span>R / B Farbbeschriftung</span>
+        <span class="switch" id="sw-colors"></span>
+      </div>
+
+      <div class="setting-row" id="row-values" title="Werte in Komplexitätstabellen einblenden">
+        <span>Werte anzeigen</span>
+        <span class="switch" id="sw-values"></span>
+      </div>
+
     </div>
 
   </nav><!-- /sidebar -->
@@ -1823,26 +1848,38 @@ def bubble_sort(A):
   if (activeChapter) activateViewers(activeChapter);
 
   /* ============================================================
-     DARK / LIGHT TOGGLE
+     ANZEIGE-EINSTELLUNGEN
   ============================================================ */
-  const themeBtn   = document.getElementById('themeToggle');
-  const themeIcon  = document.getElementById('themeIcon');
-  const themeLabel = document.getElementById('themeLabel');
-  const root       = document.documentElement;
+  const root = document.documentElement;
 
-  function applyTheme(t) {
-    root.dataset.theme   = t;
-    themeIcon.textContent  = t === 'dark' ? '☀' : '☽';
-    themeLabel.textContent = t === 'dark' ? 'Hellmodus' : 'Dunkelmodus';
+  function makeToggle(rowId, switchId, storageKey, onActivate, defaultOn) {
+    const row = document.getElementById(rowId);
+    const sw  = document.getElementById(switchId);
+    const saved = localStorage.getItem(storageKey);
+    let active = saved !== null ? saved === '1' : defaultOn;
+
+    function apply(val) {
+      active = val;
+      sw.classList.toggle('on', active);
+      onActivate(active);
+      localStorage.setItem(storageKey, active ? '1' : '0');
+    }
+
+    apply(active);
+    row.addEventListener('click', () => apply(!active));
   }
 
-  applyTheme(localStorage.getItem('theme') || 'dark');
+  makeToggle('row-theme', 'sw-theme', 'theme', active => {
+    root.dataset.theme = active ? 'dark' : 'light';
+  }, true);
 
-  themeBtn.addEventListener('click', () => {
-    const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
-    localStorage.setItem('theme', next);
-    applyTheme(next);
-  });
+  makeToggle('row-colors', 'sw-colors', 'show-rb', active => {
+    root.dataset.showRb = active ? '1' : '0';
+  }, false);
+
+  makeToggle('row-values', 'sw-values', 'show-values', active => {
+    root.dataset.showValues = active ? '1' : '0';
+  }, false);
 </script>
 
 </body>
