@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 import java.util.List;
 
-public class RBTree<K extends Comparable<K>, V> {
+class RBTree<K extends Comparable<K>, V> {
     private static final boolean RED = true;
     private static final boolean BLACK = false;
 
@@ -15,6 +15,7 @@ public class RBTree<K extends Comparable<K>, V> {
         Node left = nil;
         Node right = nil;
         Node parent = nil;
+        int size = 1;  // Größe des Subtree
 
         Node(K key, V value, boolean color) {
             this.key = key;
@@ -25,6 +26,13 @@ public class RBTree<K extends Comparable<K>, V> {
 
     public RBTree() {
         nil.left = nil.right = nil.parent = nil;
+    }
+
+    public RBTree(List<K> keys, List<V> values) {
+        this();
+        for (int i = 0; i < keys.size(); i++) {
+            insert(keys.get(i), values.get(i));
+        }
     }
 
     public V search(K key) {
@@ -114,6 +122,14 @@ public class RBTree<K extends Comparable<K>, V> {
         }
         z.left = nil;
         z.right = nil;
+        
+        // Größen aktualisieren
+        Node temp = y;
+        while (temp != nil) {
+            updateSize(temp);
+            temp = temp.parent;
+        }
+        
         insertFixup(z);
     }
 
@@ -166,6 +182,10 @@ public class RBTree<K extends Comparable<K>, V> {
         else x.parent.right = y;
         y.left = x;
         x.parent = y;
+        
+        // Größen aktualisieren
+        updateSize(x);
+        updateSize(y);
     }
 
     private void rightRotate(Node y) {
@@ -178,6 +198,10 @@ public class RBTree<K extends Comparable<K>, V> {
         else y.parent.left = x;
         x.right = y;
         y.parent = x;
+        
+        // Größen aktualisieren
+        updateSize(y);
+        updateSize(x);
     }
 
     public boolean delete(K key) {
@@ -287,14 +311,152 @@ public class RBTree<K extends Comparable<K>, V> {
         inorder(node.right, keys);
     }
 
-    public static void main(String[] args) {
-        RBTree<Integer, String> tree = new RBTree<>();
-        for (int key : new int[]{41, 38, 31, 12, 19, 8}) {
-            tree.insert(key, "Ereignis " + key);
+    // Hilfsmethode zur Größenaktualisierung
+    private void updateSize(Node node) {
+        if (node != nil) {
+            node.size = 1 + (node.left != nil ? node.left.size : 0) + (node.right != nil ? node.right.size : 0);
         }
-        System.out.println(tree.inorderKeys());
-        System.out.println(tree.search(19));
-        tree.delete(12);
-        System.out.println(tree.inorderKeys());
     }
+
+    // Gibt an, ob der Knoten mit key rot ist
+    public boolean isNodeRed(K key) {
+        Node node = searchNode(key);
+        return node != nil && node.color == RED;
+    }
+
+    // Hilfsmethoden für UI-Rendering
+    public K getRoot() {
+        return root == nil ? null : root.key;
+    }
+
+    public K getLeftChild(K key) {
+        Node node = searchNode(key);
+        return node != nil && node.left != nil ? node.left.key : null;
+    }
+
+    public K getRightChild(K key) {
+        Node node = searchNode(key);
+        return node != nil && node.right != nil ? node.right.key : null;
+    }
+
+    // Zählt alle Knoten mit key > x in O(log n)
+    public int greaterThan(K x) {
+        return greaterThan(root, x);
+    }
+
+    private int greaterThan(Node node, K x) {
+        if (node == nil) return 0;
+        
+        int cmp = node.key.compareTo(x);
+        
+        if (cmp > 0) {
+            // node.key > x: Zähle diesen Knoten + rechten Subtree + greaterThan(linker)
+            int rightSize = node.right != nil ? node.right.size : 0;
+            return 1 + rightSize + greaterThan(node.left, x);
+        } else {
+            // node.key <= x: Gehe nur nach rechts
+            return greaterThan(node.right, x);
+        }
+    }
+
+    // Zählt alle Knoten mit key < x in O(log n)
+    public int lessThan(K x) {
+        return lessThan(root, x);
+    }
+
+    private int lessThan(Node node, K x) {
+        if (node == nil) return 0;
+        
+        int cmp = node.key.compareTo(x);
+        
+        if (cmp < 0) {
+            // node.key < x: Zähle diesen Knoten + linken Subtree + lessThan(rechter)
+            int leftSize = node.left != nil ? node.left.size : 0;
+            return 1 + leftSize + lessThan(node.right, x);
+        } else {
+            // node.key >= x: Gehe nur nach links
+            return lessThan(node.left, x);
+        }
+    }
+
+    // Gibt eine Liste aller Knoten zurück, die größer als x sind
+    public List<K> getGreaterThan(K x) {
+        List<K> result = new ArrayList<>();
+        collectGreaterThan(root, x, result);
+        return result;
+    }
+
+    private void collectGreaterThan(Node node, K x, List<K> result) {
+        if (node == nil) return;
+        
+        if (node.key.compareTo(x) > 0) {
+            collectGreaterThan(node.left, x, result);
+            result.add(node.key);
+            collectGreaterThan(node.right, x, result);
+        } else {
+            collectGreaterThan(node.right, x, result);
+        }
+    }
+
+    // Gibt eine Liste aller Knoten zurück, die kleiner als x sind
+    public List<K> getLessThan(K x) {
+        List<K> result = new ArrayList<>();
+        collectLessThan(root, x, result);
+        return result;
+    }
+
+    private void collectLessThan(Node node, K x, List<K> result) {
+        if (node == nil) return;
+        
+        if (node.key.compareTo(x) < 0) {
+            collectLessThan(node.left, x, result);
+            result.add(node.key);
+            collectLessThan(node.right, x, result);
+        } else {
+            collectLessThan(node.left, x, result);
+        }
+    }
+
+    // JSON Serialisierung
+    public String toJSON() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        List<K> keys = inorderKeys();
+        for (int i = 0; i < keys.size(); i++) {
+            if (i > 0) sb.append(",");
+            sb.append(keys.get(i));
+        }
+        sb.append("]");
+        return sb.toString();
+    }
+
+    // JSON Deserialisierung
+    public static <K extends Comparable<K>> RBTree<K, String> fromJSON(String json) {
+        RBTree<K, String> tree = new RBTree<>();
+        
+        json = json.trim();
+        if (!json.startsWith("[") || !json.endsWith("]")) {
+            return tree;
+        }
+        
+        String content = json.substring(1, json.length() - 1).trim();
+        if (content.isEmpty()) {
+            return tree;
+        }
+        
+        String[] values = content.split(",");
+        for (String val : values) {
+            try {
+                @SuppressWarnings("unchecked")
+                K key = (K) Integer.valueOf(val.trim());
+                tree.insert(key, "Value_" + key);
+            } catch (NumberFormatException e) {
+                // Ignoriere ungültige Werte
+            }
+        }
+        
+        return tree;
+    }
+
+    
 }
