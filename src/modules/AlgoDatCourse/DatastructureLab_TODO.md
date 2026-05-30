@@ -49,6 +49,22 @@
 
 ---
 
+## Feature: Experimentelle Datensätze (in "Neue Struktur"-Dialog)
+- [x] 🗓 Historische Jahreszahlen – Schlüssel = Jahr, Wert = Ereignis (9 Einträge)
+- [x] 🔑 Git-Commit-Hashes – Schlüssel = Hex als Int, Wert = Commit-Message (8 Einträge)
+- [x] 📐 Primzahlen – Schlüssel = Primzahl, Wert = "Primzahl" (11 Einträge)
+
+## Feature: Pseudocode-Fenster (ANZEIGE-Menü)
+- [x] Schwebendes Panel – ziehbar, resizable, schließbar
+- [x] Speed-Steuerung: 🐢 Langsam (820 ms) / ⚡ Schnell (220 ms) / 🖐 Manuell (Schritt-Button)
+- [x] Pseudocode-Definitionen für RBTree (insert, delete)
+- [x] Pseudocode-Definitionen für MinHeap/MaxHeap (insert, extractTop, delete)
+- [x] Pseudocode-Definitionen für BinomialHeap (insert, extractMin, merge, delete)
+- [x] Pseudocode-Definitionen für FibHeap (insert, extractMin, decreaseKey, merge, delete)
+- [x] Zeilenhighlighting per Regex-Mapping aus Op-Log-Einträgen
+- [x] _startLog erhält op-Parameter → _currentOp gesetzt
+- [x] _endLog ruft startPseudoAnim() → Animation startet automatisch
+
 ## Weitere Ideen / Backlog
 - [ ] Bidirektionale Pfeile für Fibonacci-Heap-Kindlisten (doppelt verkettet)
 - [ ] "Wurzelliste"-Label oberhalb der Wurzelknoten-Reihe

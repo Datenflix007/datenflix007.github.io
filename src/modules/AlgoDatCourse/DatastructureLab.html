@@ -156,6 +156,54 @@ main{flex:1;position:relative;overflow:hidden}
 .log-step{color:var(--muted);display:block}
 .log-step b{color:var(--text)}
 .log-hint{color:var(--muted);font-style:italic;font-size:11px}
+
+/* ── PSEUDO PANEL ───────────────────────────────────────────── */
+.pseudo-panel{
+  position:fixed;top:50px;right:18px;width:370px;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);box-shadow:0 14px 44px rgba(0,0,0,.55);
+  z-index:800;display:flex;flex-direction:column;
+  max-height:calc(100vh - 120px);overflow:hidden;
+  resize:both;min-width:240px;min-height:100px;
+}
+.pseudo-panel.hidden{display:none}
+.pseudo-toolbar{
+  display:flex;align-items:center;gap:6px;padding:7px 10px;
+  background:var(--surface2);border-bottom:1px solid var(--border);
+  flex-shrink:0;cursor:move;-webkit-user-select:none;user-select:none
+}
+.pseudo-op-title{
+  font-size:11px;font-weight:700;color:var(--accent);
+  flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap
+}
+.pseudo-spd-group{display:flex;gap:3px}
+.pseudo-spd{
+  background:none;border:1px solid var(--border);color:var(--muted);
+  border-radius:5px;padding:2px 7px;cursor:pointer;font-size:13px;
+  transition:border-color .1s,color .1s
+}
+.pseudo-spd.active,.pseudo-spd:hover{border-color:var(--accent);color:var(--accent)}
+.pseudo-step-btn{
+  background:var(--accent);color:#000;border:none;
+  border-radius:5px;padding:3px 9px;cursor:pointer;
+  font-size:11px;font-weight:700;white-space:nowrap;
+  transition:opacity .1s
+}
+.pseudo-step-btn:hover{opacity:.8}
+.pseudo-step-btn.hidden{display:none}
+.pseudo-close{
+  background:none;border:none;color:var(--muted);font-size:15px;
+  cursor:pointer;padding:0 3px;line-height:1;transition:color .1s;flex-shrink:0
+}
+.pseudo-close:hover{color:var(--red)}
+#pseudoLines{overflow-y:auto;padding:8px 0;flex:1}
+.pline{
+  padding:2px 14px;white-space:pre;line-height:1.65;
+  color:var(--muted);transition:background .12s,color .12s;
+  font-size:11px;font-family:'Cascadia Code','Consolas',monospace
+}
+.pline.active{background:rgba(251,191,36,.18);color:#fbbf24;font-weight:700}
+.pline.dim{opacity:.28}
 </style>
 </head>
 <body>
@@ -184,6 +232,8 @@ main{flex:1;position:relative;overflow:hidden}
       <hr>
       <button onclick="toggleSetting('showRB')"><span class="ck" id="ck-showRB"> </span> R / B Farbbeschriftung</button>
       <button onclick="toggleSetting('showValues')"><span class="ck" id="ck-showValues"> </span> Werte anzeigen</button>
+      <hr>
+      <button onclick="openPseudoPanel()">📋 Pseudocode-Fenster</button>
     </div>
   </div>
 
@@ -209,6 +259,20 @@ main{flex:1;position:relative;overflow:hidden}
       <button class="btn-ok" id="dlgOK">OK</button>
     </div>
   </div>
+</div>
+
+<div id="pseudoPanel" class="pseudo-panel hidden">
+  <div class="pseudo-toolbar" id="pseudoDragBar">
+    <span class="pseudo-op-title" id="pseudoOpTitle">Pseudocode</span>
+    <div class="pseudo-spd-group">
+      <button class="pseudo-spd" data-spd="slow" title="Langsam (800 ms)">🐢</button>
+      <button class="pseudo-spd active" data-spd="fast" title="Schnell (200 ms)">⚡</button>
+      <button class="pseudo-spd" data-spd="manual" title="Manuell – Klick für Schritt">🖐</button>
+    </div>
+    <button type="button" class="pseudo-step-btn hidden" id="pseudoStepBtn">▶ Schritt</button>
+    <button type="button" class="pseudo-close" id="pseudoClose" title="Schließen">✕</button>
+  </div>
+  <div id="pseudoLines"></div>
 </div>
 
 <div id="tooltip"></div>
@@ -302,7 +366,7 @@ function truncateVal(v, max) {
 let _opLog = [];
 let _logging = false;
 function _log(msg) { if (_logging) _opLog.push(msg); }
-function _startLog(header) { _opLog = [header]; _logging = true; }
+function _startLog(header, op) { _opLog = [header]; _logging = true; if (op !== undefined) _currentOp = op; }
 function _endLog() {
   _logging = false;
   const el = document.getElementById('opLog');
@@ -310,6 +374,7 @@ function _endLog() {
   const steps = _opLog.slice(1);
   el.innerHTML = `<span class="log-header">${_opLog[0] || ''}</span>` +
     steps.map(s => `<span class="log-step">▸ ${s}</span>`).join('');
+  startPseudoAnim();
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -952,6 +1017,413 @@ class FibHeap {
 }
 
 // ══════════════════════════════════════════════════════════════
+//  PSEUDOCODE DEFINITIONS
+// ══════════════════════════════════════════════════════════════
+const PSEUDOCODE = {
+  RBTree: {
+    insert: {
+      title: 'RB-Insert',
+      code: [
+        'RB-Insert(T, z):',
+        '  BST-Insert(T, z)           // Position suchen',
+        '  z.farbe ← ROT',
+        '  while Vater(z).farbe = ROT:',
+        '    Onkel ← Geschwister(Vater(z))',
+        '    if Onkel.farbe = ROT:    // Roter Onkelfall',
+        '      Vater(z).farbe  ← SCHWARZ',
+        '      Onkel.farbe     ← SCHWARZ',
+        '      Großvater.farbe ← ROT',
+        '      z ← Großvater(z)',
+        '    else:                    // Schwarzer Onkel',
+        '      if z = inneres Kind:   // Knick',
+        '        z ← Vater(z)',
+        '        Rotation(T, z)       // begradigen',
+        '      Vater(z).farbe  ← SCHWARZ',
+        '      Großvater.farbe ← ROT',
+        '      Rotation(T, Großvater(z))',
+        '  T.wurzel.farbe ← SCHWARZ',
+      ],
+      lineMap: [
+        { re: /linkes Kind|rechtes Kind|neue Wurzel|bereits vorhanden/, lines: [1,2] },
+        { re: /Elter ist schwarz/,          lines: [3] },
+        { re: /Roter Onkelfall/,            lines: [4,5,6,7,8,9] },
+        { re: /Knick/,                      lines: [10,11,12,13] },
+        { re: /LL-Fall|RR-Fall/,            lines: [14,15,16] },
+        { re: /kein Fixup/,                 lines: [17] },
+      ]
+    },
+    delete: {
+      title: 'RB-Delete',
+      code: [
+        'RB-Delete(T, z):',
+        '  y ← z;  yFarbe ← y.farbe',
+        '  if z.links = NIL:',
+        '    Transplant(T, z, z.rechts)',
+        '  else if z.rechts = NIL:',
+        '    Transplant(T, z, z.links)',
+        '  else:',
+        '    y ← Inorder-Nachfolger(z.rechts)',
+        '    Transplant(T, z, y)',
+        '  if yFarbe = SCHWARZ:',
+        '    RB-Delete-Fixup(T, x)',
+        '  // ── Delete-Fixup ─────────────────────',
+        '  while x ≠ Wurzel und x.farbe = SCHWARZ:',
+        '    w ← Geschwister(x)',
+        '    [Fall 1] w.farbe = ROT:',
+        '      Rotation + Umfärben',
+        '    [Fall 2] w + beide Kinder schwarz:',
+        '      w.farbe ← ROT;  x ← Vater(x)',
+        '    [Fall 3] nahes Kind von w ist rot:',
+        '      Rotation + Umfärben  →  Fall 4',
+        '    [Fall 4] fernes Kind von w ist rot:',
+        '      Rotation + Umfärben;  fertig',
+        '  x.farbe ← SCHWARZ',
+      ],
+      lineMap: [
+        { re: /kein linkes Kind/,                    lines: [2,3] },
+        { re: /kein rechtes Kind/,                   lines: [4,5] },
+        { re: /Inorder-Nachfolger/,                  lines: [6,7,8] },
+        { re: /schwarz.*Doppelschwarz|schwarz.*Fixup/, lines: [9,10] },
+        { re: /rot.*kein Fixup/,                     lines: [9] },
+        { re: /Fall 1/,                              lines: [12,13,14,15] },
+        { re: /Fall 2/,                              lines: [12,13,16,17] },
+        { re: /Fall 3/,                              lines: [12,13,18,19] },
+        { re: /Fall 4/,                              lines: [12,13,20,21,22] },
+      ]
+    },
+  },
+  MinHeap: {
+    insert: {
+      title: 'MinHeap-Insert',
+      code: [
+        'Heap-Insert(A, key):',
+        '  A.append(key)          // ans Ende',
+        '  i ← len(A) - 1',
+        '  while i > 0:',
+        '    p ← ⌊(i-1)/2⌋       // Elter-Index',
+        '    if A[i] < A[p]:     // Heap-Eigenschaft verletzt?',
+        '      swap(A[i], A[p])',
+        '      i ← p',
+        '    else: break          // Eigenschaft OK',
+      ],
+      lineMap: [
+        { re: /eingefügt \(Blatt\)/,   lines: [1,2] },
+        { re: /Heap-Up.*tauscht/,      lines: [3,4,5,6,7] },
+        { re: /Position.*korrekt/,     lines: [8] },
+      ]
+    },
+    extractTop: {
+      title: 'MinHeap-Extract-Min',
+      code: [
+        'Heap-Extract-Min(A):',
+        '  min ← A[0]',
+        '  A[0] ← A[n-1];  n--   // letztes → Wurzel',
+        '  i ← 0',
+        '  while true:',
+        '    l←2i+1;  r←2i+2',
+        '    b ← Min-Index({i, l, r})',
+        '    if b = i: break      // Eigenschaft erfüllt',
+        '    swap(A[i], A[b])',
+        '    i ← b',
+        '  return min',
+      ],
+      lineMap: [
+        { re: /entfernt.*letztes/,     lines: [1,2] },
+        { re: /Heap-Down.*tauscht/,    lines: [4,5,6,7,8,9] },
+      ]
+    },
+    delete: {
+      title: 'MinHeap-Delete',
+      code: [
+        'Heap-Delete(A, key):',
+        '  i ← Index(key)',
+        '  A[i] ← A[n-1];  n--  // letztes → Position i',
+        '  Heap-Up(A, i)',
+        '  Heap-Down(A, i)',
+      ],
+      lineMap: [
+        { re: /war letztes/,           lines: [1] },
+        { re: /übernimmt Position/,    lines: [2] },
+        { re: /Heap-Up.*tauscht/,      lines: [3] },
+        { re: /Heap-Down.*tauscht/,    lines: [4] },
+        { re: /Position.*korrekt/,     lines: [3,4] },
+      ]
+    },
+  },
+  BinomialHeap: {
+    insert: {
+      title: 'Binomial-Insert',
+      code: [
+        'Binomial-Insert(H, key):',
+        '  h ← neuer B₀-Baum {key}',
+        '  H ← Union(H, h)',
+        '  // Union = binäres Addieren',
+        '  for k = 0, 1, 2, …:',
+        '    if zwei Bₖ-Bäume vorhanden:',
+        '      verknüpfe (kleinere Wurzel oben)',
+        '      Carry: ein B_{k+1}-Baum',
+      ],
+      lineMap: [
+        { re: /B.*Baum.*eingestellt/,  lines: [1,2] },
+        { re: /B.*B.*→.*Kind/,         lines: [3,4,5,6,7] },
+      ]
+    },
+    extractMin: {
+      title: 'Binomial-Extract-Min',
+      code: [
+        'Binomial-Extract-Min(H):',
+        '  z ← Wurzel mit kleinstem Key',
+        '  Entferne z aus Wurzelliste',
+        '  Kinder(z) → neue Wurzelliste H\'',
+        '  H ← Union(H \\ {z}, H\')',
+        '  // Union = binäres Addieren',
+        '  for k = 0, 1, 2, …:',
+        '    if zwei Bₖ-Bäume vorhanden:',
+        '      kleinere Wurzel übernimmt',
+      ],
+      lineMap: [
+        { re: /Minimum.*gefunden/,           lines: [1,2] },
+        { re: /Kinder.*neue Wurzeln|Keine Kinder/, lines: [3,4] },
+        { re: /B.*B.*→.*Kind/,               lines: [5,6,7,8] },
+      ]
+    },
+    merge: {
+      title: 'Binomial-Merge',
+      code: [
+        'Binomial-Merge(H1, H2):',
+        '  H ← Union(H1, H2)',
+        '  // wie binäre Addition',
+        '  for k = 0, 1, 2, …:',
+        '    0 Bäume → überspringen',
+        '    1 Baum  → direkt übernehmen',
+        '    2 Bäume → verknüpfen (Carry)',
+        '    3 Bäume → einen nehmen + Carry',
+      ],
+      lineMap: [
+        { re: /Wurzellisten zusammenführen/, lines: [1,2] },
+        { re: /B.*B.*→.*Kind/,              lines: [3,4,5,6,7] },
+      ]
+    },
+    delete: {
+      title: 'Binomial-Delete',
+      code: [
+        'Binomial-Delete(H, key):',
+        '  Knoten mit key finden',
+        '  Alle anderen Knoten sammeln',
+        '  Heap neu aufbauen (re-insert)',
+      ],
+      lineMap: []
+    },
+  },
+  FibHeap: {
+    insert: {
+      title: 'Fib-Insert',
+      code: [
+        'Fib-Insert(H, key):',
+        '  x ← neuer Knoten {key}',
+        '  x.grad ← 0;  x.markiert ← false',
+        '  Füge x in Wurzelliste ein',
+        '  if key < H.min.key:  H.min ← x',
+        '  H.n++',
+        '  // Lazy: kein Restructuring!',
+      ],
+      lineMap: [
+        { re: /lazy.*eingefügt/, lines: [1,2,3,4,5,6] },
+      ]
+    },
+    extractMin: {
+      title: 'Fib-Extract-Min',
+      code: [
+        'Fib-Extract-Min(H):',
+        '  z ← H.min',
+        '  Kinder(z) → Wurzelliste;  z.parent ← null',
+        '  Entferne z aus Wurzelliste',
+        '  if H leer:  H.min ← null',
+        '  else:  Konsolidierung(H)',
+        '  // ── Konsolidierung ──────────────────',
+        '  A[0..⌊log n⌋] ← alle null',
+        '  for w in Wurzelliste:',
+        '    d ← w.grad',
+        '    while A[d] ≠ null:',
+        '      y ← A[d]',
+        '      if w.key > y.key: tausche w, y',
+        '      Verknüpfe y unter w',
+        '      w.grad++;  A[d] ← null;  d++',
+        '    A[d] ← w',
+        '  H.min ← Minimum aller Wurzeln',
+      ],
+      lineMap: [
+        { re: /Minimum.*entfernt.*Kind/,        lines: [1,2,3] },
+        { re: /Minimum.*entfernt.*keine Kinder/, lines: [1,2,3,4] },
+        { re: /Konsolidierung/,                 lines: [5,6,7] },
+        { re: /Grad.*Kind von/,                 lines: [8,9,10,11,12,13,14,15] },
+      ]
+    },
+    decreaseKey: {
+      title: 'Fib-Decrease-Key',
+      code: [
+        'Fib-Decrease-Key(H, x, k):',
+        '  x.key ← k',
+        '  p ← x.Vater',
+        '  if p ≠ null und x.key < p.key:',
+        '    Cut(H, x, p)',
+        '    Cascading-Cut(H, p)',
+        '  if x.key < H.min.key:  H.min ← x',
+        '  // ── Cascading-Cut ───────────────────',
+        '  p ← n.Vater',
+        '  if p ≠ null:',
+        '    if n.markiert = false:',
+        '      n.markiert ← true',
+        '    else:',
+        '      Cut(H, n, p)',
+        '      Cascading-Cut(H, p)',
+      ],
+      lineMap: [
+        { re: /Heap-Eigenschaft verletzt/,      lines: [1,2,3,4,5] },
+        { re: /Heap-Eigenschaft OK/,            lines: [1,2,3] },
+        { re: /Neues Minimum/,                  lines: [6] },
+        { re: /markiert \(hat ein Kind/,         lines: [8,9,10,11] },
+        { re: /bereits markiert.*Cascading/,    lines: [8,9,12,13,14] },
+      ]
+    },
+    merge: {
+      title: 'Fib-Merge',
+      code: [
+        'Fib-Merge(H1, H2):',
+        '  Konkateniere Wurzellisten',
+        '  H1.min ← Min(H1.min, H2.min)',
+        '  H1.n   ← H1.n + H2.n',
+        '  // Lazy: kein Restructuring!',
+      ],
+      lineMap: [
+        { re: /Lazy Merge|Erster Heap war leer/, lines: [1,2,3,4] },
+        { re: /Neues Minimum/,                   lines: [2] },
+      ]
+    },
+    delete: {
+      title: 'Fib-Delete',
+      code: [
+        'Fib-Delete(H, x):',
+        '  Decrease-Key(H, x, -∞)',
+        '  Extract-Min(H)',
+      ],
+      lineMap: []
+    },
+  },
+};
+// MaxHeap = MinHeap mit umgekehrtem Vergleich
+PSEUDOCODE.MaxHeap = {
+  insert:     { ...PSEUDOCODE.MinHeap.insert,     title: 'MaxHeap-Insert'      },
+  extractTop: { ...PSEUDOCODE.MinHeap.extractTop, title: 'MaxHeap-Extract-Max' },
+  delete:     { ...PSEUDOCODE.MinHeap.delete,     title: 'MaxHeap-Delete'      },
+};
+
+// ══════════════════════════════════════════════════════════════
+//  PSEUDO PANEL – ENGINE
+// ══════════════════════════════════════════════════════════════
+let _pseudoSpeed     = 'fast';
+let _pseudoAnimSteps = [];
+let _pseudoAnimIdx   = 0;
+let _pseudoAnimTimer = null;
+let _currentOp       = null;
+
+function pseudoVisible() {
+  return !document.getElementById('pseudoPanel').classList.contains('hidden');
+}
+
+function openPseudoPanel() {
+  document.getElementById('pseudoPanel').classList.remove('hidden');
+  _refreshPseudo();
+}
+
+function _closePseudoPanel() {
+  document.getElementById('pseudoPanel').classList.add('hidden');
+  clearTimeout(_pseudoAnimTimer);
+}
+
+function _getPseudo() {
+  if (!_currentOp) return null;
+  const ns = PSEUDOCODE[structType] || PSEUDOCODE.MinHeap;
+  return (ns && ns[_currentOp]) || null;
+}
+
+function _escH(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function _refreshPseudo() {
+  const pc = _getPseudo();
+  document.getElementById('pseudoOpTitle').textContent = pc ? pc.title : 'Pseudocode';
+  const el = document.getElementById('pseudoLines');
+  el.innerHTML = pc
+    ? pc.code.map((l,i) => `<div class="pline" data-line="${i}">${_escH(l)}</div>`).join('')
+    : '<div class="pline log-hint">Führe eine Operation aus …</div>';
+}
+
+function _hlLines(idxs) {
+  document.querySelectorAll('#pseudoLines .pline').forEach(el => {
+    const i = +el.dataset.line;
+    el.classList.toggle('active', idxs.includes(i));
+    el.classList.toggle('dim',   idxs.length > 0 && !idxs.includes(i));
+  });
+  const first = document.querySelector('#pseudoLines .pline.active');
+  if (first) first.scrollIntoView({ block:'nearest', behavior:'smooth' });
+}
+
+function _clearHL() {
+  document.querySelectorAll('#pseudoLines .pline').forEach(el => el.classList.remove('active','dim'));
+}
+
+function _buildAnimSteps() {
+  const pc = _getPseudo();
+  if (!pc || !pc.lineMap) return [];
+  const steps = [];
+  for (const entry of _opLog) {
+    const msg = typeof entry === 'string' ? entry : '';
+    for (const { re, lines } of pc.lineMap) {
+      if (re.test(msg)) { steps.push(lines); break; }
+    }
+  }
+  return steps;
+}
+
+function startPseudoAnim() {
+  if (!pseudoVisible()) return;
+  clearTimeout(_pseudoAnimTimer);
+  _refreshPseudo();
+  _pseudoAnimSteps = _buildAnimSteps();
+  _pseudoAnimIdx   = 0;
+  _updateStepBtn();
+  if (!_pseudoAnimSteps.length) { _clearHL(); return; }
+  if (_pseudoSpeed === 'manual') { _hlLines(_pseudoAnimSteps[0]); _pseudoAnimIdx = 1; }
+  else _autoPlay();
+}
+
+function _autoPlay() {
+  if (_pseudoAnimIdx >= _pseudoAnimSteps.length) {
+    _pseudoAnimTimer = setTimeout(_clearHL, 500); return;
+  }
+  _hlLines(_pseudoAnimSteps[_pseudoAnimIdx++]);
+  _pseudoAnimTimer = setTimeout(_autoPlay, _pseudoSpeed === 'fast' ? 220 : 820);
+}
+
+function _stepPseudo() {
+  if (_pseudoAnimIdx >= _pseudoAnimSteps.length) {
+    _clearHL(); _pseudoAnimIdx = 0;
+  } else {
+    _hlLines(_pseudoAnimSteps[_pseudoAnimIdx++]);
+  }
+  _updateStepBtn();
+}
+
+function _updateStepBtn() {
+  const btn = document.getElementById('pseudoStepBtn');
+  if (!btn) return;
+  btn.classList.toggle('hidden', _pseudoSpeed !== 'manual');
+  btn.textContent = _pseudoAnimIdx >= _pseudoAnimSteps.length ? '↺ Reset' : '▶ Schritt';
+}
+
+// ══════════════════════════════════════════════════════════════
 //  APP STATE
 // ══════════════════════════════════════════════════════════════
 let structure  = null;        // current data structure
@@ -1556,7 +2028,7 @@ function cmdInsert() {
     const v=document.getElementById('_iv').value.trim()||('Value_'+k);
     if (isNaN(k)) return;
     highlighted.clear();
-    _startLog(`${structType} — Insert(${k})`);
+    _startLog(`${structType} — Insert(${k})`, 'insert');
     structure.insert(k,v);
     _endLog();
     setStatus(`✓ ${k} → ${v.length>40?v.slice(0,40)+'…':v}`);
@@ -1568,7 +2040,7 @@ function cmdDelete() {
   if (!need()) return;
   askKey('Delete', k=>{
     highlighted.clear();
-    _startLog(`${structType} — Delete(${k})`);
+    _startLog(`${structType} — Delete(${k})`, 'delete');
     const ok = structure.delete(k);
     _endLog();
     setStatus(ok ? `✓ ${k} gelöscht` : `✗ ${k} nicht gefunden`);
@@ -1665,7 +2137,7 @@ function cmdDecreaseKey() {
     if (isNaN(oldK) || isNaN(newK)) return;
     if (newK >= oldK) { setStatus('⚠ Neuer Key muss kleiner als alter Key sein'); return; }
     highlighted.clear();
-    _startLog(`FibHeap — DecreaseKey(${oldK} → ${newK})`);
+    _startLog(`FibHeap — DecreaseKey(${oldK} → ${newK})`, 'decreaseKey');
     if (structure.decreaseKey(oldK, newK)) {
       const ln = layout.nodes.find(n => n.key === newK);
       if (ln) highlighted.add(ln.id);
@@ -1691,7 +2163,7 @@ function cmdMerge() {
     if (!keys.length) return;
     const other = structure instanceof FibHeap ? new FibHeap() : new BinomialHeap();
     keys.forEach(k => other.insert(k, 'Value_' + k));
-    _startLog(`${structType} — Merge (${keys.length} Knoten: ${keys.join(', ')})`);
+    _startLog(`${structType} — Merge (${keys.length} Knoten: ${keys.join(', ')})`, 'merge');
     structure.merge(other);
     _endLog();
     highlighted.clear();
@@ -1702,7 +2174,8 @@ function cmdMerge() {
 
 function cmdExtract() {
   if (!need()) return; highlighted.clear();
-  _startLog(`${structType} — Extract Min`);
+  const _exOp = (structure instanceof BinomialHeap || structure instanceof FibHeap) ? 'extractMin' : 'extractTop';
+  _startLog(`${structType} — Extract ${structType === 'MaxHeap' ? 'Max' : 'Min'}`, _exOp);
   const r = (structure instanceof BinomialHeap || structure instanceof FibHeap) ? structure.extractMin() : structure.extractTop();
   _endLog();
   setStatus(r ? `✓ Extracted: <b>${r.key}</b> → ${r.value}` : 'Heap ist leer');
@@ -1757,23 +2230,33 @@ function cmdNew() {
       <label>Beispielwerte</label>
       <select id="_smp">
         <option value="">Leere Struktur</option>
-        <option value="s">Klein (7 Knoten)</option>
-        <option value="m">Mittel (13 Knoten)</option>
+        <option value="s">Klein – 7 Knoten</option>
+        <option value="m">Mittel – 13 Knoten</option>
+        <optgroup label="── Experimentelle Datensätze ──">
+          <option value="hist">🗓  Historische Jahreszahlen (9) – empfohlen für RBTree</option>
+          <option value="git">🔑  Git-Commit-Hashes (8) – empfohlen für Heap</option>
+          <option value="prime">📐  Primzahlen (11) – empfohlen für Heap</option>
+        </optgroup>
       </select>
     </div>`, () => {
     const smp=document.getElementById('_smp').value;
     const SMALL=[10,5,15,3,8,12,20];
     const MED  =[15,10,20,8,12,17,25,5,11,14,16,22,27];
-    const keys = smp==='s'?SMALL:smp==='m'?MED:[];
+    const rawKeys =
+      smp==='s'    ? SMALL.map(k=>({k,v:'Value_'+k})) :
+      smp==='m'    ? MED.map(k=>({k,v:'Value_'+k}))   :
+      smp==='hist' ? SAMPLE_HIST  :
+      smp==='git'  ? SAMPLE_GIT   :
+      smp==='prime'? SAMPLE_PRIME : [];
     structType = chosen; highlighted.clear(); wobble.clear();
     if      (structType === 'MinHeap')      structure = new MinHeap();
     else if (structType === 'MaxHeap')      structure = new MaxHeap();
     else if (structType === 'BinomialHeap') structure = new BinomialHeap();
     else if (structType === 'FibHeap')      structure = new FibHeap();
     else                                    structure = new RBTree();
-    keys.forEach(k => structure.insert(k, 'Value_' + k));
+    rawKeys.forEach(({k,v}) => structure.insert(k, v));
     buildOpsMenu();
-    setStatus(`✓ Neuer ${structType} erstellt${keys.length?' mit '+keys.length+' Beispielknoten':''}`);
+    setStatus(`✓ Neuer ${structType} erstellt${rawKeys.length?' mit '+rawKeys.length+' Beispielknoten':''}`);
   });
 }
 
@@ -1809,6 +2292,39 @@ function cmdLoad() {
 }
 
 // ══════════════════════════════════════════════════════════════
+//  EXPERIMENTAL SAMPLE DATA
+// ══════════════════════════════════════════════════════════════
+const SAMPLE_HIST = [
+  {k:1066, v:'Normannische Eroberung Englands'},
+  {k:1215, v:'Magna Carta unterzeichnet'},
+  {k:1347, v:'Schwarzer Tod erreicht Europa'},
+  {k:1453, v:'Fall von Konstantinopel'},
+  {k:1492, v:'Kolumbus entdeckt Amerika'},
+  {k:1687, v:'Newton: Principia Mathematica'},
+  {k:1789, v:'Beginn der Französischen Revolution'},
+  {k:1969, v:'Mondlandung – Apollo 11'},
+  {k:1989, v:'Mauerfall in Berlin'},
+];
+
+const SAMPLE_GIT = [
+  {k:0x3a5f, v:'fix: resolve race condition in auth'},
+  {k:0x1b2c, v:'feat: add dark mode toggle'},
+  {k:0x9d4e, v:'refactor: extract ApiClient class'},
+  {k:0x6f10, v:'docs: update README examples'},
+  {k:0xc823, v:'test: add integration tests for login'},
+  {k:0x4a71, v:'chore: bump dependency versions'},
+  {k:0xe53b, v:'fix: null pointer in user profile view'},
+  {k:0x2d96, v:'feat: export data to CSV'},
+];
+
+const SAMPLE_PRIME = [
+  {k:2,v:'erste Primzahl'},{k:3,v:'Primzahl'},{k:5,v:'Primzahl'},
+  {k:7,v:'Primzahl'},{k:11,v:'Primzahl'},{k:13,v:'Primzahl'},
+  {k:17,v:'Primzahl'},{k:19,v:'Primzahl'},{k:23,v:'Primzahl'},
+  {k:29,v:'Primzahl'},{k:31,v:'Primzahl'},
+];
+
+// ══════════════════════════════════════════════════════════════
 //  INIT
 // ══════════════════════════════════════════════════════════════
 structure = new RBTree();
@@ -1816,6 +2332,45 @@ structure = new RBTree();
 buildOpsMenu();
 applySettings();
 draw();
+
+// ── Pseudo-Panel: Events ──────────────────────────────────────
+document.getElementById('pseudoStepBtn').addEventListener('click', _stepPseudo);
+document.getElementById('pseudoClose').addEventListener('click', _closePseudoPanel);
+document.querySelectorAll('.pseudo-spd').forEach(btn => {
+  btn.addEventListener('click', () => {
+    _pseudoSpeed = btn.dataset.spd;
+    document.querySelectorAll('.pseudo-spd').forEach(b =>
+      b.classList.toggle('active', b.dataset.spd === _pseudoSpeed));
+    clearTimeout(_pseudoAnimTimer);
+    _updateStepBtn();
+    if (_pseudoSpeed !== 'manual' && _pseudoAnimSteps.length) {
+      _pseudoAnimIdx = 0; _autoPlay();
+    }
+  });
+});
+
+// ── Pseudo-Panel: Drag ────────────────────────────────────────
+(function() {
+  const bar   = document.getElementById('pseudoDragBar');
+  const panel = document.getElementById('pseudoPanel');
+  let ox = 0, oy = 0;
+  bar.addEventListener('mousedown', e => {
+    if (e.target.closest('button')) return;
+    const r = panel.getBoundingClientRect();
+    ox = e.clientX - r.left; oy = e.clientY - r.top;
+    const onMove = ev => {
+      panel.style.left  = (ev.clientX - ox) + 'px';
+      panel.style.top   = (ev.clientY - oy) + 'px';
+      panel.style.right = 'auto';
+    };
+    const onUp = () => {
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup',   onUp);
+    };
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup',   onUp);
+  });
+})();
 </script>
 </body>
 </html>
