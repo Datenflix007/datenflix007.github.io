@@ -15,6 +15,13 @@
   --green:#4ade80;--yellow:#fbbf24;--orange:#fb923c;
   --radius:8px;
 }
+[data-theme="light"]{
+  --bg:#f0f4f8;--surface:#ffffff;--surface2:#e8ecf0;
+  --border:#c8d4e0;--text:#1a2030;--muted:#6b7585;
+  --accent:#0284c7;--accent2:#4f46e5;
+  --red:#dc2626;--red2:#ef4444;
+}
+.ck{display:inline-block;width:16px;color:var(--accent);font-size:12px}
 html,body{height:100%;overflow:hidden}
 body{background:var(--bg);color:var(--text);
   font-family:'Segoe UI',system-ui,sans-serif;
@@ -158,6 +165,16 @@ main{flex:1;position:relative;overflow:hidden}
     <div class="dropdown" id="dropdownOps"></div>
   </div>
 
+  <div class="menu-group">
+    <button class="menu-btn">ANZEIGE</button>
+    <div class="dropdown">
+      <button onclick="toggleSetting('darkMode')"><span class="ck" id="ck-darkMode">✓</span> Dunkelmodus</button>
+      <hr>
+      <button onclick="toggleSetting('showRB')"><span class="ck" id="ck-showRB"> </span> R / B Farbbeschriftung</button>
+      <button onclick="toggleSetting('showValues')"><span class="ck" id="ck-showValues"> </span> Werte anzeigen</button>
+    </div>
+  </div>
+
   <span class="struct-badge" id="structBadge">RBTree</span>
 </header>
 
@@ -185,6 +202,28 @@ main{flex:1;position:relative;overflow:hidden}
 
 <script>
 'use strict';
+
+// ══════════════════════════════════════════════════════════════
+//  ANZEIGE SETTINGS
+// ══════════════════════════════════════════════════════════════
+const settings = {
+  darkMode:   true,
+  showRB:     JSON.parse(localStorage.getItem('lab-showRB')    || 'false'),
+  showValues: JSON.parse(localStorage.getItem('lab-showValues')|| 'false'),
+};
+
+function applySettings() {
+  document.documentElement.dataset.theme = settings.darkMode ? 'dark' : 'light';
+  document.getElementById('ck-darkMode').textContent   = settings.darkMode   ? '✓' : ' ';
+  document.getElementById('ck-showRB').textContent     = settings.showRB     ? '✓' : ' ';
+  document.getElementById('ck-showValues').textContent = settings.showValues ? '✓' : ' ';
+}
+
+function toggleSetting(key) {
+  settings[key] = !settings[key];
+  if (key !== 'darkMode') localStorage.setItem('lab-' + key, settings[key]);
+  applySettings();
+}
 
 // ══════════════════════════════════════════════════════════════
 //  UTILITIES
@@ -579,27 +618,45 @@ function stepPhysics() {
 //  RENDERER
 // ══════════════════════════════════════════════════════════════
 function draw() {
-  // sync canvas resolution
   if (canvas.width!==canvas.clientWidth||canvas.height!==canvas.clientHeight) {
     canvas.width=canvas.clientWidth; canvas.height=canvas.clientHeight;
   }
 
   ctx.clearRect(0,0,canvas.width,canvas.height);
 
-  // subtle dot-grid background
-  ctx.fillStyle='rgba(255,255,255,0.025)';
-  const gs=40;
-  for(let x=gs;x<canvas.width;x+=gs) for(let y=gs;y<canvas.height;y+=gs) {
-    ctx.beginPath(); ctx.arc(x,y,1,0,Math.PI*2); ctx.fill();
-  }
+  const dm = settings.darkMode;
+  const C = {
+    dotGrid:     dm ? 'rgba(255,255,255,0.025)' : 'rgba(0,0,0,0.04)',
+    edge:        dm ? '#2a3a4e'                 : '#94aac0',
+    nilLine:     dm ? 'rgba(42,58,74,.55)'      : 'rgba(100,140,180,.55)',
+    nilFill:     dm ? 'rgba(35,44,60,.85)'      : 'rgba(200,210,225,.9)',
+    nilStroke:   dm ? 'rgba(70,90,120,.6)'      : 'rgba(100,140,180,.6)',
+    nilText:     dm ? 'rgba(140,155,180,.9)'    : 'rgba(80,100,130,.9)',
+    nodeFillBlk: dm ? '#1e2636'                 : '#2d4060',
+    nodeFillRed: dm ? '#b82828'                 : '#cc2222',
+    nodeBordBlk: dm ? '#3a4a60'                 : '#4a6080',
+    nodeBordRed: dm ? '#e05050'                 : '#e03030',
+    rbLabelRed:  dm ? 'rgba(255,120,120,.85)'   : 'rgba(180,0,0,.9)',
+    rbLabelBlk:  dm ? 'rgba(140,160,190,.75)'   : 'rgba(50,80,120,.9)',
+    valLabel:    dm ? 'rgba(100,150,210,.9)'    : 'rgba(30,100,200,.9)',
+    emptyText:   dm ? '#8892a6'                 : '#6b7585',
+  };
+
+  // dot-grid background
+  ctx.fillStyle = C.dotGrid;
+  const gs = 40;
+  for (let x=gs; x<canvas.width; x+=gs)
+    for (let y=gs; y<canvas.height; y+=gs) {
+      ctx.beginPath(); ctx.arc(x,y,1,0,Math.PI*2); ctx.fill();
+    }
 
   stepPhysics();
   layout = computeLayout();
 
   if (!layout.nodes.length) {
-    ctx.fillStyle='#8892a6';
-    ctx.font='18px "Segoe UI",system-ui,sans-serif';
-    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillStyle = C.emptyText;
+    ctx.font = '18px "Segoe UI",system-ui,sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.fillText(
       structure ? 'Leer  •  DICTIONARY > Insert' : 'Kein Baum  •  FILE > Neu',
       canvas.width/2, canvas.height/2
@@ -609,95 +666,86 @@ function draw() {
 
   const nodeMap = new Map(layout.nodes.map(n=>[n.id,n]));
 
-  // ── solid edges ────────────────────────────────────────────
-  ctx.strokeStyle='#2a3a4e'; ctx.lineWidth=2.5; ctx.setLineDash([]);
+  // ── edges ──────────────────────────────────────────────────
+  ctx.strokeStyle = C.edge; ctx.lineWidth = 2.5; ctx.setLineDash([]);
   for (const e of layout.edges) {
     const fn=nodeMap.get(e.fromId), tn=nodeMap.get(e.toId); if(!fn||!tn) continue;
     ctx.beginPath();
     ctx.moveTo(fn.x+wx(e.fromId), fn.y+wy(e.fromId)+RADIUS);
-    ctx.lineTo(tn.x+wx(e.toId),  tn.y+wy(e.toId) -RADIUS);
+    ctx.lineTo(tn.x+wx(e.toId),  tn.y+wy(e.toId)  -RADIUS);
     ctx.stroke();
   }
 
-  // ── NIL nodes (RBTree only) ─────────────────────────────────
+  // ── NIL nodes ──────────────────────────────────────────────
   for (const nil of layout.nilNodes) {
-    const par=nodeMap.get(nil.parentId);
+    const par = nodeMap.get(nil.parentId);
     if (par) {
-      ctx.strokeStyle='rgba(42,58,74,.55)'; ctx.lineWidth=1.2;
-      ctx.setLineDash([4,4]);
+      ctx.strokeStyle = C.nilLine; ctx.lineWidth = 1.2; ctx.setLineDash([4,4]);
       ctx.beginPath();
       ctx.moveTo(par.x+wx(nil.parentId), par.y+wy(nil.parentId)+RADIUS);
       ctx.lineTo(nil.x, nil.y-7); ctx.stroke();
     }
     ctx.setLineDash([]);
-    // shadow
-    ctx.fillStyle='rgba(0,0,0,.18)';
+    ctx.fillStyle = 'rgba(0,0,0,.18)';
     roundRect(ctx, nil.x-13, nil.y-7+2, 26, 14, 4); ctx.fill();
-    // box
-    ctx.fillStyle='rgba(35,44,60,.85)';
+    ctx.fillStyle = C.nilFill;
     roundRect(ctx, nil.x-13, nil.y-7, 26, 14, 4); ctx.fill();
-    ctx.strokeStyle='rgba(70,90,120,.6)'; ctx.lineWidth=1;
+    ctx.strokeStyle = C.nilStroke; ctx.lineWidth = 1;
     roundRect(ctx, nil.x-13, nil.y-7, 26, 14, 4); ctx.stroke();
-    // label
-    ctx.fillStyle='rgba(140,155,180,.9)';
-    ctx.font='bold 8px "Segoe UI",system-ui,sans-serif';
-    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillStyle = C.nilText;
+    ctx.font = 'bold 8px "Segoe UI",system-ui,sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.fillText('NIL', nil.x, nil.y);
   }
   ctx.setLineDash([]);
 
   // ── nodes ──────────────────────────────────────────────────
   for (const n of layout.nodes) {
-    const x=n.x+wx(n.id), y=n.y+wy(n.id);
+    const x = n.x+wx(n.id), y = n.y+wy(n.id);
 
-    // glow for highlighted
     if (highlighted.has(n.id)) {
-      const g=ctx.createRadialGradient(x,y,RADIUS,x,y,RADIUS+24);
+      const g = ctx.createRadialGradient(x,y,RADIUS,x,y,RADIUS+24);
       g.addColorStop(0,'rgba(251,191,36,.40)');
       g.addColorStop(1,'rgba(251,191,36,0)');
-      ctx.fillStyle=g;
+      ctx.fillStyle = g;
       ctx.beginPath(); ctx.arc(x,y,RADIUS+24,0,Math.PI*2); ctx.fill();
     }
 
-    // shadow
-    ctx.fillStyle='rgba(0,0,0,.35)';
+    ctx.fillStyle = 'rgba(0,0,0,.35)';
     ctx.beginPath(); ctx.arc(x+3,y+4,RADIUS,0,Math.PI*2); ctx.fill();
 
-    // fill
-    ctx.fillStyle=n.isRed ? '#b82828' : '#1e2636';
+    ctx.fillStyle = n.isRed ? C.nodeFillRed : C.nodeFillBlk;
     ctx.beginPath(); ctx.arc(x,y,RADIUS,0,Math.PI*2); ctx.fill();
 
-    // border
-    ctx.strokeStyle=n.isRed ? '#e05050' : '#3a4a60';
-    ctx.lineWidth=2.2;
+    ctx.strokeStyle = n.isRed ? C.nodeBordRed : C.nodeBordBlk;
+    ctx.lineWidth = 2.2;
     ctx.beginPath(); ctx.arc(x,y,RADIUS,0,Math.PI*2); ctx.stroke();
 
-    // inner gloss
-    const gl=ctx.createRadialGradient(x-8,y-8,2,x,y,RADIUS);
+    const gl = ctx.createRadialGradient(x-8,y-8,2,x,y,RADIUS);
     gl.addColorStop(0,'rgba(255,255,255,.12)');
     gl.addColorStop(1,'rgba(255,255,255,0)');
-    ctx.fillStyle=gl;
+    ctx.fillStyle = gl;
     ctx.beginPath(); ctx.arc(x,y,RADIUS,0,Math.PI*2); ctx.fill();
 
-    // key text
-    ctx.fillStyle='#fff';
-    ctx.font='bold 14px "Segoe UI",system-ui,sans-serif';
-    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 14px "Segoe UI",system-ui,sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.fillText(String(n.key), x, y);
 
-    // R / B badge (RBTree only)
-    if (structType==='RBTree') {
-      ctx.fillStyle=n.isRed?'rgba(255,120,120,.85)':'rgba(140,160,190,.75)';
-      ctx.font='bold 9px "Segoe UI",system-ui,sans-serif';
-      ctx.fillText(n.isRed?'R':'B', x, y+RADIUS+13);
+    // R / B badge
+    if (structType==='RBTree' && settings.showRB) {
+      ctx.fillStyle = n.isRed ? C.rbLabelRed : C.rbLabelBlk;
+      ctx.font = 'bold 9px "Segoe UI",system-ui,sans-serif';
+      ctx.fillText(n.isRed ? 'R' : 'B', x, y+RADIUS+13);
     }
 
     // value label
-    if (n.value) {
-      const tv=truncateVal(n.value,12);
-      ctx.fillStyle='rgba(100,150,210,.9)';
-      ctx.font='9px "Segoe UI",system-ui,sans-serif';
-      ctx.fillText(tv, x, y+RADIUS+(structType==='RBTree'?26:15));
+    if (n.value && settings.showValues) {
+      const tv = truncateVal(n.value, 12);
+      ctx.fillStyle = C.valLabel;
+      ctx.font = '9px "Segoe UI",system-ui,sans-serif';
+      const rbOffset = (structType==='RBTree' && settings.showRB) ? 26 : 15;
+      ctx.fillText(tv, x, y+RADIUS+rbOffset);
     }
   }
 
@@ -1074,6 +1122,7 @@ function cmdLoad() {
 structure = new RBTree();
 [15,10,20,8,12,17,25,5,11,14,16,22,27].forEach(k=>structure.insert(k,'Value_'+k));
 buildOpsMenu();
+applySettings();
 draw();
 </script>
 </body>
