@@ -2,7 +2,7 @@
 
 Jeder Baum blutet, wenn man ihn aufschneidet. Die Harzer wussten das – und machten es zu ihrem Beruf. Mit Schnitzmessern und Harzschabern ritzten sie tiefe, schräge Wunden in Kiefern und Tannen, hängten darunter kleine Tontöpfe und warteten. Tropfen für Tropfen sammelte sich das klebrige, goldgelbe Harz. Es roch intensiv nach Nadelwald, nach Wachs und Rauch. Es war eine der ältesten Methoden, dem Wald etwas abzuverlangen – ohne den Baum zu fällen. Und trotzdem starb der Baum dabei.
 
-![img](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/img/harzer1.jpg)
+!![Harzer bei der Arbeit|Harzer ritzt Lachen in Kiefer|](../img/harzer1.jpg)
 
 ---
 
@@ -33,9 +33,9 @@ Die Produkte wurden gebraucht für:
 - **Handwerk**: Kolophonium für Streichinstrumenten-Bögen; Pech für Lederbehandlung und Fackeln
 - **Leuchtmittel**: Harzreiches Kiefernholz (Kienspan) brannte besonders hell und wurde in Haushalten und Bergwerken eingesetzt[^7]
 
-![img](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/img/harzer2.jpg)
+!![Lachentopf und Sammlung|Harz tropft in gebrannten Tontopf|](../img/harzer2.jpg)
 
-![harzer3](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/img/harzer3.jpg)
+!![Harzverarbeitung in der Pechhütte|Erhitzen von Rohpech zur Trennung von Terpentin|](../image/harzer3.JPG)
 
 ---
 

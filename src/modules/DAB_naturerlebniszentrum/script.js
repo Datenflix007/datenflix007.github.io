@@ -469,6 +469,7 @@ function parseMarkdown(markdown) {
 
   // Pass 2: render content
   const html = [];
+  const figures = [];
   let inList = false;
 
   function closeListIfNeeded() {
@@ -484,10 +485,13 @@ function parseMarkdown(markdown) {
       const desc = parts[1] || "";
       const source = parts[2] || "";
       const src = figureMatch[2].trim();
+      // collect for Abbildungsverzeichnis
+      figures.push({ title, src, source });
       html.push(`<figure class="article-figure">
         <img src="${src}" alt="${escapeHtml(title)}">
         <figcaption class="figure-caption">
           ${title ? `<strong class="figure-title">${escapeHtml(title)}</strong>` : ""}
+          ${title ? `<div class="figure-legend">Abbildung: ${escapeHtml(title)}</div>` : ""}
           ${desc ? `<span class="figure-desc">${escapeHtml(desc)}</span>` : ""}
           <span class="figure-source">Quelle: ${source ? `<a href="${escapeHtml(source)}" target="_blank" rel="noopener noreferrer">${escapeHtml(source)}</a>` : "<em>[wird ergänzt]</em>"}</span>
         </figcaption>
@@ -538,6 +542,18 @@ function parseMarkdown(markdown) {
       html.push(`<li id="fn-${key}" class="footnote-item"><span>${formatInlineMarkdown(footnotes.get(key) || "")}</span> <a href="#fnref-${key}" class="footnote-back" aria-label="Zurück zum Text">↩</a></li>`);
     }
     html.push("</ol></div>");
+  }
+
+  // Abbildungsverzeichnis direkt unter den Fußnoten
+  if (figures.length > 0) {
+    html.push('<div class="figure-index"><h3>Abbildungsverzeichnis</h3><ol>');
+    figures.forEach((f, i) => {
+      const title = f.title || `Abbildung ${i + 1}`;
+      const src = f.src || "";
+      const source = f.source || "";
+      html.push(`<li class="figure-index__item">${escapeHtml(title)} ${src ? `— <a href="${escapeHtml(src)}" target="_blank" rel="noopener noreferrer">Bild</a>` : ""} ${source ? `(${escapeHtml(source)})` : ""}</li>`);
+    });
+    html.push('</ol></div>');
   }
 
   return html.join("");
