@@ -2,7 +2,7 @@
 
 Stellt euch vor: Ihr müsst einen riesigen Eichenbaum fällen – ohne Motorsäge, ohne Maschinen, ohne Sicherheitsnetz. Mit einer schweren Axt und einer langen Säge, die ihr mit einem zweiten Mann zusammen zieht und drückt, bis der Baum kracht und fällt. Das war der Alltag eines Holzhauers im Mittelalter. Oft arbeiteten sie von früh morgens bis in den Abend, mitten im Wald, bei Wind, Frost und Regen – und wurden dafür schlechter bezahlt als fast alle anderen.
 
-!![Holzfäller fällt einen Baum|Ein Holzhauer arbeitet mit Axt und Säge im Wald.|](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/img/holzf%C3%A4ller1.jpg)
+![Holzfäller fällt einen Baum|Ein Holzhauer arbeitet mit Axt und Säge im Wald.|](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/img/holzf%C3%A4ller1.jpg)
 
 ---
 
