@@ -466,6 +466,23 @@ function parseMarkdown(markdown) {
     fnKey = null;
     contentLines.push(line);
   }
+  // Normalize inline image markdown to figure-syntax so all images are treated the same.
+  // Keep the original URL as the source (do not convert to relative paths).
+  for (let i = 0; i < contentLines.length; i++) {
+    contentLines[i] = contentLines[i].replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (m, alt, url) => {
+      const cleanUrl = url.trim();
+      let title = (alt || "").trim();
+      if (!title || title.toLowerCase() === "img") {
+        try {
+          const fn = cleanUrl.split("/").pop().split("?")[0];
+          title = fn.replace(/\.[^.]+$/, "").replace(/[-_]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+        } catch (e) {
+          title = "Abbildung";
+        }
+      }
+      return `!![${title}||${cleanUrl}](${cleanUrl})`;
+    });
+  }
 
   // Pass 2: render content
   const html = [];
