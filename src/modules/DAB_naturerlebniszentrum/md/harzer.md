@@ -35,7 +35,7 @@ Die Produkte wurden gebraucht für:
 
 ![Lachentopf und Sammlung|Harz tropft in gebrannten Tontopf|](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/img/harzer2.jpg)
 
-!![Harzverarbeitung in der Pechhütte|Erhitzen von Rohpech zur Trennung von Terpentin|](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/img/harzer3.jpg)
+![Harzverarbeitung in der Pechhütte|Erhitzen von Rohpech zur Trennung von Terpentin|](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/image/harzer3.JPG)
 
 ---
 
