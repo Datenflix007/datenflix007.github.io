@@ -2,7 +2,6 @@
 
 Hunderte von Schweinen stürmten im Herbst in die Eichenwälder. Vor ihnen: ein Mann mit einem langen Stab, ein paar abgerichtete Hunde, vielleicht ein Knecht. Der Waldhirt trieb die Tiere dorthin, wo die Eicheln dick lagen – und sorgte dafür, dass die Schweine gemästet wurden, bevor der Winter kam. Es war laut, dreckig und anstrengend. Aber für die Menschen des Mittelalters bedeutete es: Fleisch für die kalten Monate. Ohne die Waldhirten hätten viele Dorfgemeinschaften kaum überlebt.
 
-![img](../img/waldhirten1.jpg)
 
 ---
 
@@ -34,7 +33,7 @@ Zwischen den verschiedenen Tierarten gab es erhebliche Unterschiede im Schaden:
 - **Rinder und Pferde** verdichteten den Boden durch ihr Gewicht und fraßen Knospen junger Bäume
 - **Ziegen** galten als die zerstörerischsten: Sie fraßen Rinde, Jungtriebe und Knospen – bis zum vollständigen Absterben des Jungwuchses in einem Waldabschnitt[^7]
 
-![img](../img/waldhirten2.jpg)
+
 
 ---
 
