@@ -312,19 +312,8 @@ function renderOutput(markdown, mode) {
           </div>
         </article>
 
-        <aside class="asset-card">
-          <p class="eyebrow">Erweiterbare Assets</p>
-          <h3>Weitere Materialien</h3>
-          <p>Die Seite ist so angelegt, dass später weitere Workshop-Bausteine eingebunden werden können.</p>
-          <div class="asset-list">
-            ${additionalAssets.map((asset) => `
-              <div class="asset-item">
-                <strong>${asset.title}</strong>
-                <span>${asset.description}</span>
-              </div>
-            `).join("")}
-          </div>
-        </aside>
+        
+       
       </div>
     </section>
   `;
