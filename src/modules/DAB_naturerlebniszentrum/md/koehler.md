@@ -4,7 +4,7 @@ Monatelang lebten die Köhler allein im Wald. Sie bewachten ihren glühenden Mei
 
 
 
-![img](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/img/k%C3%B6hler1.jpg)
+!![Köhler am Meiler|Ein Köhler überwacht seinen glühenden Holzkohlemeiler im Wald.|](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/img/k%C3%B6hler1.jpg)
 
 ---
 
@@ -30,7 +30,7 @@ Ab Mitte des 16. Jahrhunderts kamen neben den Meilern **massive Teeröfen** hinz
 
 Das Verhältnis von Einsatz zu Ertrag: Aus einem Raummeter Klobenholz entstanden etwa **120 Kilogramm Holzkohle** und rund  **10 Liter Holzteer** .[^6] Letzterer wurde in einer Rinne aufgefangen. Holzkohle selbst war das mengenmäßig größte Endprodukt – Teer war wertvoll, aber die Kohle war das, worauf alle warteten.
 
-![img](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/img/k%C3%B6hler3.jpg)
+!![Teerofen und Holzkohle|Ein Teerofen mit Holzkohleproduktion in der Forstwirtschaft.|](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/img/k%C3%B6hler3.jpg)
 
 ---
 

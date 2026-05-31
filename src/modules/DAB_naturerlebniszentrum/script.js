@@ -500,8 +500,11 @@ function parseMarkdown(markdown) {
       const parts = figureMatch[1].split("|").map((p) => p.trim());
       const title = parts[0] || "";
       const desc = parts[1] || "";
-      const source = parts[2] || "";
+      let source = parts[2] || "";
       const src = figureMatch[2].trim();
+      if (!source) {
+        source = src;
+      }
       // collect for Abbildungsverzeichnis
       figures.push({ title, src, source });
       html.push(`<figure class="article-figure">

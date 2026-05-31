@@ -2,7 +2,7 @@
 
 Habt ihr schon mal durch eine alte Kirchenfensterscheibe geschaut und bemerkt, dass das Bild leicht verzerrt ist? Das liegt daran, dass das Glas von Hand geblasen wurde – von einem Glasbläser, der mit seinem Atem und einem langen Eisenrohr flüssiges Glas in Form brachte. Heute klingt das wie Magie. Doch hinter diesem Handwerk steckt eine der folgenreichsten Industrien des Mittelalters und der Frühen Neuzeit – eine, die ganze Wälder vernichtete.
 
-!![Glasbläser bei der Arbeit | Ein Glasbläser formt mit dem Blasrohr aus flüssiger Glasmasse ein Gefäß. Die Arbeit musste zügig gehen, bevor das Glas abkühlte und brach. | ](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/img/glasbl%C3%A4ser1.jpg)
+![Glasbläser bei der Arbeit | Ein Glasbläser formt mit dem Blasrohr aus flüssiger Glasmasse ein Gefäß. Die Arbeit musste zügig gehen, bevor das Glas abkühlte und brach. | ](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/img/glasbl%C3%A4ser1.jpg)
 
 ---
 

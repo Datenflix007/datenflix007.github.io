@@ -14,7 +14,7 @@ Der Waidstrauch sieht unscheinbar aus – kleine gelbe Blüten, grüne Blätter.
 
 Das Endprodukt – der **Waidkuchen** – roch entsetzlich, war aber Gold wert. Damit konnten Tuchfärber leuchtend blaue Stoffe herstellen, die von Adligen und Bürgern in ganz Europa begehrt waren.
 
-![img](../img/kiepe2.jpg)
+!![Waidernte in Thüringen|Waidsammler ernten die Blätter der Waidpflanze.|](../img/kiepe2.jpg)
 
 ## Im Jenaer Wald und Umland
 

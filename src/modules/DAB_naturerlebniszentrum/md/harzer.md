@@ -2,7 +2,7 @@
 
 Jeder Baum blutet, wenn man ihn aufschneidet. Die Harzer wussten das – und machten es zu ihrem Beruf. Mit Schnitzmessern und Harzschabern ritzten sie tiefe, schräge Wunden in Kiefern und Tannen, hängten darunter kleine Tontöpfe und warteten. Tropfen für Tropfen sammelte sich das klebrige, goldgelbe Harz. Es roch intensiv nach Nadelwald, nach Wachs und Rauch. Es war eine der ältesten Methoden, dem Wald etwas abzuverlangen – ohne den Baum zu fällen. Und trotzdem starb der Baum dabei.
 
-!![Harzer bei der Arbeit|Harzer ritzt Lachen in Kiefer|](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/img/harzer1.jpg)
+![Harzer bei der Arbeit|Harzer ritzt Lachen in Kiefer|](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/img/harzer1.jpg)
 
 ---
 

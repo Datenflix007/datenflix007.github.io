@@ -4,7 +4,7 @@ Stellt euch vor: Jede Berufsgruppe im Wald produziert etwas – Holzkohle, Glas,
 
 
 
-![img](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/img/h%C3%A4ndler1.jpg)
+!![Händler am Markt|Ein Händler mit Warenkarren handelt auf dem Markt.|](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/img/h%C3%A4ndler1.jpg)
 
 ---
 
