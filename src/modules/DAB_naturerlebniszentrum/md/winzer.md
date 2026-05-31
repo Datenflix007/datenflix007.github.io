@@ -12,15 +12,15 @@ Ein Weinberg braucht das ganze Jahr Pflege. Im Frühling wurden die Rebstöcke *
 
 Die Trauben wurden dann gepresst, der Saft in Fässern gelagert und fermentierte zu Wein. Wein war auch deshalb so wichtig, weil Wasser damals oft verschmutzt und gefährlich zu trinken war – ein Becher Wein war manchmal sicherer als das Brunnenwasser.
 
-!![Winzer bei der Weinlese|Ernte von Trauben auf einem Weinberg.|](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/img/winzer1.jpg)
+![Winzer bei der Weinlese|Ernte von Trauben auf einem Weinberg.|](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/img/winzer1.jpg)
 
-!![Weinbergpflege|Ein Winzer pflegt die Reben im Sommer.|](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/img/winzer2.jpg)
+![Weinbergpflege|Ein Winzer pflegt die Reben im Sommer.|](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/img/winzer2.jpg)
 
-!![Pressen der Trauben|Die Trauben werden zu Most gepresst.|](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/img/winzer3.jpg)
+![Pressen der Trauben|Die Trauben werden zu Most gepresst.|](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/img/winzer3.jpg)
 
-!![Weinfässer im Lager|Lagerung des Weins in Holzfässern.|](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/img/winzer4.jpg)
+![Weinfässer im Lager|Lagerung des Weins in Holzfässern.|](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/img/winzer4.jpg)
 
-!![Saale-Weinberg|Terrassierte Weinberge an der Saale.|](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/img/winzer5.jpg)
+![Saale-Weinberg|Terrassierte Weinberge an der Saale.|](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/img/winzer5.jpg)
 
 ## Im Jenaer Wald und an der Saale
 

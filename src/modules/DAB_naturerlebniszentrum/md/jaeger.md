@@ -55,7 +55,7 @@ Die **Treibjagd** war das Gegenteil der Pirsch: laut, aufwändig, sozial wirksam
 
 Für den Berufsjäger bedeutete die Treibjagd wochenlange Vorbereitung: Wildwechsel erkunden, Schneisen schlagen, Netze setzen, Hunde koordinieren. Den eigentlichen Schuss tat dann oft der Adlige – der Jäger hatte die ganze Arbeit gemacht, ohne den Ruhm zu ernten.
 
-!![Treibjagd mit Netzen|Treiber und Jäger drängen Wild in eine Schusslinie.|](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/img/jaeger3.jpg)
+![Treibjagd mit Netzen|Treiber und Jäger drängen Wild in eine Schusslinie.|](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/img/jaeger3.jpg)
 
 ### Die Beizjagd (Falknerei) – die Kunst der Könige
 
@@ -63,7 +63,7 @@ Noch prestigeträchtiger als die Treibjagd galt die **Beizjagd**: die Jagd mit a
 
 Die Ausbildung eines Falken dauerte Jahre. Nur spezialisierte **Falkner** beherrschten die Kunst. Beizjagd war damit nicht nur eine Jagdform – sie war eine eigene Profession und ein Zeichen höchster Bildung. Wer einen Falken auf der Faust trug, zeigte: Ich gehöre zur obersten Schicht.
 
-!![Beizjagd mit Falken|Ein Falkner und sein Falke bei der Jagd.|](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/img/jaeger4.jpg)
+![Beizjagd mit Falken|Ein Falkner und sein Falke bei der Jagd.|](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/img/jaeger4.jpg)
 
 ### Die Parforce-Jagd – Hetzjagd ohne Gnade
 
@@ -87,7 +87,7 @@ Das Horn – ursprünglich ein echtes Tierhorn, später ein metallenes Instrumen
 
 Nur ausgebildete Berufsjäger beherrschten das volle Repertoire. Wer falsch blies, machte sich vor der Herrschaft lächerlich. Das *Ständebuch* von Jost Amman (1568) – die wichtigste zeitgenössische Dokumentation der Berufsbilder Mitteleuropas – zeigt den Jäger mit dem Jagdhorn als zentralem Erkennungsmerkmal seines Standes.
 
-!![Jagdhornsignale|Ein Jäger bläst das Horn, um auf der Jagd zu signalisieren.|](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/img/jaeger2.jpg)
+![Jagdhornsignale|Ein Jäger bläst das Horn, um auf der Jagd zu signalisieren.|](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/img/jaeger2.jpg)
 
 ---
 
@@ -167,47 +167,47 @@ Das Jagdrecht ist bis heute ein eigenes Rechtsgebiet in Deutschland. Das **Bunde
 ## Literatur
 
 [^1]: Rösener, Werner: Die Geschichte der Jagd. Kultur, Gesellschaft und Jagdwesen im Wandel der Zeit. Düsseldorf 2004, S. 112–115 (Struktur des mittelalterlichen Jagdrechts; hohe und niedere Jagd; ständische Bindung des Jagdprivilegs).
-
+    
 [^2]: Ebd., S. 115–118 (Wildbann als königliches und fürstliches Reservatrecht; Abgrenzung zur niederen Jagd; Entwicklung im Hochmittelalter).
-
+    
 [^3]: Leppin, Volker / Hartzsch, Gerhard: Historische Holzberufe. Hrsg. v. Landesbetrieb Forst Brandenburg. Potsdam 2014, S. 26–28 (Berufsjäger im Dienst des Adels; Aufgaben der Jagdgehilfen; Pflege von Wildbeständen und Jagdhunden).
-
+    
 [^4]: Rösener 2004, S. 141–145 (Treibjagd als aufwändiges höfisches Ereignis; Organisation und Ablauf; logistische Rolle der Berufsjäger).
-
+    
 [^5]: Küster, Hansjörg: Geschichte des Waldes. Von der Urzeit bis zur Gegenwart. München 1998, S. 197–199 (Wildfütterung und Hegepraxis; künstliche Erhaltung von Wildbeständen durch Berufsjäger im Dienst der Herrschaft).
-
+    
 [^6]: Rösener 2004, S. 148–153 (Jagdwerkzeug; Armbrust, Speer, Saufeder; Jagdnetze; Hundehaltung und Rassenentwicklung für verschiedene Jagdformen).
-
+    
 [^7]: Eckardt, Hans Wilhelm: Herrschaftliche Jagd, bäuerliche Not und bürgerliche Kritik. Zur Geschichte der fürstlichen und adligen Jagdprivilegien vornehmlich im südwestdeutschen Raum. Göttingen 1976, S. 45–52 (Wildschaden als systematisches und existenzbedrohendes Problem; Rechtlosigkeit der Bauern gegenüber Wildschäden).
-
+    
 [^8]: Ebd., S. 53–58 (konkrete Beschränkungen der Bauern: Verbot des Jagdrechts, Verbot aktiver Wildabwehr; Wege der Beschwerde).
-
+    
 [^9]: Schreg, Rainer: Kahlschlag? Im Urwald? In: Hirbodian, Sigrid / Scheible, Johanna (Hg.): Wald im Mittelalter. Tübingen 2024, S. 36–62, hier S. 47–48 (Zwölf Artikel 1525; Jagd- und Fischereifreiheit als Bauernforderung; Wald als zentraler sozialer Konfliktraum im Bauernkrieg).
-
+    
 [^10]: Rösener 2004, S. 195–197 (Strafrecht für Wilderei: Handverlust, Blendung, Todesstrafe; regionale Unterschiede in der Strenge; Verschärfung der Strafen im 17. und 18. Jahrhundert).
-
+    
 [^11]: Eckardt 1976, S. 88–93 (Wildschützen als Volkshelden; Grenze zwischen sozialem Widerstand und Kriminalität; Dorfsolidarität gegenüber obrigkeitlicher Verfolgung).
-
+    
 [^12]: Mantel, Kurt: Wald und Forst in der Geschichte. Ein Lehr- und Handbuch. Alfeld/Hannover 1990, S. 176–178 (sozialer Druck auf Jäger; Konflikt zwischen Dienstpflicht gegenüber dem Herrn und Loyalität zur Dorfgemeinschaft).
-
+    
 [^13]: Regnath, R. Johanna: Energie – Werkstoffe – Nahrung. Wald als zentrale Rohstoffquelle der Frühen Neuzeit. In: Hirbodian / Scheible 2024, S. 77–96, hier S. 82–83 (thüringische Jagdreviere der Herzöge von Sachsen-Weimar; Jenaer Waldgebiet als Teil höfischer Jagdorganisation).
-
+    
 [^14]: Eckardt 1976, S. 60–63 (archivalische Belege für Wildschadenbeschwerden im 17. und 18. Jahrhundert; regionale Fallstudien aus Thüringen und Sachsen).
-
+    
 [^15]: Rösener 2004, S. 200–202 (Korruption und Grauzone im Jägerberuf; Bestechung durch Wilderer; unterschiedliches Verhalten der Jäger gegenüber Wilddiebstahl in der Praxis).
-
+    
 [^16]: Ebd., S. 248–252 (Revolution von 1848; Abschaffung des feudalen Jagdrechts in deutschen Staaten; Bindung des Jagdrechts an Grundbesitz; Fortbestehen sozialer Ungleichheit im Pachtrecht).
-
+    
 [^17]: Hasel, Karl / Schwartz, Ekkehard: Forstgeschichte. Ein Grundriss für Studium und Praxis. 3. Aufl. Remagen 2002, S. 312–315 (Bundesjagdgesetz 1952; Regelung von Jagdrecht, Hegeverpflichtung und Wildschadensersatz im modernen Deutschland).
-
+    
 [^18]: Rösener 2004, S. 130–135 (Pirschjagd: Technik, Ausrüstung und soziale Bedeutung; Anforderungen an Geduld und Ortskenntnis; Pirsch als Tugendprüfung für den Adel).
-
+    
 [^19]: Ebd., S. 141–148 (Treibjagd: Organisation und Personalaufwand; Rolle der Berufsjäger bei der Vorbereitung; Machtdemonstration als sozialer Zweck).
-
+    
 [^20]: Ebd., S. 155–165 (Beizjagd/Falknerei: Kosten und Ausbildungsdauer von Falken; Friedrich II. und *De arte venandi cum avibus*; Falkner als Berufsstand; soziale Exklusivität der Beizjagd).
-
+    
 [^21]: Ebd., S. 175–179 (Parforce-Jagd: Ablauf der Hetzjagd; Popularität im Absolutismus; Waldzerstörung und Konflikte mit der Landbevölkerung).
-
+    
 [^22]: Ebd., S. 136–140 (Jagdhorn: Entwicklung vom Tierhorn zum Metallinstrument; Funktion als Kommunikationsmittel und Statussymbol; Hornrufe als Jägersprache).
-
+    
 [^23]: Eckardt 1976, S. 30–32 (Hornrufe und ihre Bedeutungen: Aufbruch, Horrido, Halali, Totschrei; tierartspezifische Fanfaren; Bedeutung des richtigen Blasens für das Ansehen des Jägers).

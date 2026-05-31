@@ -33,7 +33,7 @@ Die Produkte wurden gebraucht für:
 - **Handwerk**: Kolophonium für Streichinstrumenten-Bögen; Pech für Lederbehandlung und Fackeln
 - **Leuchtmittel**: Harzreiches Kiefernholz (Kienspan) brannte besonders hell und wurde in Haushalten und Bergwerken eingesetzt[^7]
 
-!![Lachentopf und Sammlung|Harz tropft in gebrannten Tontopf|](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/img/harzer2.jpg)
+![Lachentopf und Sammlung|Harz tropft in gebrannten Tontopf|](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/img/harzer2.jpg)
 
 !![Harzverarbeitung in der Pechhütte|Erhitzen von Rohpech zur Trennung von Terpentin|](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/img/harzer3.jpg)
 
@@ -111,31 +111,31 @@ Ortsnamen wie **Pechhütte**, **Pechgraben**, **Kienheide** oder **Teerschwele**
 ## Literatur
 
 [^1]: Leppin, Volker / Hartzsch, Gerhard: Historische Holzberufe. Hrsg. v. Landesbetrieb Forst Brandenburg. Potsdam 2014, S. 70–72 (Pechscharrer; Terminologie und regionale Varianten der Harzgewinnung).
-
+    
 [^2]: Küster, Hansjörg: Geschichte des Waldes. Von der Urzeit bis zur Gegenwart. München 1998, S. 183–185 (Harzgewinnung als Raubbauform; Langzeitfolgen für den Baum).
-
+    
 [^3]: Leppin / Hartzsch 2014, S. 72 (soziale Stellung der Harzer; Nähe zu Köhlern und anderen Wanderhandwerkern; Misstrauen der Dorfgemeinschaft).
-
+    
 [^4]: Hasel, Karl / Schwartz, Ekkehard: Forstgeschichte. Ein Grundriss für Studium und Praxis. 3. Aufl. Remagen 2002, S. 98–99 (Technik des Anschärfens; Lachensystem; Rohpechgewinnung).
-
+    
 [^5]: Ebd., S. 99 (Wanderung der Lache am Stamm; Jahrzehnte langer Betrieb pro Baum).
-
+    
 [^6]: Küster 1998, S. 184 (Verarbeitungsschritte in der Pechhütte; Trennung von Terpentin und Kolophonium durch Erhitzen).
-
+    
 [^7]: Regnath, R. Johanna: Energie – Werkstoffe – Nahrung. Wald als zentrale Rohstoffquelle der Frühen Neuzeit. In: Hirbodian, Sigrid / Scheible, Johanna (Hg.): Wald im Mittelalter. Tübingen 2024, S. 77–96, hier S. 85–87 (Pechprodukte: Schiffbau, Heilkunde, Leuchtmittel; Kienspan als Grundleuchtmittel).
-
+    
 [^8]: Schreg, Rainer: Kahlschlag? Im Urwald? In: Hirbodian / Scheible 2024, S. 36–62, hier S. 52 (Harzgewinnung als Waldschädigung; Borkenkäferbefall; Windbruchgefahr gehärzter Bäume).
-
+    
 [^9]: Mantel, Kurt: Wald und Forst in der Geschichte. Ein Lehr- und Handbuch. Alfeld/Hannover 1990, S. 210–212 (Waldordnungen des 16./17. Jahrhunderts; Einschränkungen der Harzgewinnung; Beschränkung auf einschlagreife Bäume).
-
+    
 [^10]: Küster 1998, S. 185–186 (regionale Verbreitung der Harzgewinnung; Thüringen als Randgebiet gegenüber norddeutschen Kieferngebieten; Saaletal als Ausnahme).
-
+    
 [^11]: Regnath in Hirbodian / Scheible 2024, S. 88–89 (regionale Handelsketten für Pech und Terpentin; Abnehmer in Handwerk, Glasmacherei und Schifffahrt).
-
+    
 [^12]: Leppin / Hartzsch 2014, S. 72–73 (Verdacht des Wilddiebstahls; soziale Ausgrenzung; nächtliche Arbeit im Wald als Misstrauensfaktor).
-
+    
 [^13]: Mantel 1990, S. 212–213 (Verleihverträge; Abgabepflichten der Harzer gegenüber Forstkammer oder Landesherrn).
-
+    
 [^14]: Küster 1998, S. 186 (etymologische Anmerkungen zu „Pechvogel"; Alltagssprache als historische Quelle für soziale Verhältnisse).
-
+    
 [^15]: Hasel / Schwartz 2002, S. 100–101 (Verdrängung durch Steinkohlechemie ab dem 19. Jahrhundert; Rückgang der gewerblichen Harzgewinnung in deutschen Territorien).

@@ -14,7 +14,7 @@ Die meisten Holzhauer waren Bauern oder einfache Leute, die den Wald als **Neben
 
 Es gab aber auch organisierte Gruppen:  **Holzhauervereinigungen** , die in Partien von zwei bis vier Mann arbeiteten, und sogenannte **Unternehmensmannschaften** unter einem Holzmeister, der Aufträge der Forstverwaltung abarbeitete.[^3]
 
-!![Holzfäller beim Holztransport|Ein Holzhauer transportiert das gesägte Holz aus dem Wald.|](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/img/holzf%C3%A4ller2.jpg)
+![Holzfäller beim Holztransport|Ein Holzhauer transportiert das gesägte Holz aus dem Wald.|](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/img/holzf%C3%A4ller2.jpg)
 
 ---
 
@@ -32,7 +32,7 @@ Das gefällte Holz wurde für viele Zwecke gebraucht:
 * **Brennholz** für Haushalt, Bäcker, Schmiede und Salinen
 * **Rohstoff für Köhler** (Holzkohle), **Glasmacher** (Brennholz und Asche) und **Gerber** (Lohrinde)
 * **Transportmaterial** : Auf schmalen Waldwegen zogen Fuhrleute mit Pferde- und Ochsengespannen das Holz heraus; schwere Stämme wurden auf Flüssen wie der Saale geflößt[^9]
-* !![Holzstämme und Werkzeuge|Holzstämme liegen bereit, während Werkzeuge zur Weiterverarbeitung bereitstehen.|](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/img/holzf%C3%A4ller3.jpg)
+* ![Holzstämme und Werkzeuge|Holzstämme liegen bereit, während Werkzeuge zur Weiterverarbeitung bereitstehen.|](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/img/holzf%C3%A4ller3.jpg)
 
 ---
 
