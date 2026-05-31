@@ -87,7 +87,7 @@ Das Horn – ursprünglich ein echtes Tierhorn, später ein metallenes Instrumen
 
 Nur ausgebildete Berufsjäger beherrschten das volle Repertoire. Wer falsch blies, machte sich vor der Herrschaft lächerlich. Das *Ständebuch* von Jost Amman (1568) – die wichtigste zeitgenössische Dokumentation der Berufsbilder Mitteleuropas – zeigt den Jäger mit dem Jagdhorn als zentralem Erkennungsmerkmal seines Standes.
 
-![Jagdhornsignale|Ein Jäger bläst das Horn, um auf der Jagd zu signalisieren.|](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/img/jaeger2.jpg)
+![Jagdhornsignale|Ein Jäger bläst das Horn, um auf der Jagd zu signalisieren.|](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/image/jäger2.jpg)
 
 ---
 

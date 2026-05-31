@@ -14,7 +14,7 @@ Die meisten Holzhauer waren Bauern oder einfache Leute, die den Wald als **Neben
 
 Es gab aber auch organisierte Gruppen:  **Holzhauervereinigungen** , die in Partien von zwei bis vier Mann arbeiteten, und sogenannte **Unternehmensmannschaften** unter einem Holzmeister, der Aufträge der Forstverwaltung abarbeitete.[^3]
 
-![Holzfäller beim Holztransport|Ein Holzhauer transportiert das gesägte Holz aus dem Wald.|](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/img/holzf%C3%A4ller2.jpg)
+![Holzfäller schwingt die Axt|Ein Holzhauer schwingt die Axt, um einen Baum zu fällen.|](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/img/holzf%C3%A4ller2.jpg)
 
 ---
 
