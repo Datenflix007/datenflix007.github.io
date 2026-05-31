@@ -2,7 +2,7 @@
 
 Jeder Baum blutet, wenn man ihn aufschneidet. Die Harzer wussten das – und machten es zu ihrem Beruf. Mit Schnitzmessern und Harzschabern ritzten sie tiefe, schräge Wunden in Kiefern und Tannen, hängten darunter kleine Tontöpfe und warteten. Tropfen für Tropfen sammelte sich das klebrige, goldgelbe Harz. Es roch intensiv nach Nadelwald, nach Wachs und Rauch. Es war eine der ältesten Methoden, dem Wald etwas abzuverlangen – ohne den Baum zu fällen. Und trotzdem starb der Baum dabei.
 
-![img](../img/harzer1.jpg)
+![img](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/img/harzer1.jpg)
 
 ---
 
@@ -33,7 +33,17 @@ Die Produkte wurden gebraucht für:
 - **Handwerk**: Kolophonium für Streichinstrumenten-Bögen; Pech für Lederbehandlung und Fackeln
 - **Leuchtmittel**: Harzreiches Kiefernholz (Kienspan) brannte besonders hell und wurde in Haushalten und Bergwerken eingesetzt[^7]
 
-![img](../img/harzer2.jpg)
+![img](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/img/harzer2.jpg)
+
+![harzer3](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/img/harzer3.jpg)
+
+---
+
+## Kurz: Wie wurde Harz gesammelt und wofür wurde es verwendet?
+
+Harz wurde durch gezieltes Aufschneiden der Baumrinde gewonnen (das sogenannte "Anschärfen"). Der Harzer ritzt V-förmige Rillen in den Stamm und befestigt darunter Töpfe oder Behälter, in die das ausfließende Harz tropft. Alle paar Wochen sammelt er das Rohharz ein; später wird es in Pechhütten erhitzt, dabei verdampft Terpentin und das verbleibende Harz wird zu Kolophonium oder Schiffspech verarbeitet.
+
+Verwendungszwecke (kurz): Abdichtung von Schiffen und Holz, Imprägnierung von Seilen und Leder, Leuchtmittel (Kienspan), medizinische Anwendungen (Terpentin) und als Rohstoff für Geigenharz und andere Handwerksprodukte.
 
 ---
 

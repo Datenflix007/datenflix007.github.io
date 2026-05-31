@@ -2,7 +2,7 @@
 
 Ein Schuss aus dem Hinterhalt, eine Schlinge im Dunkel, ein Reh, das niemand gesehen haben will – Wilderei war im Mittelalter weder selten noch moralisch geächtet, wenn man die Bauern fragte. Für Adlige und König war Jagd dagegen ein heiliges Vorrecht, ein Zeichen von Macht und Rang. Zwischen diesen beiden Welten lebte der Jäger: als geduldeter Diener des Adels, als gefürchteter Waldwächter – oder als verfolgter Verbrecher, der nachts Netze aufstellte und am Morgen tat, als wäre nichts gewesen.
 
-![img](../img/jaeger1.jpg)
+![img](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/img/jaeger1.jpg)
 
 ---
 
@@ -55,7 +55,7 @@ Die **Treibjagd** war das Gegenteil der Pirsch: laut, aufwändig, sozial wirksam
 
 Für den Berufsjäger bedeutete die Treibjagd wochenlange Vorbereitung: Wildwechsel erkunden, Schneisen schlagen, Netze setzen, Hunde koordinieren. Den eigentlichen Schuss tat dann oft der Adlige – der Jäger hatte die ganze Arbeit gemacht, ohne den Ruhm zu ernten.
 
-![img](../img/jaeger3.jpg)
+![img](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/img/jaeger3.jpg)
 
 ### Die Beizjagd (Falknerei) – die Kunst der Könige
 
@@ -63,7 +63,7 @@ Noch prestigeträchtiger als die Treibjagd galt die **Beizjagd**: die Jagd mit a
 
 Die Ausbildung eines Falken dauerte Jahre. Nur spezialisierte **Falkner** beherrschten die Kunst. Beizjagd war damit nicht nur eine Jagdform – sie war eine eigene Profession und ein Zeichen höchster Bildung. Wer einen Falken auf der Faust trug, zeigte: Ich gehöre zur obersten Schicht.
 
-![img](../img/jaeger4.jpg)
+![img](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/img/jaeger4.jpg)
 
 ### Die Parforce-Jagd – Hetzjagd ohne Gnade
 
@@ -87,7 +87,7 @@ Das Horn – ursprünglich ein echtes Tierhorn, später ein metallenes Instrumen
 
 Nur ausgebildete Berufsjäger beherrschten das volle Repertoire. Wer falsch blies, machte sich vor der Herrschaft lächerlich. Das *Ständebuch* von Jost Amman (1568) – die wichtigste zeitgenössische Dokumentation der Berufsbilder Mitteleuropas – zeigt den Jäger mit dem Jagdhorn als zentralem Erkennungsmerkmal seines Standes.
 
-![img](../img/jaeger2.png)
+![img](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/img/jaeger2.jpg)
 
 ---
 
