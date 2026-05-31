@@ -37,7 +37,57 @@ Je nach Jagdform nutzte der Jäger verschiedene Mittel:
 - **Jagdnetze**: große Treibnetze, die Wild in bestimmte Abschnitte drängten
 - **Jagdhunde**: speziell gezüchtete Rassen für unterschiedliche Aufgaben – Hetzhunde, Spurhunde, Vorstehhunde[^6]
 
-![img](../img/jaeger2.jpg)
+---
+
+## Jagdformen: vom stillen Anschleichen bis zur Hetzjagd zu Pferd
+
+Jagd war nicht gleich Jagd. Je nach Tierart, sozialem Stand und Saison gab es grundlegend verschiedene Jagdformen, die unterschiedliches Personal, unterschiedliche Ausrüstung und unterschiedliche Vorbereitungszeit verlangten.
+
+### Die Pirschjagd – der stille Einzelne
+
+Die **Pirschjagd** (von mittelhochdeutsch *birsen*, anschleichen) war die älteste und technisch anspruchsvollste Form: Ein einzelner Jäger oder eine kleine Gruppe schlich sich im Schutz von Büschen und Geländekuppen an das Wild heran.[^18] Sie verlangte tiefes Wissen über Tierverhalten, Windrichtung und jedes Geräusch im Wald – und vor allem Geduld.
+
+Für den Berufsjäger war die Pirsch Alltagsarbeit. Für den Adligen war sie eine Tugendprobe: Ein Fürst, der in der Pirsch versagte, stand schlechter da als einer, der beim höfischen Bankett trank.
+
+### Die Treibjagd – das Spektakel der Herrschaft
+
+Die **Treibjagd** war das Gegenteil der Pirsch: laut, aufwändig, sozial wirksam. Dutzende, manchmal Hunderte von Treibern drängten das Wild auf Schusslinien oder in Netzkorridore, wo der Adel wartete.[^19] Nicht die Jagdkunst des Einzelnen stand im Vordergrund, sondern die Machtdemonstration: Wer so viel Personal aufbieten konnte, der war reich und mächtig.
+
+Für den Berufsjäger bedeutete die Treibjagd wochenlange Vorbereitung: Wildwechsel erkunden, Schneisen schlagen, Netze setzen, Hunde koordinieren. Den eigentlichen Schuss tat dann oft der Adlige – der Jäger hatte die ganze Arbeit gemacht, ohne den Ruhm zu ernten.
+
+![img](../img/jaeger3.jpg)
+
+### Die Beizjagd (Falknerei) – die Kunst der Könige
+
+Noch prestigeträchtiger als die Treibjagd galt die **Beizjagd**: die Jagd mit abgerichteten Greifvögeln – Falken, Habichten und Adlern.[^20] Ein gut abgerichteter Jagdfalke kostete im Mittelalter mehr als ein Pferd. Kaiser Friedrich II. verfasste im 13. Jahrhundert mit *De arte venandi cum avibus* (Über die Kunst, mit Vögeln zu jagen) das erste große wissenschaftliche Werk über Falknerei in Europa – ein Zeichen, wie hoch das Ansehen dieser Jagdform war.
+
+Die Ausbildung eines Falken dauerte Jahre. Nur spezialisierte **Falkner** beherrschten die Kunst. Beizjagd war damit nicht nur eine Jagdform – sie war eine eigene Profession und ein Zeichen höchster Bildung. Wer einen Falken auf der Faust trug, zeigte: Ich gehöre zur obersten Schicht.
+
+![img](../img/jaeger4.jpg)
+
+### Die Parforce-Jagd – Hetzjagd ohne Gnade
+
+Bei der **Parforce-Jagd** (von französisch *par force*, durch Kraft) wurde ein einzelner Hirsch von einem Hunderudel und Reitern so lange gejagt, bis er vor Erschöpfung zusammenbrach.[^21] Diese Form war bei absolutistischen Herrschern des 17. und 18. Jahrhunderts beliebt – spektakulär und schnell.
+
+Für den Wald war die Parforce-Jagd verheerend: Reiter und Hunde durchbrachen rücksichtslos Jungwuchs und Feldflächen. Für die Bauern, deren Äcker die Reiter querten, gab es keine Entschädigung.
+
+---
+
+## Das Jagdhorn: Signal, Sprache und Statussymbol
+
+Kein Gegenstand war so eng mit dem Berufsbild des Jägers verbunden wie das **Jagdhorn**. Es war Kommunikationsmittel, Statussymbol und akustische Sprache in einem.[^22]
+
+Das Horn – ursprünglich ein echtes Tierhorn, später ein metallenes Instrument – war das Hauptverständigungsmittel auf jeder größeren Jagd. Unterschiedliche **Hornrufe** (auch *Jägersprache* genannt) signalisierten präzise Situationen:
+
+- **Aufbruch**: Der Jagdzug setzt sich in Bewegung
+- **Horrido**: Wild ist gesichtet
+- **Halali**: Das Wild ist gestellt oder erlegt
+- **Totschrei**: Das Wild ist gefallen, die Jagd beendet
+- **Tierart-Fanfare**: Je nach Wildart unterschiedliche Rufe – Hirsch, Sau und Fuchs hatten je eigene Töne[^23]
+
+Nur ausgebildete Berufsjäger beherrschten das volle Repertoire. Wer falsch blies, machte sich vor der Herrschaft lächerlich. Das *Ständebuch* von Jost Amman (1568) – die wichtigste zeitgenössische Dokumentation der Berufsbilder Mitteleuropas – zeigt den Jäger mit dem Jagdhorn als zentralem Erkennungsmerkmal seines Standes.
+
+![img](../img/jaeger2.png)
 
 ---
 
@@ -106,6 +156,10 @@ Das Jagdrecht ist bis heute ein eigenes Rechtsgebiet in Deutschland. Das **Bunde
 * [Zwölf Artikel – Wikipedia](https://de.wikipedia.org/wiki/Zw%C3%B6lf_Artikel): Die Forderungen des deutschen Bauernaufstands von 1525 – Jagd und Wald als Streitpunkte
 * [Hohe Jagd – Wikipedia](https://de.wikipedia.org/wiki/Hohe_Jagd): Was ist die hohe Jagd, und wer durfte sie ausüben?
 * [Jagdhund – Wikipedia](https://de.wikipedia.org/wiki/Jagdhund): Rassen und historische Aufgaben der Jagdhunde
+* [Jagdhorn – Wikipedia](https://de.wikipedia.org/wiki/Jagdhorn): Geschichte und Bedeutung des Jagdhorns – von der akustischen Signalgebung zum Statussymbol
+* [Falknerei – Wikipedia](https://de.wikipedia.org/wiki/Falknerei): Beizjagd als immaterielles Weltkulturerbe der UNESCO
+* [Pirschjagd – Wikipedia](https://de.wikipedia.org/wiki/Pirsch): Die älteste und technisch schwierigste Jagdform
+* [Parforce-Jagd – Wikipedia](https://de.wikipedia.org/wiki/Parforcejagd): Hetzjagd zu Pferd und ihre Geschichte in Deutschland
 * [Thüringer Landesmuseum Heidecksburg Rudolstadt](https://www.heidecksburg.de/): Thüringische Hof- und Jagdgeschichte mit historischen Sammlungen zur herzoglichen Jagd
 
 ---
@@ -145,3 +199,15 @@ Das Jagdrecht ist bis heute ein eigenes Rechtsgebiet in Deutschland. Das **Bunde
 [^16]: Ebd., S. 248–252 (Revolution von 1848; Abschaffung des feudalen Jagdrechts in deutschen Staaten; Bindung des Jagdrechts an Grundbesitz; Fortbestehen sozialer Ungleichheit im Pachtrecht).
 
 [^17]: Hasel, Karl / Schwartz, Ekkehard: Forstgeschichte. Ein Grundriss für Studium und Praxis. 3. Aufl. Remagen 2002, S. 312–315 (Bundesjagdgesetz 1952; Regelung von Jagdrecht, Hegeverpflichtung und Wildschadensersatz im modernen Deutschland).
+
+[^18]: Rösener 2004, S. 130–135 (Pirschjagd: Technik, Ausrüstung und soziale Bedeutung; Anforderungen an Geduld und Ortskenntnis; Pirsch als Tugendprüfung für den Adel).
+
+[^19]: Ebd., S. 141–148 (Treibjagd: Organisation und Personalaufwand; Rolle der Berufsjäger bei der Vorbereitung; Machtdemonstration als sozialer Zweck).
+
+[^20]: Ebd., S. 155–165 (Beizjagd/Falknerei: Kosten und Ausbildungsdauer von Falken; Friedrich II. und *De arte venandi cum avibus*; Falkner als Berufsstand; soziale Exklusivität der Beizjagd).
+
+[^21]: Ebd., S. 175–179 (Parforce-Jagd: Ablauf der Hetzjagd; Popularität im Absolutismus; Waldzerstörung und Konflikte mit der Landbevölkerung).
+
+[^22]: Ebd., S. 136–140 (Jagdhorn: Entwicklung vom Tierhorn zum Metallinstrument; Funktion als Kommunikationsmittel und Statussymbol; Hornrufe als Jägersprache).
+
+[^23]: Eckardt 1976, S. 30–32 (Hornrufe und ihre Bedeutungen: Aufbruch, Horrido, Halali, Totschrei; tierartspezifische Fanfaren; Bedeutung des richtigen Blasens für das Ansehen des Jägers).
