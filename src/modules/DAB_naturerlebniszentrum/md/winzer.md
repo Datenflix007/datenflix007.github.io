@@ -16,9 +16,9 @@ Die Trauben wurden dann gepresst, der Saft in Fässern gelagert und fermentierte
 
 ![Weinbergpflege|Ein Winzer pflegt die Reben im Sommer.|](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/img/winzer2.jpg)
 
-![Pressen der Trauben|Die Trauben werden zu Most gepresst.|](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/img/winzer3.jpg)
+![Weinbergernte|Ein Winzer erntet die Reben.|](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/img/winzer3.jpg)
 
-![Weinfässer im Lager|Lagerung des Weins in Holzfässern.|](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/img/winzer4.jpg)
+![Pressen der Trauben|Die Trauben werden zu Most gepresst.|](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/img/winzer4.jpg)
 
 ![Winzer mit Korb auf dem Rücken| https://upload.wikimedia.org/wikipedia/commons/4/48/Fotothek_df_ps_0001927_Landschaften_%5E_H%C3%BCgellandschaften_-_Gebirgslandschaften_%5E.jpg](https://github.com/Datenflix007/datenflix007.github.io/raw/main/src/modules/DAB_naturerlebniszentrum/img/winzer5.jpg)
 
