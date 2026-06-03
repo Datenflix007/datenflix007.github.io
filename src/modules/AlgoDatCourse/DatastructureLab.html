@@ -699,6 +699,10 @@ class BinomialHeap {
   // Make y a child of z (caller ensures z.key ≤ y.key)
   _link(y, z) { z.children.push(y); z.degree++; }
 
+  _better(a, b) { return a < b; }  // true → a is the better root (min-heap)
+  _topLabel() { return 'Minimum'; }
+  _typeName()  { return 'BinomialHeap'; }
+
   // Union two root-arrays (indexed by degree) into one
   _union(a, b) {
     const len = Math.max(a.length, b.length) + 1;
@@ -714,8 +718,8 @@ class BinomialHeap {
       else {
         res[k] = ts.length === 3 ? ts[0] : null;
         const [t1, t2] = ts.length === 3 ? ts.slice(1) : ts;
-        if (t1.key <= t2.key) { _log(`B<sub>${k}</sub>+B<sub>${k}</sub>→B<sub>${k+1}</sub>: <b>${t2.key}</b> wird Kind von <b>${t1.key}</b> (${t1.key}≤${t2.key})`); this._link(t2, t1); carry = t1; }
-        else                  { _log(`B<sub>${k}</sub>+B<sub>${k}</sub>→B<sub>${k+1}</sub>: <b>${t1.key}</b> wird Kind von <b>${t2.key}</b> (${t2.key}<${t1.key})`); this._link(t1, t2); carry = t2; }
+        if (!this._better(t2.key, t1.key)) { _log(`B<sub>${k}</sub>+B<sub>${k}</sub>→B<sub>${k+1}</sub>: <b>${t2.key}</b> wird Kind von <b>${t1.key}</b>`); this._link(t2, t1); carry = t1; }
+        else                               { _log(`B<sub>${k}</sub>+B<sub>${k}</sub>→B<sub>${k+1}</sub>: <b>${t1.key}</b> wird Kind von <b>${t2.key}</b>`); this._link(t1, t2); carry = t2; }
       }
     }
     while (res.length && !res[res.length - 1]) res.pop();
@@ -731,7 +735,7 @@ class BinomialHeap {
   peek() {
     let min = null;
     for (const r of this.roots)
-      if (r && (min === null || r.key < min.key)) min = r;
+      if (r && (min === null || this._better(r.key, min.key))) min = r;
     return min ? { key: min.key, value: min.value } : null;
   }
 
@@ -739,9 +743,9 @@ class BinomialHeap {
     if (!this.roots.length) return null;
     let mi = -1;
     for (let i = 0; i < this.roots.length; i++)
-      if (this.roots[i] && (mi < 0 || this.roots[i].key < this.roots[mi].key)) mi = i;
+      if (this.roots[i] && (mi < 0 || this._better(this.roots[i].key, this.roots[mi].key))) mi = i;
     const minNode = this.roots[mi];
-    _log(`Minimum <b>${minNode.key}</b> in B<sub>${mi}</sub> gefunden und entfernt`);
+    _log(`${this._topLabel()} <b>${minNode.key}</b> in B<sub>${mi}</sub> gefunden und entfernt`);
     if (minNode.children.length)
       _log(`${minNode.children.length} Kinder [<b>${minNode.children.map(c=>c.key).join(', ')}</b>] werden neue Wurzeln → Union`);
     else
@@ -808,11 +812,25 @@ class BinomialHeap {
   size()    { return this._cnt; }
 
   toJSON() {
-    return { type: 'BinomialHeap', nodes: this._allNodes().map(({ key: k, value: v }) => ({ k, v })) };
+    return { type: this._typeName(), nodes: this._allNodes().map(({ key: k, value: v }) => ({ k, v })) };
   }
 
   static fromJSON(d) {
     const h = new BinomialHeap();
+    for (const { k, v } of (d.nodes || [])) h.insert(Number(k), v);
+    return h;
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  MAX BINOMIAL HEAP
+// ══════════════════════════════════════════════════════════════
+class MaxBinomialHeap extends BinomialHeap {
+  _better(a, b) { return a > b; }
+  _topLabel() { return 'Maximum'; }
+  _typeName()  { return 'MaxBinomialHeap'; }
+  static fromJSON(d) {
+    const h = new MaxBinomialHeap();
     for (const { k, v } of (d.nodes || [])) h.insert(Number(k), v);
     return h;
   }
@@ -828,6 +846,11 @@ class FibHeap {
     this._idSeq = 0;
   }
 
+  _better(a, b) { return a < b; }  // true → a is the better root (min-heap)
+  _topLabel() { return 'Minimum'; }
+  _cmpSign()  { return '<'; }
+  _typeName()  { return 'FibHeap'; }
+
   _node(key, value) {
     const n = { key, value, degree: 0, mark: false, parent: null, child: null, _id: this._idSeq++ };
     n.left = n; n.right = n;
@@ -841,7 +864,7 @@ class FibHeap {
       const last = this.min.left;
       last.right = n;  n.left = last;
       n.right = this.min; this.min.left = n;
-      if (n.key < this.min.key) this.min = n;
+      if (this._better(n.key, this.min.key)) this.min = n;
     }
   }
 
@@ -871,7 +894,7 @@ class FibHeap {
     const tl = this.min.left, ol = other.min.left;
     tl.right = other.min; other.min.left = tl;
     ol.right = this.min;  this.min.left  = ol;
-    if (other.min.key < this.min.key) { _log(`Neues Minimum: <b>${other.min.key}</b>`); this.min = other.min; }
+    if (this._better(other.min.key, this.min.key)) { _log(`Neues ${this._topLabel()}: <b>${other.min.key}</b>`); this.min = other.min; }
     this._size += other._size;
     other.min = null; other._size = 0;
   }
@@ -880,7 +903,7 @@ class FibHeap {
     const z = this.min; if (!z) return null;
     if (z.child) {
       const ch = this._listArr(z.child);
-      _log(`Minimum <b>${z.key}</b> entfernt; ${ch.length} Kind${ch.length>1?'er':''} [<b>${ch.map(c=>c.key).join(', ')}</b>] in Wurzelliste verschoben`);
+      _log(`${this._topLabel()} <b>${z.key}</b> entfernt; ${ch.length} Kind${ch.length>1?'er':''} [<b>${ch.map(c=>c.key).join(', ')}</b>] in Wurzelliste verschoben`);
       for (const c of ch) { c.parent = null; c.mark = false; }
       const first = z.child, last = z.child.left;
       const prevZ = z.left;
@@ -888,7 +911,7 @@ class FibHeap {
       last.right  = z;     z.left     = last;
       z.child = null;
     } else {
-      _log(`Minimum <b>${z.key}</b> entfernt (keine Kinder)`);
+      _log(`${this._topLabel()} <b>${z.key}</b> entfernt (keine Kinder)`);
     }
     z.left.right = z.right; z.right.left = z.left;
     const res = { key: z.key, value: z.value };
@@ -906,7 +929,7 @@ class FibHeap {
       let d = w.degree;
       while (A[d]) {
         let y = A[d];
-        if (w.key > y.key) { [w, y] = [y, w]; }
+        if (this._better(y.key, w.key)) { [w, y] = [y, w]; }
         _log(`Grad ${d}: <b>${w.key}</b> und <b>${y.key}</b> → <b>${y.key}</b> wird Kind von <b>${w.key}</b> (Grad ${d+1})`);
         this._link(y, w);
         A[d++] = undefined;
@@ -934,16 +957,16 @@ class FibHeap {
 
   decreaseKey(oldKey, newKey) {
     const n = this._findNode(oldKey);
-    if (!n || newKey > n.key) return false;
+    if (!n || this._better(n.key, newKey)) return false;
     n.key = newKey;
     const p = n.parent;
-    if (p && n.key < p.key) {
-      _log(`Heap-Eigenschaft verletzt: <b>${newKey}</b> < Elter <b>${p.key}</b> → Schnitt von <b>${newKey}</b>`);
+    if (p && this._better(n.key, p.key)) {
+      _log(`Heap-Eigenschaft verletzt: <b>${newKey}</b> ${this._cmpSign()} Elter <b>${p.key}</b> → Schnitt von <b>${newKey}</b>`);
       this._cut(n, p); this._cascadingCut(p);
     } else {
       _log(`Heap-Eigenschaft OK (<b>${newKey}</b>${p?` ≥ Elter <b>${p.key}</b>` : ', Wurzel'}) → kein Schnitt`);
     }
-    if (n.key < this.min.key) { _log(`Neues Minimum: <b>${n.key}</b>`); this.min = n; }
+    if (this._better(n.key, this.min.key)) { _log(`Neues ${this._topLabel()}: <b>${n.key}</b>`); this.min = n; }
     return true;
   }
 
@@ -1008,9 +1031,24 @@ class FibHeap {
   isEmpty() { return this._size === 0; }
   size()    { return this._size; }
 
-  toJSON() { return { type: 'FibHeap', nodes: this._allNodes().map(({ key: k, value: v }) => ({ k, v })) }; }
+  toJSON() { return { type: this._typeName(), nodes: this._allNodes().map(({ key: k, value: v }) => ({ k, v })) }; }
   static fromJSON(d) {
     const h = new FibHeap();
+    for (const { k, v } of (d.nodes || [])) h.insert(Number(k), v);
+    return h;
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  MAX FIBONACCI HEAP
+// ══════════════════════════════════════════════════════════════
+class MaxFibHeap extends FibHeap {
+  _better(a, b) { return a > b; }
+  _topLabel() { return 'Maximum'; }
+  _cmpSign()  { return '>'; }
+  _typeName()  { return 'MaxFibHeap'; }
+  static fromJSON(d) {
+    const h = new MaxFibHeap();
     for (const { k, v } of (d.nodes || [])) h.insert(Number(k), v);
     return h;
   }
@@ -1317,6 +1355,19 @@ PSEUDOCODE.MaxHeap = {
   extractTop: { ...PSEUDOCODE.MinHeap.extractTop, title: 'MaxHeap-Extract-Max' },
   delete:     { ...PSEUDOCODE.MinHeap.delete,     title: 'MaxHeap-Delete'      },
 };
+PSEUDOCODE.MaxBinomialHeap = {
+  insert:     { ...PSEUDOCODE.BinomialHeap.insert,     title: 'MaxBinomial-Insert'      },
+  extractMin: { ...PSEUDOCODE.BinomialHeap.extractMin, title: 'MaxBinomial-Extract-Max' },
+  merge:      { ...PSEUDOCODE.BinomialHeap.merge,      title: 'MaxBinomial-Merge'       },
+  delete:     { ...PSEUDOCODE.BinomialHeap.delete,     title: 'MaxBinomial-Delete'      },
+};
+PSEUDOCODE.MaxFibHeap = {
+  insert:      { ...PSEUDOCODE.FibHeap.insert,      title: 'MaxFib-Insert'        },
+  extractMin:  { ...PSEUDOCODE.FibHeap.extractMin,  title: 'MaxFib-Extract-Max'   },
+  decreaseKey: { ...PSEUDOCODE.FibHeap.decreaseKey, title: 'MaxFib-Increase-Key'  },
+  merge:       { ...PSEUDOCODE.FibHeap.merge,        title: 'MaxFib-Merge'         },
+  delete:      { ...PSEUDOCODE.FibHeap.delete,       title: 'MaxFib-Delete'        },
+};
 
 // ══════════════════════════════════════════════════════════════
 //  PSEUDO PANEL – ENGINE
@@ -1448,9 +1499,9 @@ const LEVELH = 100;
 function computeLayout() {
   const W = canvas.width;
   if (!structure || structure.isEmpty()) return { nodes:[], edges:[], nilNodes:[] };
-  if (structType === 'RBTree')        return layoutRBTree(W);
-  if (structType === 'BinomialHeap')  return layoutBinomialHeap(W);
-  if (structType === 'FibHeap')       return layoutFibHeap(W);
+  if (structType === 'RBTree')                                               return layoutRBTree(W);
+  if (structType === 'BinomialHeap' || structType === 'MaxBinomialHeap')    return layoutBinomialHeap(W);
+  if (structType === 'FibHeap'      || structType === 'MaxFibHeap')         return layoutFibHeap(W);
   return layoutHeap(W);
 }
 
@@ -1492,7 +1543,7 @@ function layoutBinomialHeap(W) {
 
   const minNode = (() => {
     let m = null;
-    for (const r of structure.roots) if (r && (!m || r.key < m.key)) m = r;
+    for (const r of structure.roots) if (r && (!m || structure._better(r.key, m.key))) m = r;
     return m;
   })();
 
@@ -2010,10 +2061,12 @@ function buildOpsMenu() {
   drop.innerHTML='';
   document.getElementById('structBadge').textContent=structType;
 
-  const isRBT   = structType === 'RBTree';
-  const isBinom = structType === 'BinomialHeap';
-  const isFib   = structType === 'FibHeap';
-  const isMin   = structType === 'MinHeap';
+  const isRBT      = structType === 'RBTree';
+  const isBinom    = structType === 'BinomialHeap' || structType === 'MaxBinomialHeap';
+  const isFib      = structType === 'FibHeap' || structType === 'MaxFibHeap';
+  const isMin      = structType === 'MinHeap';
+  const isMaxBinom = structType === 'MaxBinomialHeap';
+  const isMaxFib   = structType === 'MaxFibHeap';
   btn.textContent = isRBT ? 'DICTIONARY' : 'HEAP';
 
   const items = isRBT ? [
@@ -2029,24 +2082,24 @@ function buildOpsMenu() {
     ['🟡  greaterThan', () => cmdCount(true)],
     ['🟡  lessThan',    () => cmdCount(false)],
   ] : isBinom ? [
-    ['➕  Insert',       cmdInsert],
-    ['⬇  Extract Min',  cmdExtract],
-    ['⬇  Peek Min',     cmdPeek],
+    ['➕  Insert',                                                  cmdInsert],
+    [isMaxBinom ? '⬆  Extract Max' : '⬇  Extract Min',            cmdExtract],
+    [isMaxBinom ? '⬆  Peek Max'    : '⬇  Peek Min',               cmdPeek],
     null,
     ['🔍  Search',       cmdSearch],
     ['❌  Delete',       cmdDelete],
     null,
     ['🔗  Merge',        cmdMerge],
   ] : isFib ? [
-    ['➕  Insert',         cmdInsert],
-    ['⬇  Extract Min',    cmdExtract],
-    ['⬇  Peek Min',       cmdPeek],
+    ['➕  Insert',                                                  cmdInsert],
+    [isMaxFib ? '⬆  Extract Max'    : '⬇  Extract Min',           cmdExtract],
+    [isMaxFib ? '⬆  Peek Max'       : '⬇  Peek Min',              cmdPeek],
     null,
-    ['🔍  Search',         cmdSearch],
-    ['❌  Delete',         cmdDelete],
-    ['🔽  Decrease Key',   cmdDecreaseKey],
+    ['🔍  Search',                                                  cmdSearch],
+    ['❌  Delete',                                                  cmdDelete],
+    [isMaxFib ? '🔼  Increase Key'  : '🔽  Decrease Key',         cmdDecreaseKey],
     null,
-    ['🔗  Merge',          cmdMerge],
+    ['🔗  Merge',                                                   cmdMerge],
   ] : [
     ['➕  Insert',                              cmdInsert],
     [isMin ? '⬇  Extract Min' : '⬆  Extract Max', cmdExtract],
@@ -2197,26 +2250,31 @@ function cmdCount(isGreater) {
 
 function cmdDecreaseKey() {
   if (!need()) return;
-  showDialog('Decrease Key', `
+  const isMax = structType === 'MaxFibHeap';
+  const dlgTitle = isMax ? 'Increase Key' : 'Decrease Key';
+  const hint     = isMax ? 'muss größer sein' : 'muss kleiner sein';
+  showDialog(dlgTitle, `
     <div class="dialog-field">
       <label>Aktueller Key</label>
       <input type="number" id="_dk" step="1">
     </div>
     <div class="dialog-field">
-      <label>Neuer Key (muss kleiner sein)</label>
+      <label>Neuer Key (${hint})</label>
       <input type="number" id="_nk" step="1">
     </div>`, () => {
     const oldK = parseInt(document.getElementById('_dk').value);
     const newK = parseInt(document.getElementById('_nk').value);
     if (isNaN(oldK) || isNaN(newK)) return;
-    if (newK >= oldK) { setStatus('⚠ Neuer Key muss kleiner als alter Key sein'); return; }
+    if (isMax ? newK <= oldK : newK >= oldK) {
+      setStatus(`⚠ Neuer Key muss ${isMax ? 'größer' : 'kleiner'} als alter Key sein`); return;
+    }
     highlighted.clear();
-    _startLog(`FibHeap — DecreaseKey(${oldK} → ${newK})`, 'decreaseKey');
+    _startLog(`${structType} — ${isMax ? 'IncreaseKey' : 'DecreaseKey'}(${oldK} → ${newK})`, 'decreaseKey');
     if (structure.decreaseKey(oldK, newK)) {
       const ln = layout.nodes.find(n => n.key === newK);
       if (ln) highlighted.add(ln.id);
       _endLog();
-      setStatus(`✓ Decrease Key: ${oldK} → ${newK}`);
+      setStatus(`✓ ${isMax ? 'Increase' : 'Decrease'} Key: ${oldK} → ${newK}`);
     } else {
       _endLog();
       setStatus(`✗ Key ${oldK} nicht gefunden`);
@@ -2235,7 +2293,10 @@ function cmdMerge() {
     const keys = document.getElementById('_mk').value
                    .split(/[\s,]+/).map(Number).filter(n => !isNaN(n) && Number.isInteger(n));
     if (!keys.length) return;
-    const other = structure instanceof FibHeap ? new FibHeap() : new BinomialHeap();
+    const other = structure instanceof MaxFibHeap     ? new MaxFibHeap()     :
+                  structure instanceof FibHeap         ? new FibHeap()         :
+                  structure instanceof MaxBinomialHeap ? new MaxBinomialHeap() :
+                                                         new BinomialHeap();
     keys.forEach(k => other.insert(k, 'Value_' + k));
     _startLog(`${structType} — Merge (${keys.length} Knoten: ${keys.join(', ')})`, 'merge');
     structure.merge(other);
@@ -2249,7 +2310,8 @@ function cmdMerge() {
 function cmdExtract() {
   if (!need()) return; highlighted.clear();
   const _exOp = (structure instanceof BinomialHeap || structure instanceof FibHeap) ? 'extractMin' : 'extractTop';
-  _startLog(`${structType} — Extract ${structType === 'MaxHeap' ? 'Max' : 'Min'}`, _exOp);
+  const isMaxType = structType === 'MaxHeap' || structType === 'MaxBinomialHeap' || structType === 'MaxFibHeap';
+  _startLog(`${structType} — Extract ${isMaxType ? 'Max' : 'Min'}`, _exOp);
   const r = (structure instanceof BinomialHeap || structure instanceof FibHeap) ? structure.extractMin() : structure.extractTop();
   _endLog();
   setStatus(r ? `✓ Extracted: <b>${r.key}</b> → ${r.value}` : 'Heap ist leer');
@@ -2263,7 +2325,7 @@ function cmdPeek() {
       ? (layout.nodes.find(n => n.key === r.key)?.id ?? -1)
       : 0;
     if (id >= 0) highlighted.add(id);
-    const label = structType === 'MaxHeap' ? 'Max' : 'Min';
+    const label = (structType === 'MaxHeap' || structType === 'MaxBinomialHeap' || structType === 'MaxFibHeap') ? 'Max' : 'Min';
     setStatus(`${label}: <b>${r.key}</b> → ${r.value}`);
   } else setStatus('Heap ist leer');
 }
@@ -2272,11 +2334,13 @@ function cmdPeek() {
 //  FILE OPERATIONS
 // ══════════════════════════════════════════════════════════════
 function cmdNew() {
-  let chosen='RBTree';
-  window._pickTile=t=>{
-    chosen=t;
-    document.querySelectorAll('.struct-tile').forEach(el=>el.classList.remove('selected'));
-    document.getElementById('tile-'+t).classList.add('selected');
+  let chosen = 'RBTree';
+  window._pickTile = t => {
+    chosen = t;
+    document.querySelectorAll('.struct-tile').forEach(el => el.classList.remove('selected'));
+    document.getElementById('tile-' + t).classList.add('selected');
+    const heapRow = document.getElementById('_heapTypeRow');
+    if (heapRow) heapRow.style.display = (t !== 'RBTree') ? '' : 'none';
   };
 
   showDialog('Neue Struktur', `
@@ -2286,11 +2350,8 @@ function cmdNew() {
         <div class="struct-tile selected" id="tile-RBTree" onclick="_pickTile('RBTree')">
           <div class="tile-icon">🌳</div><div class="tile-name">RBTree</div>
         </div>
-        <div class="struct-tile" id="tile-MinHeap" onclick="_pickTile('MinHeap')">
-          <div class="tile-icon">⬇</div><div class="tile-name">MinHeap</div>
-        </div>
-        <div class="struct-tile" id="tile-MaxHeap" onclick="_pickTile('MaxHeap')">
-          <div class="tile-icon">⬆</div><div class="tile-name">MaxHeap</div>
+        <div class="struct-tile" id="tile-Heap" onclick="_pickTile('Heap')">
+          <div class="tile-icon">⬆⬇</div><div class="tile-name">Heap</div>
         </div>
         <div class="struct-tile" id="tile-BinomialHeap" onclick="_pickTile('BinomialHeap')">
           <div class="tile-icon">🔗</div><div class="tile-name">BinomialHeap</div>
@@ -2299,6 +2360,13 @@ function cmdNew() {
           <div class="tile-icon">🌀</div><div class="tile-name">FibHeap</div>
         </div>
       </div>
+    </div>
+    <div class="dialog-field" id="_heapTypeRow" style="display:none">
+      <label>Heap-Typ</label>
+      <select id="_heapType">
+        <option value="max" selected>MaxHeap – größter Key an der Wurzel</option>
+        <option value="min">MinHeap – kleinster Key an der Wurzel</option>
+      </select>
     </div>
     <div class="dialog-field">
       <label>Beispielwerte</label>
@@ -2313,7 +2381,9 @@ function cmdNew() {
         </optgroup>
       </select>
     </div>`, () => {
-    const smp=document.getElementById('_smp').value;
+    const smp      = document.getElementById('_smp').value;
+    const heapType = document.getElementById('_heapType').value; // 'max' | 'min'
+    const isMax    = heapType === 'max';
     const SMALL=[10,5,15,3,8,12,20];
     const MED  =[15,10,20,8,12,17,25,5,11,14,16,22,27];
     const rawKeys =
@@ -2323,12 +2393,21 @@ function cmdNew() {
       smp==='git'  ? SAMPLE_GIT   :
       smp==='prime'? SAMPLE_PRIME : [];
     _dataMode = smp==='hist' ? 'hist' : smp==='git' ? 'git' : 'default';
-    structType = chosen; highlighted.clear(); wobble.clear();
-    if      (structType === 'MinHeap')      structure = new MinHeap();
-    else if (structType === 'MaxHeap')      structure = new MaxHeap();
-    else if (structType === 'BinomialHeap') structure = new BinomialHeap();
-    else if (structType === 'FibHeap')      structure = new FibHeap();
-    else                                    structure = new RBTree();
+
+    if      (chosen === 'RBTree')       structType = 'RBTree';
+    else if (chosen === 'Heap')         structType = isMax ? 'MaxHeap' : 'MinHeap';
+    else if (chosen === 'BinomialHeap') structType = isMax ? 'MaxBinomialHeap' : 'BinomialHeap';
+    else if (chosen === 'FibHeap')      structType = isMax ? 'MaxFibHeap' : 'FibHeap';
+
+    highlighted.clear(); wobble.clear();
+    if      (structType === 'MinHeap')         structure = new MinHeap();
+    else if (structType === 'MaxHeap')         structure = new MaxHeap();
+    else if (structType === 'BinomialHeap')    structure = new BinomialHeap();
+    else if (structType === 'MaxBinomialHeap') structure = new MaxBinomialHeap();
+    else if (structType === 'FibHeap')         structure = new FibHeap();
+    else if (structType === 'MaxFibHeap')      structure = new MaxFibHeap();
+    else                                       structure = new RBTree();
+
     rawKeys.forEach(({k,v}) => structure.insert(k, v));
     buildOpsMenu();
     setStatus(`✓ Neuer ${structType} erstellt${rawKeys.length?' mit '+rawKeys.length+' Beispielknoten':''}`);
@@ -2351,11 +2430,13 @@ function cmdLoad() {
         const d=JSON.parse(e.target.result);
         highlighted.clear(); wobble.clear();
         structType=d.type;
-        if      (structType === 'RBTree')        structure = RBTree.fromJSON(d);
-        else if (structType === 'MinHeap')       structure = MinHeap.fromJSON(d);
-        else if (structType === 'MaxHeap')       structure = MaxHeap.fromJSON(d);
-        else if (structType === 'BinomialHeap')  structure = BinomialHeap.fromJSON(d);
-        else if (structType === 'FibHeap')        structure = FibHeap.fromJSON(d);
+        if      (structType === 'RBTree')           structure = RBTree.fromJSON(d);
+        else if (structType === 'MinHeap')          structure = MinHeap.fromJSON(d);
+        else if (structType === 'MaxHeap')          structure = MaxHeap.fromJSON(d);
+        else if (structType === 'BinomialHeap')     structure = BinomialHeap.fromJSON(d);
+        else if (structType === 'MaxBinomialHeap')  structure = MaxBinomialHeap.fromJSON(d);
+        else if (structType === 'FibHeap')          structure = FibHeap.fromJSON(d);
+        else if (structType === 'MaxFibHeap')       structure = MaxFibHeap.fromJSON(d);
         else throw new Error('Unknown type: ' + structType);
         buildOpsMenu();
         setStatus(`✓ Geladen: ${f.name}`);
