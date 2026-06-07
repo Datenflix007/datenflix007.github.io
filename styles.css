@@ -220,6 +220,27 @@ main {
     align-self: flex-end;
 }
 
+.timeline-item.poster-entry {
+    align-self: flex-start;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.timeline-item.poster-entry .timeline-media {
+    margin-left: auto;
+    justify-content: flex-end;
+}
+
+.timeline-item.poster-entry .avatar-border {
+    padding: 0;
+}
+
+.timeline-item.poster-entry .avatar-border img {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+}
+
 .timeline-content {
     background: radial-gradient(circle at top left, #111827, var(--surface));
     border-radius: 1.5rem;
