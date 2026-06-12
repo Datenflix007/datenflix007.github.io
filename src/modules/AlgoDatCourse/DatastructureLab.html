@@ -345,6 +345,126 @@ const settings = {
   tableView:  JSON.parse(localStorage.getItem('lab-tableView') || 'false'),
 };
 
+const EXTRA_PSEUDOCODE = {
+  HashTable: {
+    insert: {
+      title: 'Hash-Insert',
+      code: [
+        'ChainedHashInsert(T, x):',
+        '  fuege x an den Kopf der Liste T[h(key[x])] ein',
+        '',
+        'HashInsert(T, k):',
+        '  i = 0',
+        '  repeat:',
+        '    j = h(k, i)',
+        '    if T[j] = NIL or T[j] = DELETED:',
+        '      T[j] = k; return j',
+        '    else i = i + 1',
+        '  until i = m',
+        '  Error Ueberlauf',
+      ],
+      lineMap: [
+        { re: /ChainedHashInsert|Kopf der Liste/, lines: [0,1] },
+        { re: /HashInsert|sondieren/, lines: [3,4,5,6] },
+        { re: /NIL|DELETED.*speichern/, lines: [7,8] },
+        { re: /Ueberlauf/, lines: [10,11] },
+      ]
+    },
+    search: {
+      title: 'Hash-Search',
+      code: [
+        'ChainedHashSearch(T, k):',
+        '  suche in T[h(k)] nach key k',
+        '',
+        'HashSearch(T, k):',
+        '  i = 0',
+        '  repeat:',
+        '    j = h(k, i)',
+        '    if T[j] = k: return j',
+        '    i = i + 1',
+        '  until i = m or T[j] = NIL',
+      ],
+      lineMap: [
+        { re: /ChainedHashSearch|Liste/, lines: [0,1] },
+        { re: /HashSearch|sondiert/, lines: [3,4,5,6] },
+        { re: /NIL.*erfolglos/, lines: [9] },
+      ]
+    },
+    delete: {
+      title: 'Hash-Delete',
+      code: [
+        'ChainedHashDelete(T, x):',
+        '  entferne x aus Liste T[h(key[x])]',
+        '',
+        'HashDelete(T, k):',
+        '  suche k mit derselben Sondierungsfolge',
+        '  wenn gefunden: T[j] = DELETED',
+        '  // nicht NIL, sonst bricht spaetere Suche zu frueh ab',
+      ],
+      lineMap: [
+        { re: /ChainedHashDelete|entferne/, lines: [0,1] },
+        { re: /HashDelete|DELETED/, lines: [3,4,5,6] },
+      ]
+    },
+  },
+  UnionFind: {
+    makeSet: {
+      title: 'Make-Set',
+      code: [
+        'MakeSet(x):',
+        '  parent[x] = x',
+        '  Rang[x] = 0',
+      ],
+      lineMap: [
+        { re: /MakeSet/, lines: [0,1,2] },
+      ]
+    },
+    findSet: {
+      title: 'Find-Set',
+      code: [
+        'FindSet(x):',
+        '  if x != parent[x]:',
+        '    parent[x] = FindSet(parent[x])',
+        '  return parent[x]',
+      ],
+      lineMap: [
+        { re: /folge Vaterzeiger/, lines: [1,2] },
+        { re: /Pfadverkuerzung/, lines: [2] },
+        { re: /Repräsentant|Wurzel/, lines: [3] },
+      ]
+    },
+    union: {
+      title: 'DSF-Union / Link',
+      code: [
+        'DSFUnion(x, y):',
+        '  DSFLink(FindSet(x), FindSet(y))',
+        '',
+        'DSFLink(x, y):',
+        '  if Rang[x] > Rang[y]:',
+        '    parent[y] = x',
+        '  else:',
+        '    parent[x] = y',
+        '    if Rang[x] = Rang[y]:',
+        '      Rang[y] = Rang[y] + 1',
+      ],
+      lineMap: [
+        { re: /DSFUnion/, lines: [0,1] },
+        { re: /Rang.*>/, lines: [4,5] },
+        { re: /parent\[.*\] =/, lines: [6,7] },
+        { re: /gleicher Rang/, lines: [8,9] },
+      ]
+    },
+    delete: {
+      title: 'UnionFind-Delete',
+      code: [
+        'Nicht Teil des Skript-ADT.',
+        'Nur Lab-Hilfsoperation: Element entfernen und Forest neu aufbauen.',
+      ],
+      lineMap: []
+    },
+  },
+};
+
 function applySettings() {
   document.documentElement.dataset.theme = settings.darkMode ? 'dark' : 'light';
   document.getElementById('ck-darkMode').textContent   = settings.darkMode ? '✓' : ' ';
@@ -1113,6 +1233,217 @@ class MaxFibHeap extends FibHeap {
 // ══════════════════════════════════════════════════════════════
 //  PSEUDOCODE DEFINITIONS
 // ══════════════════════════════════════════════════════════════
+class HashTable {
+  constructor({ mode='chaining', m=11, probe='linear', c1=1, c2=3, hashExpr='k % m' } = {}) {
+    this.mode = mode;
+    this.m = Math.max(3, Number(m) || 11);
+    this.probe = probe;
+    this.c1 = Number(c1) || 1;
+    this.c2 = Number(c2) || 3;
+    this.hashExpr = hashExpr || 'k % m';
+    this.DELETED = { deleted: true };
+    this.n = 0;
+    this.table = Array.from({ length: this.m }, () => this.mode === 'chaining' ? [] : null);
+  }
+  _typeName() { return 'HashTable'; }
+  _evalHash(k) {
+    try {
+      const fn = new Function('k', 'm', 'Math', `"use strict"; return (${this.hashExpr});`);
+      const raw = Number(fn(Number(k), this.m, Math));
+      return Number.isFinite(raw) ? Math.trunc(raw) : Number(k);
+    } catch (err) {
+      return Number(k);
+    }
+  }
+  _h1Raw(k) { return this._evalHash(k); }
+  _norm(v) { return ((Number(v) % this.m) + this.m) % this.m; }
+  _h1(k) { return this._norm(this._h1Raw(k)); }
+  _h2(k) { return 1 + (((Number(k) % (this.m - 1)) + (this.m - 1)) % (this.m - 1)); }
+  _probe(k, i) {
+    const h1 = this._h1(k);
+    if (this.probe === 'quadratic') return (h1 + this.c1 * i + this.c2 * i * i) % this.m;
+    if (this.probe === 'double') return (h1 + i * this._h2(k)) % this.m;
+    return (h1 + i) % this.m;
+  }
+  _probeName() {
+    return this.probe === 'quadratic' ? 'quadratisches Sondieren'
+         : this.probe === 'double' ? 'doppeltes Hashing'
+         : 'lineares Sondieren';
+  }
+  insert(key, value) { return this.mode === 'chaining' ? this._insertChained(key, value) : this._insertOpen(key, value); }
+  _insertChained(key, value) {
+    const raw = this._h1Raw(key), j = this._norm(raw), bucket = this.table[j];
+    _log(`h'(${key}) = ${this.hashExpr} = ${raw}; h(${key}) = <b>${j}</b>`);
+    const old = bucket.find(e => e.key === key);
+    if (old) { old.value = value; _log(`Key <b>${key}</b> bereits in T[${j}] -> Value aktualisiert`); return j; }
+    bucket.unshift({ key, value, home:j }); this.n++;
+    _log(`ChainedHashInsert: <b>${key}</b> an den Kopf der Liste T[${j}] eingefuegt`);
+    return j;
+  }
+  _insertOpen(key, value) {
+    let firstDeleted = -1;
+    _log(`HashInsert mit ${this._probeName()}: freie Position sondieren`);
+    for (let i = 0; i < this.m; i++) {
+      const j = this._probe(key, i), slot = this.table[j];
+      _log(`i=${i}: h(${key},${i}) = <b>${j}</b> -> ${slot === null ? 'NIL' : slot.deleted ? 'DELETED' : 'belegt durch <b>'+slot.key+'</b>'}`);
+      if (slot && !slot.deleted && slot.key === key) { slot.value = value; _log(`Key <b>${key}</b> gefunden -> Value aktualisiert`); return j; }
+      if (slot && slot.deleted && firstDeleted < 0) firstDeleted = j;
+      if (slot === null) {
+        const target = firstDeleted >= 0 ? firstDeleted : j;
+        this.table[target] = { key, value, home:this._h1(key) }; this.n++;
+        _log(`T[${target}] ist ${firstDeleted >= 0 ? 'DELETED' : 'NIL'} -> <b>${key}</b> dort speichern`);
+        return target;
+      }
+    }
+    if (firstDeleted >= 0) { this.table[firstDeleted] = { key, value, home:this._h1(key) }; this.n++; return firstDeleted; }
+    _log('Ueberlauf: alle Tabellenplaetze wurden sondiert');
+    return -1;
+  }
+  search(key) {
+    if (this.mode === 'chaining') {
+      const j = this._h1(key);
+      _log(`ChainedHashSearch: Suche in Liste T[h(${key})] = T[${j}]`);
+      for (const e of this.table[j]) { _log(`vergleiche mit <b>${e.key}</b>`); if (e.key === key) return e.value; }
+      return null;
+    }
+    _log(`HashSearch sondiert dieselbe Folge wie HashInsert (${this._probeName()})`);
+    for (let i = 0; i < this.m; i++) {
+      const j = this._probe(key, i), slot = this.table[j];
+      _log(`i=${i}: h(${key},${i}) = <b>${j}</b>`);
+      if (slot === null) { _log(`T[${j}] = NIL -> Suche erfolglos beendet`); return null; }
+      if (!slot.deleted && slot.key === key) return slot.value;
+    }
+    return null;
+  }
+  delete(key) {
+    if (this.mode === 'chaining') {
+      const j = this._h1(key), bucket = this.table[j];
+      _log(`ChainedHashDelete: entferne <b>${key}</b> aus T[h(${key})] = T[${j}]`);
+      const idx = bucket.findIndex(e => e.key === key);
+      if (idx < 0) return false;
+      bucket.splice(idx, 1); this.n--; return true;
+    }
+    _log('HashDelete: Zelle nicht auf NIL setzen, sondern mit DELETED markieren');
+    for (let i = 0; i < this.m; i++) {
+      const j = this._probe(key, i), slot = this.table[j];
+      _log(`i=${i}: pruefe T[${j}]`);
+      if (slot === null) return false;
+      if (!slot.deleted && slot.key === key) { this.table[j] = this.DELETED; this.n--; _log(`T[${j}] <- DELETED`); return true; }
+    }
+    return false;
+  }
+  slotIdForKey(key) {
+    if (this.mode === 'chaining') return 'h' + this._h1(key);
+    for (let i = 0; i < this.m; i++) {
+      const j = this._probe(key, i), slot = this.table[j];
+      if (slot === null) return null;
+      if (!slot.deleted && slot.key === key) return 'h' + j;
+    }
+    return null;
+  }
+  entries() { return this.mode === 'chaining' ? this.table.flat() : this.table.filter(e => e && !e.deleted); }
+  size() { return this.n; }
+  isEmpty() { return this.n === 0; }
+  loadFactor() { return this.n / this.m; }
+  clusterInfo() {
+    const primary = new Set();
+    const secondary = new Map();
+    if (this.mode !== 'open') return { primary, secondary };
+    const homesAll = new Map();
+    for (let s = 0; s < this.m; s++) {
+      const e = this.table[s];
+      if (!e || e.deleted) continue;
+      if (!homesAll.has(e.home)) homesAll.set(e.home, []);
+      homesAll.get(e.home).push(s);
+    }
+    let sid = 1;
+    homesAll.forEach(xs => {
+      if (xs.length > 1) {
+        xs.forEach(x => secondary.set(x, sid));
+        sid++;
+      }
+    });
+    let i = 0;
+    while (i < this.m) {
+      if (!this.table[i] || this.table[i].deleted) { i++; continue; }
+      const idxs = [];
+      while (i < this.m && this.table[i] && !this.table[i].deleted) idxs.push(i++);
+      if (idxs.length > 1) idxs.forEach(x => primary.add(x));
+    }
+    return { primary, secondary };
+  }
+  toJSON() {
+    return { type:this._typeName(), mode:this.mode, m:this.m, probe:this.probe, c1:this.c1, c2:this.c2, hashExpr:this.hashExpr,
+      nodes:this.entries().map(({ key:k, value:v }) => ({ k, v })) };
+  }
+  static fromJSON(d) {
+    const h = new HashTable({ mode:d.mode || 'chaining', m:d.m || 11, probe:d.probe || 'linear', c1:d.c1, c2:d.c2, hashExpr:d.hashExpr || 'k % m' });
+    for (const { k, v } of (d.nodes || [])) h.insert(Number(k), v);
+    return h;
+  }
+}
+
+class UnionFind {
+  constructor() { this.items = new Map(); }
+  insert(key, value) { return this.makeSet(key, value); }
+  makeSet(key, value='') {
+    if (this.items.has(key)) { this.items.get(key).value = value || this.items.get(key).value; _log(`MakeSet(${key}): Element existiert bereits`); return false; }
+    this.items.set(key, { key, value, parent:key, rank:0 });
+    _log(`MakeSet(${key}): parent[${key}] = ${key}, Rang[${key}] = 0`);
+    return true;
+  }
+  _findNode(key, compress=true) {
+    const x = this.items.get(key);
+    if (!x) return null;
+    if (x.parent !== key) {
+      _log(`FindSet(${key}): parent[${key}] = ${x.parent}, folge Vaterzeiger`);
+      const root = this._findNode(x.parent, compress);
+      if (!root) return null;
+      if (compress && x.parent !== root.key) { _log(`Pfadverkuerzung: parent[${key}] = ${root.key}`); x.parent = root.key; }
+      return root;
+    }
+    _log(`FindSet(${key}): Wurzel/Repräsentant <b>${key}</b> erreicht`);
+    return x;
+  }
+  findSet(key) { const r = this._findNode(key, true); return r ? r.key : null; }
+  search(key) { const x = this.items.get(key); return x ? x.value : null; }
+  union(xKey, yKey) {
+    if (!this.items.has(xKey) || !this.items.has(yKey)) return false;
+    _log(`DSFUnion(${xKey}, ${yKey}): Link(FindSet(${xKey}), FindSet(${yKey}))`);
+    const x = this._findNode(xKey, true), y = this._findNode(yKey, true);
+    if (!x || !y) return false;
+    if (x.key === y.key) { _log(`Beide Elemente haben bereits Repräsentant <b>${x.key}</b>`); return true; }
+    this._link(x, y); return true;
+  }
+  _link(x, y) {
+    if (x.rank > y.rank) { y.parent = x.key; _log(`DSFLink: Rang[${x.key}] > Rang[${y.key}] -> parent[${y.key}] = ${x.key}`); }
+    else {
+      x.parent = y.key; _log(`DSFLink: parent[${x.key}] = ${y.key}`);
+      if (x.rank === y.rank) { y.rank++; _log(`gleicher Rang -> Rang[${y.key}] = ${y.rank}`); }
+    }
+  }
+  delete(key) {
+    if (!this.items.has(key)) return false;
+    const remaining = [...this.items.values()].filter(x => x.key !== key).map(x => ({ k:x.key, v:x.value }));
+    this.items.clear();
+    remaining.forEach(({ k, v }) => this.makeSet(k, v));
+    _log(`Element <b>${key}</b> entfernt; Forest aus Singleton-Mengen neu aufgebaut`);
+    return true;
+  }
+  size() { return this.items.size; }
+  isEmpty() { return this.items.size === 0; }
+  toJSON() { return { type:'UnionFind', nodes:[...this.items.values()].map(x => ({ k:x.key, v:x.value, parent:x.parent, rank:x.rank })) }; }
+  static fromJSON(d) {
+    const uf = new UnionFind();
+    for (const { k, v } of (d.nodes || [])) uf.makeSet(Number(k), v);
+    for (const { k, parent, rank } of (d.nodes || [])) {
+      const x = uf.items.get(Number(k));
+      if (x) { x.parent = Number(parent); x.rank = Number(rank) || 0; }
+    }
+    return uf;
+  }
+}
+
 const PSEUDOCODE = {
   RBTree: {
     insert: {
@@ -1424,6 +1755,8 @@ PSEUDOCODE.MaxFibHeap = {
   merge:       { ...PSEUDOCODE.FibHeap.merge,        title: 'MaxFib-Merge'         },
   delete:      { ...PSEUDOCODE.FibHeap.delete,       title: 'MaxFib-Delete'        },
 };
+PSEUDOCODE.HashTable = EXTRA_PSEUDOCODE.HashTable;
+PSEUDOCODE.UnionFind = EXTRA_PSEUDOCODE.UnionFind;
 
 // ══════════════════════════════════════════════════════════════
 //  PSEUDO PANEL – ENGINE
@@ -1560,11 +1893,87 @@ const LEVELH = 100;
 // ══════════════════════════════════════════════════════════════
 function computeLayout() {
   const W = canvas.width;
-  if (!structure || structure.isEmpty()) return { nodes:[], edges:[], nilNodes:[] };
+  if (!structure) return { nodes:[], edges:[], nilNodes:[] };
+  if (structType === 'HashTable') return layoutHashTable(W);
+  if (structType === 'UnionFind') return layoutUnionFind(W);
+  if (structure.isEmpty()) return { nodes:[], edges:[], nilNodes:[] };
   if (structType === 'RBTree')                                               return layoutRBTree(W);
   if (structType === 'BinomialHeap' || structType === 'MaxBinomialHeap')    return layoutBinomialHeap(W);
   if (structType === 'FibHeap'      || structType === 'MaxFibHeap')         return layoutFibHeap(W);
   return layoutHeap(W);
+}
+
+function layoutHashTable(W) {
+  const nodes = [], edges = [], m = structure.m;
+  const cellW = settings.tableView ? Math.max(TABLE_W, 220) : 174;
+  const cellH = settings.tableView ? Math.max(_nodeHalfH() * 2, 70) : 70;
+  const gapX = 18, gapY = 20;
+  const cols = Math.max(1, Math.min(m, Math.floor((W - 40) / (cellW + gapX)) || 1));
+  const totalW = cols * cellW + (cols - 1) * gapX;
+  const startX = Math.max(30, (W - totalW) / 2) + cellW / 2;
+  const clusters = structure.clusterInfo();
+  for (let i = 0; i < m; i++) {
+    const row = Math.floor(i / cols), col = i % cols;
+    const raw = structure.table[i];
+    let entries = [];
+    let state = 'NIL';
+    if (structure.mode === 'chaining') {
+      entries = raw;
+      state = entries.length ? 'LIST' : 'NIL';
+    } else if (raw && raw.deleted) {
+      state = 'DELETED';
+    } else if (raw) {
+      entries = [raw];
+      state = 'FULL';
+    }
+    nodes.push({
+      id:'h' + i, x:startX + col * (cellW + gapX), y:_startY() + row * (cellH + gapY),
+      key:i, value:entries.map(e => e.key + ':' + (e.value || '')).join(', '),
+      hashCell:true, entries, state, width:cellW, height:cellH, isRed:false,
+      cluster1:clusters.primary.has(i), cluster2:clusters.secondary.get(i) || null
+    });
+  }
+  return { nodes, edges, nilNodes:[] };
+}
+
+function layoutUnionFind(W) {
+  const nodes = [], edges = [];
+  const items = [...structure.items.values()].sort((a, b) => a.key - b.key);
+  if (!items.length) return { nodes, edges, nilNodes:[] };
+  const children = new Map(), roots = [];
+  for (const x of items) children.set(x.key, []);
+  for (const x of items) {
+    if (x.parent === x.key || !children.has(x.parent)) roots.push(x);
+    else children.get(x.parent).push(x);
+  }
+  const BASE = settings.tableView ? TABLE_W + 38 : 86;
+  const GAP = settings.tableView ? 34 : 28;
+  const LH = _getLevelH();
+  const widthOf = x => {
+    const ch = children.get(x.key) || [];
+    return ch.length ? Math.max(BASE, ch.reduce((s, c) => s + widthOf(c), 0) + GAP * (ch.length - 1)) : BASE;
+  };
+  const widths = roots.map(widthOf);
+  const totalW = widths.reduce((s, w) => s + w, 0) + GAP * Math.max(0, roots.length - 1);
+  let x0 = Math.max(GAP, (W - totalW) / 2);
+  const place = (x, cx, y) => {
+    nodes.push({ id:x.key, x:cx, y, key:x.key, value:x.value, rank:x.rank, parent:x.parent, isRed:false });
+    const ch = (children.get(x.key) || []).sort((a, b) => a.key - b.key);
+    if (!ch.length) return;
+    const cws = ch.map(widthOf), tot = cws.reduce((s, w) => s + w, 0) + GAP * (ch.length - 1);
+    let cur = cx - tot / 2;
+    for (let i = 0; i < ch.length; i++) {
+      const ccx = cur + cws[i] / 2;
+      edges.push({ fromId:x.key, toId:ch[i].key, fromX:cx, fromY:y, toX:ccx, toY:y + LH });
+      place(ch[i], ccx, y + LH);
+      cur += cws[i] + GAP;
+    }
+  };
+  for (let i = 0; i < roots.length; i++) {
+    place(roots[i], x0 + widths[i] / 2, _startY());
+    x0 += widths[i] + GAP;
+  }
+  return { nodes, edges, nilNodes:[] };
 }
 
 function layoutRBTree(W) {
@@ -1815,6 +2224,57 @@ function _drawTableNode(ctx, n, x, y, isHl, C) {
   }
 }
 
+function _drawHashCell(ctx, n, x, y, isHl, C) {
+  const W = n.width || 150, H = n.height || 54;
+  const rx = x - W / 2, ry = y - H / 2;
+  if (isHl) {
+    const g = ctx.createRadialGradient(x, y, 5, x, y, W / 2 + 24);
+    g.addColorStop(0, 'rgba(251,191,36,.30)');
+    g.addColorStop(1, 'rgba(251,191,36,0)');
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, W / 2 + 24, 0, Math.PI * 2); ctx.fill();
+  }
+  ctx.fillStyle = 'rgba(0,0,0,.25)';
+  roundRect(ctx, rx + 2, ry + 3, W, H, 7); ctx.fill();
+  const isDeleted = n.state === 'DELETED';
+  const isFull = n.entries && n.entries.length;
+  ctx.fillStyle = isDeleted ? 'rgba(251,146,60,.20)' : isFull ? C.nodeFillMin : C.nodeFillBlk;
+  roundRect(ctx, rx, ry, W, H, 7); ctx.fill();
+  if (n.cluster1) {
+    ctx.fillStyle = 'rgba(251,191,36,.18)';
+    roundRect(ctx, rx + 3, ry + 3, W - 6, H - 6, 6); ctx.fill();
+  }
+  if (n.cluster2) {
+    ctx.fillStyle = 'rgba(167,139,250,.22)';
+    roundRect(ctx, rx + 8, ry + 8, W - 16, H - 16, 5); ctx.fill();
+  }
+  ctx.strokeStyle = isDeleted ? '#fb923c' : isFull ? C.nodeBordMin : C.nodeBordBlk;
+  ctx.lineWidth = 1.6; roundRect(ctx, rx, ry, W, H, 7); ctx.stroke();
+  ctx.fillStyle = 'rgba(190,210,245,.72)';
+  ctx.font = 'bold 10px "Segoe UI",system-ui,sans-serif';
+  ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+  ctx.fillText('T[' + n.key + ']', rx + 8, ry + 7);
+  ctx.textAlign = 'right';
+  ctx.fillText(n.state, rx + W - 8, ry + 7);
+  ctx.fillStyle = '#fff';
+  ctx.font = '11px "Segoe UI",system-ui,sans-serif';
+  ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+  const txt = n.entries && n.entries.length
+    ? n.entries.map(e => e.key + ':' + truncateVal(e.value || '', 9) + (e.home !== undefined ? ' h=' + e.home : '')).join('  ->  ')
+    : (isDeleted ? 'DELETED' : 'NIL');
+  ctx.fillText(truncateVal(txt, Math.floor(W / 7)), rx + 8, y + 2);
+  ctx.font = 'bold 9px "Segoe UI",system-ui,sans-serif';
+  ctx.textBaseline = 'bottom';
+  if (n.cluster1) {
+    ctx.fillStyle = '#f59e0b';
+    ctx.fillText('Cluster 1. Art', rx + 8, ry + H - 7);
+  }
+  if (n.cluster2) {
+    ctx.fillStyle = '#a78bfa';
+    ctx.textAlign = 'right';
+    ctx.fillText('Cluster 2. Art', rx + W - 8, ry + H - 7);
+  }
+}
+
 // ══════════════════════════════════════════════════════════════
 //  RENDERER
 // ══════════════════════════════════════════════════════════════
@@ -1955,6 +2415,11 @@ function draw() {
   for (const n of layout.nodes) {
     const x = n.x+wx(n.id), y = n.y+wy(n.id);
 
+    if (n.hashCell) {
+      _drawHashCell(ctx, n, x, y, highlighted.has(n.id), C);
+      continue;
+    }
+
     if (settings.tableView) {
       _drawTableNode(ctx, n, x, y, highlighted.has(n.id), C);
       continue;
@@ -2015,12 +2480,18 @@ function draw() {
       ctx.fillText(n.isRed ? 'R' : 'B', x, y+RADIUS+13);
     }
 
+    if (structType === 'UnionFind') {
+      ctx.fillStyle = C.rbLabelBlk;
+      ctx.font = 'bold 9px "Segoe UI",system-ui,sans-serif';
+      ctx.fillText(`r${n.rank}`, x, y + RADIUS + 13);
+    }
+
     // value label
     if (n.value && settings.showValues) {
       const tv = _shortVal(n.value);
       ctx.fillStyle = C.valLabel;
       ctx.font = '9px "Segoe UI",system-ui,sans-serif';
-      const hasBadge = (structType==='RBTree' && settings.showRB) || structType==='BinomialHeap';
+      const hasBadge = (structType==='RBTree' && settings.showRB) || structType==='BinomialHeap' || structType==='UnionFind';
       ctx.fillText(tv, x, y + RADIUS + (hasBadge ? 26 : 15));
     }
   }
@@ -2035,6 +2506,11 @@ function draw() {
 function nodeAt(sx, sy) {
   const wsx = (sx - panX) / zoom;
   const wsy = (sy - panY) / zoom;
+  for (const n of layout.nodes) {
+    if (!n.hashCell) continue;
+    const nx = n.x + wx(n.id), ny = n.y + wy(n.id);
+    if (Math.abs(wsx - nx) <= (n.width || 150) / 2 && Math.abs(wsy - ny) <= (n.height || 54) / 2) return n;
+  }
   if (settings.tableView) {
     const hh = _nodeHalfH();
     for (const n of layout.nodes) {
@@ -2170,12 +2646,16 @@ canvas.addEventListener('mouseleave', () => {
 // ══════════════════════════════════════════════════════════════
 function openValueEditor(nodeId) {
   if (!structure) return;
+  if (structure instanceof HashTable) return;
   let currentKey, currentVal;
   if (structure instanceof RBTree) {
     currentKey = nodeId; currentVal = structure.search(nodeId) || '';
   } else if (structure instanceof BinomialHeap || structure instanceof FibHeap) {
     const ln = layout.nodes.find(n => n.id === nodeId); if (!ln) return;
     currentKey = ln.key; currentVal = ln.value || '';
+  } else if (structure instanceof UnionFind) {
+    const item = structure.items.get(nodeId); if (!item) return;
+    currentKey = item.key; currentVal = item.value || '';
   } else {
     const d = structure.data[nodeId]; if (!d) return;
     currentKey = d.key; currentVal = d.value || '';
@@ -2185,6 +2665,7 @@ function openValueEditor(nodeId) {
     if      (structure instanceof RBTree)         structure.insert(currentKey, v);
     else if (structure instanceof BinomialHeap || structure instanceof FibHeap)
                                                  structure.updateValue(currentKey, v);
+    else if (structure instanceof UnionFind)      structure.makeSet(currentKey, v);
     else                                         structure.data[nodeId].value = v;
     const label = _dataMode==='hist' ? _fmtHistKey(currentKey) : currentKey;
     setStatus(`✓ Key ${label} → ${v.length>40?v.slice(0,40)+'…':v}`);
@@ -2348,12 +2829,27 @@ function buildOpsMenu() {
   const isRBT      = structType === 'RBTree';
   const isBinom    = structType === 'BinomialHeap' || structType === 'MaxBinomialHeap';
   const isFib      = structType === 'FibHeap' || structType === 'MaxFibHeap';
+  const isHash     = structType === 'HashTable';
+  const isUF       = structType === 'UnionFind';
   const isMin      = structType === 'MinHeap';
   const isMaxBinom = structType === 'MaxBinomialHeap';
   const isMaxFib   = structType === 'MaxFibHeap';
-  btn.textContent = isRBT ? 'DICTIONARY' : 'HEAP';
+  btn.textContent = isRBT || isHash ? 'DICTIONARY' : isUF ? 'UNION-FIND' : 'HEAP';
 
-  const items = isRBT ? [
+  const items = isHash ? [
+    ['➕  Insert',      cmdInsert],
+    ['➕  Multi Insert', cmdMultiInsert],
+    ['ƒ  Hashfunktion', cmdHashConfig],
+    null,
+    ['❌  Delete',      cmdDelete],
+    ['🔍  Search',      cmdSearch],
+  ] : isUF ? [
+    ['➕  Make-Set',    cmdMakeSet],
+    ['🔍  Find-Set',    cmdFindSet],
+    ['🔗  Union',       cmdUnion],
+    null,
+    ['❌  Delete',      cmdDelete],
+  ] : isRBT ? [
     ['➕  Insert',      cmdInsert],
     ['❌  Delete',      cmdDelete],
     ['🔍  Search',      cmdSearch],
@@ -2453,11 +2949,107 @@ function cmdInsert() {
     const v = _encodeVal(baseV, tagValues);
     highlighted.clear();
     _startLog(`${structType} — Insert(${k})`, 'insert');
-    structure.insert(k, v);
+    const pos = structure.insert(k, v);
     _endLog();
+    if (structure instanceof HashTable && pos >= 0) highlighted.add('h' + pos);
     setStatus(`✓ ${k} → ${baseV.length>40?baseV.slice(0,40)+'…':baseV}`);
   });
   setTimeout(()=>document.getElementById('_ik')?.focus(),50);
+}
+
+function cmdMultiInsert() {
+  if (!need()) return;
+  showDialog('Multi Insert', `
+    <div class="dialog-field">
+      <label>Keys (kommagetrennt oder zeilenweise)</label>
+      <textarea id="_multiKeys" rows="6" style="width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:8px;border-radius:7px;resize:vertical;font-family:monospace;font-size:12px" placeholder="10, 21, 32, 43"></textarea>
+    </div>
+    <div class="dialog-field">
+      <label>Value-Prefix</label>
+      <input type="text" id="_multiPrefix" value="Value_">
+    </div>`, () => {
+    const keys = document.getElementById('_multiKeys').value
+      .split(/[\s,;]+/).map(Number).filter(n => Number.isInteger(n));
+    if (!keys.length) return;
+    const prefix = document.getElementById('_multiPrefix').value || 'Value_';
+    highlighted.clear();
+    _startLog(`${structType} - MultiInsert(${keys.join(', ')})`, 'insert');
+    const placed = [];
+    for (const k of keys) {
+      const pos = structure.insert(k, prefix + k);
+      if (pos >= 0) placed.push(pos);
+    }
+    _endLog();
+    placed.forEach(pos => highlighted.add('h' + pos));
+    setStatus(`✓ Multi Insert: ${keys.length} Elemente`);
+  });
+  setTimeout(()=>document.getElementById('_multiKeys')?.focus(),50);
+}
+
+function cmdHashConfig() {
+  if (!need() || !(structure instanceof HashTable)) return;
+  showDialog('Hashfunktion', `
+    <div class="dialog-field">
+      <label>Hashing</label>
+      <select id="_cfgMode">
+        <option value="chaining"${structure.mode==='chaining'?' selected':''}>Verkettung</option>
+        <option value="open"${structure.mode==='open'?' selected':''}>Offene Adressierung</option>
+      </select>
+    </div>
+    <div class="dialog-field">
+      <label>Tabellengroesse m</label>
+      <input type="number" id="_cfgM" min="3" step="1" value="${structure.m}">
+    </div>
+    <div class="dialog-field">
+      <label>Hashfunktion h'(k)</label>
+      <input type="text" id="_cfgExpr" value="${String(structure.hashExpr).replace(/"/g,'&quot;')}">
+    </div>
+    <div class="dialog-field">
+      <label>Sondierung</label>
+      <select id="_cfgProbe">
+        <option value="linear"${structure.probe==='linear'?' selected':''}>Linear</option>
+        <option value="quadratic"${structure.probe==='quadratic'?' selected':''}>Quadratisch</option>
+        <option value="double"${structure.probe==='double'?' selected':''}>Doppeltes Hashing</option>
+      </select>
+    </div>`, () => {
+    const old = structure.entries().map(e => ({ k:e.key, v:e.value }));
+    const mode = document.getElementById('_cfgMode').value;
+    const m = parseInt(document.getElementById('_cfgM').value) || 11;
+    const hashExpr = document.getElementById('_cfgExpr').value.trim() || 'k % m';
+    const probe = document.getElementById('_cfgProbe').value;
+    highlighted.clear();
+    _startLog(`${structType} - Rehash`, 'insert');
+    structure = new HashTable({ mode, m, probe, hashExpr });
+    old.forEach(({ k, v }) => structure.insert(k, v));
+    _endLog();
+    buildOpsMenu();
+    setStatus(`✓ Rehash mit h'(k) = ${hashExpr}`);
+  });
+  setTimeout(()=>document.getElementById('_cfgExpr')?.focus(),50);
+}
+
+function cmdMakeSet() {
+  if (!need()) return;
+  showDialog('Make-Set', `
+    <div class="dialog-field">
+      <label>Element x (Ganzzahl)</label>
+      <input type="number" id="_msk" step="1">
+    </div>
+    <div class="dialog-field">
+      <label>Value (optional)</label>
+      <input type="text" id="_msv" placeholder="Value_x">
+    </div>`, () => {
+    const k = parseInt(document.getElementById('_msk').value);
+    if (isNaN(k)) return;
+    const v = document.getElementById('_msv').value.trim() || ('Value_' + k);
+    highlighted.clear();
+    _startLog(`${structType} — MakeSet(${k})`, 'makeSet');
+    structure.makeSet(k, v);
+    _endLog();
+    highlighted.add(k);
+    setStatus(`✓ Make-Set: <b>${k}</b>`);
+  });
+  setTimeout(()=>document.getElementById('_msk')?.focus(),50);
 }
 
 function cmdDelete() {
@@ -2475,17 +3067,63 @@ function cmdSearch() {
   if (!need()) return;
   askKey('Search', k => {
     highlighted.clear();
+    if (structure instanceof HashTable) _startLog(`${structType} - Search(${k})`, 'search');
     const v = structure.search(k);
+    if (structure instanceof HashTable) _endLog();
     if (v !== null) {
       let id;
       if      (structure instanceof RBTree)       id = k;
+      else if (structure instanceof HashTable)    id = structure.slotIdForKey(k);
+      else if (structure instanceof UnionFind)    id = k;
       else if (structure instanceof BinomialHeap || structure instanceof FibHeap)
                                                    id = layout.nodes.find(n => n.key === k)?.id ?? -1;
       else                                         id = structure.data.findIndex(d => d.key === k);
-      if (id >= 0) highlighted.add(id);
+      if (typeof id === 'string' || id >= 0) highlighted.add(id);
       setStatus(`✓ <b>${k}</b> → ${v}`);
     } else setStatus(`✗ ${k} nicht gefunden`);
   });
+}
+
+function cmdFindSet() {
+  if (!need()) return;
+  askKey('Find-Set', k => {
+    highlighted.clear();
+    _startLog(`${structType} - FindSet(${k})`, 'findSet');
+    const r = structure.findSet(k);
+    _endLog();
+    if (r !== null) {
+      highlighted.add(k);
+      highlighted.add(r);
+      setStatus(`Repräsentant von <b>${k}</b>: <b>${r}</b>`);
+    } else setStatus(`âœ— ${k} nicht gefunden`);
+  });
+}
+
+function cmdUnion() {
+  if (!need()) return;
+  showDialog('Union', `
+    <div class="dialog-field">
+      <label>x</label>
+      <input type="number" id="_ux" step="1">
+    </div>
+    <div class="dialog-field">
+      <label>y</label>
+      <input type="number" id="_uy" step="1">
+    </div>`, () => {
+    const x = parseInt(document.getElementById('_ux').value);
+    const y = parseInt(document.getElementById('_uy').value);
+    if (isNaN(x) || isNaN(y)) return;
+    highlighted.clear();
+    _startLog(`${structType} - Union(${x}, ${y})`, 'union');
+    const ok = structure.union(x, y);
+    _endLog();
+    if (ok) {
+      highlighted.add(x);
+      highlighted.add(y);
+      setStatus(`âœ“ Union(${x}, ${y})`);
+    } else setStatus('âœ— Mindestens ein Element fehlt');
+  });
+  setTimeout(()=>document.getElementById('_ux')?.focus(),50);
 }
 
 function cmdMin() {
@@ -2637,7 +3275,8 @@ function cmdNew() {
     document.querySelectorAll('.struct-tile').forEach(el => el.classList.remove('selected'));
     document.getElementById('tile-' + t).classList.add('selected');
     const heapRow = document.getElementById('_heapTypeRow');
-    if (heapRow) heapRow.style.display = (t !== 'RBTree') ? '' : 'none';
+    if (heapRow) heapRow.style.display = (t === 'Heap' || t === 'BinomialHeap' || t === 'FibHeap') ? '' : 'none';
+    document.querySelectorAll('.hash-config-row').forEach(row => row.style.display = (t === 'HashTable') ? '' : 'none');
   };
 
   showDialog('Neue Struktur', `
@@ -2656,6 +3295,12 @@ function cmdNew() {
         <div class="struct-tile" id="tile-FibHeap" onclick="_pickTile('FibHeap')">
           <div class="tile-icon">🌀</div><div class="tile-name">FibHeap</div>
         </div>
+        <div class="struct-tile" id="tile-HashTable" onclick="_pickTile('HashTable')">
+          <div class="tile-icon">#</div><div class="tile-name">HashTable</div>
+        </div>
+        <div class="struct-tile" id="tile-UnionFind" onclick="_pickTile('UnionFind')">
+          <div class="tile-icon">UF</div><div class="tile-name">UnionFind</div>
+        </div>
       </div>
     </div>
     <div class="dialog-field" id="_heapTypeRow" style="display:none">
@@ -2663,6 +3308,29 @@ function cmdNew() {
       <select id="_heapType">
         <option value="max" selected>MaxHeap – größter Key an der Wurzel</option>
         <option value="min">MinHeap – kleinster Key an der Wurzel</option>
+      </select>
+    </div>
+    <div class="dialog-field hash-config-row" style="display:none">
+      <label>Hashing</label>
+      <select id="_hashMode">
+        <option value="chaining" selected>Verkettung</option>
+        <option value="open">Offene Adressierung</option>
+      </select>
+    </div>
+    <div class="dialog-field hash-config-row" style="display:none">
+      <label>Tabellengroesse m</label>
+      <input type="number" id="_hashM" min="3" step="1" value="11">
+    </div>
+    <div class="dialog-field hash-config-row" style="display:none">
+      <label>Hashfunktion h'(k)</label>
+      <input type="text" id="_hashExpr" value="k % m" placeholder="z.B. k % m oder Math.floor(k * 0.618)">
+    </div>
+    <div class="dialog-field hash-config-row" style="display:none">
+      <label>Sondierung</label>
+      <select id="_hashProbe">
+        <option value="linear" selected>Linear</option>
+        <option value="quadratic">Quadratisch</option>
+        <option value="double">Doppeltes Hashing</option>
       </select>
     </div>
     <div class="dialog-field">
@@ -2687,6 +3355,10 @@ function cmdNew() {
     const smp      = document.getElementById('_smp').value;
     const heapType = document.getElementById('_heapType').value; // 'max' | 'min'
     const isMax    = heapType === 'max';
+    const hashMode = document.getElementById('_hashMode')?.value || 'chaining';
+    const hashM    = parseInt(document.getElementById('_hashM')?.value || '11');
+    const hashProbe= document.getElementById('_hashProbe')?.value || 'linear';
+    const hashExpr = document.getElementById('_hashExpr')?.value.trim() || 'k % m';
     const SMALL=[10,5,15,3,8,12,20];
     const MED  =[15,10,20,8,12,17,25,5,11,14,16,22,27];
     const rawKeys =
@@ -2701,9 +3373,13 @@ function cmdNew() {
     else if (chosen === 'Heap')         structType = isMax ? 'MaxHeap' : 'MinHeap';
     else if (chosen === 'BinomialHeap') structType = isMax ? 'MaxBinomialHeap' : 'BinomialHeap';
     else if (chosen === 'FibHeap')      structType = isMax ? 'MaxFibHeap' : 'FibHeap';
+    else if (chosen === 'HashTable')    structType = 'HashTable';
+    else if (chosen === 'UnionFind')    structType = 'UnionFind';
 
     highlighted.clear(); wobble.clear();
-    if      (structType === 'MinHeap')         structure = new MinHeap();
+    if      (structType === 'HashTable')       structure = new HashTable({ mode:hashMode, m:hashM, probe:hashProbe, hashExpr });
+    else if (structType === 'UnionFind')       structure = new UnionFind();
+    else if (structType === 'MinHeap')         structure = new MinHeap();
     else if (structType === 'MaxHeap')         structure = new MaxHeap();
     else if (structType === 'BinomialHeap')    structure = new BinomialHeap();
     else if (structType === 'MaxBinomialHeap') structure = new MaxBinomialHeap();
@@ -2741,6 +3417,8 @@ function cmdLoad() {
         nodeSchema = d.schema || [];
         structType=d.type;
         if      (structType === 'RBTree')           structure = RBTree.fromJSON(d);
+        else if (structType === 'HashTable')        structure = HashTable.fromJSON(d);
+        else if (structType === 'UnionFind')        structure = UnionFind.fromJSON(d);
         else if (structType === 'MinHeap')          structure = MinHeap.fromJSON(d);
         else if (structType === 'MaxHeap')          structure = MaxHeap.fromJSON(d);
         else if (structType === 'BinomialHeap')     structure = BinomialHeap.fromJSON(d);
