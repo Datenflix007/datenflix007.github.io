@@ -6,7 +6,14 @@
       "Bash(git push *)",
       "WebFetch(domain:commons.wikimedia.org)",
       "WebFetch(domain:en.wikipedia.org)",
-      "WebFetch(domain:de.wikipedia.org)"
+      "WebFetch(domain:de.wikipedia.org)",
+      "Skill(run)",
+      "Skill(run:*)",
+      "Bash(npx --yes playwright install chromium)",
+      "Bash(node -e \"const {chromium} = require\\('playwright'\\); console.log\\('playwright ok'\\);\")",
+      "Bash(npm install *)",
+      "Bash(node -e \"const {chromium} = require\\('playwright'\\); console.log\\('ok'\\);\")",
+      "Bash(node -e ' *)"
     ]
   }
 }

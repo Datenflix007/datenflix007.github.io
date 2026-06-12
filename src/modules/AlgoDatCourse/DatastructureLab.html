@@ -69,7 +69,7 @@ body{background:var(--bg);color:var(--text);
 
 /* ── CANVAS ──────────────────────────────────────────────── */
 main{flex:1;position:relative;overflow:hidden}
-#canvas{width:100%;height:100%;display:block}
+#canvas{width:100%;height:100%;display:block;touch-action:none}
 
 /* ── STATUS BAR ──────────────────────────────────────────── */
 .statusbar{
@@ -96,9 +96,10 @@ main{flex:1;position:relative;overflow:hidden}
 .overlay.hidden{display:none}
 .dialog-box{
   background:var(--surface);border:1px solid var(--border);
-  border-radius:12px;padding:26px 28px;min-width:340px;max-width:500px;
+  border-radius:12px;padding:26px 28px;min-width:340px;max-width:560px;
   box-shadow:0 20px 60px rgba(0,0,0,.55)
 }
+#dlgContent{max-height:62vh;overflow-y:auto;padding-right:2px}
 .dialog-box h3{margin-bottom:18px;color:var(--accent);font-size:15px;font-weight:700}
 .dialog-field{margin-bottom:13px}
 .dialog-field label{
@@ -111,6 +112,7 @@ main{flex:1;position:relative;overflow:hidden}
   border-radius:7px;outline:none;font-family:inherit
 }
 .dialog-field input:focus,.dialog-field select:focus{border-color:var(--accent)}
+.schema-row input,.schema-row select{width:auto;padding:7px 9px;font-size:12px}
 .input-row{display:flex;gap:6px}
 .input-row input{flex:1}
 .browse-btn{
@@ -144,6 +146,17 @@ main{flex:1;position:relative;overflow:hidden}
 .tile-icon{font-size:22px;margin-bottom:5px}
 .tile-name{font-size:11px;font-weight:700;color:var(--muted)}
 .struct-tile.selected .tile-name{color:var(--accent)}
+
+/* ── SCHEMA BUILDER ──────────────────────────────────────────── */
+.schema-row{display:flex;gap:6px;align-items:center;margin-bottom:5px}
+.schema-tag-name{flex:1;width:auto;min-width:60px;background:var(--surface2);border:1px solid var(--border);color:var(--text);font-size:12px;padding:7px 9px;border-radius:6px;outline:none;font-family:inherit}
+.schema-tag-name:focus{border-color:var(--accent)}
+.schema-type-sel{width:100px;flex-shrink:0;background:var(--surface2);border:1px solid var(--border);color:var(--text);font-size:12px;padding:7px 9px;border-radius:6px;outline:none;font-family:inherit;cursor:pointer}
+.schema-type-sel:focus{border-color:var(--accent)}
+.schema-rem{background:none;border:1px solid var(--border);color:var(--red);border-radius:6px;padding:5px 9px;cursor:pointer;font-size:13px;transition:border-color .1s,background .1s;flex-shrink:0}
+.schema-rem:hover{background:rgba(224,80,80,.12);border-color:var(--red)}
+.add-tag-btn{background:none;border:1px dashed var(--border);color:var(--muted);border-radius:6px;padding:7px 12px;cursor:pointer;font-size:11px;width:100%;margin-top:4px;transition:border-color .1s,color .1s}
+.add-tag-btn:hover{border-color:var(--accent);color:var(--accent)}
 
 /* ── OP LOG ──────────────────────────────────────────────────── */
 #opLog{
@@ -196,6 +209,33 @@ main{flex:1;position:relative;overflow:hidden}
   cursor:pointer;padding:0 3px;line-height:1;transition:color .1s;flex-shrink:0
 }
 .pseudo-close:hover{color:var(--red)}
+
+/* ── TUTORIAL OVERLAY ───────────────────────────────────────── */
+.tutorial-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.60);
+  display:flex;align-items:center;justify-content:center;z-index:3000
+}
+.tutorial-overlay.hidden{display:none}
+.tutorial-box{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:12px;padding:28px 30px;max-width:440px;width:92%;
+  box-shadow:0 20px 60px rgba(0,0,0,.65)
+}
+.tutorial-box h3{color:var(--accent);font-size:15px;font-weight:700;margin-bottom:16px}
+.tut-row{
+  display:flex;align-items:center;gap:14px;
+  padding:8px 0;border-bottom:1px solid var(--border)
+}
+.tut-row:last-of-type{border-bottom:none}
+.tut-key{font-size:11px;color:var(--text);font-weight:600;min-width:190px;flex-shrink:0}
+.tut-desc{font-size:11px;color:var(--muted)}
+.tut-close-btn{
+  display:block;width:100%;margin-top:18px;
+  background:var(--accent);color:#000;border:none;
+  padding:10px;border-radius:7px;font-weight:700;
+  cursor:pointer;font-size:13px;transition:opacity .1s
+}
+.tut-close-btn:hover{opacity:.85}
 #pseudoLines{overflow-y:auto;padding:8px 0;flex:1}
 .pline{
   padding:2px 14px;white-space:pre;line-height:1.65;
@@ -232,6 +272,7 @@ main{flex:1;position:relative;overflow:hidden}
       <hr>
       <button onclick="toggleSetting('showRB')"><span class="ck" id="ck-showRB"> </span> R / B Farbbeschriftung</button>
       <button onclick="toggleSetting('showValues')"><span class="ck" id="ck-showValues"> </span> Werte anzeigen</button>
+      <button onclick="toggleSetting('tableView')"><span class="ck" id="ck-tableView"> </span> Tabellen-Ansicht</button>
       <hr>
       <button onclick="openPseudoPanel()">📋 Pseudocode-Fenster</button>
     </div>
@@ -275,6 +316,19 @@ main{flex:1;position:relative;overflow:hidden}
   <div id="pseudoLines"></div>
 </div>
 
+<div id="tutorialOverlay" class="tutorial-overlay">
+  <div class="tutorial-box">
+    <h3>Steuerung</h3>
+    <div class="tut-row"><span class="tut-key">🖱 Mausrad</span><span class="tut-desc">Hinein- / Herauszoomen</span></div>
+    <div class="tut-row"><span class="tut-key">🖱 Rechte Maustaste + Ziehen</span><span class="tut-desc">Ansicht verschieben (Pan)</span></div>
+    <div class="tut-row"><span class="tut-key">📱 Zwei Finger spreizen / zusammenführen</span><span class="tut-desc">Hinein- / Herauszoomen</span></div>
+    <div class="tut-row"><span class="tut-key">📱 Ein Finger ziehen</span><span class="tut-desc">Ansicht verschieben (Pan)</span></div>
+    <div class="tut-row"><span class="tut-key">🖱 Linksklick / Tap auf Knoten</span><span class="tut-desc">Wert &amp; Tags bearbeiten</span></div>
+    <div class="tut-row"><span class="tut-key">🖱 Linksklick + Halten &amp; Ziehen</span><span class="tut-desc">Knoten bewegen (Wobble)</span></div>
+    <button type="button" class="tut-close-btn" onclick="closeTutorial()">Verstanden ✓</button>
+  </div>
+</div>
+
 <div id="tooltip"></div>
 <input type="file" id="fileInput" accept=".json" style="display:none">
 
@@ -288,6 +342,7 @@ const settings = {
   darkMode:   false,
   showRB:     JSON.parse(localStorage.getItem('lab-showRB')    || 'false'),
   showValues: JSON.parse(localStorage.getItem('lab-showValues')|| 'false'),
+  tableView:  JSON.parse(localStorage.getItem('lab-tableView') || 'false'),
 };
 
 function applySettings() {
@@ -295,6 +350,7 @@ function applySettings() {
   document.getElementById('ck-darkMode').textContent   = settings.darkMode ? '✓' : ' ';
   document.getElementById('ck-showRB').textContent     = settings.showRB     ? '✓' : ' ';
   document.getElementById('ck-showValues').textContent = settings.showValues ? '✓' : ' ';
+  document.getElementById('ck-tableView').textContent  = settings.tableView  ? '✓' : ' ';
 }
 
 function toggleSetting(key) {
@@ -1480,6 +1536,12 @@ function _updateStepBtn() {
 let structure  = null;        // current data structure
 let structType = 'RBTree';
 let highlighted = new Set();  // highlighted node IDs
+let nodeSchema  = [];         // [{name, type}] – custom tags per node
+
+// Viewport
+let zoom = 1.0, panX = 0, panY = 0;
+let _panning = false, _panSX = 0, _panSY = 0, _panOX = 0, _panOY = 0;
+let _pinch0 = null, _touch0 = null;
 
 // Physics
 const wobble = new Map();     // id → [offX, offY, velX, velY]
@@ -1510,16 +1572,17 @@ function layoutRBTree(W) {
   const root = structure.getRoot();
   if (root === null) return {nodes,edges,nilNodes};
 
+  const LH = _getLevelH(), minGap = _nodeHalfW() * 2 + 22;
   function calc(key, x, y, off) {
     nodes.push({ id:key, x, y, key, value:structure.search(key), isRed:structure.isRed(key) });
-    const co = Math.max(off/2, 35);
+    const co = Math.max(off/2, minGap);
     const L=structure.leftOf(key), R=structure.rightOf(key);
-    if (L!==null) { edges.push({fromId:key,toId:L,fromX:x,fromY:y,toX:x-off,toY:y+LEVELH}); calc(L,x-off,y+LEVELH,co); }
-    else nilNodes.push({x:x-off, y:y+LEVELH, parentId:key});
-    if (R!==null) { edges.push({fromId:key,toId:R,fromX:x,fromY:y,toX:x+off,toY:y+LEVELH}); calc(R,x+off,y+LEVELH,co); }
-    else nilNodes.push({x:x+off, y:y+LEVELH, parentId:key});
+    if (L!==null) { edges.push({fromId:key,toId:L,fromX:x,fromY:y,toX:x-off,toY:y+LH}); calc(L,x-off,y+LH,co); }
+    else nilNodes.push({x:x-off, y:y+LH, parentId:key});
+    if (R!==null) { edges.push({fromId:key,toId:R,fromX:x,fromY:y,toX:x+off,toY:y+LH}); calc(R,x+off,y+LH,co); }
+    else nilNodes.push({x:x+off, y:y+LH, parentId:key});
   }
-  calc(root, W/2, 50, W/4);
+  calc(root, W/2, _startY(), W/4);
   return {nodes,edges,nilNodes};
 }
 
@@ -1528,7 +1591,9 @@ function layoutBinomialHeap(W) {
   const trees = structure.roots.filter(r => r !== null);
   if (!trees.length) return { nodes, edges, nilNodes: [] };
 
-  const BASE = 80, GAP = 50;
+  const BASE = settings.tableView ? TABLE_W + 30 : 80;
+  const GAP  = settings.tableView ? Math.floor(TABLE_W / 2) : 50;
+  const LH   = _getLevelH();
 
   // Assign stable per-frame layout IDs
   let lid = 0;
@@ -1556,14 +1621,14 @@ function layoutBinomialHeap(W) {
     let x0     = cx - totC / 2;
     for (let i = 0; i < node.children.length; i++) {
       const child = node.children[i], childCx = x0 + cws[i] / 2;
-      edges.push({ fromId: node._lid, toId: child._lid, fromX: cx, fromY: y, toX: childCx, toY: y + LEVELH });
-      layoutNode(child, childCx, y + LEVELH);
+      edges.push({ fromId: node._lid, toId: child._lid, fromX: cx, fromY: y, toX: childCx, toY: y + LH });
+      layoutNode(child, childCx, y + LH);
       x0 += cws[i];
     }
   };
 
   for (let i = 0; i < trees.length; i++) {
-    layoutNode(trees[i], cx0 + widths[i] / 2, 50);
+    layoutNode(trees[i], cx0 + widths[i] / 2, _startY());
     cx0 += widths[i] + GAP;
   }
   const rootListEdges = [];
@@ -1577,7 +1642,9 @@ function layoutFibHeap(W) {
   const nodes = [], edges = [];
   if (!structure.min) return { nodes, edges, nilNodes: [] };
 
-  const BASE = 80, GAP = 50;
+  const BASE = settings.tableView ? TABLE_W + 30 : 80;
+  const GAP  = settings.tableView ? Math.floor(TABLE_W / 2) : 50;
+  const LH   = _getLevelH();
   let lid = 0;
 
   const assignIds = n => {
@@ -1605,14 +1672,14 @@ function layoutFibHeap(W) {
     let x0 = cx - totC / 2;
     for (let i = 0; i < ch.length; i++) {
       const childCx = x0 + cws[i] / 2;
-      edges.push({ fromId: node._lid, toId: ch[i]._lid, fromX: cx, fromY: y, toX: childCx, toY: y + LEVELH });
-      layoutNode(ch[i], childCx, y + LEVELH);
+      edges.push({ fromId: node._lid, toId: ch[i]._lid, fromX: cx, fromY: y, toX: childCx, toY: y + LH });
+      layoutNode(ch[i], childCx, y + LH);
       x0 += cws[i];
     }
   };
 
   for (let i = 0; i < trees.length; i++) {
-    layoutNode(trees[i], cx0 + widths[i] / 2, 50);
+    layoutNode(trees[i], cx0 + widths[i] / 2, _startY());
     cx0 += widths[i] + GAP;
   }
   const rootListEdges = [];
@@ -1625,15 +1692,16 @@ function layoutFibHeap(W) {
 function layoutHeap(W) {
   const nodes=[], edges=[], n=structure.size();
   if (!n) return {nodes,edges,nilNodes:[]};
+  const LH = _getLevelH(), minGap = _nodeHalfW() * 2 + 22;
   function calc(i, x, y, off) {
     if (i>=n) return;
     const d=structure.data[i];
     nodes.push({id:i, x, y, key:d.key, value:d.value, isRed:false});
-    const co=Math.max(off/2,35), li=2*i+1, ri=2*i+2;
-    if(li<n){edges.push({fromId:i,toId:li,fromX:x,fromY:y,toX:x-off,toY:y+LEVELH});calc(li,x-off,y+LEVELH,co);}
-    if(ri<n){edges.push({fromId:i,toId:ri,fromX:x,fromY:y,toX:x+off,toY:y+LEVELH});calc(ri,x+off,y+LEVELH,co);}
+    const co=Math.max(off/2, minGap), li=2*i+1, ri=2*i+2;
+    if(li<n){edges.push({fromId:i,toId:li,fromX:x,fromY:y,toX:x-off,toY:y+LH});calc(li,x-off,y+LH,co);}
+    if(ri<n){edges.push({fromId:i,toId:ri,fromX:x,fromY:y,toX:x+off,toY:y+LH});calc(ri,x+off,y+LH,co);}
   }
-  calc(0, W/2, 50, W/4);
+  calc(0, W/2, _startY(), W/4);
   return {nodes,edges,nilNodes:[]};
 }
 
@@ -1651,6 +1719,99 @@ function stepPhysics() {
     s[0]+=s[2]; s[1]+=s[3];
     if (Math.abs(s[0])<.08&&Math.abs(s[1])<.08&&Math.abs(s[2])<.08&&Math.abs(s[3])<.08)
       wobble.delete(id);
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  TABLE NODE RENDERING
+// ══════════════════════════════════════════════════════════════
+const TABLE_COL1_W = 66;
+const TABLE_COL2_W = 90;
+const TABLE_W      = TABLE_COL1_W + TABLE_COL2_W; // 156
+const TABLE_ROW_H  = 17;
+
+function _nodeHalfH() {
+  if (!settings.tableView) return RADIUS;
+  return (TABLE_ROW_H * (2 + nodeSchema.length) + 6) / 2;
+}
+function _nodeHalfW() {
+  return settings.tableView ? TABLE_W / 2 : RADIUS;
+}
+function _getLevelH() {
+  return settings.tableView ? Math.max(100, _nodeHalfH() * 2 + 30) : 100;
+}
+function _startY() {
+  return _nodeHalfH() + 20;
+}
+
+function _drawTableNode(ctx, n, x, y, isHl, C) {
+  const rows = [];
+  const decoded = _decodeVal(n.value);
+
+  if (_dataMode === 'hist') {
+    const o = _parseVal(n.value);
+    rows.push({ k:'key',   v: o ? (o.date||_fmtHistKey(n.key)) : _fmtHistKey(n.key) });
+    rows.push({ k:'value', v: o ? truncateVal(o.title||'',14) : '' });
+  } else if (_dataMode === 'git') {
+    const o = _parseVal(n.value);
+    rows.push({ k:'key',   v: String(n.key) });
+    rows.push({ k:'value', v: o ? truncateVal(o.msg||'',14) : '' });
+  } else {
+    rows.push({ k:'key',   v: _nodeLabel(n) });
+    const bv = decoded ? (decoded._v||'') : (n.value||'');
+    rows.push({ k:'value', v: truncateVal(bv, 14) });
+  }
+  for (const tag of nodeSchema) {
+    const tv = decoded && decoded[tag.name]!==undefined ? String(decoded[tag.name]) : '—';
+    rows.push({ k: tag.name, v: truncateVal(tv, 14) });
+  }
+
+  const H  = TABLE_ROW_H * rows.length + 6;
+  const rx = x - TABLE_W / 2;
+  const ry = y - H / 2;
+
+  if (isHl) {
+    const g = ctx.createRadialGradient(x, y, 5, x, y, TABLE_W / 2 + 22);
+    g.addColorStop(0, 'rgba(251,191,36,.30)');
+    g.addColorStop(1, 'rgba(251,191,36,0)');
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(x, y, TABLE_W / 2 + 22, 0, Math.PI * 2); ctx.fill();
+  }
+
+  ctx.fillStyle = 'rgba(0,0,0,.28)';
+  roundRect(ctx, rx+2, ry+3, TABLE_W, H, 7); ctx.fill();
+
+  ctx.fillStyle = n.isRed ? C.nodeFillRed : (n.isMin ? C.nodeFillMin : C.nodeFillBlk);
+  roundRect(ctx, rx, ry, TABLE_W, H, 7); ctx.fill();
+  ctx.strokeStyle = n.isRed ? C.nodeBordRed : (n.isMin ? C.nodeBordMin : C.nodeBordBlk);
+  ctx.lineWidth = 1.6;
+  roundRect(ctx, rx, ry, TABLE_W, H, 7); ctx.stroke();
+
+  const divX = rx + TABLE_COL1_W;
+  ctx.save();
+  ctx.globalAlpha = 0.28;
+  ctx.strokeStyle = '#fff';
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(divX, ry+5); ctx.lineTo(divX, ry+H-5); ctx.stroke();
+  ctx.restore();
+
+  for (let i = 0; i < rows.length; i++) {
+    const rowTop = ry + 3 + i * TABLE_ROW_H;
+    const midY   = rowTop + TABLE_ROW_H / 2;
+    if (i > 0) {
+      ctx.save(); ctx.globalAlpha = 0.10;
+      ctx.strokeStyle = '#fff'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(rx+5, rowTop); ctx.lineTo(rx+TABLE_W-5, rowTop); ctx.stroke();
+      ctx.restore();
+    }
+    ctx.fillStyle = 'rgba(190,210,245,0.58)';
+    ctx.font = 'bold 8px "Segoe UI",system-ui,sans-serif';
+    ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+    ctx.fillText(rows[i].k, divX - 4, midY);
+    ctx.fillStyle = '#fff';
+    ctx.font = '9px "Segoe UI",system-ui,sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText(String(rows[i].v), divX + 5, midY);
   }
 }
 
@@ -1684,14 +1845,6 @@ function draw() {
     emptyText:   dm ? '#8892a6'                 : '#6b7585',
   };
 
-  // dot-grid background
-  ctx.fillStyle = C.dotGrid;
-  const gs = 40;
-  for (let x=gs; x<canvas.width; x+=gs)
-    for (let y=gs; y<canvas.height; y+=gs) {
-      ctx.beginPath(); ctx.arc(x,y,1,0,Math.PI*2); ctx.fill();
-    }
-
   stepPhysics();
   layout = computeLayout();
 
@@ -1706,15 +1859,31 @@ function draw() {
     requestAnimationFrame(draw); return;
   }
 
+  ctx.save();
+  ctx.setTransform(zoom, 0, 0, zoom, panX, panY);
+
+  // dot-grid (Weltkoordinaten – bewegt sich mit der Ansicht)
+  ctx.fillStyle = C.dotGrid;
+  const gs = 40;
+  const _gx0 = Math.floor(-panX / zoom / gs) * gs;
+  const _gy0 = Math.floor(-panY / zoom / gs) * gs;
+  const _gx1 = Math.ceil((canvas.width  - panX) / zoom / gs) * gs;
+  const _gy1 = Math.ceil((canvas.height - panY) / zoom / gs) * gs;
+  for (let x=_gx0; x<=_gx1; x+=gs)
+    for (let y=_gy0; y<=_gy1; y+=gs) {
+      ctx.beginPath(); ctx.arc(x,y,1,0,Math.PI*2); ctx.fill();
+    }
+
   const nodeMap = new Map(layout.nodes.map(n=>[n.id,n]));
 
   // ── edges ──────────────────────────────────────────────────
+  const _eHH = _nodeHalfH(), _eHW = _nodeHalfW();
   ctx.strokeStyle = C.edge; ctx.lineWidth = 2.5; ctx.setLineDash([]);
   for (const e of layout.edges) {
     const fn=nodeMap.get(e.fromId), tn=nodeMap.get(e.toId); if(!fn||!tn) continue;
     ctx.beginPath();
-    ctx.moveTo(fn.x+wx(e.fromId), fn.y+wy(e.fromId)+RADIUS);
-    ctx.lineTo(tn.x+wx(e.toId),  tn.y+wy(e.toId)  -RADIUS);
+    ctx.moveTo(fn.x+wx(e.fromId), fn.y+wy(e.fromId)+_eHH);
+    ctx.lineTo(tn.x+wx(e.toId),  tn.y+wy(e.toId)  -_eHH);
     ctx.stroke();
   }
 
@@ -1725,9 +1894,9 @@ function draw() {
     for (const e of layout.rootListEdges) {
       const fn = nodeMap.get(e.fromId), tn = nodeMap.get(e.toId);
       if (!fn || !tn) continue;
-      const x1 = fn.x + wx(e.fromId) + RADIUS;
+      const x1 = fn.x + wx(e.fromId) + _eHW;
       const y1 = fn.y + wy(e.fromId);
-      const x2 = tn.x + wx(e.toId)  - RADIUS;
+      const x2 = tn.x + wx(e.toId)  - _eHW;
       const y2 = tn.y + wy(e.toId);
       ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
       const ang = Math.atan2(y2 - y1, x2 - x1), aLen = 9, aW = 0.38;
@@ -1746,7 +1915,7 @@ function draw() {
     if (fn) {
       const rlColor = dm ? 'rgba(125,211,252,0.65)' : 'rgba(2,132,199,0.65)';
       const nx = fn.x + wx(fn.id), ny = fn.y + wy(fn.id);
-      const x1 = nx - RADIUS - 38, x2 = nx - RADIUS;
+      const x1 = nx - _eHW - 38, x2 = nx - _eHW;
       ctx.strokeStyle = rlColor; ctx.lineWidth = 1.8; ctx.setLineDash([]);
       ctx.beginPath(); ctx.moveTo(x1, ny); ctx.lineTo(x2, ny); ctx.stroke();
       const aLen = 9, aW = 0.38;
@@ -1765,7 +1934,7 @@ function draw() {
     if (par) {
       ctx.strokeStyle = C.nilLine; ctx.lineWidth = 1.2; ctx.setLineDash([4,4]);
       ctx.beginPath();
-      ctx.moveTo(par.x+wx(nil.parentId), par.y+wy(nil.parentId)+RADIUS);
+      ctx.moveTo(par.x+wx(nil.parentId), par.y+wy(nil.parentId)+_eHH);
       ctx.lineTo(nil.x, nil.y-7); ctx.stroke();
     }
     ctx.setLineDash([]);
@@ -1785,6 +1954,11 @@ function draw() {
   // ── nodes ──────────────────────────────────────────────────
   for (const n of layout.nodes) {
     const x = n.x+wx(n.id), y = n.y+wy(n.id);
+
+    if (settings.tableView) {
+      _drawTableNode(ctx, n, x, y, highlighted.has(n.id), C);
+      continue;
+    }
 
     if (highlighted.has(n.id)) {
       const g = ctx.createRadialGradient(x,y,RADIUS,x,y,RADIUS+24);
@@ -1851,15 +2025,26 @@ function draw() {
     }
   }
 
+  ctx.restore();
   requestAnimationFrame(draw);
 }
 
 // ══════════════════════════════════════════════════════════════
 //  HIT TEST
 // ══════════════════════════════════════════════════════════════
-function nodeAt(mx, my) {
+function nodeAt(sx, sy) {
+  const wsx = (sx - panX) / zoom;
+  const wsy = (sy - panY) / zoom;
+  if (settings.tableView) {
+    const hh = _nodeHalfH();
+    for (const n of layout.nodes) {
+      const nx = n.x+wx(n.id), ny = n.y+wy(n.id);
+      if (Math.abs(wsx-nx) <= TABLE_W/2 && Math.abs(wsy-ny) <= hh) return n;
+    }
+    return null;
+  }
   for (const n of layout.nodes) {
-    const dx=mx-n.x-wx(n.id), dy=my-n.y-wy(n.id);
+    const dx=wsx-n.x-wx(n.id), dy=wsy-n.y-wy(n.id);
     if (dx*dx+dy*dy<=RADIUS*RADIUS) return n;
   }
   return null;
@@ -1869,6 +2054,13 @@ function nodeAt(mx, my) {
 //  MOUSE  –  drag / click / wobble
 // ══════════════════════════════════════════════════════════════
 canvas.addEventListener('mousedown', e => {
+  if (e.button === 2) {
+    const r = canvas.getBoundingClientRect();
+    _panning = true;
+    _panSX = e.clientX - r.left; _panSY = e.clientY - r.top;
+    _panOX = panX; _panOY = panY;
+    return;
+  }
   if (e.button!==0) return;
   const r=canvas.getBoundingClientRect(), mx=e.clientX-r.left, my=e.clientY-r.top;
   const n=nodeAt(mx,my); if(!n) return;
@@ -1880,14 +2072,23 @@ canvas.addEventListener('mousedown', e => {
 canvas.addEventListener('mousemove', e => {
   const r=canvas.getBoundingClientRect(), mx=e.clientX-r.left, my=e.clientY-r.top;
 
-  // drag
+  // pan (rechte Maustaste)
+  if (_panning) {
+    panX = _panOX + (mx - _panSX);
+    panY = _panOY + (my - _panSY);
+    canvas.style.cursor = 'grabbing';
+    document.getElementById('tooltip').style.display = 'none';
+    return;
+  }
+
+  // drag (linke Maustaste – Wobble in Weltkoordinaten)
   if (drag) {
-    const dx=mx-drag.startX, dy=my-drag.startY;
-    if (!drag.moved && dx*dx+dy*dy>25) drag.moved=true;
+    const dxS=mx-drag.startX, dyS=my-drag.startY;
+    if (!drag.moved && dxS*dxS+dyS*dyS>25) drag.moved=true;
     if (drag.moved) {
       const s=wobble.get(drag.id)||[0,0,0,0];
       wobble.set(drag.id,s);
-      s[0]=drag.initOX+dx; s[1]=drag.initOY+dy;
+      s[0]=drag.initOX+dxS/zoom; s[1]=drag.initOY+dyS/zoom;
     }
     canvas.style.cursor='grabbing';
   } else {
@@ -1911,7 +2112,15 @@ canvas.addEventListener('mousemove', e => {
       dispVal = `<b>${(obj.msg||'').replace(/</g,'&lt;')}</b>`;
       if (obj.diff) dispVal += `<br><code style="font-size:10px;opacity:.75;display:block;margin-top:3px;white-space:pre">${obj.diff.replace(/</g,'&lt;').slice(0,160)}</code>`;
     } else {
-      dispVal = (n.value||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      const dec = _decodeVal(n.value);
+      if (dec && nodeSchema.length) {
+        const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+        dispVal = `<b>value:</b> ${esc(dec._v||'')}`;
+        for (const tag of nodeSchema)
+          dispVal += `<br><b>${esc(tag.name)}:</b> ${dec[tag.name]!==undefined?esc(dec[tag.name]):'—'}`;
+      } else {
+        dispVal = (n.value||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      }
     }
     tip.innerHTML=`<b>Key:</b> ${dispKey}<br>${dispVal||'<em style="color:var(--muted)">leer</em>'}`;
   } else {
@@ -1920,6 +2129,7 @@ canvas.addEventListener('mousemove', e => {
 });
 
 canvas.addEventListener('mouseup', e => {
+  if (e.button === 2) { _panning = false; canvas.style.cursor = 'default'; return; }
   if (!drag) return;
   if (drag.moved) {
     const s=wobble.get(drag.id);
@@ -1932,7 +2142,21 @@ canvas.addEventListener('mouseup', e => {
   drag=null;
 });
 
+canvas.addEventListener('contextmenu', e => e.preventDefault());
+
+canvas.addEventListener('wheel', e => {
+  e.preventDefault();
+  const r = canvas.getBoundingClientRect();
+  const mx = e.clientX - r.left, my = e.clientY - r.top;
+  const factor = e.deltaY < 0 ? 1.12 : 1 / 1.12;
+  const newZoom = Math.max(0.08, Math.min(8, zoom * factor));
+  panX = mx - (mx - panX) * (newZoom / zoom);
+  panY = my - (my - panY) * (newZoom / zoom);
+  zoom = newZoom;
+}, { passive: false });
+
 canvas.addEventListener('mouseleave', () => {
+  _panning = false;
   document.getElementById('tooltip').style.display='none';
   if (drag?.moved) {
     const s=wobble.get(drag.id);
@@ -2024,8 +2248,18 @@ function openValueEditor(nodeId) {
   }
 
   // ── Standard-Modus ──────────────────────────────────────────
-  const safe = currentVal.replace(/"/g,'&quot;').replace(/</g,'&lt;');
-  showDialog('Value bearbeiten', `
+  const decoded = _decodeVal(currentVal);
+  const baseVal = decoded ? (decoded._v || '') : currentVal;
+  const safe = baseVal.replace(/"/g,'&quot;').replace(/</g,'&lt;');
+  const extraFieldsHTML = nodeSchema.map((tag, i) => {
+    const cur = decoded && decoded[tag.name] !== undefined ? String(decoded[tag.name]) : '';
+    const safeCur = cur.replace(/"/g,'&quot;').replace(/</g,'&lt;');
+    if (tag.type === 'boolean') {
+      return `<div class="dialog-field"><label>${tag.name.replace(/</g,'&lt;')} <span style="font-size:10px;color:var(--muted)">(boolean)</span></label><select id="_etag_${i}"><option value="false"${cur!=='true'?' selected':''}>false</option><option value="true"${cur==='true'?' selected':''}>true</option></select></div>`;
+    }
+    return `<div class="dialog-field"><label>${tag.name.replace(/</g,'&lt;')} <span style="font-size:10px;color:var(--muted)">(${tag.type})</span></label><input type="${tag.type==='integer'?'number':'text'}" id="_etag_${i}" value="${safeCur}" ${tag.type==='integer'?'step="1"':''}></div>`;
+  }).join('');
+  showDialog('Knoten bearbeiten', `
     <div class="dialog-field">
       <label>Key</label>
       <input type="text" value="${currentKey}" readonly style="opacity:.5;cursor:default">
@@ -2036,10 +2270,16 @@ function openValueEditor(nodeId) {
         <input type="text" id="editVal" value="${safe}" placeholder="Text, URL …">
         <button class="browse-btn" onclick="pickFile('editVal')" title="Datei">📁</button>
       </div>
-    </div>`, () => {
-    const v = document.getElementById('editVal').value.trim();
-    if (!v) return;
-    _save(v);
+    </div>
+    ${extraFieldsHTML}`, () => {
+    const newBase = document.getElementById('editVal').value.trim();
+    if (!newBase && !nodeSchema.length) return;
+    const tagValues = {};
+    nodeSchema.forEach((tag, i) => {
+      const el = document.getElementById('_etag_' + i);
+      if (el) tagValues[tag.name] = el.value;
+    });
+    _save(_encodeVal(newBase, tagValues));
   });
   setTimeout(() => document.getElementById('editVal')?.focus(), 50);
 }
@@ -2050,6 +2290,50 @@ function pickFile(inputId) {
     if(inp.files[0]) document.getElementById(inputId).value=inp.files[0].name;
   };
   inp.click();
+}
+
+// ══════════════════════════════════════════════════════════════
+//  NODE SCHEMA – custom tags
+// ══════════════════════════════════════════════════════════════
+window._addSchemaRow = function(name='', type='string') {
+  const container = document.getElementById('_schemaRows');
+  if (!container) return;
+  const row = document.createElement('div');
+  row.className = 'schema-row';
+  row.innerHTML =
+    `<input type="text" class="schema-tag-name" placeholder="Tag-Name" value="${name.replace(/"/g,'&quot;')}">` +
+    `<select class="schema-type-sel">` +
+      `<option value="string"${type==='string'?' selected':''}>string</option>` +
+      `<option value="integer"${type==='integer'?' selected':''}>integer</option>` +
+      `<option value="boolean"${type==='boolean'?' selected':''}>boolean</option>` +
+    `</select>` +
+    `<button type="button" class="schema-rem" onclick="this.closest('.schema-row').remove()" title="Tag entfernen">✕</button>`;
+  container.appendChild(row);
+};
+
+function _readSchema() {
+  const rows = document.querySelectorAll('#_schemaRows .schema-row');
+  return Array.from(rows).map(row => ({
+    name: row.querySelector('.schema-tag-name').value.trim(),
+    type: row.querySelector('.schema-type-sel').value,
+  })).filter(t => t.name);
+}
+
+function _encodeVal(baseVal, tagValues) {
+  if (!nodeSchema.length) return baseVal;
+  const obj = { _v: baseVal };
+  for (const {name, type} of nodeSchema) {
+    const raw = tagValues[name] !== undefined ? String(tagValues[name]) : '';
+    obj[name] = type === 'integer' ? (parseInt(raw) || 0)
+              : type === 'boolean' ? (raw === 'true')
+              : raw;
+  }
+  return JSON.stringify(obj);
+}
+
+function _decodeVal(rawVal) {
+  const obj = _parseVal(rawVal);
+  return (obj && typeof obj === 'object' && '_v' in obj) ? obj : null;
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -2139,6 +2423,12 @@ function askKey(title, cb) {
 
 function cmdInsert() {
   if (!need()) return;
+  const extraFields = nodeSchema.map((tag, i) => {
+    if (tag.type === 'boolean') {
+      return `<div class="dialog-field"><label>${tag.name.replace(/</g,'&lt;')} <span style="font-size:10px;color:var(--muted)">(boolean)</span></label><select id="_itag_${i}"><option value="false">false</option><option value="true">true</option></select></div>`;
+    }
+    return `<div class="dialog-field"><label>${tag.name.replace(/</g,'&lt;')} <span style="font-size:10px;color:var(--muted)">(${tag.type})</span></label><input type="${tag.type==='integer'?'number':'text'}" id="_itag_${i}" ${tag.type==='integer'?'step="1"':''} placeholder="${tag.name.replace(/"/g,'&quot;')}"></div>`;
+  }).join('');
   showDialog('Insert', `
     <div class="dialog-field">
       <label>Key (Ganzzahl)</label>
@@ -2150,15 +2440,22 @@ function cmdInsert() {
         <input type="text" id="_iv" placeholder="Text, URL …">
         <button class="browse-btn" onclick="pickFile('_iv')" title="Datei">📁</button>
       </div>
-    </div>`, () => {
-    const k=parseInt(document.getElementById('_ik').value);
-    const v=document.getElementById('_iv').value.trim()||('Value_'+k);
+    </div>
+    ${extraFields}`, () => {
+    const k = parseInt(document.getElementById('_ik').value);
+    const baseV = document.getElementById('_iv').value.trim() || ('Value_' + k);
     if (isNaN(k)) return;
+    const tagValues = {};
+    nodeSchema.forEach((tag, i) => {
+      const el = document.getElementById('_itag_' + i);
+      if (el) tagValues[tag.name] = el.value;
+    });
+    const v = _encodeVal(baseV, tagValues);
     highlighted.clear();
     _startLog(`${structType} — Insert(${k})`, 'insert');
-    structure.insert(k,v);
+    structure.insert(k, v);
     _endLog();
-    setStatus(`✓ ${k} → ${v.length>40?v.slice(0,40)+'…':v}`);
+    setStatus(`✓ ${k} → ${baseV.length>40?baseV.slice(0,40)+'…':baseV}`);
   });
   setTimeout(()=>document.getElementById('_ik')?.focus(),50);
 }
@@ -2380,7 +2677,13 @@ function cmdNew() {
           <option value="prime">📐  Primzahlen (11) – empfohlen für Heap</option>
         </optgroup>
       </select>
+    </div>
+    <div class="dialog-field">
+      <label>Knoten-Schema — zusätzliche Tags</label>
+      <div id="_schemaRows"></div>
+      <button type="button" class="add-tag-btn" onclick="window._addSchemaRow()">＋ Tag hinzufügen</button>
     </div>`, () => {
+    nodeSchema = _readSchema();
     const smp      = document.getElementById('_smp').value;
     const heapType = document.getElementById('_heapType').value; // 'max' | 'min'
     const isMax    = heapType === 'max';
@@ -2412,11 +2715,17 @@ function cmdNew() {
     buildOpsMenu();
     setStatus(`✓ Neuer ${structType} erstellt${rawKeys.length?' mit '+rawKeys.length+' Beispielknoten':''}`);
   });
+  setTimeout(() => {
+    const c = document.getElementById('_schemaRows');
+    if (c) { c.innerHTML = ''; nodeSchema.forEach(t => window._addSchemaRow(t.name, t.type)); }
+  }, 30);
 }
 
 function cmdSave() {
   if (!need()) return;
-  downloadJSON(`${structType}_${Date.now()}.json`, structure.toJSON());
+  const data = structure.toJSON();
+  if (nodeSchema.length) data.schema = nodeSchema;
+  downloadJSON(`${structType}_${Date.now()}.json`, data);
   setStatus('✓ Gespeichert');
 }
 
@@ -2429,6 +2738,7 @@ function cmdLoad() {
       try {
         const d=JSON.parse(e.target.result);
         highlighted.clear(); wobble.clear();
+        nodeSchema = d.schema || [];
         structType=d.type;
         if      (structType === 'RBTree')           structure = RBTree.fromJSON(d);
         else if (structType === 'MinHeap')          structure = MinHeap.fromJSON(d);
@@ -2543,6 +2853,70 @@ structure = new RBTree();
 buildOpsMenu();
 applySettings();
 draw();
+
+// Tutorial
+function closeTutorial() {
+  document.getElementById('tutorialOverlay').style.display = 'none';
+  sessionStorage.setItem('lab-tutorial-shown', '1');
+}
+if (sessionStorage.getItem('lab-tutorial-shown')) {
+  document.getElementById('tutorialOverlay').style.display = 'none';
+}
+
+// ── Touch: Pinch-Zoom + Ein-Finger-Pan ───────────────────────
+canvas.addEventListener('touchstart', e => {
+  e.preventDefault();
+  if (e.touches.length === 2) {
+    const t1 = e.touches[0], t2 = e.touches[1];
+    const r = canvas.getBoundingClientRect();
+    _pinch0 = {
+      dist: Math.hypot(t2.clientX-t1.clientX, t2.clientY-t1.clientY),
+      zoom, panX, panY,
+      midX: (t1.clientX+t2.clientX)/2 - r.left,
+      midY: (t1.clientY+t2.clientY)/2 - r.top,
+    };
+    _touch0 = null;
+  } else if (e.touches.length === 1) {
+    const r = canvas.getBoundingClientRect();
+    _touch0 = {
+      sx: e.touches[0].clientX - r.left,
+      sy: e.touches[0].clientY - r.top,
+      panX, panY, moved: false,
+    };
+    _pinch0 = null;
+  }
+}, { passive: false });
+
+canvas.addEventListener('touchmove', e => {
+  e.preventDefault();
+  if (e.touches.length === 2 && _pinch0) {
+    const t1 = e.touches[0], t2 = e.touches[1];
+    const dist = Math.hypot(t2.clientX-t1.clientX, t2.clientY-t1.clientY);
+    const newZoom = Math.max(0.08, Math.min(8, _pinch0.zoom * (dist / _pinch0.dist)));
+    panX = _pinch0.midX - (_pinch0.midX - _pinch0.panX) * (newZoom / _pinch0.zoom);
+    panY = _pinch0.midY - (_pinch0.midY - _pinch0.panY) * (newZoom / _pinch0.zoom);
+    zoom = newZoom;
+  } else if (e.touches.length === 1 && _touch0) {
+    const r = canvas.getBoundingClientRect();
+    const cx = e.touches[0].clientX - r.left, cy = e.touches[0].clientY - r.top;
+    const dx = cx - _touch0.sx, dy = cy - _touch0.sy;
+    if (!_touch0.moved && dx*dx+dy*dy > 16) _touch0.moved = true;
+    if (_touch0.moved) { panX = _touch0.panX + dx; panY = _touch0.panY + dy; }
+  }
+}, { passive: false });
+
+canvas.addEventListener('touchend', e => {
+  if (e.touches.length === 0 && _touch0 && !_touch0.moved) {
+    const n = nodeAt(_touch0.sx, _touch0.sy);
+    if (n) setTimeout(() => openValueEditor(n.id), 10);
+  }
+  if (e.touches.length < 2) _pinch0 = null;
+  if (e.touches.length === 0) { _touch0 = null; }
+  else if (e.touches.length === 1 && !_pinch0) {
+    const r = canvas.getBoundingClientRect();
+    _touch0 = { sx: e.touches[0].clientX-r.left, sy: e.touches[0].clientY-r.top, panX, panY, moved: false };
+  }
+}, { passive: false });
 
 // ── Pseudo-Panel: Events ──────────────────────────────────────
 document.getElementById('pseudoStepBtn').addEventListener('click', _stepPseudo);
