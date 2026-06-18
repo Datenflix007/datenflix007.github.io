@@ -1,0 +1,1067 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AlltagsLabor | Datenflix</title>
+  <meta name="description" content="AlltagsLabor: eine offene Sammlung alltagsnaher Experimente und Lernmaterialien fuer Schule, Projektarbeit und eigenes Forschen." />
+  <link rel="icon" type="image/png" href="icon.png" />
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+      startup: { typeset: false }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f5f7f2;
+      --ink: #1f2933;
+      --muted: #59636e;
+      --panel: #ffffff;
+      --panel-soft: #eef4e8;
+      --line: #d9e0d4;
+      --green: #2f7d5b;
+      --green-dark: #19553d;
+      --blue: #2c6ca3;
+      --amber: #b46b13;
+      --red: #a33c2c;
+      --shadow: 0 18px 45px rgba(31, 41, 51, .11);
+      --max: 1180px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      background:
+        linear-gradient(180deg, rgba(245, 247, 242, .82), rgba(245, 247, 242, 1)),
+        url("https://gitlab.com/Datenflix007/alltagslabordata/-/raw/main/documentation/Screenshot_2025-06-03_153937.png");
+      background-size: cover;
+      background-attachment: fixed;
+      color: var(--ink);
+      line-height: 1.62;
+    }
+
+    a { color: inherit; }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      border-bottom: 1px solid rgba(217, 224, 212, .9);
+      background: rgba(255, 255, 255, .92);
+      backdrop-filter: blur(14px);
+    }
+
+    .topbar-inner {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 11px;
+      min-width: 0;
+      text-decoration: none;
+      font-weight: 850;
+    }
+
+    .brand img {
+      width: 36px;
+      height: 36px;
+      border-radius: 9px;
+      box-shadow: 0 5px 16px rgba(47, 125, 91, .22);
+    }
+
+    .brand span {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 38px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      padding: 8px 12px;
+      font-weight: 750;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .btn:hover { border-color: var(--green); color: var(--green-dark); }
+    .btn.primary {
+      border-color: var(--green);
+      background: var(--green);
+      color: #fff;
+    }
+    .btn.ghost { background: rgba(255, 255, 255, .62); }
+
+    .hero {
+      min-height: 74vh;
+      display: grid;
+      align-items: end;
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 76px 20px 38px;
+    }
+
+    .hero-content {
+      max-width: 790px;
+      padding-bottom: 22px;
+    }
+
+    .kicker {
+      color: var(--green-dark);
+      font-weight: 850;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      font-size: .76rem;
+    }
+
+    h1 {
+      margin: 14px 0 18px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(3.2rem, 9vw, 6.8rem);
+      line-height: .95;
+      letter-spacing: -0.04em;
+      color: #152219;
+    }
+
+    .lead {
+      max-width: 760px;
+      margin: 0;
+      font-size: clamp(1.07rem, 1.8vw, 1.28rem);
+      color: #26322b;
+    }
+
+    .hero-actions {
+      margin-top: 24px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 0 20px 36px;
+    }
+
+    .stat {
+      background: rgba(255, 255, 255, .84);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px 16px;
+      box-shadow: 0 8px 22px rgba(31, 41, 51, .06);
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 1.45rem;
+      line-height: 1.1;
+      color: var(--green-dark);
+    }
+
+    .stat span {
+      color: var(--muted);
+      font-size: .91rem;
+    }
+
+    .band {
+      background: var(--bg);
+      border-top: 1px solid var(--line);
+    }
+
+    .workspace {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 34px 20px 72px;
+      display: grid;
+      grid-template-columns: 315px minmax(0, 1fr);
+      gap: 26px;
+      align-items: start;
+    }
+
+    .filters {
+      position: sticky;
+      top: 76px;
+      display: grid;
+      gap: 14px;
+      border-right: 1px solid var(--line);
+      padding-right: 22px;
+    }
+
+    .filters h2,
+    .content-head h2 {
+      margin: 0;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+
+    .field label {
+      color: var(--muted);
+      font-size: .84rem;
+      font-weight: 800;
+    }
+
+    .field input,
+    .field select {
+      width: 100%;
+      min-height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #fff;
+      color: var(--ink);
+      padding: 8px 10px;
+    }
+
+    .filter-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .source-note {
+      color: var(--muted);
+      font-size: .9rem;
+      margin: 6px 0 0;
+    }
+
+    .source-note a { color: var(--green-dark); font-weight: 750; }
+
+    .content-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .view-toggle {
+      display: inline-flex;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+      background: #fff;
+      flex: 0 0 auto;
+    }
+
+    .view-toggle button {
+      border: 0;
+      background: transparent;
+      min-height: 38px;
+      padding: 8px 12px;
+      font-weight: 800;
+      color: var(--muted);
+    }
+
+    .view-toggle button[aria-pressed="true"] {
+      background: var(--green);
+      color: #fff;
+    }
+
+    .experiment-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .experiment-card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .92);
+      padding: 17px;
+      min-height: 230px;
+      display: grid;
+      gap: 12px;
+      align-content: start;
+      box-shadow: 0 10px 24px rgba(31, 41, 51, .05);
+      transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease;
+    }
+
+    .experiment-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(47, 125, 91, .52);
+      box-shadow: var(--shadow);
+    }
+
+    .experiment-card h3 {
+      margin: 0;
+      font-size: 1.24rem;
+      line-height: 1.22;
+    }
+
+    .description {
+      color: var(--muted);
+      font-size: .95rem;
+      max-height: 7.4em;
+      overflow: hidden;
+    }
+
+    .description :first-child { margin-top: 0; }
+    .description :last-child { margin-bottom: 0; }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-top: auto;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      border-radius: 999px;
+      border: 1px solid #d1ddcc;
+      background: #f4f8f0;
+      color: #355242;
+      padding: 4px 9px;
+      font-size: .82rem;
+      font-weight: 750;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .empty,
+    .error {
+      border: 1px solid var(--line);
+      border-left: 4px solid var(--amber);
+      background: #fff;
+      border-radius: 8px;
+      padding: 18px;
+      color: var(--muted);
+    }
+
+    .error { border-left-color: var(--red); }
+
+    dialog {
+      width: min(960px, calc(100vw - 28px));
+      max-height: calc(100vh - 28px);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 0;
+      box-shadow: 0 24px 80px rgba(31, 41, 51, .28);
+      color: var(--ink);
+      background: #fff;
+    }
+
+    dialog::backdrop { background: rgba(21, 34, 25, .46); }
+
+    .modal-head {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: start;
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255, 255, 255, .96);
+      backdrop-filter: blur(10px);
+    }
+
+    .modal-head h2 {
+      margin: 0;
+      line-height: 1.18;
+    }
+
+    .modal-tools {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .experiment-body {
+      padding: 20px;
+    }
+
+    .detail-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 0 0 18px;
+    }
+
+    .step {
+      margin: 14px 0;
+      padding: 14px 16px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: #fff;
+    }
+
+    .step.text {
+      padding: 0;
+      border: 0;
+      background: transparent;
+    }
+
+    .step.aufgabe {
+      border-left: 5px solid var(--blue);
+      background: #eef6ff;
+    }
+
+    .step.merksatz {
+      border-left: 5px solid var(--amber);
+      background: #fff6e8;
+    }
+
+    .step img,
+    .experiment-body img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+    }
+
+    .step audio { width: 100%; }
+
+    .step :first-child { margin-top: 0; }
+    .step :last-child { margin-bottom: 0; }
+
+    .about {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 56px 20px 72px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(280px, .9fr);
+      gap: 38px;
+    }
+
+    .about h2 {
+      margin: 0 0 14px;
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      line-height: 1.06;
+      letter-spacing: -0.03em;
+    }
+
+    .about p { color: #334139; }
+
+    .info-list {
+      display: grid;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .info-row {
+      border-left: 4px solid var(--green);
+      background: rgba(255, 255, 255, .72);
+      padding: 12px 14px;
+      border-radius: 4px;
+    }
+
+    .info-row strong { display: block; }
+    .info-row span { color: var(--muted); }
+
+    footer {
+      border-top: 1px solid var(--line);
+      background: #152219;
+      color: #d8e3d4;
+      padding: 26px 20px;
+    }
+
+    footer .inner {
+      max-width: var(--max);
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+
+    @media print {
+      body { background: #fff; }
+      .topbar, .filters, .content-head, .hero, .stats, .about, footer, .modal-tools { display: none !important; }
+      dialog {
+        position: static;
+        display: block;
+        width: 100%;
+        max-height: none;
+        border: 0;
+        box-shadow: none;
+      }
+      .modal-head { position: static; padding: 0 0 12px; }
+      .experiment-body { padding: 0; }
+    }
+
+    @media (max-width: 900px) {
+      .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .workspace { grid-template-columns: 1fr; }
+      .filters {
+        position: static;
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+        padding: 0 0 22px;
+      }
+      .experiment-grid { grid-template-columns: 1fr; }
+      .about { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 620px) {
+      .topbar-inner { align-items: start; flex-direction: column; }
+      .nav-actions { justify-content: flex-start; }
+      .hero { min-height: 68vh; padding-top: 46px; }
+      .stats { grid-template-columns: 1fr; }
+      .content-head { align-items: stretch; flex-direction: column; }
+      .view-toggle { width: 100%; }
+      .view-toggle button { flex: 1; }
+      .modal-head { flex-direction: column; }
+      .modal-tools { justify-content: flex-start; }
+      .filter-actions { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="#start" aria-label="AlltagsLabor Start">
+        <img src="icon.png" alt="" />
+        <span>AlltagsLabor</span>
+      </a>
+      <nav class="nav-actions" aria-label="Navigation">
+        <a class="btn ghost" href="../../../index.html">Startseite</a>
+        <a class="btn ghost" href="../../projekte.html">Projekte</a>
+        <a class="btn" href="https://gitlab.com/Datenflix007/alltagslabor" target="_blank" rel="noopener">App-Repo</a>
+        <a class="btn primary" href="https://gitlab.com/Datenflix007/alltagslabordata" target="_blank" rel="noopener">Datenrepo</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="start">
+    <section class="hero">
+      <div class="hero-content">
+        <div class="kicker">Offenes Bildungsprojekt</div>
+        <h1>AlltagsLabor</h1>
+        <p class="lead">Eine Sammlung alltagsnaher Experimente, Beobachtungen und Arbeitsmaterialien. Die GitHub-Page zeigt die Inhalte als Lese- und Druckansicht, waehrend die eigentlichen Experimente weiterhin aus dem GitLab-Datenrepo geladen werden.</p>
+        <div class="hero-actions">
+          <a class="btn primary" href="#experimente">Experimente ansehen</a>
+          <a class="btn" href="#mitmachen">Mitmachen</a>
+          <button class="btn" type="button" id="reloadTop">Daten aktualisieren</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="stats" aria-label="Datenstand">
+      <div class="stat"><strong id="statExperiments">...</strong><span>Eintraege im Datenrepo</span></div>
+      <div class="stat"><strong id="statSubjects">...</strong><span>Faecher</span></div>
+      <div class="stat"><strong id="statSchools">...</strong><span>Schulformen</span></div>
+      <div class="stat"><strong>GitLab</strong><span>Daten bleiben extern versioniert</span></div>
+    </section>
+
+    <section class="band" id="experimente">
+      <div class="workspace">
+        <aside class="filters" aria-label="Filter">
+          <div>
+            <div class="kicker">Suche</div>
+            <h2>Material finden</h2>
+            <p class="source-note">Live geladen aus <a href="https://gitlab.com/Datenflix007/alltagslabordata" target="_blank" rel="noopener">alltagslabordata</a>. Neue Eintraege erscheinen hier nach dem Merge ins Datenrepo.</p>
+          </div>
+
+          <div class="field">
+            <label for="query">Suchbegriff</label>
+            <input id="query" type="search" autocomplete="off" placeholder="Titel, Beschreibung, Inhalt" />
+          </div>
+
+          <div class="field">
+            <label for="subject">Fach</label>
+            <select id="subject"><option value="">Alle Faecher</option></select>
+          </div>
+
+          <div class="field">
+            <label for="grade">Klassenstufe</label>
+            <select id="grade"><option value="">Alle Stufen</option></select>
+          </div>
+
+          <div class="field">
+            <label for="school">Schulform</label>
+            <select id="school"><option value="">Alle Schulformen</option></select>
+          </div>
+
+          <div class="filter-actions">
+            <button class="btn primary" type="button" id="applyFilters">Anwenden</button>
+            <button class="btn" type="button" id="resetFilters">Zuruecksetzen</button>
+          </div>
+        </aside>
+
+        <section aria-live="polite">
+          <div class="content-head">
+            <div>
+              <div class="kicker" id="resultKicker">Lade Daten</div>
+              <h2 id="resultTitle">Experimente</h2>
+            </div>
+            <div class="view-toggle" aria-label="Ansicht">
+              <button type="button" id="compactView" aria-pressed="true">Kompakt</button>
+              <button type="button" id="wideView" aria-pressed="false">Ausfuehrlich</button>
+            </div>
+          </div>
+          <div id="status" class="empty">Daten werden aus dem GitLab-Datenrepo geladen...</div>
+          <div id="experimentGrid" class="experiment-grid" hidden></div>
+        </section>
+      </div>
+    </section>
+
+    <section class="about" id="mitmachen">
+      <div>
+        <div class="kicker">Projektidee</div>
+        <h2>Vom Alltag zur fachlichen Erklaerung</h2>
+        <p>Das AlltagsLabor sammelt Experimente, die mit einfachen Materialien funktionieren und an vertraute Situationen anschliessen. Lernende beginnen mit einer Beobachtung, probieren etwas selbst aus und ordnen die Erfahrung anschliessend fachlich ein.</p>
+        <p>Diese Seite ist bewusst als Besucheransicht umgesetzt: lesen, suchen, filtern, drucken. Wer neue Experimente beitragen moechte, kann Kontakt zum Entwicklerteam aufnehmen oder im Datenrepo mitarbeiten.</p>
+        <div class="hero-actions">
+          <a class="btn primary" href="mailto:felix.staacke@uni-jena.de?subject=AlltagsLabor%20Mitmachen">Kontakt aufnehmen</a>
+          <a class="btn" href="https://gitlab.com/Datenflix007/alltagslabordata" target="_blank" rel="noopener">Datenrepo ansehen</a>
+        </div>
+      </div>
+      <div class="info-list">
+        <div class="info-row"><strong>App-Architektur</strong><span>Die alte App bleibt als GitLab-Source erhalten. Diese Seite ist eine statische GitHub-Page ohne Serverpflicht.</span></div>
+        <div class="info-row"><strong>Datenhaltung</strong><span>Experimente, Bilder, Audio und Impressum liegen weiterhin im GitLab-Datenrepo.</span></div>
+        <div class="info-row"><strong>Beitraege</strong><span>Neue Inhalte sollten als strukturierte JSON-Eintraege im Datenrepo landen und koennen dort reviewed werden.</span></div>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="detailDialog" aria-labelledby="dialogTitle">
+    <div class="modal-head">
+      <div>
+        <div class="kicker">Experiment</div>
+        <h2 id="dialogTitle"></h2>
+      </div>
+      <div class="modal-tools">
+        <button class="btn" type="button" id="printExperiment">Drucken</button>
+        <button class="btn" type="button" id="pdfExperiment">PDF</button>
+        <button class="btn primary" type="button" id="closeDialog">Schliessen</button>
+      </div>
+    </div>
+    <article class="experiment-body" id="dialogBody"></article>
+  </dialog>
+
+  <footer>
+    <div class="inner">
+      <span>Felix Staacke · AlltagsLabor</span>
+      <span id="dataTimestamp">Datenstand: wird geladen</span>
+    </div>
+  </footer>
+
+  <script>
+    const DATA_REPO_API = "https://gitlab.com/api/v4/projects/Datenflix007%2Falltagslabordata/repository/files/";
+    const DATA_URL = gitlabFileUrl("_experiments.json");
+    const IMPRESSUM_URL = gitlabFileUrl("impressum.txt");
+
+    const state = {
+      experiments: [],
+      filtered: [],
+      compact: true,
+      activeExperiment: null
+    };
+
+    const els = {
+      query: document.getElementById("query"),
+      subject: document.getElementById("subject"),
+      grade: document.getElementById("grade"),
+      school: document.getElementById("school"),
+      grid: document.getElementById("experimentGrid"),
+      status: document.getElementById("status"),
+      resultKicker: document.getElementById("resultKicker"),
+      resultTitle: document.getElementById("resultTitle"),
+      dialog: document.getElementById("detailDialog"),
+      dialogTitle: document.getElementById("dialogTitle"),
+      dialogBody: document.getElementById("dialogBody")
+    };
+
+    document.getElementById("applyFilters").addEventListener("click", applyFilters);
+    document.getElementById("resetFilters").addEventListener("click", resetFilters);
+    document.getElementById("reloadTop").addEventListener("click", loadData);
+    document.getElementById("closeDialog").addEventListener("click", () => els.dialog.close());
+    document.getElementById("printExperiment").addEventListener("click", () => window.print());
+    document.getElementById("pdfExperiment").addEventListener("click", exportPdf);
+    document.getElementById("compactView").addEventListener("click", () => setView(true));
+    document.getElementById("wideView").addEventListener("click", () => setView(false));
+    els.query.addEventListener("keydown", event => {
+      if (event.key === "Enter") applyFilters();
+    });
+
+    loadData();
+
+    async function loadData() {
+      showStatus("Daten werden aus dem GitLab-Datenrepo geladen...", "empty");
+      try {
+        const response = await fetch(DATA_URL, { cache: "no-store" });
+        if (!response.ok) throw new Error("HTTP " + response.status);
+        const data = await response.json();
+        state.experiments = Array.isArray(data) ? data : [];
+        state.filtered = [...state.experiments];
+        populateFilters(state.experiments);
+        renderStats(state.experiments);
+        renderExperiments();
+        loadImpressum();
+        document.getElementById("dataTimestamp").textContent = "Datenstand: " + new Date().toLocaleString("de-DE");
+      } catch (error) {
+        showStatus("Die Daten konnten nicht geladen werden. Das GitLab-Datenrepo muss oeffentlich erreichbar sein. Technischer Hinweis: " + error.message, "error");
+      }
+    }
+
+    async function loadImpressum() {
+      try {
+        const response = await fetch(IMPRESSUM_URL, { cache: "no-store" });
+        if (!response.ok) return;
+        const impressum = await response.text();
+        if (!impressum.trim()) return;
+        const footer = document.querySelector("footer .inner");
+        const details = document.createElement("details");
+        details.style.flexBasis = "100%";
+        const summary = document.createElement("summary");
+        summary.textContent = "Impressum aus dem Datenrepo";
+        const pre = document.createElement("pre");
+        pre.style.whiteSpace = "pre-wrap";
+        pre.style.margin = "10px 0 0";
+        pre.textContent = impressum.trim();
+        details.append(summary, pre);
+        footer.appendChild(details);
+      } catch (error) {
+        console.warn("Impressum konnte nicht geladen werden", error);
+      }
+    }
+
+    function populateFilters(experiments) {
+      fillSelect(els.subject, uniqueValues(experiments, "subject"), "Alle Faecher");
+      fillSelect(els.grade, uniqueValues(experiments, "gradeLevel").sort(sortGrades), "Alle Stufen");
+      fillSelect(els.school, uniqueValues(experiments, "schoolType"), "Alle Schulformen");
+    }
+
+    function uniqueValues(experiments, key) {
+      return [...new Set(experiments.map(exp => exp[key]).filter(Boolean))].sort((a, b) => String(a).localeCompare(String(b), "de"));
+    }
+
+    function fillSelect(select, values, label) {
+      select.innerHTML = "";
+      select.append(new Option(label, ""));
+      values.forEach(value => select.append(new Option(value, value)));
+    }
+
+    function sortGrades(a, b) {
+      const na = Number(a);
+      const nb = Number(b);
+      if (!Number.isNaN(na) && !Number.isNaN(nb)) return na - nb;
+      return String(a).localeCompare(String(b), "de");
+    }
+
+    function renderStats(experiments) {
+      document.getElementById("statExperiments").textContent = experiments.length;
+      document.getElementById("statSubjects").textContent = uniqueValues(experiments, "subject").length;
+      document.getElementById("statSchools").textContent = uniqueValues(experiments, "schoolType").length;
+    }
+
+    function applyFilters() {
+      const query = normalize(els.query.value);
+      const subject = els.subject.value;
+      const grade = els.grade.value;
+      const school = els.school.value;
+
+      state.filtered = state.experiments.filter(exp => {
+        const searchable = [
+          exp.title,
+          exp.shortDescription,
+          exp.subject,
+          exp.gradeLevel,
+          exp.schoolType,
+          ...(Array.isArray(exp.steps) ? exp.steps.map(step => step.content) : [])
+        ].join(" ");
+
+        return (!query || normalize(searchable).includes(query))
+          && (!subject || exp.subject === subject)
+          && (!grade || exp.gradeLevel === grade)
+          && (!school || exp.schoolType === school);
+      });
+
+      renderExperiments();
+    }
+
+    function resetFilters() {
+      els.query.value = "";
+      els.subject.value = "";
+      els.grade.value = "";
+      els.school.value = "";
+      state.filtered = [...state.experiments];
+      renderExperiments();
+    }
+
+    function normalize(value) {
+      return String(value || "").toLowerCase().replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+    }
+
+    function setView(compact) {
+      state.compact = compact;
+      document.getElementById("compactView").setAttribute("aria-pressed", String(compact));
+      document.getElementById("wideView").setAttribute("aria-pressed", String(!compact));
+      renderExperiments();
+    }
+
+    function renderExperiments() {
+      els.grid.innerHTML = "";
+      els.grid.hidden = false;
+      els.status.hidden = true;
+      els.resultKicker.textContent = state.filtered.length + " von " + state.experiments.length + " Eintraegen";
+      els.resultTitle.textContent = state.filtered.length === 1 ? "Ein Experiment" : "Experimente";
+
+      if (!state.filtered.length) {
+        els.grid.hidden = true;
+        showStatus("Keine passenden Experimente gefunden. Aendere die Filter oder setze die Suche zurueck.", "empty");
+        return;
+      }
+
+      state.filtered.forEach((experiment, index) => {
+        const card = document.createElement("article");
+        card.className = "experiment-card";
+
+        const title = document.createElement("h3");
+        title.textContent = experiment.title || "Ohne Titel";
+
+        const description = document.createElement("div");
+        description.className = "description";
+        description.innerHTML = state.compact ? stripLongHtml(experiment.shortDescription || "Keine Kurzbeschreibung vorhanden.") : rewriteMediaPaths(experiment.shortDescription || "Keine Kurzbeschreibung vorhanden.");
+
+        const meta = document.createElement("div");
+        meta.className = "meta";
+        [experiment.subject, formatGrade(experiment.gradeLevel), experiment.schoolType].filter(Boolean).forEach(value => {
+          const tag = document.createElement("span");
+          tag.className = "tag";
+          tag.textContent = value;
+          meta.appendChild(tag);
+        });
+
+        const actions = document.createElement("div");
+        actions.className = "card-actions";
+        const open = document.createElement("button");
+        open.className = "btn primary";
+        open.type = "button";
+        open.textContent = "Lesen";
+        open.addEventListener("click", () => showExperiment(experiment));
+        const print = document.createElement("button");
+        print.className = "btn";
+        print.type = "button";
+        print.textContent = "Drucken";
+        print.addEventListener("click", () => {
+          showExperiment(experiment);
+          setTimeout(() => window.print(), 120);
+        });
+        actions.append(open, print);
+
+        card.append(title, description, meta, actions);
+        card.style.animationDelay = (index * 20) + "ms";
+        els.grid.appendChild(card);
+      });
+    }
+
+    function stripLongHtml(html) {
+      const wrapper = document.createElement("div");
+      wrapper.innerHTML = rewriteMediaPaths(html);
+      const text = wrapper.textContent || wrapper.innerText || "";
+      const shortened = text.length > 260 ? text.slice(0, 257).trim() + "..." : text;
+      const p = document.createElement("p");
+      p.textContent = shortened;
+      return p.outerHTML;
+    }
+
+    function formatGrade(grade) {
+      if (!grade) return "";
+      return /^\d+$/.test(String(grade)) ? "Klasse " + grade : String(grade);
+    }
+
+    function showStatus(message, type) {
+      els.status.hidden = false;
+      els.status.className = type;
+      els.status.textContent = message;
+      els.grid.hidden = true;
+    }
+
+    function showExperiment(experiment) {
+      state.activeExperiment = experiment;
+      els.dialogTitle.textContent = experiment.title || "Experiment";
+      els.dialogBody.innerHTML = "";
+
+      const meta = document.createElement("div");
+      meta.className = "detail-meta";
+      [experiment.subject, formatGrade(experiment.gradeLevel), experiment.schoolType].filter(Boolean).forEach(value => {
+        const tag = document.createElement("span");
+        tag.className = "tag";
+        tag.textContent = value;
+        meta.appendChild(tag);
+      });
+      els.dialogBody.appendChild(meta);
+
+      if (experiment.shortDescription) {
+        const intro = document.createElement("section");
+        intro.className = "step";
+        intro.innerHTML = rewriteMediaPaths(experiment.shortDescription);
+        els.dialogBody.appendChild(intro);
+      }
+
+      (experiment.steps || []).forEach(step => {
+        const section = document.createElement("section");
+        section.className = "step " + (step.type || "text");
+
+        if (step.type === "image") {
+          const img = document.createElement("img");
+          img.src = resolveAsset(step.content);
+          img.alt = step.description || experiment.title || "Experimentbild";
+          section.appendChild(img);
+          if (step.description) {
+            const caption = document.createElement("p");
+            caption.textContent = step.description;
+            section.appendChild(caption);
+          }
+        } else if (step.type === "audio") {
+          const audio = document.createElement("audio");
+          audio.controls = true;
+          audio.src = resolveAsset(step.content);
+          section.appendChild(audio);
+        } else {
+          section.innerHTML = rewriteMediaPaths(step.content || "");
+        }
+
+        els.dialogBody.appendChild(section);
+      });
+
+      if (typeof els.dialog.showModal === "function") {
+        els.dialog.showModal();
+      } else {
+        els.dialog.setAttribute("open", "");
+      }
+
+      if (window.MathJax && MathJax.typesetPromise) {
+        MathJax.typesetPromise([els.dialogBody]).catch(console.warn);
+      }
+    }
+
+    function resolveAsset(path) {
+      if (!path) return "";
+      if (/^https?:\/\//i.test(path)) return path;
+      return gitlabFileUrl(path.replace(/^dataEditor\//, "").replace(/^\/+/, ""));
+    }
+
+    function gitlabFileUrl(path) {
+      return DATA_REPO_API + encodeURIComponent(path).replace(/%2F/g, "%2F") + "/raw?ref=main";
+    }
+
+    function rewriteMediaPaths(html) {
+      const wrapper = document.createElement("div");
+      wrapper.innerHTML = html || "";
+      wrapper.querySelectorAll("img, audio, source").forEach(node => {
+        const attr = node.hasAttribute("src") ? "src" : "href";
+        const value = node.getAttribute(attr);
+        if (value) node.setAttribute(attr, resolveAsset(value));
+      });
+      wrapper.querySelectorAll("a").forEach(link => {
+        if (link.href && /^https?:\/\//i.test(link.href)) {
+          link.target = "_blank";
+          link.rel = "noopener";
+        }
+      });
+      return wrapper.innerHTML;
+    }
+
+    function exportPdf() {
+      if (!state.activeExperiment || !window.html2canvas || !window.jspdf) {
+        window.print();
+        return;
+      }
+
+      const source = els.dialogBody.cloneNode(true);
+      const printable = document.createElement("div");
+      printable.style.position = "fixed";
+      printable.style.left = "-9999px";
+      printable.style.top = "0";
+      printable.style.width = "760px";
+      printable.style.padding = "28px";
+      printable.style.background = "#fff";
+      printable.style.color = "#1f2933";
+      printable.innerHTML = "<h1 style='font-size:28px;line-height:1.1;margin:0 0 18px'>" + escapeHtml(state.activeExperiment.title || "AlltagsLabor") + "</h1>";
+      printable.appendChild(source);
+      document.body.appendChild(printable);
+
+      const render = () => html2canvas(printable, { scale: 2, backgroundColor: "#ffffff", useCORS: true }).then(canvas => {
+        const pdf = new window.jspdf.jsPDF({ orientation: "portrait", unit: "pt", format: "a4" });
+        const pageWidth = pdf.internal.pageSize.getWidth();
+        const pageHeight = pdf.internal.pageSize.getHeight();
+        const imgWidth = pageWidth;
+        const imgHeight = canvas.height * imgWidth / canvas.width;
+        const imgData = canvas.toDataURL("image/png");
+        let position = 0;
+
+        pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+        let remainingHeight = imgHeight - pageHeight;
+        while (remainingHeight > 0) {
+          position -= pageHeight;
+          pdf.addPage();
+          pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+          remainingHeight -= pageHeight;
+        }
+
+        pdf.save((state.activeExperiment.title || "alltagslabor").replace(/[^\w\-]+/g, "_") + ".pdf");
+        document.body.removeChild(printable);
+      }).catch(error => {
+        document.body.removeChild(printable);
+        console.warn(error);
+        window.print();
+      });
+
+      if (window.MathJax && MathJax.typesetPromise) {
+        MathJax.typesetPromise([printable]).then(render).catch(render);
+      } else {
+        render();
+      }
+    }
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+      })[char]);
+    }
+  </script>
+</body>
+</html>
