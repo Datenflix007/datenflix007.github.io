@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>AlltagsLabor | Datenflix</title>
+  <title>AlltagsLabor</title>
   <meta name="description" content="AlltagsLabor: eine offene Sammlung alltagsnaher Experimente und Lernmaterialien fuer Schule, Projektarbeit und eigenes Forschen." />
   <link rel="icon" type="image/png" href="icon.png" />
   <script>
@@ -40,9 +40,12 @@
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
       background:
         linear-gradient(180deg, rgba(245, 247, 242, .82), rgba(245, 247, 242, 1)),
-        url("https://gitlab.com/Datenflix007/alltagslabordata/-/raw/main/documentation/Screenshot_2025-06-03_153937.png");
-      background-size: cover;
+        url("icon2.png");
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: min(46vw, 460px);
       background-attachment: fixed;
+      background-color: var(--bg);
       color: var(--ink);
       line-height: 1.62;
     }
@@ -272,29 +275,6 @@
       margin-bottom: 18px;
     }
 
-    .view-toggle {
-      display: inline-flex;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      overflow: hidden;
-      background: #fff;
-      flex: 0 0 auto;
-    }
-
-    .view-toggle button {
-      border: 0;
-      background: transparent;
-      min-height: 38px;
-      padding: 8px 12px;
-      font-weight: 800;
-      color: var(--muted);
-    }
-
-    .view-toggle button[aria-pressed="true"] {
-      background: var(--green);
-      color: #fff;
-    }
-
     .experiment-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -479,22 +459,6 @@
 
     .about p { color: #334139; }
 
-    .info-list {
-      display: grid;
-      gap: 12px;
-      margin-top: 12px;
-    }
-
-    .info-row {
-      border-left: 4px solid var(--green);
-      background: rgba(255, 255, 255, .72);
-      padding: 12px 14px;
-      border-radius: 4px;
-    }
-
-    .info-row strong { display: block; }
-    .info-row span { color: var(--muted); }
-
     footer {
       border-top: 1px solid var(--line);
       background: #152219;
@@ -509,6 +473,14 @@
       justify-content: space-between;
       gap: 18px;
       flex-wrap: wrap;
+    }
+
+    .impressum-content {
+      flex-basis: 100%;
+      margin: 0;
+      white-space: pre-wrap;
+      color: inherit;
+      font: inherit;
     }
 
     @media print {
@@ -545,8 +517,6 @@
       .hero { min-height: 68vh; padding-top: 46px; }
       .stats { grid-template-columns: 1fr; }
       .content-head { align-items: stretch; flex-direction: column; }
-      .view-toggle { width: 100%; }
-      .view-toggle button { flex: 1; }
       .modal-head { flex-direction: column; }
       .modal-tools { justify-content: flex-start; }
       .filter-actions { grid-template-columns: 1fr; }
@@ -557,11 +527,11 @@
   <header class="topbar">
     <div class="topbar-inner">
       <a class="brand" href="#start" aria-label="AlltagsLabor Start">
-        <img src="icon.png" alt="" />
+        <img src="icon2.png" alt="" />
         <span>AlltagsLabor</span>
       </a>
       <nav class="nav-actions" aria-label="Navigation">
-        <a class="btn ghost" href="../../../index.html">Startseite</a>
+        <!--<a class="btn ghost" href="../../../index.html">Startseite</a>-->
         <a class="btn ghost" href="../../projekte.html">Projekte</a>
         <a class="btn" href="https://gitlab.com/Datenflix007/alltagslabor" target="_blank" rel="noopener">App-Repo</a>
         <a class="btn primary" href="https://gitlab.com/Datenflix007/alltagslabordata" target="_blank" rel="noopener">Datenrepo</a>
@@ -587,7 +557,7 @@
       <div class="stat"><strong id="statExperiments">...</strong><span>Eintraege im Datenrepo</span></div>
       <div class="stat"><strong id="statSubjects">...</strong><span>Faecher</span></div>
       <div class="stat"><strong id="statSchools">...</strong><span>Schulformen</span></div>
-      <div class="stat"><strong>GitLab</strong><span>Daten bleiben extern versioniert</span></div>
+      <!-- <div class="stat"><strong>GitLab</strong><span>Daten bleiben extern versioniert</span></div> -->
     </section>
 
     <section class="band" id="experimente">
@@ -602,6 +572,17 @@
           <div class="field">
             <label for="query">Suchbegriff</label>
             <input id="query" type="search" autocomplete="off" placeholder="Titel, Beschreibung, Inhalt" />
+          </div>
+
+          <div class="field">
+            <label for="language">Sprache</label>
+            <select id="language">
+              <option value="de">Deutsch</option>
+              <option value="eng">English</option>
+              <option value="fr">Français</option>
+              <option value="ru">Русский</option>
+              <option value="uk">Українська</option>
+            </select>
           </div>
 
           <div class="field">
@@ -631,10 +612,6 @@
               <div class="kicker" id="resultKicker">Lade Daten</div>
               <h2 id="resultTitle">Experimente</h2>
             </div>
-            <div class="view-toggle" aria-label="Ansicht">
-              <button type="button" id="compactView" aria-pressed="true">Kompakt</button>
-              <button type="button" id="wideView" aria-pressed="false">Ausfuehrlich</button>
-            </div>
           </div>
           <div id="status" class="empty">Daten werden aus dem GitLab-Datenrepo geladen...</div>
           <div id="experimentGrid" class="experiment-grid" hidden></div>
@@ -649,14 +626,9 @@
         <p>Das AlltagsLabor sammelt Experimente, die mit einfachen Materialien funktionieren und an vertraute Situationen anschliessen. Lernende beginnen mit einer Beobachtung, probieren etwas selbst aus und ordnen die Erfahrung anschliessend fachlich ein.</p>
         <p>Diese Seite ist bewusst als Besucheransicht umgesetzt: lesen, suchen, filtern, drucken. Wer neue Experimente beitragen moechte, kann Kontakt zum Entwicklerteam aufnehmen oder im Datenrepo mitarbeiten.</p>
         <div class="hero-actions">
-          <a class="btn primary" href="mailto:felix.staacke@uni-jena.de?subject=AlltagsLabor%20Mitmachen">Kontakt aufnehmen</a>
+          <a class="btn primary" href="mailto:pianoflix@gmx.de?subject=AlltagsLabor%20Mitmachen">Kontakt aufnehmen</a>
           <a class="btn" href="https://gitlab.com/Datenflix007/alltagslabordata" target="_blank" rel="noopener">Datenrepo ansehen</a>
         </div>
-      </div>
-      <div class="info-list">
-        <div class="info-row"><strong>App-Architektur</strong><span>Die alte App bleibt als GitLab-Source erhalten. Diese Seite ist eine statische GitHub-Page ohne Serverpflicht.</span></div>
-        <div class="info-row"><strong>Datenhaltung</strong><span>Experimente, Bilder, Audio und Impressum liegen weiterhin im GitLab-Datenrepo.</span></div>
-        <div class="info-row"><strong>Beitraege</strong><span>Neue Inhalte sollten als strukturierte JSON-Eintraege im Datenrepo landen und koennen dort reviewed werden.</span></div>
       </div>
     </section>
   </main>
@@ -685,18 +657,25 @@
 
   <script>
     const DATA_REPO_API = "https://gitlab.com/api/v4/projects/Datenflix007%2Falltagslabordata/repository/files/";
-    const DATA_URL = gitlabFileUrl("_experiments.json");
+    const LANGUAGE_FILES = {
+      de: "_experiments_de.json",
+      eng: "_experiments_eng.json",
+      fr: "_experiments_fr.json",
+      ru: "_experiments_ru.json",
+      uk: "_experiments_uk.json"
+    };
     const IMPRESSUM_URL = gitlabFileUrl("impressum.txt");
 
     const state = {
       experiments: [],
       filtered: [],
-      compact: true,
+      language: "de",
       activeExperiment: null
     };
 
     const els = {
       query: document.getElementById("query"),
+      language: document.getElementById("language"),
       subject: document.getElementById("subject"),
       grade: document.getElementById("grade"),
       school: document.getElementById("school"),
@@ -715,8 +694,10 @@
     document.getElementById("closeDialog").addEventListener("click", () => els.dialog.close());
     document.getElementById("printExperiment").addEventListener("click", () => window.print());
     document.getElementById("pdfExperiment").addEventListener("click", exportPdf);
-    document.getElementById("compactView").addEventListener("click", () => setView(true));
-    document.getElementById("wideView").addEventListener("click", () => setView(false));
+    els.language.addEventListener("change", () => {
+      state.language = els.language.value;
+      loadData();
+    });
     els.query.addEventListener("keydown", event => {
       if (event.key === "Enter") applyFilters();
     });
@@ -726,7 +707,7 @@
     async function loadData() {
       showStatus("Daten werden aus dem GitLab-Datenrepo geladen...", "empty");
       try {
-        const response = await fetch(DATA_URL, { cache: "no-store" });
+        const response = await fetch(dataUrlForLanguage(state.language), { cache: "no-store" });
         if (!response.ok) throw new Error("HTTP " + response.status);
         const data = await response.json();
         state.experiments = Array.isArray(data) ? data : [];
@@ -748,16 +729,10 @@
         const impressum = await response.text();
         if (!impressum.trim()) return;
         const footer = document.querySelector("footer .inner");
-        const details = document.createElement("details");
-        details.style.flexBasis = "100%";
-        const summary = document.createElement("summary");
-        summary.textContent = "Impressum aus dem Datenrepo";
-        const pre = document.createElement("pre");
-        pre.style.whiteSpace = "pre-wrap";
-        pre.style.margin = "10px 0 0";
+        const pre = footer.querySelector(".impressum-content") || document.createElement("pre");
+        pre.className = "impressum-content";
         pre.textContent = impressum.trim();
-        details.append(summary, pre);
-        footer.appendChild(details);
+        if (!pre.parentNode) footer.appendChild(pre);
       } catch (error) {
         console.warn("Impressum konnte nicht geladen werden", error);
       }
@@ -830,13 +805,6 @@
       return String(value || "").toLowerCase().replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
     }
 
-    function setView(compact) {
-      state.compact = compact;
-      document.getElementById("compactView").setAttribute("aria-pressed", String(compact));
-      document.getElementById("wideView").setAttribute("aria-pressed", String(!compact));
-      renderExperiments();
-    }
-
     function renderExperiments() {
       els.grid.innerHTML = "";
       els.grid.hidden = false;
@@ -859,7 +827,7 @@
 
         const description = document.createElement("div");
         description.className = "description";
-        description.innerHTML = state.compact ? stripLongHtml(experiment.shortDescription || "Keine Kurzbeschreibung vorhanden.") : rewriteMediaPaths(experiment.shortDescription || "Keine Kurzbeschreibung vorhanden.");
+        description.innerHTML = rewriteMediaPaths(experiment.shortDescription || "Keine Kurzbeschreibung vorhanden.");
 
         const meta = document.createElement("div");
         meta.className = "meta";
@@ -891,16 +859,6 @@
         card.style.animationDelay = (index * 20) + "ms";
         els.grid.appendChild(card);
       });
-    }
-
-    function stripLongHtml(html) {
-      const wrapper = document.createElement("div");
-      wrapper.innerHTML = rewriteMediaPaths(html);
-      const text = wrapper.textContent || wrapper.innerText || "";
-      const shortened = text.length > 260 ? text.slice(0, 257).trim() + "..." : text;
-      const p = document.createElement("p");
-      p.textContent = shortened;
-      return p.outerHTML;
     }
 
     function formatGrade(grade) {
@@ -982,6 +940,10 @@
 
     function gitlabFileUrl(path) {
       return DATA_REPO_API + encodeURIComponent(path).replace(/%2F/g, "%2F") + "/raw?ref=main";
+    }
+
+    function dataUrlForLanguage(language) {
+      return gitlabFileUrl(LANGUAGE_FILES[language] || LANGUAGE_FILES.de);
     }
 
     function rewriteMediaPaths(html) {
