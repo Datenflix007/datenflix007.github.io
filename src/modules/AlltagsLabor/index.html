@@ -54,6 +54,18 @@
     button, input, select { font: inherit; }
     button { cursor: pointer; }
 
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
     .topbar {
       position: sticky;
       top: 0;
@@ -101,6 +113,35 @@
       gap: 8px;
       flex-wrap: wrap;
       justify-content: flex-end;
+    }
+
+    .language-picker {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      padding: 5px 8px 5px 10px;
+      color: var(--ink);
+      font-weight: 800;
+    }
+
+    .language-picker::before {
+      content: "Aa";
+      color: var(--green-dark);
+      font-family: Georgia, "Times New Roman", serif;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .language-picker select {
+      min-height: 30px;
+      border: 0;
+      background: transparent;
+      color: inherit;
+      font: inherit;
+      outline: 0;
     }
 
     .btn {
@@ -203,6 +244,7 @@
     .band {
       background: var(--bg);
       border-top: 1px solid var(--line);
+      min-height: calc(100vh - 62px);
     }
 
     .workspace {
@@ -444,10 +486,7 @@
     .about {
       max-width: var(--max);
       margin: 0 auto;
-      padding: 56px 20px 72px;
-      display: grid;
-      grid-template-columns: minmax(0, 1.1fr) minmax(280px, .9fr);
-      gap: 38px;
+      padding: 82px 20px;
     }
 
     .about h2 {
@@ -499,7 +538,6 @@
     }
 
     @media (max-width: 900px) {
-      .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .workspace { grid-template-columns: 1fr; }
       .filters {
         position: static;
@@ -508,14 +546,11 @@
         padding: 0 0 22px;
       }
       .experiment-grid { grid-template-columns: 1fr; }
-      .about { grid-template-columns: 1fr; }
     }
 
     @media (max-width: 620px) {
       .topbar-inner { align-items: start; flex-direction: column; }
       .nav-actions { justify-content: flex-start; }
-      .hero { min-height: 68vh; padding-top: 46px; }
-      .stats { grid-template-columns: 1fr; }
       .content-head { align-items: stretch; flex-direction: column; }
       .modal-head { flex-direction: column; }
       .modal-tools { justify-content: flex-start; }
@@ -531,60 +566,34 @@
         <span>AlltagsLabor</span>
       </a>
       <nav class="nav-actions" aria-label="Navigation">
-        <!--<a class="btn ghost" href="../../../index.html">Startseite</a>-->
-        <a class="btn ghost" href="../../projekte.html">Projekte</a>
-        <a class="btn" href="https://gitlab.com/Datenflix007/alltagslabor" target="_blank" rel="noopener">App-Repo</a>
-        <a class="btn primary" href="https://gitlab.com/Datenflix007/alltagslabordata" target="_blank" rel="noopener">Datenrepo</a>
+        <label class="language-picker" for="language">
+          <span class="sr-only">Sprache</span>
+          <select id="language">
+            <option value="de">Deutsch</option>
+            <option value="eng">English</option>
+            <option value="fr">Français</option>
+            <option value="ru">Русский</option>
+            <option value="uk">Українська</option>
+          </select>
+        </label>
       </nav>
     </div>
   </header>
 
   <main id="start">
-    <section class="hero">
-      <div class="hero-content">
-        <div class="kicker">Offenes Bildungsprojekt</div>
-        <h1>AlltagsLabor</h1>
-        <p class="lead">Eine Sammlung alltagsnaher Experimente, Beobachtungen und Arbeitsmaterialien. Die GitHub-Page zeigt die Inhalte als Lese- und Druckansicht, waehrend die eigentlichen Experimente weiterhin aus dem GitLab-Datenrepo geladen werden.</p>
-        <div class="hero-actions">
-          <a class="btn primary" href="#experimente">Experimente ansehen</a>
-          <a class="btn" href="#mitmachen">Mitmachen</a>
-          <button class="btn" type="button" id="reloadTop">Daten aktualisieren</button>
-        </div>
-      </div>
-    </section>
-
-    <section class="stats" aria-label="Datenstand">
-      <div class="stat"><strong id="statExperiments">...</strong><span>Eintraege im Datenrepo</span></div>
-      <div class="stat"><strong id="statSubjects">...</strong><span>Faecher</span></div>
-      <div class="stat"><strong id="statSchools">...</strong><span>Schulformen</span></div>
-      <!-- <div class="stat"><strong>GitLab</strong><span>Daten bleiben extern versioniert</span></div> -->
-    </section>
-
     <section class="band" id="experimente">
       <div class="workspace">
         <aside class="filters" aria-label="Filter">
           <div>
             <div class="kicker">Suche</div>
             <h2>Material finden</h2>
-            <p class="source-note">Live geladen aus <a href="https://gitlab.com/Datenflix007/alltagslabordata" target="_blank" rel="noopener">alltagslabordata</a>. Neue Eintraege erscheinen hier nach dem Merge ins Datenrepo.</p>
+            <p class="source-note">Live geladen aus dem Datenrepo. Neue Eintraege erscheinen hier nach dem Merge.</p>
           </div>
 
           <div class="field">
             <label for="query">Suchbegriff</label>
             <input id="query" type="search" autocomplete="off" placeholder="Titel, Beschreibung, Inhalt" />
           </div>
-
-          <div class="field">
-            <label for="language">Sprache</label>
-            <select id="language">
-              <option value="de">Deutsch</option>
-              <option value="eng">English</option>
-              <option value="fr">Français</option>
-              <option value="ru">Русский</option>
-              <option value="uk">Українська</option>
-            </select>
-          </div>
-
           <div class="field">
             <label for="subject">Fach</label>
             <select id="subject"><option value="">Alle Faecher</option></select>
@@ -627,6 +636,7 @@
         <p>Diese Seite ist bewusst als Besucheransicht umgesetzt: lesen, suchen, filtern, drucken. Wer neue Experimente beitragen moechte, kann Kontakt zum Entwicklerteam aufnehmen oder im Datenrepo mitarbeiten.</p>
         <div class="hero-actions">
           <a class="btn primary" href="mailto:pianoflix@gmx.de?subject=AlltagsLabor%20Mitmachen">Kontakt aufnehmen</a>
+          <a class="btn" href="https://gitlab.com/Datenflix007/alltagslabor" target="_blank" rel="noopener">Source-Code-Repo</a>
           <a class="btn" href="https://gitlab.com/Datenflix007/alltagslabordata" target="_blank" rel="noopener">Datenrepo ansehen</a>
         </div>
       </div>
@@ -690,7 +700,6 @@
 
     document.getElementById("applyFilters").addEventListener("click", applyFilters);
     document.getElementById("resetFilters").addEventListener("click", resetFilters);
-    document.getElementById("reloadTop").addEventListener("click", loadData);
     document.getElementById("closeDialog").addEventListener("click", () => els.dialog.close());
     document.getElementById("printExperiment").addEventListener("click", () => window.print());
     document.getElementById("pdfExperiment").addEventListener("click", exportPdf);
@@ -713,7 +722,6 @@
         state.experiments = Array.isArray(data) ? data : [];
         state.filtered = [...state.experiments];
         populateFilters(state.experiments);
-        renderStats(state.experiments);
         renderExperiments();
         loadImpressum();
         document.getElementById("dataTimestamp").textContent = "Datenstand: " + new Date().toLocaleString("de-DE");
@@ -759,12 +767,6 @@
       const nb = Number(b);
       if (!Number.isNaN(na) && !Number.isNaN(nb)) return na - nb;
       return String(a).localeCompare(String(b), "de");
-    }
-
-    function renderStats(experiments) {
-      document.getElementById("statExperiments").textContent = experiments.length;
-      document.getElementById("statSubjects").textContent = uniqueValues(experiments, "subject").length;
-      document.getElementById("statSchools").textContent = uniqueValues(experiments, "schoolType").length;
     }
 
     function applyFilters() {
