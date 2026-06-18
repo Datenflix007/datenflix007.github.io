@@ -1,0 +1,539 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Experiment einreichen | AlltagsLabor</title>
+  <meta name="description" content="Einpflegemaske fuer neue AlltagsLabor-Experimente." />
+  <link rel="icon" type="image/png" href="icon.png" />
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f5f7f2;
+      --ink: #1f2933;
+      --muted: #59636e;
+      --panel: #ffffff;
+      --line: #d9e0d4;
+      --green: #2f7d5b;
+      --green-dark: #19553d;
+      --blue: #2c6ca3;
+      --amber: #b46b13;
+      --red: #a33c2c;
+      --shadow: 0 18px 45px rgba(31, 41, 51, .11);
+      --max: 1180px;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      background:
+        linear-gradient(180deg, rgba(245, 247, 242, .88), rgba(245, 247, 242, 1)),
+        url("icon2.png");
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: min(42vw, 420px);
+      background-attachment: fixed;
+      background-color: var(--bg);
+      color: var(--ink);
+      line-height: 1.58;
+    }
+
+    a { color: inherit; }
+    button, input, select, textarea { font: inherit; }
+    button { cursor: pointer; }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      border-bottom: 1px solid rgba(217, 224, 212, .9);
+      background: rgba(255, 255, 255, .92);
+      backdrop-filter: blur(14px);
+    }
+
+    .topbar-inner {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 11px;
+      min-width: 0;
+      text-decoration: none;
+      font-weight: 850;
+    }
+
+    .brand img {
+      width: 36px;
+      height: 36px;
+      border-radius: 9px;
+      box-shadow: 0 5px 16px rgba(47, 125, 91, .22);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 38px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      padding: 8px 12px;
+      font-weight: 750;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .btn:hover { border-color: var(--green); color: var(--green-dark); }
+    .btn.primary {
+      border-color: var(--green);
+      background: var(--green);
+      color: #fff;
+    }
+
+    main {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 34px 20px 72px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 390px;
+      gap: 22px;
+      align-items: start;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .94);
+      box-shadow: 0 10px 24px rgba(31, 41, 51, .05);
+      padding: 20px;
+    }
+
+    .panel.sticky {
+      position: sticky;
+      top: 82px;
+    }
+
+    .kicker {
+      color: var(--green-dark);
+      font-weight: 850;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      font-size: .76rem;
+    }
+
+    h1, h2, h3 {
+      margin: 0;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+    }
+
+    h1 {
+      margin-top: 10px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(2.3rem, 6vw, 4.4rem);
+      letter-spacing: -0.04em;
+      color: #152219;
+    }
+
+    .lead {
+      color: var(--muted);
+      margin: 12px 0 0;
+      max-width: 760px;
+    }
+
+    form {
+      display: grid;
+      gap: 18px;
+      margin-top: 20px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+
+    .field.full { grid-column: 1 / -1; }
+
+    label {
+      color: var(--muted);
+      font-size: .84rem;
+      font-weight: 800;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      min-height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #fff;
+      color: var(--ink);
+      padding: 8px 10px;
+    }
+
+    textarea {
+      min-height: 112px;
+      resize: vertical;
+    }
+
+    .steps {
+      display: grid;
+      gap: 12px;
+    }
+
+    .step-card {
+      border: 1px solid var(--line);
+      border-left: 5px solid var(--green);
+      border-radius: 8px;
+      background: #fff;
+      padding: 14px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .step-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .message {
+      display: none;
+      border: 1px solid var(--line);
+      border-left: 5px solid var(--amber);
+      border-radius: 8px;
+      background: #fff;
+      padding: 12px 14px;
+      color: var(--muted);
+      white-space: pre-wrap;
+    }
+
+    .message.visible { display: block; }
+    .message.error { border-left-color: var(--red); }
+    .message.success { border-left-color: var(--green); color: var(--green-dark); }
+
+    pre {
+      margin: 14px 0 0;
+      max-height: 620px;
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #152219;
+      color: #d8e3d4;
+      padding: 14px;
+      font-size: .84rem;
+      line-height: 1.45;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .note {
+      color: var(--muted);
+      font-size: .9rem;
+      margin: 10px 0 0;
+    }
+
+    @media (max-width: 960px) {
+      main { grid-template-columns: 1fr; }
+      .panel.sticky { position: static; }
+    }
+
+    @media (max-width: 640px) {
+      .topbar-inner { align-items: flex-start; flex-direction: column; }
+      .grid { grid-template-columns: 1fr; }
+      .step-head { align-items: flex-start; flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="index.html">
+        <img src="icon2.png" alt="" />
+        <span>AlltagsLabor</span>
+      </a>
+      <a class="btn" href="index.html">Zur Besucheransicht</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="panel">
+      <div class="kicker">Einpflegen</div>
+      <h1>Experiment einreichen</h1>
+      <p class="lead">Der Eintrag wird nicht direkt veröffentlicht. Die Maske sendet ihn an eine Serverless-Function, die einen validierten Pull Request im Datenrepo auslöst.</p>
+
+      <form id="submissionForm" novalidate>
+        <div class="grid">
+          <div class="field">
+            <label for="accessCode">Zugangscode</label>
+            <input id="accessCode" name="accessCode" type="password" autocomplete="off" required />
+          </div>
+          <div class="field">
+            <label for="language">Sprache</label>
+            <select id="language" name="language" required>
+              <option value="de">de</option>
+              <option value="eng">eng</option>
+              <option value="fr">fr</option>
+              <option value="ru">ru</option>
+              <option value="uk">uk</option>
+            </select>
+          </div>
+          <div class="field full">
+            <label for="submitter">Einreicherkennung optional</label>
+            <input id="submitter" name="submitter" type="text" autocomplete="name" placeholder="z. B. Schule, Kurs oder Kürzel" />
+          </div>
+          <div class="field full">
+            <label for="title">Titel</label>
+            <input id="title" name="title" type="text" required />
+          </div>
+          <div class="field full">
+            <label for="shortDescription">Kurzbeschreibung HTML oder Text</label>
+            <textarea id="shortDescription" name="shortDescription" required></textarea>
+          </div>
+          <div class="field">
+            <label for="subject">Fach</label>
+            <input id="subject" name="subject" type="text" required />
+          </div>
+          <div class="field">
+            <label for="gradeLevel">Klassenstufe</label>
+            <input id="gradeLevel" name="gradeLevel" type="text" required />
+          </div>
+          <div class="field full">
+            <label for="schoolType">Schulform</label>
+            <input id="schoolType" name="schoolType" type="text" required />
+          </div>
+        </div>
+
+        <section>
+          <div class="step-head">
+            <h2>Schritte</h2>
+            <button class="btn" type="button" id="addStep">Schritt hinzufügen</button>
+          </div>
+          <p class="note">Bei Bild und Audio ist der Inhalt ein relativer Pfad im Datenrepo oder eine vollständige URL.</p>
+          <div class="steps" id="steps"></div>
+        </section>
+
+        <div class="message" id="message" role="status" aria-live="polite"></div>
+
+        <div class="actions">
+          <button class="btn primary" type="submit">Experiment einreichen</button>
+          <button class="btn" type="button" id="updatePreview">Vorschau aktualisieren</button>
+        </div>
+      </form>
+    </section>
+
+    <aside class="panel sticky">
+      <div class="kicker">JSON</div>
+      <h2>Vorschau</h2>
+      <p class="note">Diese Vorschau entspricht dem Objekt, das an den Workflow übergeben wird.</p>
+      <pre id="preview">{}</pre>
+    </aside>
+  </main>
+
+  <template id="stepTemplate">
+    <article class="step-card">
+      <div class="step-head">
+        <h3>Schritt</h3>
+        <button class="btn" type="button" data-remove-step>Entfernen</button>
+      </div>
+      <div class="grid">
+        <div class="field">
+          <label>Typ</label>
+          <select data-step-type required>
+            <option value="text">text</option>
+            <option value="aufgabe">aufgabe</option>
+            <option value="merksatz">merksatz</option>
+            <option value="image">image</option>
+            <option value="audio">audio</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Beschreibung optional bei Medien</label>
+          <input data-step-description type="text" />
+        </div>
+        <div class="field full">
+          <label>Inhalt</label>
+          <textarea data-step-content required></textarea>
+        </div>
+      </div>
+    </article>
+  </template>
+
+  <script>
+    const SUBMISSION_ENDPOINT = "https://example-worker.example.workers.dev";
+    const ALLOWED_LANGUAGES = new Set(["de", "eng", "fr", "ru", "uk"]);
+    const ALLOWED_STEP_TYPES = new Set(["text", "aufgabe", "merksatz", "image", "audio"]);
+
+    const form = document.getElementById("submissionForm");
+    const stepsEl = document.getElementById("steps");
+    const previewEl = document.getElementById("preview");
+    const messageEl = document.getElementById("message");
+
+    document.getElementById("addStep").addEventListener("click", () => addStep());
+    document.getElementById("updatePreview").addEventListener("click", updatePreview);
+    form.addEventListener("input", updatePreview);
+    form.addEventListener("submit", submitExperiment);
+
+    addStep();
+    updatePreview();
+
+    function addStep(data = {}) {
+      const fragment = document.getElementById("stepTemplate").content.cloneNode(true);
+      const card = fragment.querySelector(".step-card");
+      card.querySelector("[data-step-type]").value = data.type || "text";
+      card.querySelector("[data-step-content]").value = data.content || "";
+      card.querySelector("[data-step-description]").value = data.description || "";
+      card.querySelector("[data-remove-step]").addEventListener("click", () => {
+        card.remove();
+        updatePreview();
+      });
+      stepsEl.appendChild(card);
+      updatePreview();
+    }
+
+    function buildExperiment() {
+      const steps = [...stepsEl.querySelectorAll(".step-card")].map(card => {
+        const step = {
+          type: card.querySelector("[data-step-type]").value.trim(),
+          content: sanitizeHtml(card.querySelector("[data-step-content]").value.trim())
+        };
+        const description = card.querySelector("[data-step-description]").value.trim();
+        if (description) step.description = sanitizePlainText(description);
+        return step;
+      });
+
+      return {
+        title: sanitizePlainText(form.title.value.trim()),
+        shortDescription: sanitizeHtml(form.shortDescription.value.trim()),
+        subject: sanitizePlainText(form.subject.value.trim()),
+        gradeLevel: sanitizePlainText(form.gradeLevel.value.trim()),
+        schoolType: sanitizePlainText(form.schoolType.value.trim()),
+        steps
+      };
+    }
+
+    function validatePayload() {
+      const errors = [];
+      const accessCode = form.accessCode.value.trim();
+      const language = form.language.value.trim();
+      const experiment = buildExperiment();
+
+      if (!accessCode) errors.push("Zugangscode darf nicht leer sein.");
+      if (!ALLOWED_LANGUAGES.has(language)) errors.push("Sprache muss de, eng, fr, ru oder uk sein.");
+      ["title", "shortDescription", "subject", "gradeLevel", "schoolType"].forEach(key => {
+        if (!experiment[key]) errors.push(key + " darf nicht leer sein.");
+      });
+      if (!experiment.steps.length) errors.push("Es muss mindestens ein Schritt vorhanden sein.");
+      experiment.steps.forEach((step, index) => {
+        const label = "Schritt " + (index + 1) + ": ";
+        if (!ALLOWED_STEP_TYPES.has(step.type)) errors.push(label + "Typ ist ungueltig.");
+        if (!step.content) errors.push(label + "Inhalt darf nicht leer sein.");
+        if ((step.type === "image" || step.type === "audio") && !looksLikePathOrUrl(step.content)) {
+          errors.push(label + "Inhalt muss bei Medien ein Pfad oder eine URL sein.");
+        }
+      });
+
+      return {
+        ok: errors.length === 0,
+        errors,
+        payload: {
+          accessCode,
+          language,
+          submitter: sanitizePlainText(form.submitter.value.trim()),
+          experiment
+        }
+      };
+    }
+
+    function updatePreview() {
+      previewEl.textContent = JSON.stringify(buildExperiment(), null, 2);
+    }
+
+    async function submitExperiment(event) {
+      event.preventDefault();
+      updatePreview();
+      const result = validatePayload();
+      if (!result.ok) {
+        showMessage(result.errors.join("\n"), "error");
+        return;
+      }
+
+      if (SUBMISSION_ENDPOINT.includes("example-worker.example")) {
+        showMessage("SUBMISSION_ENDPOINT ist noch ein Platzhalter. Trage zuerst die veroeffentlichte Worker-URL ein.", "error");
+        return;
+      }
+
+      showMessage("Einreichung wird gesendet...", "");
+      try {
+        const response = await fetch(SUBMISSION_ENDPOINT, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(result.payload)
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          throw new Error(data.error || data.message || "HTTP " + response.status);
+        }
+        showMessage(data.message || "Einreichung angekommen. Der Pull Request wird durch den Workflow erstellt.", "success");
+        form.reset();
+        stepsEl.innerHTML = "";
+        addStep();
+      } catch (error) {
+        showMessage("Einreichung fehlgeschlagen: " + error.message, "error");
+      }
+    }
+
+    function showMessage(text, type) {
+      messageEl.textContent = text;
+      messageEl.className = "message visible" + (type ? " " + type : "");
+    }
+
+    function sanitizePlainText(value) {
+      return String(value || "").replace(/[<>]/g, "").replace(/\s+/g, " ").trim();
+    }
+
+    function sanitizeHtml(value) {
+      const template = document.createElement("template");
+      template.innerHTML = String(value || "");
+      template.content.querySelectorAll("script, iframe, object, embed, link, meta").forEach(node => node.remove());
+      template.content.querySelectorAll("*").forEach(node => {
+        [...node.attributes].forEach(attr => {
+          const name = attr.name.toLowerCase();
+          const attrValue = attr.value.trim();
+          if (name.startsWith("on") || /^javascript:/i.test(attrValue)) {
+            node.removeAttribute(attr.name);
+          }
+        });
+      });
+      return template.innerHTML.trim();
+    }
+
+    function looksLikePathOrUrl(value) {
+      return /^https?:\/\/\S+$/i.test(value) || /^[\w./-]+\.[a-z0-9]{2,8}(\?\S*)?$/i.test(value);
+    }
+  </script>
+</body>
+</html>

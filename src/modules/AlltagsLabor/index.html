@@ -587,7 +587,7 @@
           <div>
             <div class="kicker">Suche</div>
             <h2>Material finden</h2>
-            <p class="source-note">Live geladen aus dem Datenrepo. Neue Eintraege erscheinen hier nach dem Merge.</p>
+            <p class="source-note">Live geladen aus dem GitHub-Datenrepo. Neue Eintraege erscheinen hier nach Review und Merge.</p>
           </div>
 
           <div class="field">
@@ -622,7 +622,7 @@
               <h2 id="resultTitle">Experimente</h2>
             </div>
           </div>
-          <div id="status" class="empty">Daten werden aus dem GitLab-Datenrepo geladen...</div>
+          <div id="status" class="empty">Daten werden aus dem GitHub-Datenrepo geladen...</div>
           <div id="experimentGrid" class="experiment-grid" hidden></div>
         </section>
       </div>
@@ -636,8 +636,9 @@
         <p>Diese Seite ist bewusst als Besucheransicht umgesetzt: lesen, suchen, filtern, drucken. Wer neue Experimente beitragen moechte, kann Kontakt zum Entwicklerteam aufnehmen oder im Datenrepo mitarbeiten.</p>
         <div class="hero-actions">
           <a class="btn primary" href="mailto:pianoflix@gmx.de?subject=AlltagsLabor%20Mitmachen">Kontakt aufnehmen</a>
-          <a class="btn" href="https://gitlab.com/Datenflix007/alltagslabor" target="_blank" rel="noopener">Source-Code-Repo</a>
-          <a class="btn" href="https://gitlab.com/Datenflix007/alltagslabordata" target="_blank" rel="noopener">Datenrepo ansehen</a>
+          <a class="btn" href="einpflegen.html">Experiment einreichen</a>
+          <a class="btn" href="https://github.com/Datenflix007/datenflix007.github.io" target="_blank" rel="noopener">Source-Code-Repo</a>
+          <a class="btn" href="https://github.com/Datenflix007/alltagslabordata" target="_blank" rel="noopener">Datenrepo ansehen</a>
         </div>
       </div>
     </section>
@@ -666,7 +667,7 @@
   </footer>
 
   <script>
-    const DATA_REPO_API = "https://gitlab.com/api/v4/projects/Datenflix007%2Falltagslabordata/repository/files/";
+    const DATA_REPO_BASE_URL = "https://raw.githubusercontent.com/Datenflix007/alltagslabordata/main/";
     const LANGUAGE_FILES = {
       de: "_experiments_de.json",
       eng: "_experiments_eng.json",
@@ -674,7 +675,7 @@
       ru: "_experiments_ru.json",
       uk: "_experiments_uk.json"
     };
-    const IMPRESSUM_URL = gitlabFileUrl("impressum.txt");
+    const IMPRESSUM_URL = repoFileUrl("impressum.txt");
 
     const state = {
       experiments: [],
@@ -714,7 +715,7 @@
     loadData();
 
     async function loadData() {
-      showStatus("Daten werden aus dem GitLab-Datenrepo geladen...", "empty");
+      showStatus("Daten werden aus dem GitHub-Datenrepo geladen...", "empty");
       try {
         const response = await fetch(dataUrlForLanguage(state.language), { cache: "no-store" });
         if (!response.ok) throw new Error("HTTP " + response.status);
@@ -726,7 +727,7 @@
         loadImpressum();
         document.getElementById("dataTimestamp").textContent = "Datenstand: " + new Date().toLocaleString("de-DE");
       } catch (error) {
-        showStatus("Die Daten konnten nicht geladen werden. Das GitLab-Datenrepo muss oeffentlich erreichbar sein. Technischer Hinweis: " + error.message, "error");
+        showStatus("Die Daten konnten nicht geladen werden. Das GitHub-Datenrepo muss oeffentlich erreichbar sein. Technischer Hinweis: " + error.message, "error");
       }
     }
 
@@ -937,20 +938,21 @@
     function resolveAsset(path) {
       if (!path) return "";
       if (/^https?:\/\//i.test(path)) return path;
-      return gitlabFileUrl(path.replace(/^dataEditor\//, "").replace(/^\/+/, ""));
+      return repoFileUrl(path.replace(/^dataEditor\//, "").replace(/^\/+/, ""));
     }
 
-    function gitlabFileUrl(path) {
-      return DATA_REPO_API + encodeURIComponent(path).replace(/%2F/g, "%2F") + "/raw?ref=main";
+    function repoFileUrl(path) {
+      return DATA_REPO_BASE_URL + String(path || "").split("/").map(encodeURIComponent).join("/");
     }
 
     function dataUrlForLanguage(language) {
-      return gitlabFileUrl(LANGUAGE_FILES[language] || LANGUAGE_FILES.de);
+      return repoFileUrl(LANGUAGE_FILES[language] || LANGUAGE_FILES.de);
     }
 
     function rewriteMediaPaths(html) {
       const wrapper = document.createElement("div");
       wrapper.innerHTML = html || "";
+      sanitizeElement(wrapper);
       wrapper.querySelectorAll("img, audio, source").forEach(node => {
         const attr = node.hasAttribute("src") ? "src" : "href";
         const value = node.getAttribute(attr);
@@ -963,6 +965,19 @@
         }
       });
       return wrapper.innerHTML;
+    }
+
+    function sanitizeElement(root) {
+      root.querySelectorAll("script, iframe, object, embed, link, meta").forEach(node => node.remove());
+      root.querySelectorAll("*").forEach(node => {
+        [...node.attributes].forEach(attr => {
+          const name = attr.name.toLowerCase();
+          const value = attr.value.trim();
+          if (name.startsWith("on") || /^javascript:/i.test(value)) {
+            node.removeAttribute(attr.name);
+          }
+        });
+      });
     }
 
     function exportPdf() {
