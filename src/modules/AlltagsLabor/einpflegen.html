@@ -976,7 +976,11 @@
         showLoginError("Bitte Anmeldename und Passwort eingeben.");
         return;
       }
-      session = { name, password, permissions: ACCOUNT_PERMISSIONS[name] || new Set(["create"]) };
+      if (!ACCOUNT_PERMISSIONS[name]) {
+        showLoginError("Unbekannter Anmeldename. Wende dich ans Admin-Team, um einen Account zu erhalten.");
+        return;
+      }
+      session = { name, password, permissions: ACCOUNT_PERMISSIONS[name] };
       loginError.className = "";
       loginError.textContent = "";
       loginScreen.hidden = true;
