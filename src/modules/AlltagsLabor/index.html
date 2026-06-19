@@ -607,8 +607,12 @@
           <select id="language">
             <option value="de">Deutsch</option>
             <option value="eng">English</option>
+            <option value="fa">Farsi</option>
             <option value="fr">Français</option>
+            <option value="pol">Polski</option>
+            <option value="rum">Română</option>
             <option value="ru">Русский</option>
+            <option value="es">Español</option>
             <option value="uk">Українська</option>
           </select>
         </label>
@@ -709,7 +713,11 @@
     const LANGUAGE_FILES = {
       de: "_experiments_de.json",
       eng: "_experiments_eng.json",
+      es: "_experiments_es.json",
+      fa: "_experiments_fa.json",
       fr: "_experiments_fr.json",
+      pol: "_experiments_pol.json",
+      rum: "_experiments_rum.json",
       ru: "_experiments_ru.json",
       uk: "_experiments_uk.json"
     };
@@ -802,6 +810,94 @@
         gradePrefix: "Grade {grade}",
         imageAlt: "Experiment image"
       },
+      es: {
+        languageLabel: "Idioma",
+        translationNote: "Nota: Los experimentos se redactaron originalmente en alemán y después se tradujeron con IA. Por eso pueden aparecer errores de traducción.",
+        filtersAria: "Filtros",
+        searchKicker: "Búsqueda",
+        findMaterial: "Encontrar material",
+        sourceNote: "Cargado en directo desde el repositorio de datos de GitHub. Las nuevas entradas aparecen aquí después de la revisión y la fusión.",
+        queryLabel: "Término de búsqueda",
+        queryPlaceholder: "Título, descripción, contenido",
+        subjectLabel: "Asignatura",
+        gradeLabel: "Curso",
+        schoolLabel: "Tipo de centro",
+        applyFilters: "Aplicar",
+        resetFilters: "Restablecer",
+        loadingKicker: "Cargando datos",
+        experimentsTitle: "Experimentos",
+        loadingStatus: "Cargando datos desde el repositorio de GitHub...",
+        allSubjects: "Todas las asignaturas",
+        allGrades: "Todos los cursos",
+        allSchools: "Todos los tipos de centro",
+        projectIdeaKicker: "Idea del proyecto",
+        aboutTitle: "De la vida cotidiana a la explicación científica",
+        aboutText1: "AlltagsLabor reúne experimentos que funcionan con materiales sencillos y conectan con situaciones conocidas. El alumnado empieza con una observación, prueba algo por sí mismo y después clasifica la experiencia desde la materia correspondiente.",
+        aboutText2: "Esta página está diseñada como vista para visitantes: leer, buscar, filtrar e imprimir. Quien quiera aportar nuevos experimentos puede contactar con el equipo de desarrollo o colaborar en el repositorio de datos.",
+        contactButton: "Contactar",
+        submitButton: "Enviar experimento",
+        sourceRepoButton: "Repositorio del código",
+        dataRepoButton: "Ver repositorio de datos",
+        experimentKicker: "Experimento",
+        printButton: "Imprimir",
+        closeButton: "Cerrar",
+        dataTimestampLoading: "Estado de los datos: cargando",
+        dataTimestamp: "Estado de los datos: {date}",
+        loadError: "No se pudieron cargar los datos. El repositorio de GitHub debe ser accesible públicamente. Nota técnica: {message}",
+        resultCount: "{filtered} de {total} entradas",
+        oneExperiment: "Un experimento",
+        manyExperiments: "Experimentos",
+        noResults: "No se encontraron experimentos adecuados. Cambia los filtros o restablece la búsqueda.",
+        untitled: "Sin título",
+        noDescription: "No hay descripción breve disponible.",
+        readButton: "Leer",
+        gradePrefix: "Curso {grade}",
+        imageAlt: "Imagen del experimento"
+      },
+      fa: {
+        languageLabel: "زبان",
+        translationNote: "توجه: آزمایش‌ها در اصل به زبان آلمانی نوشته شده‌اند و سپس با هوش مصنوعی ترجمه شده‌اند. بنابراین ممکن است خطاهای ترجمه وجود داشته باشد.",
+        filtersAria: "فیلترها",
+        searchKicker: "جستجو",
+        findMaterial: "یافتن مواد آموزشی",
+        sourceNote: "داده‌ها به‌صورت زنده از مخزن داده GitHub بارگیری می‌شوند. ورودی‌های جدید پس از بازبینی و ادغام در اینجا ظاهر می‌شوند.",
+        queryLabel: "عبارت جستجو",
+        queryPlaceholder: "عنوان، توضیح، محتوا",
+        subjectLabel: "درس",
+        gradeLabel: "پایه",
+        schoolLabel: "نوع مدرسه",
+        applyFilters: "اعمال",
+        resetFilters: "بازنشانی",
+        loadingKicker: "در حال بارگیری داده‌ها",
+        experimentsTitle: "آزمایش‌ها",
+        loadingStatus: "داده‌ها از مخزن GitHub بارگیری می‌شوند...",
+        allSubjects: "همه درس‌ها",
+        allGrades: "همه پایه‌ها",
+        allSchools: "همه نوع‌های مدرسه",
+        projectIdeaKicker: "ایده پروژه",
+        aboutTitle: "از زندگی روزمره تا توضیح علمی",
+        aboutText1: "AlltagsLabor آزمایش‌هایی را گردآوری می‌کند که با مواد ساده انجام می‌شوند و به موقعیت‌های آشنا پیوند دارند. یادگیرندگان با یک مشاهده شروع می‌کنند، خودشان چیزی را امتحان می‌کنند و سپس تجربه را از نظر درسی دسته‌بندی می‌کنند.",
+        aboutText2: "این صفحه به‌عنوان نمای بازدیدکننده طراحی شده است: خواندن، جستجو، فیلتر کردن و چاپ. کسانی که می‌خواهند آزمایش‌های جدید اضافه کنند می‌توانند با تیم توسعه تماس بگیرند یا در مخزن داده همکاری کنند.",
+        contactButton: "تماس بگیرید",
+        submitButton: "ارسال آزمایش",
+        sourceRepoButton: "مخزن کد",
+        dataRepoButton: "مشاهده مخزن داده",
+        experimentKicker: "آزمایش",
+        printButton: "چاپ",
+        closeButton: "بستن",
+        dataTimestampLoading: "وضعیت داده‌ها: در حال بارگیری",
+        dataTimestamp: "وضعیت داده‌ها: {date}",
+        loadError: "داده‌ها بارگیری نشدند. مخزن GitHub باید به‌صورت عمومی در دسترس باشد. توضیح فنی: {message}",
+        resultCount: "{filtered} از {total} ورودی",
+        oneExperiment: "یک آزمایش",
+        manyExperiments: "آزمایش‌ها",
+        noResults: "هیچ آزمایش مطابقی پیدا نشد. فیلترها را تغییر دهید یا جستجو را بازنشانی کنید.",
+        untitled: "بدون عنوان",
+        noDescription: "توضیح کوتاهی موجود نیست.",
+        readButton: "خواندن",
+        gradePrefix: "پایه {grade}",
+        imageAlt: "تصویر آزمایش"
+      },
       fr: {
         languageLabel: "Langue",
         translationNote: "Remarque : les expériences ont été rédigées à l'origine en allemand, puis traduites par IA. Des erreurs de traduction peuvent donc apparaître.",
@@ -845,6 +941,94 @@
         readButton: "Lire",
         gradePrefix: "Niveau {grade}",
         imageAlt: "Image de l'expérience"
+      },
+      pol: {
+        languageLabel: "Język",
+        translationNote: "Uwaga: eksperymenty zostały pierwotnie napisane po niemiecku, a następnie przetłumaczone z użyciem AI. Mogą więc wystąpić błędy tłumaczenia.",
+        filtersAria: "Filtry",
+        searchKicker: "Szukaj",
+        findMaterial: "Znajdź materiał",
+        sourceNote: "Dane są ładowane bezpośrednio z repozytorium GitHub. Nowe wpisy pojawiają się tutaj po przeglądzie i scaleniu.",
+        queryLabel: "Szukana fraza",
+        queryPlaceholder: "Tytuł, opis, treść",
+        subjectLabel: "Przedmiot",
+        gradeLabel: "Klasa",
+        schoolLabel: "Typ szkoły",
+        applyFilters: "Zastosuj",
+        resetFilters: "Resetuj",
+        loadingKicker: "Ładowanie danych",
+        experimentsTitle: "Eksperymenty",
+        loadingStatus: "Dane są ładowane z repozytorium GitHub...",
+        allSubjects: "Wszystkie przedmioty",
+        allGrades: "Wszystkie klasy",
+        allSchools: "Wszystkie typy szkół",
+        projectIdeaKicker: "Idea projektu",
+        aboutTitle: "Od codzienności do wyjaśnienia naukowego",
+        aboutText1: "AlltagsLabor gromadzi eksperymenty, które działają z prostymi materiałami i nawiązują do znanych sytuacji. Uczący się zaczynają od obserwacji, próbują czegoś samodzielnie, a następnie wyjaśniają doświadczenie w kontekście przedmiotu.",
+        aboutText2: "Ta strona jest przygotowana jako widok dla odwiedzających: czytanie, wyszukiwanie, filtrowanie i drukowanie. Osoby, które chcą dodać nowe eksperymenty, mogą skontaktować się z zespołem albo współpracować w repozytorium danych.",
+        contactButton: "Kontakt",
+        submitButton: "Prześlij eksperyment",
+        sourceRepoButton: "Repozytorium kodu",
+        dataRepoButton: "Zobacz repozytorium danych",
+        experimentKicker: "Eksperyment",
+        printButton: "Drukuj",
+        closeButton: "Zamknij",
+        dataTimestampLoading: "Stan danych: ładowanie",
+        dataTimestamp: "Stan danych: {date}",
+        loadError: "Nie udało się załadować danych. Repozytorium GitHub musi być publicznie dostępne. Informacja techniczna: {message}",
+        resultCount: "{filtered} z {total} wpisów",
+        oneExperiment: "Jeden eksperyment",
+        manyExperiments: "Eksperymenty",
+        noResults: "Nie znaleziono pasujących eksperymentów. Zmień filtry albo zresetuj wyszukiwanie.",
+        untitled: "Bez tytułu",
+        noDescription: "Brak krótkiego opisu.",
+        readButton: "Czytaj",
+        gradePrefix: "Klasa {grade}",
+        imageAlt: "Obraz eksperymentu"
+      },
+      rum: {
+        languageLabel: "Limbă",
+        translationNote: "Notă: experimentele au fost scrise inițial în germană și apoi traduse cu ajutorul AI. Prin urmare, pot apărea erori de traducere.",
+        filtersAria: "Filtre",
+        searchKicker: "Căutare",
+        findMaterial: "Găsește material",
+        sourceNote: "Încărcat direct din depozitul de date GitHub. Intrările noi apar aici după verificare și integrare.",
+        queryLabel: "Termen de căutare",
+        queryPlaceholder: "Titlu, descriere, conținut",
+        subjectLabel: "Materie",
+        gradeLabel: "Clasă",
+        schoolLabel: "Tip de școală",
+        applyFilters: "Aplică",
+        resetFilters: "Resetează",
+        loadingKicker: "Se încarcă datele",
+        experimentsTitle: "Experimente",
+        loadingStatus: "Datele se încarcă din depozitul GitHub...",
+        allSubjects: "Toate materiile",
+        allGrades: "Toate clasele",
+        allSchools: "Toate tipurile de școli",
+        projectIdeaKicker: "Ideea proiectului",
+        aboutTitle: "De la viața de zi cu zi la explicația științifică",
+        aboutText1: "AlltagsLabor adună experimente care funcționează cu materiale simple și se leagă de situații familiare. Elevii încep cu o observație, încearcă singuri și apoi încadrează experiența din perspectiva disciplinei.",
+        aboutText2: "Această pagină este concepută ca o vedere pentru vizitatori: citire, căutare, filtrare, imprimare. Cei care doresc să contribuie cu experimente noi pot contacta echipa de dezvoltare sau pot lucra în depozitul de date.",
+        contactButton: "Contact",
+        submitButton: "Trimite experiment",
+        sourceRepoButton: "Depozit cod sursă",
+        dataRepoButton: "Vezi depozitul de date",
+        experimentKicker: "Experiment",
+        printButton: "Imprimă",
+        closeButton: "Închide",
+        dataTimestampLoading: "Starea datelor: se încarcă",
+        dataTimestamp: "Starea datelor: {date}",
+        loadError: "Datele nu au putut fi încărcate. Depozitul GitHub trebuie să fie accesibil public. Notă tehnică: {message}",
+        resultCount: "{filtered} din {total} intrări",
+        oneExperiment: "Un experiment",
+        manyExperiments: "Experimente",
+        noResults: "Nu s-au găsit experimente potrivite. Schimbă filtrele sau resetează căutarea.",
+        untitled: "Fără titlu",
+        noDescription: "Nu există o descriere scurtă.",
+        readButton: "Citește",
+        gradePrefix: "Clasa {grade}",
+        imageAlt: "Imaginea experimentului"
       },
       ru: {
         languageLabel: "Язык",
@@ -938,7 +1122,11 @@
     const LANGUAGE_LABELS = {
       de: "Deutsch",
       eng: "English",
+      es: "Español",
+      fa: "فارسی",
       fr: "Français",
+      pol: "Polski",
+      rum: "Română",
       ru: "Русский",
       uk: "Українська"
     };
@@ -1019,7 +1207,11 @@
       return {
         de: "de-DE",
         eng: "en-US",
+        es: "es-ES",
+        fa: "fa-IR",
         fr: "fr-FR",
+        pol: "pl-PL",
+        rum: "ro-RO",
         ru: "ru-RU",
         uk: "uk-UA"
       }[language] || "de-DE";
@@ -1032,7 +1224,12 @@
     }
 
     function applyUiTranslations() {
-      document.documentElement.lang = state.language === "eng" ? "en" : state.language;
+      document.documentElement.lang = {
+        eng: "en",
+        pol: "pl",
+        rum: "ro"
+      }[state.language] || state.language;
+      document.documentElement.dir = state.language === "fa" ? "rtl" : "ltr";
       document.querySelectorAll("[data-i18n]").forEach(node => {
         node.textContent = t(node.dataset.i18n);
       });

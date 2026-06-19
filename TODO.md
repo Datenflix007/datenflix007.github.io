@@ -105,6 +105,7 @@
 
 - [x] Besucheransicht `src/modules/AlltagsLabor/index.html` so erweitert, dass die Sprachwahl nicht nur die Experimentdaten, sondern auch die statische UI uebersetzt.
 - [x] Uebersetzungsobjekt fuer `de`, `eng`, `fr`, `ru` und `uk` angelegt.
+- [x] Sprachwahl und UI um Farsi/Persisch (`fa`), Polnisch (`pol`), Rumaenisch (`rum`) und Spanisch (`es`) erweitert.
 - [x] Hinweis an der Sprachauswahl ergaenzt, dass die Experimente urspruenglich deutsch verfasst und per KI uebersetzt wurden, sodass Uebersetzungsfehler moeglich sind.
 - [x] Dynamische Texte wie Laden/Fehler, Trefferanzahl, leere Suche, Kartenbuttons, Klassenstufe, Dialogtitel und Bild-Alt-Fallback an die aktuelle Sprache gekoppelt.
 - [x] Sichtbare Kodierungsreste bei deutschen UI-Texten, Sprachlabels und Footer bereinigt.
