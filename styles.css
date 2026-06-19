@@ -358,6 +358,25 @@ section {
     font-size: 1.05rem
 }
 
+.ref-publication--featured {
+    margin-bottom: 18px;
+}
+
+.ref-links {
+    display: inline-block;
+    margin-top: 6px;
+}
+
+.ref-links a {
+    color: #7dd3fc;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.ref-links a:hover {
+    text-decoration: underline;
+}
+
 .tag {
     display: inline-block;
     border: 1px solid var(--ring);
