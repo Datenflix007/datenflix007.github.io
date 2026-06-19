@@ -13,7 +13,13 @@
       "Bash(node -e \"const {chromium} = require\\('playwright'\\); console.log\\('playwright ok'\\);\")",
       "Bash(npm install *)",
       "Bash(node -e \"const {chromium} = require\\('playwright'\\); console.log\\('ok'\\);\")",
-      "Bash(node -e ' *)"
+      "Bash(node -e ' *)",
+      "Bash(gh repo *)",
+      "PowerShell(gh repo view Datenflix007/alltagslabordata --json name,defaultBranchRef 2>&1)",
+      "PowerShell(git clone https://github.com/Datenflix007/alltagslabordata.git \"$env:TEMP\\\\alltagslabordata\" 2>&1)",
+      "PowerShell(Get-ChildItem \"$env:TEMP\\\\alltagslabordata\" -ErrorAction SilentlyContinue | Select-Object Name)",
+      "PowerShell(Get-ChildItem \"$env:TEMP\\\\alltagslabordata\\\\.github\\\\workflows\" -ErrorAction SilentlyContinue | Select-Object Name; Get-ChildItem \"$env:TEMP\\\\alltagslabordata\\\\scripts\" -ErrorAction SilentlyContinue | Select-Object Name)",
+      "PowerShell(git -C \"$env:TEMP\\\\alltagslabordata\" log --oneline -5)"
     ]
   }
 }
