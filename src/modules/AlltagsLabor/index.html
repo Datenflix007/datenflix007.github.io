@@ -359,13 +359,14 @@
     .experiment-card {
       border: 1px solid var(--line);
       border-radius: 8px;
-      background: transparent;
+      background: rgba(255, 255, 255, .92);
       padding: 17px;
       min-height: 230px;
       display: grid;
       gap: 12px;
       align-content: start;
-      transition: transform .16s ease, border-color .16s ease;
+      box-shadow: 0 10px 24px rgba(31, 41, 51, .05);
+      transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease;
     }
 
     .experiment-card:hover {
