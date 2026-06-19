@@ -161,6 +161,22 @@
       outline: 0;
     }
 
+    .language-block {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 6px;
+      max-width: 440px;
+    }
+
+    .translation-note {
+      margin: 0;
+      color: var(--muted);
+      font-size: .74rem;
+      line-height: 1.35;
+      text-align: right;
+    }
+
     .btn {
       display: inline-flex;
       align-items: center;
@@ -568,6 +584,8 @@
     @media (max-width: 620px) {
       .topbar-inner { align-items: start; flex-direction: column; }
       .nav-actions { justify-content: flex-start; }
+      .language-block { align-items: flex-start; }
+      .translation-note { text-align: left; }
       .content-head { align-items: stretch; flex-direction: column; }
       .modal-head { flex-direction: column; }
       .modal-tools { justify-content: flex-start; }
@@ -583,8 +601,9 @@
         <span>AlltagsLabor</span>
       </a>
       <nav class="nav-actions" aria-label="Navigation">
+        <div class="language-block">
         <label class="language-picker" for="language">
-          <span class="sr-only">Sprache</span>
+          <span class="sr-only" data-i18n="languageLabel">Sprache</span>
           <select id="language">
             <option value="de">Deutsch</option>
             <option value="eng">English</option>
@@ -593,6 +612,8 @@
             <option value="uk">Українська</option>
           </select>
         </label>
+        <p class="translation-note" data-i18n="translationNote">Hinweis: Die Experimente wurden ursprünglich auf Deutsch verfasst und anschließend mit KI übersetzt. Dabei können Übersetzungsfehler auftreten.</p>
+        </div>
       </nav>
     </div>
   </header>
@@ -600,46 +621,46 @@
   <main id="start">
     <section class="band" id="experimente">
       <div class="workspace">
-        <aside class="filters" aria-label="Filter">
+        <aside class="filters" aria-label="Filter" data-i18n-attr="aria-label:filtersAria">
           <div>
-            <div class="kicker">Suche</div>
-            <h2>Material finden</h2>
-            <p class="source-note">Live geladen aus dem GitHub-Datenrepo. Neue Eintraege erscheinen hier nach Review und Merge.</p>
+            <div class="kicker" data-i18n="searchKicker">Suche</div>
+            <h2 data-i18n="findMaterial">Material finden</h2>
+            <p class="source-note" data-i18n="sourceNote">Live geladen aus dem GitHub-Datenrepo. Neue Einträge erscheinen hier nach Review und Merge.</p>
           </div>
 
           <div class="field">
-            <label for="query">Suchbegriff</label>
-            <input id="query" type="search" autocomplete="off" placeholder="Titel, Beschreibung, Inhalt" />
+            <label for="query" data-i18n="queryLabel">Suchbegriff</label>
+            <input id="query" type="search" autocomplete="off" placeholder="Titel, Beschreibung, Inhalt" data-i18n-attr="placeholder:queryPlaceholder" />
           </div>
           <div class="field">
-            <label for="subject">Fach</label>
-            <select id="subject"><option value="">Alle Faecher</option></select>
+            <label for="subject" data-i18n="subjectLabel">Fach</label>
+            <select id="subject"><option value="">Alle Fächer</option></select>
           </div>
 
           <div class="field">
-            <label for="grade">Klassenstufe</label>
+            <label for="grade" data-i18n="gradeLabel">Klassenstufe</label>
             <select id="grade"><option value="">Alle Stufen</option></select>
           </div>
 
           <div class="field">
-            <label for="school">Schulform</label>
+            <label for="school" data-i18n="schoolLabel">Schulform</label>
             <select id="school"><option value="">Alle Schulformen</option></select>
           </div>
 
           <div class="filter-actions">
-            <button class="btn primary" type="button" id="applyFilters">Anwenden</button>
-            <button class="btn" type="button" id="resetFilters">Zuruecksetzen</button>
+            <button class="btn primary" type="button" id="applyFilters" data-i18n="applyFilters">Anwenden</button>
+            <button class="btn" type="button" id="resetFilters" data-i18n="resetFilters">Zurücksetzen</button>
           </div>
         </aside>
 
         <section aria-live="polite">
           <div class="content-head">
             <div>
-              <div class="kicker" id="resultKicker">Lade Daten</div>
-              <h2 id="resultTitle">Experimente</h2>
+              <div class="kicker" id="resultKicker" data-i18n="loadingKicker">Lade Daten</div>
+              <h2 id="resultTitle" data-i18n="experimentsTitle">Experimente</h2>
             </div>
           </div>
-          <div id="status" class="empty">Daten werden aus dem GitHub-Datenrepo geladen...</div>
+          <div id="status" class="empty" data-i18n="loadingStatus">Daten werden aus dem GitHub-Datenrepo geladen...</div>
           <div id="experimentGrid" class="experiment-grid" hidden></div>
         </section>
       </div>
@@ -647,15 +668,15 @@
 
     <section class="about" id="mitmachen">
       <div>
-        <div class="kicker">Projektidee</div>
-        <h2>Vom Alltag zur fachlichen Erklaerung</h2>
-        <p>Das AlltagsLabor sammelt Experimente, die mit einfachen Materialien funktionieren und an vertraute Situationen anschliessen. Lernende beginnen mit einer Beobachtung, probieren etwas selbst aus und ordnen die Erfahrung anschliessend fachlich ein.</p>
-        <p>Diese Seite ist bewusst als Besucheransicht umgesetzt: lesen, suchen, filtern, drucken. Wer neue Experimente beitragen moechte, kann Kontakt zum Entwicklerteam aufnehmen oder im Datenrepo mitarbeiten.</p>
+        <div class="kicker" data-i18n="projectIdeaKicker">Projektidee</div>
+        <h2 data-i18n="aboutTitle">Vom Alltag zur fachlichen Erklärung</h2>
+        <p data-i18n="aboutText1">Das AlltagsLabor sammelt Experimente, die mit einfachen Materialien funktionieren und an vertraute Situationen anschließen. Lernende beginnen mit einer Beobachtung, probieren etwas selbst aus und ordnen die Erfahrung anschließend fachlich ein.</p>
+        <p data-i18n="aboutText2">Diese Seite ist bewusst als Besucheransicht umgesetzt: lesen, suchen, filtern, drucken. Wer neue Experimente beitragen möchte, kann Kontakt zum Entwicklerteam aufnehmen oder im Datenrepo mitarbeiten.</p>
         <div class="hero-actions">
-          <a class="btn primary" href="mailto:pianoflix@gmx.de?subject=AlltagsLabor%20Mitmachen">Kontakt aufnehmen</a>
-          <a class="btn" href="einpflegen.html">Experiment einreichen</a>
-          <a class="btn" href="https://github.com/Datenflix007/datenflix007.github.io" target="_blank" rel="noopener">Source-Code-Repo</a>
-          <a class="btn" href="https://github.com/Datenflix007/alltagslabordata" target="_blank" rel="noopener">Datenrepo ansehen</a>
+          <a class="btn primary" href="mailto:pianoflix@gmx.de?subject=AlltagsLabor%20Mitmachen" data-i18n="contactButton">Kontakt aufnehmen</a>
+          <a class="btn" href="einpflegen.html" data-i18n="submitButton">Experiment einreichen</a>
+          <a class="btn" href="https://github.com/Datenflix007/datenflix007.github.io" target="_blank" rel="noopener" data-i18n="sourceRepoButton">Source-Code-Repo</a>
+          <a class="btn" href="https://github.com/Datenflix007/alltagslabordata" target="_blank" rel="noopener" data-i18n="dataRepoButton">Datenrepo ansehen</a>
         </div>
       </div>
     </section>
@@ -664,13 +685,13 @@
   <dialog id="detailDialog" aria-labelledby="dialogTitle">
     <div class="modal-head">
       <div>
-        <div class="kicker">Experiment</div>
+        <div class="kicker" data-i18n="experimentKicker">Experiment</div>
         <h2 id="dialogTitle"></h2>
       </div>
       <div class="modal-tools">
-        <button class="btn" type="button" id="printExperiment">Drucken</button>
+        <button class="btn" type="button" id="printExperiment" data-i18n="printButton">Drucken</button>
         <button class="btn" type="button" id="pdfExperiment">PDF</button>
-        <button class="btn primary" type="button" id="closeDialog">Schliessen</button>
+        <button class="btn primary" type="button" id="closeDialog" data-i18n="closeButton">Schließen</button>
       </div>
     </div>
     <article class="experiment-body" id="dialogBody"></article>
@@ -679,7 +700,7 @@
   <footer>
     <div class="inner">
       <span>Felix Staacke · AlltagsLabor</span>
-      <span id="dataTimestamp">Datenstand: wird geladen</span>
+      <span id="dataTimestamp" data-i18n="dataTimestampLoading">Datenstand: wird geladen</span>
     </div>
   </footer>
 
@@ -691,6 +712,235 @@
       fr: "_experiments_fr.json",
       ru: "_experiments_ru.json",
       uk: "_experiments_uk.json"
+    };
+    const UI_TEXT = {
+      de: {
+        languageLabel: "Sprache",
+        translationNote: "Hinweis: Die Experimente wurden ursprünglich auf Deutsch verfasst und anschließend mit KI übersetzt. Dabei können Übersetzungsfehler auftreten.",
+        filtersAria: "Filter",
+        searchKicker: "Suche",
+        findMaterial: "Material finden",
+        sourceNote: "Live geladen aus dem GitHub-Datenrepo. Neue Einträge erscheinen hier nach Review und Merge.",
+        queryLabel: "Suchbegriff",
+        queryPlaceholder: "Titel, Beschreibung, Inhalt",
+        subjectLabel: "Fach",
+        gradeLabel: "Klassenstufe",
+        schoolLabel: "Schulform",
+        applyFilters: "Anwenden",
+        resetFilters: "Zurücksetzen",
+        loadingKicker: "Lade Daten",
+        experimentsTitle: "Experimente",
+        loadingStatus: "Daten werden aus dem GitHub-Datenrepo geladen...",
+        allSubjects: "Alle Fächer",
+        allGrades: "Alle Stufen",
+        allSchools: "Alle Schulformen",
+        projectIdeaKicker: "Projektidee",
+        aboutTitle: "Vom Alltag zur fachlichen Erklärung",
+        aboutText1: "Das AlltagsLabor sammelt Experimente, die mit einfachen Materialien funktionieren und an vertraute Situationen anschließen. Lernende beginnen mit einer Beobachtung, probieren etwas selbst aus und ordnen die Erfahrung anschließend fachlich ein.",
+        aboutText2: "Diese Seite ist bewusst als Besucheransicht umgesetzt: lesen, suchen, filtern, drucken. Wer neue Experimente beitragen möchte, kann Kontakt zum Entwicklerteam aufnehmen oder im Datenrepo mitarbeiten.",
+        contactButton: "Kontakt aufnehmen",
+        submitButton: "Experiment einreichen",
+        sourceRepoButton: "Source-Code-Repo",
+        dataRepoButton: "Datenrepo ansehen",
+        experimentKicker: "Experiment",
+        printButton: "Drucken",
+        closeButton: "Schließen",
+        dataTimestampLoading: "Datenstand: wird geladen",
+        dataTimestamp: "Datenstand: {date}",
+        loadError: "Die Daten konnten nicht geladen werden. Das GitHub-Datenrepo muss öffentlich erreichbar sein. Technischer Hinweis: {message}",
+        resultCount: "{filtered} von {total} Einträgen",
+        oneExperiment: "Ein Experiment",
+        manyExperiments: "Experimente",
+        noResults: "Keine passenden Experimente gefunden. Ändere die Filter oder setze die Suche zurück.",
+        untitled: "Ohne Titel",
+        noDescription: "Keine Kurzbeschreibung vorhanden.",
+        readButton: "Lesen",
+        gradePrefix: "Klasse {grade}",
+        imageAlt: "Experimentbild"
+      },
+      eng: {
+        languageLabel: "Language",
+        translationNote: "Note: The experiments were originally written in German and then translated with AI. Translation errors may therefore occur.",
+        filtersAria: "Filters",
+        searchKicker: "Search",
+        findMaterial: "Find material",
+        sourceNote: "Loaded live from the GitHub data repository. New entries appear here after review and merge.",
+        queryLabel: "Search term",
+        queryPlaceholder: "Title, description, content",
+        subjectLabel: "Subject",
+        gradeLabel: "Grade level",
+        schoolLabel: "School type",
+        applyFilters: "Apply",
+        resetFilters: "Reset",
+        loadingKicker: "Loading data",
+        experimentsTitle: "Experiments",
+        loadingStatus: "Loading data from the GitHub data repository...",
+        allSubjects: "All subjects",
+        allGrades: "All grades",
+        allSchools: "All school types",
+        projectIdeaKicker: "Project idea",
+        aboutTitle: "From everyday life to subject explanation",
+        aboutText1: "AlltagsLabor collects experiments that work with simple materials and connect to familiar situations. Learners start with an observation, try something themselves, and then classify the experience in subject terms.",
+        aboutText2: "This page is intentionally built as a visitor view: read, search, filter, print. Anyone who wants to contribute new experiments can contact the development team or work in the data repository.",
+        contactButton: "Contact us",
+        submitButton: "Submit experiment",
+        sourceRepoButton: "Source code repo",
+        dataRepoButton: "View data repo",
+        experimentKicker: "Experiment",
+        printButton: "Print",
+        closeButton: "Close",
+        dataTimestampLoading: "Data status: loading",
+        dataTimestamp: "Data status: {date}",
+        loadError: "The data could not be loaded. The GitHub data repository must be publicly reachable. Technical note: {message}",
+        resultCount: "{filtered} of {total} entries",
+        oneExperiment: "One experiment",
+        manyExperiments: "Experiments",
+        noResults: "No matching experiments found. Change the filters or reset the search.",
+        untitled: "Untitled",
+        noDescription: "No short description available.",
+        readButton: "Read",
+        gradePrefix: "Grade {grade}",
+        imageAlt: "Experiment image"
+      },
+      fr: {
+        languageLabel: "Langue",
+        translationNote: "Remarque : les expériences ont été rédigées à l'origine en allemand, puis traduites par IA. Des erreurs de traduction peuvent donc apparaître.",
+        filtersAria: "Filtres",
+        searchKicker: "Recherche",
+        findMaterial: "Trouver du matériel",
+        sourceNote: "Chargé en direct depuis le dépôt de données GitHub. Les nouvelles entrées apparaissent ici après vérification et fusion.",
+        queryLabel: "Terme de recherche",
+        queryPlaceholder: "Titre, description, contenu",
+        subjectLabel: "Matière",
+        gradeLabel: "Niveau",
+        schoolLabel: "Type d'établissement",
+        applyFilters: "Appliquer",
+        resetFilters: "Réinitialiser",
+        loadingKicker: "Chargement",
+        experimentsTitle: "Expériences",
+        loadingStatus: "Chargement des données depuis le dépôt GitHub...",
+        allSubjects: "Toutes les matières",
+        allGrades: "Tous les niveaux",
+        allSchools: "Tous les types d'établissement",
+        projectIdeaKicker: "Idée du projet",
+        aboutTitle: "Du quotidien à l'explication scientifique",
+        aboutText1: "AlltagsLabor rassemble des expériences réalisables avec du matériel simple et liées à des situations familières. Les élèves commencent par une observation, essaient eux-mêmes, puis classent l'expérience dans un cadre disciplinaire.",
+        aboutText2: "Cette page est conçue comme une vue visiteur : lire, chercher, filtrer, imprimer. Les personnes qui souhaitent proposer de nouvelles expériences peuvent contacter l'équipe de développement ou contribuer au dépôt de données.",
+        contactButton: "Prendre contact",
+        submitButton: "Soumettre une expérience",
+        sourceRepoButton: "Dépôt du code source",
+        dataRepoButton: "Voir le dépôt de données",
+        experimentKicker: "Expérience",
+        printButton: "Imprimer",
+        closeButton: "Fermer",
+        dataTimestampLoading: "État des données : chargement",
+        dataTimestamp: "État des données : {date}",
+        loadError: "Les données n'ont pas pu être chargées. Le dépôt GitHub doit être accessible publiquement. Note technique : {message}",
+        resultCount: "{filtered} sur {total} entrées",
+        oneExperiment: "Une expérience",
+        manyExperiments: "Expériences",
+        noResults: "Aucune expérience correspondante trouvée. Modifiez les filtres ou réinitialisez la recherche.",
+        untitled: "Sans titre",
+        noDescription: "Aucune description courte disponible.",
+        readButton: "Lire",
+        gradePrefix: "Niveau {grade}",
+        imageAlt: "Image de l'expérience"
+      },
+      ru: {
+        languageLabel: "Язык",
+        translationNote: "Примечание: эксперименты изначально были написаны на немецком языке, а затем переведены с помощью ИИ. Поэтому возможны ошибки перевода.",
+        filtersAria: "Фильтры",
+        searchKicker: "Поиск",
+        findMaterial: "Найти материалы",
+        sourceNote: "Данные загружаются из репозитория GitHub. Новые записи появляются здесь после проверки и слияния.",
+        queryLabel: "Поисковый запрос",
+        queryPlaceholder: "Название, описание, содержание",
+        subjectLabel: "Предмет",
+        gradeLabel: "Класс",
+        schoolLabel: "Тип школы",
+        applyFilters: "Применить",
+        resetFilters: "Сбросить",
+        loadingKicker: "Загрузка данных",
+        experimentsTitle: "Эксперименты",
+        loadingStatus: "Данные загружаются из репозитория GitHub...",
+        allSubjects: "Все предметы",
+        allGrades: "Все классы",
+        allSchools: "Все типы школ",
+        projectIdeaKicker: "Идея проекта",
+        aboutTitle: "От повседневности к научному объяснению",
+        aboutText1: "AlltagsLabor собирает эксперименты, которые можно выполнить с простыми материалами и связать со знакомыми ситуациями. Учащиеся начинают с наблюдения, пробуют сами и затем объясняют опыт в рамках учебного предмета.",
+        aboutText2: "Эта страница сделана как пользовательский просмотр: читать, искать, фильтровать, печатать. Те, кто хочет предложить новые эксперименты, могут связаться с командой или работать в репозитории данных.",
+        contactButton: "Связаться",
+        submitButton: "Отправить эксперимент",
+        sourceRepoButton: "Репозиторий кода",
+        dataRepoButton: "Репозиторий данных",
+        experimentKicker: "Эксперимент",
+        printButton: "Печать",
+        closeButton: "Закрыть",
+        dataTimestampLoading: "Состояние данных: загрузка",
+        dataTimestamp: "Состояние данных: {date}",
+        loadError: "Не удалось загрузить данные. Репозиторий GitHub должен быть публично доступен. Техническая информация: {message}",
+        resultCount: "{filtered} из {total} записей",
+        oneExperiment: "Один эксперимент",
+        manyExperiments: "Эксперименты",
+        noResults: "Подходящие эксперименты не найдены. Измените фильтры или сбросьте поиск.",
+        untitled: "Без названия",
+        noDescription: "Краткое описание отсутствует.",
+        readButton: "Читать",
+        gradePrefix: "{grade} класс",
+        imageAlt: "Изображение эксперимента"
+      },
+      uk: {
+        languageLabel: "Мова",
+        translationNote: "Примітка: експерименти спочатку були написані німецькою мовою, а потім перекладені за допомогою ШІ. Тому можливі помилки перекладу.",
+        filtersAria: "Фільтри",
+        searchKicker: "Пошук",
+        findMaterial: "Знайти матеріали",
+        sourceNote: "Дані завантажуються з репозиторію GitHub. Нові записи з'являються тут після перевірки та злиття.",
+        queryLabel: "Пошуковий запит",
+        queryPlaceholder: "Назва, опис, зміст",
+        subjectLabel: "Предмет",
+        gradeLabel: "Клас",
+        schoolLabel: "Тип школи",
+        applyFilters: "Застосувати",
+        resetFilters: "Скинути",
+        loadingKicker: "Завантаження даних",
+        experimentsTitle: "Експерименти",
+        loadingStatus: "Дані завантажуються з репозиторію GitHub...",
+        allSubjects: "Усі предмети",
+        allGrades: "Усі класи",
+        allSchools: "Усі типи шкіл",
+        projectIdeaKicker: "Ідея проєкту",
+        aboutTitle: "Від повсякденності до наукового пояснення",
+        aboutText1: "AlltagsLabor збирає експерименти, які працюють із простими матеріалами та пов'язані зі знайомими ситуаціями. Учні починають зі спостереження, пробують самі, а потім пояснюють досвід у межах навчального предмета.",
+        aboutText2: "Ця сторінка створена як перегляд для відвідувачів: читати, шукати, фільтрувати, друкувати. Ті, хто хоче запропонувати нові експерименти, можуть зв'язатися з командою або працювати в репозиторії даних.",
+        contactButton: "Зв'язатися",
+        submitButton: "Надіслати експеримент",
+        sourceRepoButton: "Репозиторій коду",
+        dataRepoButton: "Репозиторій даних",
+        experimentKicker: "Експеримент",
+        printButton: "Друк",
+        closeButton: "Закрити",
+        dataTimestampLoading: "Стан даних: завантаження",
+        dataTimestamp: "Стан даних: {date}",
+        loadError: "Не вдалося завантажити дані. Репозиторій GitHub має бути публічно доступним. Технічна інформація: {message}",
+        resultCount: "{filtered} з {total} записів",
+        oneExperiment: "Один експеримент",
+        manyExperiments: "Експерименти",
+        noResults: "Відповідних експериментів не знайдено. Змініть фільтри або скиньте пошук.",
+        untitled: "Без назви",
+        noDescription: "Короткий опис відсутній.",
+        readButton: "Читати",
+        gradePrefix: "{grade} клас",
+        imageAlt: "Зображення експерименту"
+      }
+    };
+    const LANGUAGE_LABELS = {
+      de: "Deutsch",
+      eng: "English",
+      fr: "Français",
+      ru: "Русский",
+      uk: "Українська"
     };
     const IMPRESSUM_URL = repoFileUrl("impressum.txt");
 
@@ -716,6 +966,9 @@
       dialogBody: document.getElementById("dialogBody")
     };
 
+    updateLanguageLabels();
+    applyUiTranslations();
+
     document.getElementById("applyFilters").addEventListener("click", applyFilters);
     document.getElementById("resetFilters").addEventListener("click", resetFilters);
     document.getElementById("closeDialog").addEventListener("click", () => els.dialog.close());
@@ -723,6 +976,7 @@
     document.getElementById("pdfExperiment").addEventListener("click", exportPdf);
     els.language.addEventListener("change", () => {
       state.language = els.language.value;
+      applyUiTranslations();
       loadData();
     });
     els.query.addEventListener("keydown", event => {
@@ -732,7 +986,7 @@
     loadData();
 
     async function loadData() {
-      showStatus("Daten werden aus dem GitHub-Datenrepo geladen...", "empty");
+      showStatus(t("loadingStatus"), "empty");
       try {
         const response = await fetch(dataUrlForLanguage(state.language), { cache: "no-store" });
         if (!response.ok) throw new Error("HTTP " + response.status);
@@ -742,10 +996,52 @@
         populateFilters(state.experiments);
         renderExperiments();
         loadImpressum();
-        document.getElementById("dataTimestamp").textContent = "Datenstand: " + new Date().toLocaleString("de-DE");
+        document.getElementById("dataTimestamp").textContent = formatText("dataTimestamp", {
+          date: new Date().toLocaleString(localeForLanguage(state.language))
+        });
       } catch (error) {
-        showStatus("Die Daten konnten nicht geladen werden. Das GitHub-Datenrepo muss oeffentlich erreichbar sein. Technischer Hinweis: " + error.message, "error");
+        showStatus(formatText("loadError", { message: error.message }), "error");
       }
+    }
+
+    function t(key) {
+      return (UI_TEXT[state.language] && UI_TEXT[state.language][key]) || UI_TEXT.de[key] || key;
+    }
+
+    function formatText(key, replacements = {}) {
+      return Object.entries(replacements).reduce(
+        (text, [name, value]) => text.replaceAll("{" + name + "}", value),
+        t(key)
+      );
+    }
+
+    function localeForLanguage(language) {
+      return {
+        de: "de-DE",
+        eng: "en-US",
+        fr: "fr-FR",
+        ru: "ru-RU",
+        uk: "uk-UA"
+      }[language] || "de-DE";
+    }
+
+    function updateLanguageLabels() {
+      [...els.language.options].forEach(option => {
+        option.textContent = LANGUAGE_LABELS[option.value] || option.textContent;
+      });
+    }
+
+    function applyUiTranslations() {
+      document.documentElement.lang = state.language === "eng" ? "en" : state.language;
+      document.querySelectorAll("[data-i18n]").forEach(node => {
+        node.textContent = t(node.dataset.i18n);
+      });
+      document.querySelectorAll("[data-i18n-attr]").forEach(node => {
+        node.dataset.i18nAttr.split(";").forEach(entry => {
+          const [attr, key] = entry.split(":");
+          if (attr && key) node.setAttribute(attr, t(key));
+        });
+      });
     }
 
     async function loadImpressum() {
@@ -765,13 +1061,13 @@
     }
 
     function populateFilters(experiments) {
-      fillSelect(els.subject, uniqueValues(experiments, "subject"), "Alle Faecher");
-      fillSelect(els.grade, uniqueValues(experiments, "gradeLevel").sort(sortGrades), "Alle Stufen");
-      fillSelect(els.school, uniqueValues(experiments, "schoolType"), "Alle Schulformen");
+      fillSelect(els.subject, uniqueValues(experiments, "subject"), t("allSubjects"));
+      fillSelect(els.grade, uniqueValues(experiments, "gradeLevel").sort(sortGrades), t("allGrades"));
+      fillSelect(els.school, uniqueValues(experiments, "schoolType"), t("allSchools"));
     }
 
     function uniqueValues(experiments, key) {
-      return [...new Set(experiments.map(exp => exp[key]).filter(Boolean))].sort((a, b) => String(a).localeCompare(String(b), "de"));
+      return [...new Set(experiments.map(exp => exp[key]).filter(Boolean))].sort((a, b) => String(a).localeCompare(String(b), localeForLanguage(state.language)));
     }
 
     function fillSelect(select, values, label) {
@@ -784,7 +1080,7 @@
       const na = Number(a);
       const nb = Number(b);
       if (!Number.isNaN(na) && !Number.isNaN(nb)) return na - nb;
-      return String(a).localeCompare(String(b), "de");
+      return String(a).localeCompare(String(b), localeForLanguage(state.language));
     }
 
     function applyFilters() {
@@ -829,12 +1125,15 @@
       els.grid.innerHTML = "";
       els.grid.hidden = false;
       els.status.hidden = true;
-      els.resultKicker.textContent = state.filtered.length + " von " + state.experiments.length + " Eintraegen";
-      els.resultTitle.textContent = state.filtered.length === 1 ? "Ein Experiment" : "Experimente";
+      els.resultKicker.textContent = formatText("resultCount", {
+        filtered: state.filtered.length,
+        total: state.experiments.length
+      });
+      els.resultTitle.textContent = state.filtered.length === 1 ? t("oneExperiment") : t("manyExperiments");
 
       if (!state.filtered.length) {
         els.grid.hidden = true;
-        showStatus("Keine passenden Experimente gefunden. Aendere die Filter oder setze die Suche zurueck.", "empty");
+        showStatus(t("noResults"), "empty");
         return;
       }
 
@@ -843,11 +1142,11 @@
         card.className = "experiment-card";
 
         const title = document.createElement("h3");
-        title.textContent = experiment.title || "Ohne Titel";
+        title.textContent = experiment.title || t("untitled");
 
         const description = document.createElement("div");
         description.className = "description";
-        description.innerHTML = rewriteMediaPaths(experiment.shortDescription || "Keine Kurzbeschreibung vorhanden.");
+        description.innerHTML = rewriteMediaPaths(experiment.shortDescription || t("noDescription"));
 
         const meta = document.createElement("div");
         meta.className = "meta";
@@ -863,12 +1162,12 @@
         const open = document.createElement("button");
         open.className = "btn primary";
         open.type = "button";
-        open.textContent = "Lesen";
+        open.textContent = t("readButton");
         open.addEventListener("click", () => showExperiment(experiment));
         const print = document.createElement("button");
         print.className = "btn";
         print.type = "button";
-        print.textContent = "Drucken";
+        print.textContent = t("printButton");
         print.addEventListener("click", () => {
           showExperiment(experiment);
           setTimeout(() => window.print(), 120);
@@ -883,7 +1182,7 @@
 
     function formatGrade(grade) {
       if (!grade) return "";
-      return /^\d+$/.test(String(grade)) ? "Klasse " + grade : String(grade);
+      return /^\d+$/.test(String(grade)) ? formatText("gradePrefix", { grade }) : String(grade);
     }
 
     function showStatus(message, type) {
@@ -895,7 +1194,7 @@
 
     function showExperiment(experiment) {
       state.activeExperiment = experiment;
-      els.dialogTitle.textContent = experiment.title || "Experiment";
+      els.dialogTitle.textContent = experiment.title || t("experimentKicker");
       els.dialogBody.innerHTML = "";
 
       const meta = document.createElement("div");
@@ -922,7 +1221,7 @@
         if (step.type === "image") {
           const img = document.createElement("img");
           img.src = resolveAsset(step.content);
-          img.alt = step.description || experiment.title || "Experimentbild";
+          img.alt = step.description || experiment.title || t("imageAlt");
           section.appendChild(img);
           if (step.description) {
             const caption = document.createElement("p");
