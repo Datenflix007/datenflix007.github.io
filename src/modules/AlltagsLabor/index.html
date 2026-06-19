@@ -1183,8 +1183,10 @@
         populateFilters(state.experiments);
         renderExperiments();
         loadImpressum();
+        const lastModified = response.headers.get("Last-Modified");
+        const fileDate = lastModified ? new Date(lastModified) : new Date();
         document.getElementById("dataTimestamp").textContent = formatText("dataTimestamp", {
-          date: new Date().toLocaleString(localeForLanguage(state.language))
+          date: fileDate.toLocaleString(localeForLanguage(state.language))
         });
       } catch (error) {
         showStatus(formatText("loadError", { message: error.message }), "error");
