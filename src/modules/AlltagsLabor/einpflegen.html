@@ -927,7 +927,9 @@
           });
           const data = await response.json().catch(() => ({}));
           if (!response.ok) {
-            const details = Array.isArray(data.details) ? "\n" + data.details.join("\n") : "";
+            const details = Array.isArray(data.details)
+              ? "\n" + data.details.join("\n")
+              : (data.details ? "\n" + data.details : "");
             throw new Error(`${LANGUAGE_LABELS[payload.language] || payload.language}: ` + (data.error || data.message || "HTTP " + response.status) + details);
           }
           done.push(LANGUAGE_LABELS[payload.language] || payload.language);
