@@ -1,0 +1,89 @@
+name: Submit AlltagsLabor experiment
+
+on:
+  workflow_dispatch:
+    inputs:
+      language:
+        description: "Language key: de, eng, fr, ru, uk"
+        required: true
+        type: string
+      experiment_json:
+        description: "Experiment object as JSON"
+        required: true
+        type: string
+      submitter:
+        description: "Optional submitter identifier"
+        required: false
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  append-and-open-pr:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out data repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Validate inputs and append experiment
+        env:
+          SUBMISSION_LANGUAGE: ${{ inputs.language }}
+          EXPERIMENT_JSON: ${{ inputs.experiment_json }}
+        run: node scripts/append-experiment.mjs
+
+      - name: Prepare pull request metadata
+        id: meta
+        env:
+          EXPERIMENT_JSON: ${{ inputs.experiment_json }}
+          SUBMISSION_LANGUAGE: ${{ inputs.language }}
+          SUBMITTER: ${{ inputs.submitter }}
+        run: |
+          node --input-type=module <<'NODE'
+          import { appendFileSync } from "node:fs";
+
+          const experiment = JSON.parse(process.env.EXPERIMENT_JSON);
+          const slug = String(experiment.title || "experiment")
+            .normalize("NFKD")
+            .replace(/[^\w\s-]/g, "")
+            .trim()
+            .replace(/\s+/g, "-")
+            .toLowerCase()
+            .slice(0, 60) || "experiment";
+          const date = new Date().toISOString().slice(0, 10);
+          const branch = `submission/${date}-${slug}`;
+
+          const body = [
+            "Automatisch aus der AlltagsLabor-Einpflegemaske erzeugt.",
+            "",
+            `- Sprache: ${process.env.SUBMISSION_LANGUAGE}`,
+            `- Fach: ${experiment.subject}`,
+            `- Klassenstufe: ${experiment.gradeLevel}`,
+            `- Schulform: ${experiment.schoolType}`,
+            `- Einreicherkennung: ${process.env.SUBMITTER || "nicht angegeben"}`,
+            "",
+            "Bitte Inhalt, Formatierung, Medienpfade und fachliche Korrektheit vor dem Merge pruefen."
+          ].join("\n");
+
+          appendFileSync(process.env.GITHUB_OUTPUT, `title=Neues Experiment: ${experiment.title}\n`);
+          appendFileSync(process.env.GITHUB_OUTPUT, `branch=${branch}\n`);
+          appendFileSync(process.env.GITHUB_OUTPUT, "body<<PR_BODY\n" + body + "\nPR_BODY\n");
+          NODE
+
+      - name: Create pull request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: ${{ steps.meta.outputs.branch }}
+          base: main
+          title: ${{ steps.meta.outputs.title }}
+          body: ${{ steps.meta.outputs.body }}
+          commit-message: ${{ steps.meta.outputs.title }}
+          labels: automated-submission
+          delete-branch: true
