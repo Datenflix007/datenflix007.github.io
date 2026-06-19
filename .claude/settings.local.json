@@ -19,7 +19,12 @@
       "PowerShell(git clone https://github.com/Datenflix007/alltagslabordata.git \"$env:TEMP\\\\alltagslabordata\" 2>&1)",
       "PowerShell(Get-ChildItem \"$env:TEMP\\\\alltagslabordata\" -ErrorAction SilentlyContinue | Select-Object Name)",
       "PowerShell(Get-ChildItem \"$env:TEMP\\\\alltagslabordata\\\\.github\\\\workflows\" -ErrorAction SilentlyContinue | Select-Object Name; Get-ChildItem \"$env:TEMP\\\\alltagslabordata\\\\scripts\" -ErrorAction SilentlyContinue | Select-Object Name)",
-      "PowerShell(git -C \"$env:TEMP\\\\alltagslabordata\" log --oneline -5)"
+      "PowerShell(git -C \"$env:TEMP\\\\alltagslabordata\" log --oneline -5)",
+      "PowerShell(git -C \"c:\\\\Users\\\\festa\\\\Desktop\\\\git_repos\\\\datenflix007\\\\datenflix007.github.io\" add src/modules/AlltagsLabor/einpflegen.html)",
+      "PowerShell(git -C \"c:\\\\Users\\\\festa\\\\Desktop\\\\git_repos\\\\datenflix007\\\\datenflix007.github.io\" commit -m \"show GitHub API error details in submission form\")",
+      "PowerShell(git -C \"c:\\\\Users\\\\festa\\\\Desktop\\\\git_repos\\\\datenflix007\\\\datenflix007.github.io\" push)",
+      "PowerShell(git -C \"c:\\\\Users\\\\festa\\\\Desktop\\\\git_repos\\\\datenflix007\\\\datenflix007.github.io\" commit -m \"redesign einpflegen.html: login step, article preview, tutorial modal\")",
+      "PowerShell(git -C \"c:\\\\Users\\\\festa\\\\Desktop\\\\git_repos\\\\datenflix007\\\\datenflix007.github.io\" commit -m \"validate account name client-side on login\")"
     ]
   }
 }
