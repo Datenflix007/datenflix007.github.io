@@ -1,0 +1,29 @@
+{
+  "name": "datenflix007.github.io",
+  "version": "1.0.0",
+  "description": "Statische Besucheransicht und Einreichstrecke fuer AlltagsLabor-Experimente.",
+  "main": "index.js",
+  "scripts": {
+    "cf:login": "wrangler login",
+    "cf:whoami": "wrangler whoami",
+    "cf:deploy": "wrangler deploy",
+    "cf:secret:dev": "wrangler secret put DEVTEAM_PASSWORD",
+    "cf:secret:academic": "wrangler secret put ACADEMICTEST_PASSWORD",
+    "cf:secret:school": "wrangler secret put SCHOOLACCOUNT_PASSWORD",
+    "cf:secret:github": "wrangler secret put GITHUB_TOKEN"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/datenflix007/datenflix007.github.io.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/datenflix007/datenflix007.github.io/issues"
+  },
+  "homepage": "https://github.com/datenflix007/datenflix007.github.io#readme",
+  "devDependencies": {
+    "wrangler": "^4.103.0"
+  }
+}

@@ -3,3 +3,4 @@ Editor/assets/
 _WS_2022*
 .env
 .dev.vars
+node_modules/

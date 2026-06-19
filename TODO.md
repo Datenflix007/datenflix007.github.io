@@ -31,9 +31,20 @@
 
 ## Cloudflare Worker
 
-- [ ] Worker-Projekt bei Cloudflare anlegen.
+- [x] Worker-Projekt bei Cloudflare angelegt.
 - [x] Wrangler-Konfiguration lokal angelegt: `wrangler.toml`.
-- [ ] Code aus `serverless/cloudflare-worker.js` deployen.
+- [x] Wrangler lokal als Dev-Dependency installiert, damit `workerd` unter Windows korrekt vorhanden ist.
+- [x] npm-Skripte fuer Cloudflare angelegt:
+  - `npm run cf:login`
+  - `npm run cf:whoami`
+  - `npm run cf:deploy`
+  - `npm run cf:secret:dev`
+  - `npm run cf:secret:academic`
+  - `npm run cf:secret:school`
+  - `npm run cf:secret:github`
+- [x] Cloudflare-Login abgeschlossen.
+- [x] Code aus `serverless/cloudflare-worker.js` deployt.
+  - Worker-URL: `https://alltagslabor-submission.datenflix.workers.dev`
 - [ ] Secrets/Variablen setzen:
   - `DEVTEAM_PASSWORD`
   - `ACADEMICTEST_PASSWORD`
@@ -52,9 +63,14 @@
 
 ## Frontend konfigurieren
 
-- [ ] In `src/modules/AlltagsLabor/einpflegen.html` den Platzhalter ersetzen:
-  - `SUBMISSION_ENDPOINT = "https://example-worker.example.workers.dev"`
-  - durch die echte Cloudflare-Worker-URL.
+- [x] In `src/modules/AlltagsLabor/einpflegen.html` den Platzhalter durch die echte Cloudflare-Worker-URL ersetzt:
+  - `SUBMISSION_ENDPOINT = "https://alltagslabor-submission.datenflix.workers.dev"`
+- [x] Einreichungsformular erweitert:
+  - Modus `Zusammenklicken`
+  - Modus `JSON / Uebersetzungen`
+  - Mehrsprachige Einreichung ueber mehrere Sprachdateien
+  - LLM-Prompt fuer strukturierte Uebersetzungen
+  - JSON-Vorlage fuer Experimente
 - [x] `src/modules/AlltagsLabor/einpflegen.html` fuer Accountrollen erweitert:
   - `devTeam`: erstellen, bearbeiten, loeschen
   - `academicTest`: erstellen, bearbeiten
@@ -123,6 +139,9 @@
 
 - [x] Datenrepo `Datenflix007/alltagslabordata` aktualisiert: Workflow und Script wurden nach `main` gepusht.
 - [x] Lokale Cloudflare/Wrangler-Konfiguration angelegt.
+- [x] Fehler `@cloudflare/workerd-windows-64 could not be found` behoben durch lokale Installation von Wrangler.
+- [x] `node_modules/`, `.env` und `.dev.vars` in `.gitignore` eingetragen, damit keine Secrets oder Dependencies committed werden.
+- [x] `package.json` und `package-lock.json` fuer Wrangler/NPM-Skripte angelegt.
 - [x] In `wrangler.toml` gesetzt:
   - `name=alltagslabor-submission`
   - `main=serverless/cloudflare-worker.js`
@@ -133,10 +152,26 @@
   - `GITHUB_REF=main`
   - `ALLOWED_ORIGIN=https://datenflix007.github.io`
 - [x] Beispiel fuer lokale Secret-Datei angelegt: `.dev.vars.example`.
-- [ ] Cloudflare-Secrets konnten nicht gesetzt werden, weil lokal kein bestaetigter Wrangler/Cloudflare-Login vorhanden ist und keine Secret-Werte vorliegen.
+- [x] Cloudflare-Login erfolgreich: `festaacke@gmx.de`, Account `Festaacke@gmx.de's Account`, Account-ID `83bc80388c9437600419a15d6cbc795f`.
+- [x] E-Mail-Verifizierung bei Cloudflare erledigt.
+- [x] `workers.dev`-Subdomain registriert: `datenflix.workers.dev`.
+- [x] Deploy mit `npm run cf:deploy` erfolgreich.
+  - Worker-URL: `https://alltagslabor-submission.datenflix.workers.dev`
+  - Version-ID: `65b2cb21-3c1b-4589-b67a-1133c4d90425`
+- [ ] Cloudflare-Secrets konnten noch nicht gesetzt werden, weil die Secret-Werte noch nicht vorliegen.
 - [x] Einreichstrecke auf Rollenbetrieb vorbereitet: `devTeam`, `academicTest`, `schoolAccount`.
 - [x] Worker validiert Account/Passwort ueber Cloudflare-Secrets und erzwingt Rechte serverseitig.
 - [x] Workflow und `scripts/append-experiment.mjs` koennen jetzt `create`, `edit` und `delete`.
+- [x] Einpflegemaske mit echter Worker-URL verbunden:
+  - `https://alltagslabor-submission.datenflix.workers.dev`
+- [x] Einpflegemaske um JSON-/Mehrsprachenmodus erweitert.
+- [x] Einpflegemaske erzeugt jetzt einen kopierbaren Prompt fuer beliebige LLMs, der die JSON-Struktur fuer Uebersetzungen vorgibt.
+- [x] Einpflegemaske kann mehrsprachige JSON-Antworten lesen und pro Sprache eine Workflow-Anfrage senden.
+- [x] Sichtbare Umlaut-/Encoding-Reste in `einpflegen.html` bereinigt.
+- [x] CORS-Preflight gegen Worker-URL getestet:
+  - `OPTIONS https://alltagslabor-submission.datenflix.workers.dev`
+  - Status `204`
+  - `Access-Control-Allow-Origin=https://datenflix007.github.io`
 - [x] Lokaler Test von `scripts/append-experiment.mjs`: create, edit und delete erfolgreich gegen temporaere JSON-Datei ausgefuehrt.
 - [x] Besucheransicht `src/modules/AlltagsLabor/index.html` so erweitert, dass die Sprachwahl nicht nur die Experimentdaten, sondern auch die statische UI uebersetzt.
 - [x] Uebersetzungsobjekt fuer `de`, `eng`, `fr`, `ru` und `uk` angelegt.
@@ -151,19 +186,13 @@
 
 ## Manuell noch zu tun, kurz und klar
 
-1. Cloudflare/Wrangler anmelden:
-   - im Terminal: `npx wrangler login`
-2. Worker deployen:
-   - im Terminal: `npx wrangler deploy`
-3. In Cloudflare beim Worker diese Secrets setzen:
-   - `DEVTEAM_PASSWORD`: Passwort fuer `devTeam`
-   - `ACADEMICTEST_PASSWORD`: Passwort fuer `academicTest`
-   - `SCHOOLACCOUNT_PASSWORD`: Passwort fuer `schoolAccount`
-   - `GITHUB_TOKEN`: GitHub Token fuer das Datenrepo
-4. Die Worker-URL in `src/modules/AlltagsLabor/einpflegen.html` eintragen:
-   - `SUBMISSION_ENDPOINT = "https://dein-worker.workers.dev"`
-5. Danach im Browser testen:
+1. In Cloudflare beim Worker diese Secrets setzen:
+   - `npm run cf:secret:dev` und Passwort fuer `devTeam` einfuegen
+   - `npm run cf:secret:academic` und Passwort fuer `academicTest` einfuegen
+   - `npm run cf:secret:school` und Passwort fuer `schoolAccount` einfuegen
+   - `npm run cf:secret:github` und GitHub Token fuer das Datenrepo einfuegen
+2. Danach im Browser testen:
    - mit `schoolAccount` ein neues Testexperiment einreichen
    - mit `academicTest` dieses Testexperiment bearbeiten
    - mit `devTeam` dieses Testexperiment loeschen
-6. Jeden erzeugten Pull Request im Datenrepo pruefen und mergen.
+3. Jeden erzeugten Pull Request im Datenrepo pruefen und mergen.
