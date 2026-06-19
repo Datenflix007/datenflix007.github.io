@@ -3,16 +3,28 @@ name: Submit AlltagsLabor experiment
 on:
   workflow_dispatch:
     inputs:
+      action:
+        description: "Action: create, edit, delete"
+        required: true
+        type: string
       language:
-        description: "Language key: de, eng, fr, ru, uk"
+        description: "Language key, e.g. de, eng, fr, ru, uk, fa, pol, rum, es"
         required: true
         type: string
       experiment_json:
-        description: "Experiment object as JSON"
+        description: "Experiment object as JSON. Empty object is okay for delete."
         required: true
         type: string
+      target_experiment_id:
+        description: "Existing experiment id for edit/delete"
+        required: false
+        type: string
+      target_experiment_title:
+        description: "Existing experiment title for edit/delete fallback"
+        required: false
+        type: string
       submitter:
-        description: "Optional submitter identifier"
+        description: "Submitter account or identifier"
         required: false
         type: string
 
@@ -21,7 +33,7 @@ permissions:
   pull-requests: write
 
 jobs:
-  append-and-open-pr:
+  apply-and-open-pr:
     runs-on: ubuntu-latest
 
     steps:
@@ -33,24 +45,32 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Validate inputs and append experiment
+      - name: Validate inputs and update experiment data
         env:
+          SUBMISSION_ACTION: ${{ inputs.action }}
           SUBMISSION_LANGUAGE: ${{ inputs.language }}
           EXPERIMENT_JSON: ${{ inputs.experiment_json }}
+          TARGET_EXPERIMENT_ID: ${{ inputs.target_experiment_id }}
+          TARGET_EXPERIMENT_TITLE: ${{ inputs.target_experiment_title }}
         run: node scripts/append-experiment.mjs
 
       - name: Prepare pull request metadata
         id: meta
         env:
+          SUBMISSION_ACTION: ${{ inputs.action }}
           EXPERIMENT_JSON: ${{ inputs.experiment_json }}
           SUBMISSION_LANGUAGE: ${{ inputs.language }}
+          TARGET_EXPERIMENT_ID: ${{ inputs.target_experiment_id }}
+          TARGET_EXPERIMENT_TITLE: ${{ inputs.target_experiment_title }}
           SUBMITTER: ${{ inputs.submitter }}
         run: |
           node --input-type=module <<'NODE'
           import { appendFileSync } from "node:fs";
 
-          const experiment = JSON.parse(process.env.EXPERIMENT_JSON);
-          const slug = String(experiment.title || "experiment")
+          const action = process.env.SUBMISSION_ACTION || "create";
+          const experiment = JSON.parse(process.env.EXPERIMENT_JSON || "{}");
+          const label = experiment.title || process.env.TARGET_EXPERIMENT_TITLE || process.env.TARGET_EXPERIMENT_ID || "experiment";
+          const slug = String(label)
             .normalize("NFKD")
             .replace(/[^\w\s-]/g, "")
             .trim()
@@ -58,21 +78,29 @@ jobs:
             .toLowerCase()
             .slice(0, 60) || "experiment";
           const date = new Date().toISOString().slice(0, 10);
-          const branch = `submission/${date}-${slug}`;
+          const branch = `submission/${action}/${date}-${slug}`;
+          const actionLabels = {
+            create: "Neues Experiment",
+            edit: "Experiment bearbeiten",
+            delete: "Experiment loeschen"
+          };
 
           const body = [
             "Automatisch aus der AlltagsLabor-Einpflegemaske erzeugt.",
             "",
+            `- Aktion: ${action}`,
             `- Sprache: ${process.env.SUBMISSION_LANGUAGE}`,
-            `- Fach: ${experiment.subject}`,
-            `- Klassenstufe: ${experiment.gradeLevel}`,
-            `- Schulform: ${experiment.schoolType}`,
+            `- Ziel-ID: ${process.env.TARGET_EXPERIMENT_ID || "nicht angegeben"}`,
+            `- Ziel-Titel: ${process.env.TARGET_EXPERIMENT_TITLE || "nicht angegeben"}`,
+            `- Fach: ${experiment.subject || "nicht angegeben"}`,
+            `- Klassenstufe: ${experiment.gradeLevel || "nicht angegeben"}`,
+            `- Schulform: ${experiment.schoolType || "nicht angegeben"}`,
             `- Einreicherkennung: ${process.env.SUBMITTER || "nicht angegeben"}`,
             "",
             "Bitte Inhalt, Formatierung, Medienpfade und fachliche Korrektheit vor dem Merge pruefen."
           ].join("\n");
 
-          appendFileSync(process.env.GITHUB_OUTPUT, `title=Neues Experiment: ${experiment.title}\n`);
+          appendFileSync(process.env.GITHUB_OUTPUT, `title=${actionLabels[action] || "Experiment"}: ${label}\n`);
           appendFileSync(process.env.GITHUB_OUTPUT, `branch=${branch}\n`);
           appendFileSync(process.env.GITHUB_OUTPUT, "body<<PR_BODY\n" + body + "\nPR_BODY\n");
           NODE

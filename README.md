@@ -12,15 +12,28 @@ Die Sprachdateien bleiben kompatibel zum bestehenden Format:
 
 - `_experiments_de.json`
 - `_experiments_eng.json`
+- `_experiments_es.json`
+- `_experiments_fa.json`
 - `_experiments_fr.json`
+- `_experiments_pol.json`
 - `_experiments_ru.json`
+- `_experiments_rum.json`
+- `_experiments_turk.json`
 - `_experiments_uk.json`
 
 Die Seite bietet Suche, Filter, Detailansicht, Drucken und PDF-Export. Medienpfade in Experimenten werden relativ zur Raw-Basis des Datenrepos aufgeloest.
 
 ## Experimente einreichen
 
-`src/modules/AlltagsLabor/einpflegen.html` erzeugt ein Experimentobjekt im bestehenden Format:
+`src/modules/AlltagsLabor/einpflegen.html` erzeugt ein Experimentobjekt im bestehenden Format und kann je nach Account neue Experimente einreichen, bestehende Experimente bearbeiten oder Loeschungen beantragen:
+
+- `devTeam`: erstellen, bearbeiten, loeschen
+- `academicTest`: erstellen, bearbeiten
+- `schoolAccount`: nur erstellen
+
+Die Rechte werden im Cloudflare Worker geprueft. Die Buttons in der Maske sind nur Komfort und ersetzen keine serverseitige Pruefung.
+
+Das Experimentobjekt enthaelt:
 
 - `title`
 - `shortDescription`
@@ -31,7 +44,7 @@ Die Seite bietet Suche, Filter, Detailansicht, Drucken und PDF-Export. Medienpfa
 
 Schritte koennen `text`, `aufgabe`, `merksatz`, `image` oder `audio` sein. Die Maske validiert clientseitig und entfernt einfache gefaehrliche HTML-Anteile wie `<script>`, `<iframe>`, Eventhandler-Attribute und `javascript:`-URLs.
 
-Die Einreichung wird per `fetch` an `SUBMISSION_ENDPOINT` gesendet. In `einpflegen.html` muss dafuer die veroeffentlichte Worker-URL eingetragen werden:
+Die Anfrage wird per `fetch` an `SUBMISSION_ENDPOINT` gesendet. In `einpflegen.html` muss dafuer die veroeffentlichte Worker-URL eingetragen werden:
 
 ```js
 const SUBMISSION_ENDPOINT = "https://example-worker.example.workers.dev";
@@ -43,10 +56,10 @@ Clientseitige Validierung ist nur Komfort. Die echte Sicherheitspruefung passier
 
 Ein Browser darf kein GitHub-Token enthalten. Deshalb schreibt die Einpflegemaske nicht direkt in das Repo. Stattdessen:
 
-1. Die Maske sendet Experiment, Sprache und Zugangscode an einen Cloudflare Worker.
-2. Der Worker prueft den Zugangscode gegen ein Secret.
+1. Die Maske sendet Aktion, Experiment, Sprache, Account und Passwort an einen Cloudflare Worker.
+2. Der Worker prueft den Account gegen Secrets und prueft die Rechte.
 3. Der Worker startet per GitHub API einen `workflow_dispatch`.
-4. Der Workflow validiert den Eintrag, haengt ihn an die passende JSON-Datei an und erstellt einen Pull Request.
+4. Der Workflow validiert den Eintrag, erstellt/bearbeitet/loescht in der passenden JSON-Datei und erstellt einen Pull Request.
 5. Erst nach Review und Merge wird der Eintrag produktiv.
 
 Externe Nutzer koennen dadurch keine direkten Commits nach `main` erzeugen.
@@ -55,7 +68,9 @@ Externe Nutzer koennen dadurch keine direkten Commits nach `main` erzeugen.
 
 Im Cloudflare Worker muessen gesetzt werden:
 
-- `SUBMISSION_PASSWORD`: gemeinsamer Zugangscode fuer berechtigte Einreicher
+- `DEVTEAM_PASSWORD`: Passwort fuer den Account `devTeam`
+- `ACADEMICTEST_PASSWORD`: Passwort fuer den Account `academicTest`
+- `SCHOOLACCOUNT_PASSWORD`: Passwort fuer den Account `schoolAccount`
 - `GITHUB_TOKEN`: GitHub Token mit Berechtigung, den Workflow im Datenrepo zu starten
 - `GITHUB_OWNER`: z. B. `Datenflix007`
 - `GITHUB_REPO`: z. B. `alltagslabordata`
@@ -66,7 +81,7 @@ Optional:
 - `GITHUB_REF`: Branch oder Ref, standardmaessig `main`
 - `ALLOWED_ORIGIN`: konkrete GitHub-Pages-Origin statt `*`
 
-Der gemeinsame Zugangscode ist nur eine einfache Zugangshuerde und keine echte Benutzerverwaltung.
+Fuer die aktuelle Maske werden die drei Account-Secrets genutzt. Ein einzelner gemeinsamer Zugangscode ist nicht mehr vorgesehen.
 
 ## Cloudflare Worker veroeffentlichen
 
@@ -85,18 +100,21 @@ Typischer Ablauf:
 Der Workflow liegt in `.github/workflows/submit-experiment.yml` und erwartet:
 
 - `language`
+- `action`
 - `experiment_json`
+- `target_experiment_id`
+- `target_experiment_title`
 - `submitter`
 
 Wichtig: Workflow und `scripts/append-experiment.mjs` muessen in dem Repository liegen, in dem auch die Sprachdateien liegen. Wenn `GITHUB_REPO=alltagslabordata` ist, muessen diese Dateien ins Datenrepo uebernommen werden.
 
 Der Workflow:
 
-1. prueft die Sprache,
+1. prueft Aktion und Sprache,
 2. validiert das Experiment mit Node.js,
 3. bestimmt die passende Sprachdatei,
-4. haengt das Experiment an das JSON-Array an,
-5. erstellt einen Branch `submission/<datum>-<slug>`,
+4. haengt ein neues Experiment an, ersetzt ein bestehendes Experiment oder entfernt ein bestehendes Experiment,
+5. erstellt einen Branch `submission/<aktion>/<datum>-<slug>`,
 6. oeffnet einen Pull Request gegen `main`.
 
 ## Serverseitige Validierung

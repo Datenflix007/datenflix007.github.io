@@ -1,0 +1,10 @@
+name = "alltagslabor-submission"
+main = "serverless/cloudflare-worker.js"
+compatibility_date = "2026-06-19"
+
+[vars]
+GITHUB_OWNER = "Datenflix007"
+GITHUB_REPO = "alltagslabordata"
+GITHUB_WORKFLOW_FILE = "submit-experiment.yml"
+GITHUB_REF = "main"
+ALLOWED_ORIGIN = "https://datenflix007.github.io"

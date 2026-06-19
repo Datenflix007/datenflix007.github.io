@@ -1,5 +1,20 @@
-const ALLOWED_LANGUAGES = new Set(["de", "eng", "fr", "ru", "uk"]);
+const ALLOWED_LANGUAGES = new Set(["de", "eng", "es", "fa", "fr", "pol", "ru", "rum", "turk", "uk"]);
+const ALLOWED_ACTIONS = new Set(["create", "edit", "delete"]);
 const ALLOWED_STEP_TYPES = new Set(["text", "aufgabe", "merksatz", "image", "audio"]);
+const ACCOUNTS = {
+  devTeam: {
+    passwordEnv: "DEVTEAM_PASSWORD",
+    permissions: new Set(["create", "edit", "delete"])
+  },
+  academicTest: {
+    passwordEnv: "ACADEMICTEST_PASSWORD",
+    permissions: new Set(["create", "edit"])
+  },
+  schoolAccount: {
+    passwordEnv: "SCHOOLACCOUNT_PASSWORD",
+    permissions: new Set(["create"])
+  }
+};
 
 export default {
   async fetch(request, env) {
@@ -14,17 +29,16 @@ export default {
     }
 
     try {
-      requireEnv(env, ["SUBMISSION_PASSWORD", "GITHUB_TOKEN", "GITHUB_OWNER", "GITHUB_REPO", "GITHUB_WORKFLOW_FILE"]);
+      requireEnv(env, ["GITHUB_TOKEN", "GITHUB_OWNER", "GITHUB_REPO", "GITHUB_WORKFLOW_FILE"]);
 
       const payload = await request.json();
-      if (!payload || payload.accessCode !== env.SUBMISSION_PASSWORD) {
-        return jsonResponse({ error: "Zugangscode ist ungueltig." }, 401, corsHeaders);
-      }
-
+      const account = authenticate(payload, env);
+      const action = String(payload.action || "create").trim();
       const language = String(payload.language || "").trim();
-      const experiment = sanitizeExperiment(payload.experiment);
-      const submitter = String(payload.submitter || "").trim();
-      const errors = validateSubmission(language, experiment);
+      const target = sanitizeTarget(payload.target || {});
+      const experiment = action === "delete" ? {} : sanitizeExperiment(payload.experiment);
+      const submitter = account.name + (payload.submitter ? ` / ${sanitizePlainText(payload.submitter)}` : "");
+      const errors = validateSubmission({ action, language, experiment, target, account });
       if (errors.length) {
         return jsonResponse({ error: "Validierung fehlgeschlagen.", details: errors }, 400, corsHeaders);
       }
@@ -42,8 +56,11 @@ export default {
         body: JSON.stringify({
           ref: env.GITHUB_REF || "main",
           inputs: {
+            action,
             language,
             experiment_json: JSON.stringify(experiment),
+            target_experiment_id: target.id || "",
+            target_experiment_title: target.title || "",
             submitter
           }
         })
@@ -59,13 +76,42 @@ export default {
 
       return jsonResponse({
         ok: true,
-        message: "Einreichung angenommen. Der GitHub Workflow erstellt nach Validierung einen Pull Request."
+        message: "Anfrage angenommen. Der GitHub Workflow erstellt nach Validierung einen Pull Request.",
+        action,
+        account: account.name
       }, 202, corsHeaders);
     } catch (error) {
-      return jsonResponse({ error: error.message || "Unbekannter Serverfehler." }, 500, corsHeaders);
+      const status = error.status || 500;
+      return jsonResponse({ error: error.message || "Unbekannter Serverfehler." }, status, corsHeaders);
     }
   }
 };
+
+function authenticate(payload, env) {
+  if (!payload || typeof payload !== "object") {
+    throw httpError("Ungueltige Anfrage.", 400);
+  }
+
+  const accountName = String(payload.accountName || "").trim();
+  const accountPassword = String(payload.accountPassword || "").trim();
+  const accountConfig = ACCOUNTS[accountName];
+  if (!accountConfig) {
+    throw httpError("Unbekannter Account.", 401);
+  }
+
+  const expected = env[accountConfig.passwordEnv];
+  if (!expected) {
+    throw httpError(`Serverkonfiguration unvollstaendig: ${accountConfig.passwordEnv}`, 500);
+  }
+  if (!accountPassword || accountPassword !== expected) {
+    throw httpError("Account oder Passwort ist ungueltig.", 401);
+  }
+
+  return {
+    name: accountName,
+    permissions: accountConfig.permissions
+  };
+}
 
 function buildCorsHeaders(env) {
   const origin = env.ALLOWED_ORIGIN || "*";
@@ -89,6 +135,12 @@ function jsonResponse(body, status, corsHeaders) {
   });
 }
 
+function httpError(message, status) {
+  const error = new Error(message);
+  error.status = status;
+  return error;
+}
+
 function requireEnv(env, keys) {
   const missing = keys.filter(key => !env[key]);
   if (missing.length) {
@@ -96,15 +148,33 @@ function requireEnv(env, keys) {
   }
 }
 
-function validateSubmission(language, experiment) {
+function validateSubmission({ action, language, experiment, target, account }) {
   const errors = [];
+  if (!ALLOWED_ACTIONS.has(action)) errors.push("Aktion ist nicht erlaubt.");
+  if (!account.permissions.has(action)) errors.push(`${account.name} darf die Aktion ${action} nicht ausfuehren.`);
   if (!ALLOWED_LANGUAGES.has(language)) errors.push("Sprache ist nicht erlaubt.");
+
+  if (action === "edit" || action === "delete") {
+    if (!target.id && !target.title) {
+      errors.push("Bearbeiten/Loeschen braucht ein Ziel-Experiment.");
+    }
+  }
+
+  if (action !== "delete") {
+    errors.push(...validateExperiment(experiment));
+  }
+
+  return errors;
+}
+
+function validateExperiment(experiment) {
+  const errors = [];
   if (!experiment || typeof experiment !== "object" || Array.isArray(experiment)) {
     errors.push("experiment muss ein Objekt sein.");
     return errors;
   }
 
-  ["title", "shortDescription", "subject", "gradeLevel", "schoolType"].forEach(key => {
+  ["id", "title", "shortDescription", "subject", "gradeLevel", "schoolType"].forEach(key => {
     if (typeof experiment[key] !== "string" || !experiment[key].trim()) {
       errors.push(`${key} muss ein nicht leerer String sein.`);
     }
@@ -130,12 +200,20 @@ function validateSubmission(language, experiment) {
   return errors;
 }
 
+function sanitizeTarget(target) {
+  return {
+    id: sanitizePlainText(target.id || ""),
+    title: sanitizePlainText(target.title || "")
+  };
+}
+
 function sanitizeExperiment(experiment) {
   if (!experiment || typeof experiment !== "object" || Array.isArray(experiment)) return experiment;
   const sanitized = { ...experiment };
-  ["title", "subject", "gradeLevel", "schoolType"].forEach(key => {
+  ["id", "title", "subject", "gradeLevel", "schoolType"].forEach(key => {
     if (typeof sanitized[key] === "string") sanitized[key] = sanitizePlainText(sanitized[key]);
   });
+  if (!sanitized.id && sanitized.title) sanitized.id = stableId(sanitized.title);
   if (typeof sanitized.shortDescription === "string") {
     sanitized.shortDescription = sanitizeHtml(sanitized.shortDescription);
   }
@@ -143,12 +221,23 @@ function sanitizeExperiment(experiment) {
     sanitized.steps = sanitized.steps.map(step => {
       if (!step || typeof step !== "object" || Array.isArray(step)) return step;
       const copy = { ...step };
+      if (typeof copy.type === "string") copy.type = sanitizePlainText(copy.type);
       if (typeof copy.content === "string") copy.content = sanitizeHtml(copy.content);
       if (typeof copy.description === "string") copy.description = sanitizePlainText(copy.description);
       return copy;
     });
   }
   return sanitized;
+}
+
+function stableId(value) {
+  return String(value || "experiment")
+    .normalize("NFKD")
+    .replace(/[^\w\s-]/g, "")
+    .trim()
+    .replace(/\s+/g, "-")
+    .toLowerCase()
+    .slice(0, 80) || "experiment";
 }
 
 function sanitizePlainText(value) {
