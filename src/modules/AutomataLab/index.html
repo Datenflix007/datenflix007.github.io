@@ -30,8 +30,10 @@
         <button data-example="dfa" type="button">DFA: endet auf 01</button>
         <button data-example="nfa" type="button">NFA: enthält 01</button>
         <button data-example="pda" type="button">PDA: Spiegelwort w#wᴿ</button>
+        <button data-example="pda-palindrome" type="button">PDA: Binärpalindrome mit λ-Sprung</button>
         <button data-example="tm" type="button">TM: aⁿbⁿcⁿ erkennen</button>
         <button data-example="tm-copy" type="button">TM: Binärmuster kopieren w → w#w</button>
+        <button data-example="lba" type="button">LBA: aⁿbⁿcⁿ auf beschränktem Band</button>
       </div>
     </div>
     <div class="menu-group">
@@ -57,12 +59,12 @@
       <button class="icon-btn" id="redoBtn" title="Wiederholen" type="button">↷</button>
     </div>
     <span class="save-state" id="saveState">Automatisch lokal</span>
-    <label class="type-control"><span>Maschinentyp</span><select id="machineType"><option value="DFA">DFA</option><option value="NFA">NFA</option><option value="PDA">PDA</option><option value="TM">TM</option></select></label>
-    <span class="struct-badge" id="machineBadge">DFA</span>
+    <label class="type-control"><span>Maschinentyp</span><select id="machineType"><option value="DFA">DFA</option><option value="NFA">NFA</option><option value="PDA">PDA</option><option value="TM">TM</option><option value="LBA">LBA</option></select></label>
   </header>
 
   <main class="app-grid">
     <aside class="toolbox panel">
+      <div class="pane-resizer pane-resizer-right" data-resize-pane="toolbox" title="Werkzeugleiste skalieren"></div>
       <div class="panel-title"><span>WERKZEUGE</span><strong>Konstruieren</strong></div>
       <div class="tool-list" role="group" aria-label="Editorwerkzeuge">
         <button class="tool active" data-tool="select" type="button"><span>↖</span><div><strong>Auswählen</strong><small>Ziehen und bearbeiten</small></div></button>
@@ -119,6 +121,7 @@
     </section>
 
     <aside class="inspector panel">
+      <div class="pane-resizer pane-resizer-left" data-resize-pane="inspector" title="Eigenschaften skalieren"></div>
       <div class="tabs"><button class="tab active" data-tab="properties" type="button">Eigenschaften</button><button class="tab" data-tab="program" type="button">Programm</button><button class="tab" data-tab="configs" type="button">Konfigurationen</button><button class="tab" data-tab="log" type="button">Protokoll</button></div>
       <div class="tab-pane active" id="propertiesPane">
         <div id="inspectorEmpty" class="empty"><span>◇</span><strong>Nichts ausgewählt</strong><p>Wähle einen Zustand oder Übergang.</p></div>
