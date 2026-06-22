@@ -183,8 +183,8 @@ async function addAlgorithmNode(type) {
     pendingNodeType = type;
     const sourceRoutine = activeRoutine();
     let autoRoutine = null;
-    if (type === "call" && !state.routines.some(routine => routine.id !== sourceRoutine.id)) {
-        autoRoutine = { id: uid("routine"), name: "unterroutine_1", kind: "subroutine", visibility: "private", parameters: "", algorithm: [], flowComments: [] };
+    if (type === "call") {
+        autoRoutine = { id: uid("routine"), name: `unterroutine_${state.routines.length}`, kind: "subroutine", visibility: "private", parameters: "", algorithm: [], flowComments: [] };
     }
     const selected = selection?.kind === "node" ? locateNode(selection.id) : null;
 
@@ -202,8 +202,14 @@ async function addAlgorithmNode(type) {
         } else if (branchTarget && branchTarget.parentId === selected.node.id && branchTarget.branch === "body" && selected.node.body) {
             destination = selected.node.body;
             index = destination.length;
+        } else if (branchTarget && branchTarget.parentId === selected.node.id && branchTarget.branch === "routine" && selected.node.type === "call") {
+            destination = state.routines.find(routine => routine.id === selected.node.routineId)?.algorithm || destination;
+            index = destination.length;
         } else if (["while", "for"].includes(selected.node.type)) {
             destination = selected.node.body;
+            index = destination.length;
+        } else if (selected.node.type === "call") {
+            destination = state.routines.find(routine => routine.id === selected.node.routineId)?.algorithm || destination;
             index = destination.length;
         } else {
             destination = selected.container;
@@ -212,12 +218,13 @@ async function addAlgorithmNode(type) {
     }
 
     const node = defaults[type]();
-    if (type === "call") node.routineId = (state.routines.find(routine => routine.id !== sourceRoutine.id) || autoRoutine).id;
+    if (type === "call") node.routineId = autoRoutine.id;
     commit(() => {
         if (autoRoutine) state.routines.push(autoRoutine);
         destination.splice(index, 0, node);
         selection = { kind: "node", id: node.id };
         selectedNodeIds = new Set([node.id]);
+        state.activeRoutineId = locateNode(node.id)?.routine.id || state.activeRoutineId;
         branchTarget = null;
     }, "Baustein eingefügt");
 }
@@ -228,9 +235,8 @@ function completeBranchInsert(branch) {
     const node = defaults[pendingNodeType]();
     let autoRoutine = null;
     if (pendingNodeType === "call") {
-        const target = state.routines.find(routine => routine.id !== selected.routine.id);
-        autoRoutine = target ? null : { id: uid("routine"), name: `unterroutine_${state.routines.length}`, kind: "subroutine", visibility: "private", parameters: "", algorithm: [], flowComments: [] };
-        node.routineId = (target || autoRoutine).id;
+        autoRoutine = { id: uid("routine"), name: `unterroutine_${state.routines.length}`, kind: "subroutine", visibility: "private", parameters: "", algorithm: [], flowComments: [] };
+        node.routineId = autoRoutine.id;
     }
     let destination;
     let index;
@@ -246,6 +252,7 @@ function completeBranchInsert(branch) {
         destination.splice(index, 0, node);
         selection = { kind: "node", id: node.id };
         selectedNodeIds = new Set([node.id]);
+        state.activeRoutineId = locateNode(node.id)?.routine.id || state.activeRoutineId;
         branchTarget = null;
     }, "Baustein eingefügt");
     pendingNodeType = null;
@@ -408,20 +415,29 @@ function typeLabel(type) {
 }
 
 function renderStructogram() {
-    const renderSequence = nodes => nodes.length ? nodes.map(renderNode).join("") : '<div class="empty-branch">Baustein hinzufügen</div>';
+    const renderSequence = (nodes, parentId = "", branch = "") => {
+        const blocks = nodes.length ? nodes.map(renderNode).join("") : '<div class="empty-branch">Noch keine Bausteine</div>';
+        const target = parentId ? `<button class="nest-drop-zone${branchTarget?.parentId === parentId && branchTarget?.branch === branch ? " active" : ""}" data-nest-parent="${parentId}" data-nest-branch="${branch}" type="button">+ Hier verschachteln</button>` : "";
+        return blocks + target;
+    };
     const renderNode = node => {
         const selected = selection?.kind === "node" && selection.id === node.id ? " selected" : "";
         const multi = selectedNodeIds.has(node.id) ? " multi-selected" : "";
         if (node.type === "if") {
-            return `<div class="struct-block struct-if${selected}${multi}" draggable="true" data-node-id="${node.id}"><div class="struct-condition"><span class="block-type">Wenn</span>${escapeHtml(node.condition)}</div><div class="struct-branches"><div class="struct-branch"><div class="branch-label">Dann</div>${renderSequence(node.then)}</div><div class="struct-branch"><div class="branch-label">Sonst</div>${renderSequence(node.else)}</div></div></div>`;
+            return `<div class="struct-block struct-if${selected}${multi}" draggable="true" data-node-id="${node.id}"><div class="struct-condition"><span class="block-type">Wenn</span>${escapeHtml(node.condition)}</div><div class="struct-branches"><div class="struct-branch"><div class="branch-label">Dann</div>${renderSequence(node.then, node.id, "then")}</div><div class="struct-branch"><div class="branch-label">Sonst</div>${renderSequence(node.else, node.id, "else")}</div></div></div>`;
         }
         if (["while", "for"].includes(node.type)) {
-            return `<div class="struct-block struct-loop${selected}${multi}" draggable="true" data-node-id="${node.id}"><div class="loop-header"><span class="block-type">${escapeHtml(typeLabel(node.type))}</span>${escapeHtml(nodeText(node))}</div><div class="loop-body">${renderSequence(node.body)}</div></div>`;
+            return `<div class="struct-block struct-loop${selected}${multi}" draggable="true" data-node-id="${node.id}"><div class="loop-header"><span class="block-type">${escapeHtml(typeLabel(node.type))}</span>${escapeHtml(nodeText(node))}</div><div class="loop-body">${renderSequence(node.body, node.id, "body")}</div></div>`;
+        }
+        if (node.type === "call") {
+            const target = state.routines.find(routine => routine.id === node.routineId);
+            const active = branchTarget?.parentId === node.id && branchTarget?.branch === "routine" ? " active" : "";
+            return `<div class="struct-block struct-call${selected}${multi}" draggable="true" data-node-id="${node.id}"><span class="block-type">${escapeHtml(typeLabel(node.type))}</span>${escapeHtml(nodeText(node))}<button class="nest-drop-zone call-target${active}" data-nest-parent="${node.id}" data-nest-branch="routine" type="button">+ In ${escapeHtml(target?.name || "Unterroutine")} einfügen</button></div>`;
         }
         return `<div class="struct-block${node.type === "comment" ? " struct-comment" : ""}${node.type === "call" ? " struct-call" : ""}${selected}${multi}" draggable="true" data-node-id="${node.id}"><span class="block-type">${escapeHtml(typeLabel(node.type))}</span>${escapeHtml(nodeText(node))}</div>`;
     };
 
-    diagramCanvas.innerHTML = `<div class="multi-diagram-grid">${state.routines.map(routine => `<section class="routine-column ${routine.id === state.activeRoutineId ? "active-routine" : ""}" data-routine-id="${routine.id}"><div class="routine-caption">${routine.kind === "main" ? "Hauptalgorithmus" : "Unterroutine"}</div><div class="structogram"><div class="struct-title">${escapeHtml(routine.name)}</div>${renderSequence(routine.algorithm)}</div><div class="drop-at-end" data-drop-routine="${routine.id}">Hier am Ende ablegen</div></section>`).join("")}</div>`;
+    diagramCanvas.innerHTML = `<div class="multi-diagram-grid">${state.routines.map(routine => `<section class="routine-column ${routine.id === state.activeRoutineId ? "active-routine" : ""}" data-routine-id="${routine.id}"><div class="routine-caption">${routine.kind === "main" ? "Hauptalgorithmus" : "Unterroutine"}</div><div class="structogram"><div class="struct-title">${escapeHtml(routine.name)}</div>${renderSequence(routine.algorithm)}<button class="drop-at-end" data-drop-routine="${routine.id}" type="button">+ In ${escapeHtml(routine.name)} einfügen</button></div></section>`).join("")}</div>`;
 }
 
 function buildFlowchart(routine, routineIndex) {
@@ -485,8 +501,8 @@ function buildFlowchart(routine, routineIndex) {
     result.exits.forEach(exit => connect(exit, end));
     if (!routine.algorithm.length) connect(start, end);
 
-    const maxX = Math.max(680, ...placed.map(item => item.x + item.width + 50), ...routine.flowComments.map(comment => comment.x + 230));
-    const minX = Math.min(0, ...placed.map(item => item.x - 50));
+    const maxX = Math.max(680, ...placed.map(item => item.x + item.width + (["while", "for", "call"].includes(item.node.type) ? 210 : 70)), ...routine.flowComments.map(comment => comment.x + 230));
+    const minX = Math.min(0, ...placed.map(item => item.x - (item.node.type === "if" ? 130 : 50)));
     const shift = minX < 0 ? -minX : 0;
     placed.forEach(item => item.x += shift);
     edges.forEach(edge => { edge.from = { ...edge.from, x: edge.from.x + shift }; edge.to = { ...edge.to, x: edge.to.x + shift }; });
@@ -513,10 +529,22 @@ function buildFlowchart(routine, routineIndex) {
         const label = item.node.type === "start" ? "Start" : item.node.type === "end" ? "Ende" : nodeText(item.node);
         return `<div class="flow-node ${item.node.type}${selected}${multi}" ${system ? "" : `draggable="true" data-node-id="${id}"`} style="left:${item.x}px;top:${item.y}px"><span>${escapeHtml(label)}</span></div>`;
     }).join("");
+    const nestTargetsHtml = placed.filter(item => ["if", "while", "for", "call"].includes(item.node.type)).map(item => {
+        if (item.node.type === "if") {
+            const thenActive = branchTarget?.parentId === item.node.id && branchTarget?.branch === "then" ? " active" : "";
+            const elseActive = branchTarget?.parentId === item.node.id && branchTarget?.branch === "else" ? " active" : "";
+            return `<button class="flow-nest-target branch-then${thenActive}" data-nest-parent="${item.node.id}" data-nest-branch="then" style="left:${item.x - 105}px;top:${item.y + 98}px" type="button">+ Dann</button><button class="flow-nest-target branch-else${elseActive}" data-nest-parent="${item.node.id}" data-nest-branch="else" style="left:${item.x + item.width + 15}px;top:${item.y + 98}px" type="button">+ Sonst</button>`;
+        }
+        const isCall = item.node.type === "call";
+        const branch = isCall ? "routine" : "body";
+        const active = branchTarget?.parentId === item.node.id && branchTarget?.branch === branch ? " active" : "";
+        const targetRoutine = isCall ? state.routines.find(routine => routine.id === item.node.routineId) : null;
+        return `<button class="flow-nest-target ${isCall ? "call-target" : "loop-target"}${active}" data-nest-parent="${item.node.id}" data-nest-branch="${branch}" style="left:${item.x + item.width + 18}px;top:${item.y + 15}px" type="button">+ In ${isCall ? escapeHtml(targetRoutine?.name || "Unterroutine") : "Schleife"}</button>`;
+    }).join("");
     const commentsHtml = routine.flowComments.map(comment => `<aside class="flow-comment${selection?.kind === "flowComment" && selection.id === comment.id ? " selected" : ""}" data-flow-comment-id="${comment.id}" style="left:${comment.x}px;top:${comment.y}px">${escapeHtml(comment.text)}</aside>`).join("");
     const flowHeight = Math.max(endY + 130, ...routine.flowComments.map(comment => comment.y + 120));
 
-    return `<section class="routine-column ${routine.id === state.activeRoutineId ? "active-routine" : ""}" data-routine-id="${routine.id}"><div class="routine-caption">${routine.kind === "main" ? "Hauptalgorithmus" : "Unterroutine"}: ${escapeHtml(routine.name)}</div><div class="flow-wrap" style="width:${maxX + shift}px;height:${flowHeight}px"><svg class="flow-svg" width="100%" height="100%"><defs><marker id="arrow_${routineIndex}" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#7594aa"></path></marker></defs>${edgeSvg}</svg>${nodesHtml}${commentsHtml}</div><div class="drop-at-end" data-drop-routine="${routine.id}">Hier am Ende ablegen</div></section>`;
+    return `<section class="routine-column ${routine.id === state.activeRoutineId ? "active-routine" : ""}" data-routine-id="${routine.id}"><div class="routine-caption">${routine.kind === "main" ? "Hauptalgorithmus" : "Unterroutine"}: ${escapeHtml(routine.name)}</div><div class="flow-wrap" style="width:${maxX + shift}px;height:${flowHeight}px"><svg class="flow-svg" width="100%" height="100%"><defs><marker id="arrow_${routineIndex}" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#7594aa"></path></marker></defs>${edgeSvg}</svg>${nodesHtml}${nestTargetsHtml}${commentsHtml}</div><button class="drop-at-end" data-drop-routine="${routine.id}" type="button">+ In ${escapeHtml(routine.name)} einfügen</button></section>`;
 }
 
 function renderFlowchart() {
@@ -755,10 +783,19 @@ function selectDiagramElement(event) {
     const target = event.target;
     const node = target.closest("[data-node-id]");
     const flowComment = target.closest("[data-flow-comment-id]");
+    const nestTarget = target.closest("[data-nest-parent]");
     const umlClass = target.closest("[data-class-id]");
     const relation = target.closest("[data-relation-id]");
     const routineElement = target.closest("[data-routine-id]");
-    if (flowComment) {
+    if (nestTarget) {
+        const parentId = nestTarget.dataset.nestParent;
+        selection = { kind: "node", id: parentId };
+        selectedNodeIds = new Set([parentId]);
+        branchTarget = { parentId, branch: nestTarget.dataset.nestBranch };
+        state.activeRoutineId = locateNode(parentId)?.routine.id || state.activeRoutineId;
+        render();
+        return;
+    } else if (flowComment) {
         selectedNodeIds.clear();
         selection = { kind: "flowComment", id: flowComment.dataset.flowCommentId };
         state.activeRoutineId = locateFlowComment(selection.id)?.routine.id || state.activeRoutineId;
@@ -848,6 +885,40 @@ function moveSelectedByDrop(targetId, position, targetRoutineId) {
     }, `${moving.length} Operation${moving.length === 1 ? "" : "en"} verschoben`);
 }
 
+function moveSelectedIntoNestedContainer(parentId, branch) {
+    const moving = orderedMovableNodes();
+    const parentLocation = locateNode(parentId);
+    if (!moving.length || !parentLocation) return;
+    if (moving.some(node => node.id === parentId || nodeContains(node, parentId))) {
+        toast("Ein Block kann nicht in sich selbst verschachtelt werden.");
+        return;
+    }
+    const validBranch = parentLocation.node.type === "if"
+        ? ["then", "else"].includes(branch)
+        : ["while", "for"].includes(parentLocation.node.type)
+            ? branch === "body"
+            : parentLocation.node.type === "call" && branch === "routine";
+    if (!validBranch) return;
+    if (branch === "routine" && !state.routines.some(routine => routine.id === parentLocation.node.routineId)) return;
+    commit(() => {
+        const removals = moving.map(node => locateNode(node.id)).filter(Boolean);
+        const containers = [...new Set(removals.map(item => item.container))];
+        for (const container of containers) {
+            const ids = new Set(removals.filter(item => item.container === container).map(item => item.node.id));
+            for (let index = container.length - 1; index >= 0; index--) if (ids.has(container[index].id)) container.splice(index, 1);
+        }
+        const refreshed = locateNode(parentId);
+        const destination = branch === "routine"
+            ? state.routines.find(routine => routine.id === refreshed.node.routineId)?.algorithm
+            : refreshed.node[branch];
+        destination.push(...moving);
+        state.activeRoutineId = refreshed.routine.id;
+        selection = { kind: "node", id: moving[0].id };
+        selectedNodeIds = new Set(moving.map(node => node.id));
+        branchTarget = { parentId, branch };
+    }, `${moving.length} Operation${moving.length === 1 ? "" : "en"} verschachtelt`);
+}
+
 function clearDropIndicators() {
     $$(".drop-before, .drop-after, .drag-over", diagramCanvas).forEach(element => element.classList.remove("drop-before", "drop-after", "drag-over"));
 }
@@ -868,12 +939,14 @@ function initDragAndDrop() {
     });
     diagramCanvas.addEventListener("dragover", event => {
         if (!dragInProgress) return;
+        const nest = event.target.closest("[data-nest-parent]");
         const node = event.target.closest("[data-node-id]");
         const end = event.target.closest("[data-drop-routine]");
-        if (!node && !end) return;
+        if (!nest && !node && !end) return;
         event.preventDefault();
         clearDropIndicators();
-        if (node) {
+        if (nest) nest.classList.add("drag-over");
+        else if (node) {
             const position = event.clientY < node.getBoundingClientRect().top + node.getBoundingClientRect().height / 2 ? "before" : "after";
             node.classList.add(position === "before" ? "drop-before" : "drop-after");
             node.dataset.dropPosition = position;
@@ -882,9 +955,11 @@ function initDragAndDrop() {
     diagramCanvas.addEventListener("drop", event => {
         if (!dragInProgress) return;
         event.preventDefault();
+        const nest = event.target.closest("[data-nest-parent]");
         const node = event.target.closest("[data-node-id]");
         const end = event.target.closest("[data-drop-routine]");
-        if (node) moveSelectedByDrop(node.dataset.nodeId, node.dataset.dropPosition || "after", null);
+        if (nest) moveSelectedIntoNestedContainer(nest.dataset.nestParent, nest.dataset.nestBranch);
+        else if (node) moveSelectedByDrop(node.dataset.nodeId, node.dataset.dropPosition || "after", null);
         else if (end) moveSelectedByDrop(null, "after", end.dataset.dropRoutine);
         clearDropIndicators();
         setTimeout(() => { dragInProgress = false; }, 0);
