@@ -11,7 +11,8 @@ const esc = value => String(value ?? "").replace(/[&<>"']/g, char => ({ "&": "&a
 const unique = values => [...new Set(values)];
 
 function newMachine(type = "DFA") {
-  return { version: 1, type, name: `Neuer ${type}`, alphabet: ["0", "1"], stackAlphabet: ["A", "□"], blank: "□", initialStack: "□", initialHead: 0, acceptance: "final", states: [], transitions: [] };
+  const nonterminals = type === "PDA" ? ["A", "B"] : type === "TM" ? ["X", "Y", "Z"] : [];
+  return { version: 1, type, name: `Neuer ${type}`, alphabet: ["0", "1"], nonterminals, stackAlphabet: [...nonterminals, "□"], blank: "□", initialStack: "□", initialHead: 0, acceptance: "final", states: [], transitions: [] };
 }
 
 let machine = newMachine();
@@ -99,11 +100,17 @@ function normalizeMachine(value) {
   if (!value || typeof value !== "object" || !Array.isArray(value.states) || !Array.isArray(value.transitions)) throw new Error("Ungültige AutomataLab-Datei");
   const type = ["DFA", "NFA", "PDA", "TM"].includes(value.type) ? value.type : "DFA";
   const base = newMachine(type);
+  const alphabet = unique((value.alphabet || []).map(String).filter(Boolean));
+  const inferredNonterminals = type === "PDA"
+    ? (value.stackAlphabet || []).filter(symbol => symbol !== (value.blank || "□") && !alphabet.includes(symbol))
+    : type === "TM" ? (value.transitions || []).flatMap(rule => [rule.read, rule.write]).filter(symbol => symbol && symbol !== (value.blank || "□") && !alphabet.includes(symbol)) : [];
+  const nonterminals = unique((value.nonterminals || inferredNonterminals || base.nonterminals).map(String).filter(Boolean));
   return {
     ...base, ...value, version: 1, type,
     name: String(value.name || `Importierter ${type}`),
-    alphabet: unique((value.alphabet || []).map(String).filter(Boolean)),
-    stackAlphabet: unique((value.stackAlphabet || base.stackAlphabet).map(String).filter(Boolean)),
+    alphabet,
+    nonterminals,
+    stackAlphabet: type === "PDA" ? unique([...nonterminals, String(value.blank || "□")]) : unique((value.stackAlphabet || base.stackAlphabet).map(String).filter(Boolean)),
     blank: String(value.blank || "□"),
     initialStack: String(value.initialStack ?? value.blank ?? "□"),
     initialHead: Number(value.initialHead) || 0,
@@ -171,6 +178,10 @@ function edgeGeometry(from, to) {
 }
 
 function ruleLabel(rule) {
+  return rule.read || (machine.type === "TM" ? machine.blank : EPSILON);
+}
+
+function ruleDetailLabel(rule) {
   if (machine.type === "PDA") return `${rule.read || EPSILON}, ${rule.pop || EPSILON} → ${rule.push || EPSILON}`;
   if (machine.type === "TM") return `${rule.read || machine.blank} → ${rule.write || machine.blank}, ${rule.move || "N"}`;
   return rule.read || EPSILON;
@@ -225,10 +236,17 @@ function renderGraph() {
   applyView();
 }
 
+function symbolSelect(id, label, symbols, selected) {
+  const values = unique(symbols.filter(Boolean));
+  return `<label><span>${label}</span><select id="${id}">${values.map(symbol => `<option value="${esc(symbol)}" ${symbol === selected ? "selected" : ""}>${esc(symbol)}</option>`).join("")}</select></label>`;
+}
+
 function transitionFields(rule = {}) {
-  if (machine.type === "PDA") return `<div class="property-section"><label><span>Eingabesymbol</span><input id="trRead" value="${esc(rule.read || EPSILON)}"></label><label><span>Keller-Top entfernen</span><input id="trPop" value="${esc(rule.pop || machine.blank)}"></label><label><span>Durch Kellerwort ersetzen</span><input id="trPush" value="${esc(rule.push || EPSILON)}"></label></div>`;
-  if (machine.type === "TM") return `<div class="property-section"><label><span>Gelesenes Bandsymbol</span><input id="trRead" value="${esc(rule.read || machine.blank)}"></label><label><span>Schreiben</span><input id="trWrite" value="${esc(rule.write || machine.blank)}"></label><label><span>Kopfbewegung</span><select id="trMove"><option ${rule.move === "L" ? "selected" : ""}>L</option><option ${rule.move === "R" || !rule.move ? "selected" : ""}>R</option><option ${rule.move === "N" ? "selected" : ""}>N</option></select></label></div>`;
-  return `<label><span>${machine.type === "DFA" ? "Eingabesymbol" : "Eingabesymbole"}</span><input id="trRead" value="${esc(rule.read || "")}" placeholder="z. B. 0 oder 0,1,ε"></label>`;
+  const terminals = machine.alphabet;
+  const workSymbols = unique([...machine.alphabet, ...machine.nonterminals, machine.blank]);
+  if (machine.type === "PDA") return `<div class="property-section">${symbolSelect("trRead", "Terminal lesen", [...terminals, EPSILON], rule.read || EPSILON)}${symbolSelect("trPop", "Nichtterminal vom Keller", [...machine.nonterminals, machine.blank, EPSILON], rule.pop || machine.blank)}<label><span>Durch Kellerwort ersetzen</span><input id="trPush" value="${esc(rule.push || EPSILON)}" list="stackSymbols"><datalist id="stackSymbols">${unique([...machine.nonterminals, machine.blank, EPSILON]).map(symbol => `<option value="${esc(symbol)}">`).join("")}</datalist></label></div>`;
+  if (machine.type === "TM") return `<div class="property-section">${symbolSelect("trRead", "Bandsymbol lesen", workSymbols, rule.read || machine.blank)}${symbolSelect("trWrite", "Bandsymbol schreiben", workSymbols, rule.write || machine.blank)}<label><span>Kopfbewegung</span><select id="trMove"><option ${rule.move === "L" ? "selected" : ""}>L</option><option ${rule.move === "R" || !rule.move ? "selected" : ""}>R</option><option ${rule.move === "N" ? "selected" : ""}>N</option></select></label></div>`;
+  return symbolSelect("trRead", "Terminal lesen", machine.type === "NFA" ? [...terminals, EPSILON] : terminals, rule.read || terminals[0] || "");
 }
 
 function openTransitionDialog(fromId, toId, editId = null) {
@@ -236,7 +254,7 @@ function openTransitionDialog(fromId, toId, editId = null) {
   pendingTransition = { fromId, toId, editId };
   $("#transitionTitle").textContent = `${stateLabel(fromId)} → ${stateLabel(toId)}`;
   $("#transitionFields").innerHTML = transitionFields(rule || {});
-  $("#transitionHelp").textContent = machine.type === "PDA" ? "Format gemäß Skript: Eingabe, Keller-Top → Ersatzwort. ε liest beziehungsweise schreibt nichts. Das erste Zeichen des Ersatzworts wird neues Top." : machine.type === "TM" ? "Format gemäß Skript: gelesen → geschrieben, Bewegung mit L, R oder N." : machine.type === "NFA" ? "Mehrere Symbole durch Komma trennen. ε-Übergänge sind erlaubt." : "Für einen DFA ist pro Zustand und Alphabetsymbol genau ein Folgezustand erlaubt.";
+  $("#transitionHelp").textContent = machine.type === "PDA" ? "Terminale und Nichtterminale stammen aus den Maschineneigenschaften. ε liest beziehungsweise verändert nichts." : machine.type === "TM" ? "Band- und Markierungssymbole stammen aus den Maschineneigenschaften. Wähle zusätzlich die Kopfbewegung L, R oder N." : machine.type === "NFA" ? "Es können Terminale aus Σ oder ε gewählt werden." : "Es kann genau ein Terminal aus Σ gewählt werden.";
   $("#transitionDialog").showModal();
   setTimeout(() => $("#trRead")?.focus(), 30);
 }
@@ -245,7 +263,7 @@ function submitTransition() {
   if (!pendingTransition) return;
   const base = { from: pendingTransition.fromId, to: pendingTransition.toId, read: normalizeSymbol($("#trRead")?.value), pop: EPSILON, push: EPSILON, write: "", move: "R" };
   let rules;
-  if (["DFA", "NFA"].includes(machine.type)) rules = String($("#trRead").value).split(",").map(normalizeSymbol).filter(Boolean).map(read => ({ ...base, id: uid("t"), read }));
+  if (["DFA", "NFA"].includes(machine.type)) rules = [{ ...base, id: uid("t") }];
   else if (machine.type === "PDA") rules = [{ ...base, id: uid("t"), pop: normalizeSymbol($("#trPop").value), push: normalizeSymbol($("#trPush").value) }];
   else rules = [{ ...base, id: uid("t"), write: $("#trWrite").value || machine.blank, move: $("#trMove").value }];
   if (!rules.length || !rules[0].read) { toast("Übergangsregel ist unvollständig"); return; }
@@ -263,7 +281,8 @@ function renderInspector() {
   if (!selection) {
     empty.classList.add("hidden");
     form.classList.remove("hidden");
-    form.innerHTML = `<div class="property-section"><h3>Formale Maschine</h3><label><span>Eingabealphabet Σ</span><input name="alphabet" value="${esc(machine.alphabet.join(", "))}"></label>${machine.type === "PDA" ? `<label><span>Kelleralphabet Γ</span><input name="stackAlphabet" value="${esc(machine.stackAlphabet.join(", "))}"></label><label><span>Akzeptanz</span><select name="acceptance"><option value="final" ${machine.acceptance === "final" ? "selected" : ""}>Endzustand</option><option value="empty" ${machine.acceptance === "empty" ? "selected" : ""}>Leerer Keller</option></select></label>` : ""}${machine.type === "TM" ? `<label><span>Leersymbol □</span><input name="blank" value="${esc(machine.blank)}" maxlength="3"></label>` : ""}</div><div class="property-section"><h3>Definition</h3><div class="formal-tuple">${formalDefinition()}</div></div>`;
+    const nonterminalHint = machine.type === "PDA" ? "Keller-/Nichtterminale N" : machine.type === "TM" ? "Arbeits-/Nichtterminale N" : "Nichtterminale N";
+    form.innerHTML = `<div class="property-section"><h3>Symbolmengen dieses Automaten</h3><label><span>Terminale Σ</span><input name="alphabet" value="${esc(machine.alphabet.join(", "))}" placeholder="z. B. a, b"></label><label><span>${nonterminalHint}</span><input name="nonterminals" value="${esc(machine.nonterminals.join(", "))}" placeholder="z. B. A, B"></label>${machine.type === "PDA" ? `<label><span>Kelleralphabet Γ</span><input value="${esc(machine.stackAlphabet.join(", "))}" disabled></label><label><span>Akzeptanz</span><select name="acceptance"><option value="final" ${machine.acceptance === "final" ? "selected" : ""}>Endzustand</option><option value="empty" ${machine.acceptance === "empty" ? "selected" : ""}>Leerer Keller</option></select></label>` : ""}${machine.type === "TM" ? `<label><span>Leersymbol □</span><input name="blank" value="${esc(machine.blank)}" maxlength="3"></label>` : ""}</div><div class="property-section"><h3>Definition</h3><div class="formal-tuple">${formalDefinition()}</div></div>`;
     return;
   }
   empty.classList.add("hidden"); form.classList.remove("hidden");
@@ -275,7 +294,7 @@ function renderInspector() {
     const rule = transitionById(selection.id);
     if (!rule) { selection = null; renderInspector(); return; }
     const siblings = rulesBetween(rule.from, rule.to);
-    form.innerHTML = `<div class="property-section"><h3>${esc(stateLabel(rule.from))} → ${esc(stateLabel(rule.to))}</h3>${siblings.map(item => `<button class="btn ${item.id === rule.id ? "primary" : ""}" data-select-rule="${item.id}" type="button">${esc(ruleLabel(item))}</button>`).join("")}</div><div class="property-section"><h3>Gewählte Regel</h3><div class="formal-tuple">${esc(ruleLabel(rule))}</div><button class="btn" data-edit-rule type="button">Regel bearbeiten</button></div><button class="btn danger-btn" data-delete type="button">Regel löschen</button>`;
+    form.innerHTML = `<div class="property-section"><h3>${esc(stateLabel(rule.from))} → ${esc(stateLabel(rule.to))}</h3>${siblings.map(item => `<button class="btn ${item.id === rule.id ? "primary" : ""}" data-select-rule="${item.id}" type="button">Terminal ${esc(ruleLabel(item))}</button>`).join("")}</div><div class="property-section"><h3>Gewählte Regel</h3><div class="formal-tuple">${esc(ruleDetailLabel(rule))}</div><button class="btn" data-edit-rule type="button">Regel bearbeiten</button></div><button class="btn danger-btn" data-delete type="button">Regel löschen</button>`;
   }
 }
 
@@ -283,7 +302,10 @@ function updateProperty(target) {
   if (!target.name) return;
   if (!selection) {
     commit(() => {
-      if (["alphabet", "stackAlphabet"].includes(target.name)) machine[target.name] = unique(target.value.split(",").map(value => value.trim()).filter(Boolean));
+      if (["alphabet", "nonterminals"].includes(target.name)) {
+        machine[target.name] = unique(target.value.split(",").map(value => value.trim()).filter(Boolean));
+        if (machine.type === "PDA") machine.stackAlphabet = unique([...machine.nonterminals, machine.blank]);
+      }
       else machine[target.name] = target.value;
     }, "Maschineneigenschaft geändert");
     return;
@@ -315,10 +337,14 @@ function validateMachine() {
   }
   if (machine.type === "PDA") {
     if (!isPdaDeterministic()) issues.push("PDA ist nichtdeterministisch");
+    if (machine.transitions.some(rule => rule.read !== EPSILON && !machine.alphabet.includes(rule.read))) issues.push("Übergang liest unbekanntes Terminal");
+    if (machine.transitions.some(rule => rule.pop !== EPSILON && !machine.stackAlphabet.includes(rule.pop))) issues.push("Übergang nutzt unbekanntes Kellersymbol");
   }
   if (machine.type === "TM") {
     if (!isTmDeterministic()) issues.push("TM ist nichtdeterministisch (NTM)");
     if (machine.alphabet.includes(machine.blank)) issues.push("Leersymbol darf nicht in Σ liegen");
+    const tapeSymbols = new Set([...machine.alphabet, ...machine.nonterminals, machine.blank]);
+    if (machine.transitions.some(rule => !tapeSymbols.has(rule.read) || !tapeSymbols.has(rule.write))) issues.push("Übergang nutzt unbekanntes Bandsymbol");
   }
   return unique(issues);
 }
@@ -365,7 +391,7 @@ function formalDefinition() {
   if (machine.type === "DFA") return `M = (${sigma}, ${states}, δ, ${starts[0] || "–"}, ${finals})`;
   if (machine.type === "NFA") return `M = (${sigma}, ${states}, δ, {${starts.join(", ")}}, ${finals})`;
   if (machine.type === "PDA") return `M = (${sigma}, {${machine.stackAlphabet.join(", ")}}, ${states}, δ, ${starts[0] || "–"}, ${finals})`;
-  return `M = (${sigma}, {${unique([...machine.alphabet, machine.blank, ...machine.transitions.flatMap(rule => [rule.read, rule.write])]).filter(Boolean).join(", ")}}, ${states}, δ, ${starts[0] || "–"}, ${finals}, ${machine.blank})`;
+  return `M = (${sigma}, {${unique([...machine.alphabet, ...machine.nonterminals, machine.blank]).join(", ")}}, ${states}, δ, ${starts[0] || "–"}, ${finals}, ${machine.blank})`;
 }
 
 function renderStatus() {
@@ -538,6 +564,10 @@ function configText(config) {
 }
 
 function renderSimulation() {
+  const simulationNames = { DFA: "Deterministischen Automaten ausführen", NFA: "Nichtdeterministischen Automaten ausführen", PDA: "Kellerautomaten ausführen", TM: "Turingmaschine ausführen" };
+  $("#simMachineTitle").textContent = simulationNames[machine.type];
+  $("#inputDataLabel").textContent = machine.type === "TM" ? "BAND" : "EINGABE";
+  $("#memoryDataLabel").textContent = machine.type === "PDA" ? "KELLER" : machine.type === "TM" ? "BANDKONFIGURATION" : "AKTIVE ZUSTÄNDE";
   const status = $("#simStatus"); status.className = `sim-status ${sim.status}`; status.textContent = sim.message;
   const first = sim.configs[0];
   if (machine.type === "TM") {
@@ -653,7 +683,7 @@ function transitionTableHtml() {
     const symbols = unique([...machine.alphabet, ...(machine.transitions.some(rule => rule.read === EPSILON) ? [EPSILON] : [])]);
     return `<table class="transition-table"><thead><tr><th>Zustand</th>${symbols.map(symbol => `<th>${esc(symbol)}</th>`).join("")}</tr></thead><tbody>${machine.states.map(state => `<tr><td>${state.start ? "→" : ""}${state.final ? "*" : ""}${esc(state.name)}</td>${symbols.map(symbol => `<td>${esc(machine.transitions.filter(rule => rule.from === state.id && rule.read === symbol).map(rule => stateLabel(rule.to)).join(", ") || "–")}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
   }
-  return `<table class="transition-table"><thead><tr><th>Von</th><th>Regel</th><th>Nach</th></tr></thead><tbody>${machine.transitions.map(rule => `<tr><td>${esc(stateLabel(rule.from))}</td><td>${esc(ruleLabel(rule))}</td><td>${esc(stateLabel(rule.to))}</td></tr>`).join("")}</tbody></table>`;
+  return `<table class="transition-table"><thead><tr><th>Von</th><th>Regel</th><th>Nach</th></tr></thead><tbody>${machine.transitions.map(rule => `<tr><td>${esc(stateLabel(rule.from))}</td><td>${esc(ruleDetailLabel(rule))}</td><td>${esc(stateLabel(rule.to))}</td></tr>`).join("")}</tbody></table>`;
 }
 
 function grammarText() {
@@ -683,7 +713,7 @@ function programHelp() {
 function serializeProgram() {
   const starts = machine.states.filter(state => state.start).map(state => state.name);
   const finals = machine.states.filter(state => state.final).map(state => state.name);
-  const directives = [`# AutomataLab ${machine.type}`, `@alphabet ${machine.alphabet.join(",")}`, `@start ${starts.join(",")}`, `@final ${finals.join(",")}`];
+  const directives = [`# AutomataLab ${machine.type}`, `@alphabet ${machine.alphabet.join(",")}`, `@nonterminals ${machine.nonterminals.join(",")}`, `@start ${starts.join(",")}`, `@final ${finals.join(",")}`];
   if (machine.type === "PDA") directives.push(`@stack ${machine.stackAlphabet.join(",")}`, `@initial-stack ${machine.initialStack || machine.blank}`, `@accept ${machine.acceptance}`);
   if (machine.type === "TM") directives.push(`@blank ${machine.blank}`, `@head ${machine.initialHead}`);
   const rules = machine.transitions.map(rule => {
@@ -694,12 +724,25 @@ function serializeProgram() {
   return `${directives.join("\n")}\n\n${rules.join("\n")}`;
 }
 
-function refreshProgramEditor() {
+function programFingerprint(value = machine) {
+  const stateNames = new Map(value.states.map(state => [state.id, state.name]));
+  return JSON.stringify({
+    type: value.type, alphabet: value.alphabet, nonterminals: value.nonterminals, stackAlphabet: value.stackAlphabet, blank: value.blank,
+    initialStack: value.initialStack, initialHead: value.initialHead, acceptance: value.acceptance,
+    states: value.states.map(state => [state.name, state.start, state.final]).sort(),
+    transitions: value.transitions.map(rule => [stateNames.get(rule.from), rule.read, rule.pop, rule.push, rule.write, rule.move, stateNames.get(rule.to)]).sort()
+  });
+}
+
+function refreshProgramEditor(forceGraph = false) {
   const editor = $("#programEditor");
-  editor.value = serializeProgram();
+  const sourceIsCurrent = machine.programSource && machine.programFingerprint === programFingerprint();
+  editor.value = !forceGraph && sourceIsCurrent ? machine.programSource : serializeProgram();
   editor.dataset.machineType = machine.type;
   $("#programDiagnostics").className = "program-diagnostics";
-  $("#programDiagnostics").textContent = `${machine.transitions.length} Regeln aus dem Graph übernommen.`;
+  $("#programDiagnostics").textContent = sourceIsCurrent && !forceGraph
+    ? `${machine.transitions.length} kommentierte Beispielregeln geladen.`
+    : `${machine.transitions.length} Regeln aus dem Graph übernommen.`;
 }
 
 function renderProgramMeta() {
@@ -708,8 +751,8 @@ function renderProgramMeta() {
   if ($("#programEditor").dataset.machineType !== machine.type) refreshProgramEditor();
 }
 
-function parseProgram(text) {
-  const draft = clone(machine);
+function parseProgram(text, sourceMachine = machine) {
+  const draft = clone(sourceMachine);
   draft.transitions = [];
   const errors = [];
   const ruleRows = [];
@@ -733,7 +776,14 @@ function parseProgram(text) {
       const match = line.match(/^@(\S+)\s*(.*)$/);
       const key = match?.[1]?.toLowerCase(), value = match?.[2]?.trim() || "";
       if (key === "alphabet") draft.alphabet = unique(csv(value));
-      else if (key === "stack" && draft.type === "PDA") draft.stackAlphabet = unique(csv(value));
+      else if (key === "nonterminals") {
+        draft.nonterminals = unique(csv(value));
+        if (draft.type === "PDA") draft.stackAlphabet = unique([...draft.nonterminals, draft.blank]);
+      }
+      else if (key === "stack" && draft.type === "PDA") {
+        draft.stackAlphabet = unique(csv(value));
+        draft.nonterminals = draft.stackAlphabet.filter(symbol => symbol !== draft.blank && !draft.alphabet.includes(symbol));
+      }
       else if (key === "blank" && draft.type === "TM") draft.blank = value || "□";
       else if (key === "head" && draft.type === "TM") draft.initialHead = Number(value) || 0;
       else if (key === "initial-stack" && draft.type === "PDA") draft.initialStack = value || draft.blank;
@@ -768,13 +818,16 @@ function parseProgram(text) {
 }
 
 function applyProgram() {
-  const result = parseProgram($("#programEditor").value);
+  const source = $("#programEditor").value;
+  const result = parseProgram(source);
   const diagnostics = $("#programDiagnostics");
   if (result.errors.length) {
     diagnostics.className = "program-diagnostics error";
     diagnostics.textContent = result.errors.join("\n");
     return;
   }
+  result.draft.programSource = source;
+  result.draft.programFingerprint = programFingerprint(result.draft);
   commit(() => { machine = result.draft; selection = null; }, `${result.draft.transitions.length} programmierte Regeln übernommen`);
   diagnostics.className = "program-diagnostics";
   diagnostics.textContent = `Programm gültig: ${machine.states.length} Zustände, ${machine.transitions.length} Regeln.`;
@@ -786,8 +839,85 @@ function applyProgram() {
 function exampleMachine(kind) {
   if (kind === "dfa") return normalizeMachine({ type: "DFA", name: "Endet auf 01", alphabet: ["0", "1"], states: [{ id: "q0", name: "q0", x: 170, y: 220, start: true, final: false }, { id: "q1", name: "q1", x: 390, y: 140, start: false, final: false }, { id: "q2", name: "q2", x: 610, y: 220, start: false, final: true }], transitions: [{ id: "a", from: "q0", to: "q1", read: "0" }, { id: "b", from: "q0", to: "q0", read: "1" }, { id: "c", from: "q1", to: "q1", read: "0" }, { id: "d", from: "q1", to: "q2", read: "1" }, { id: "e", from: "q2", to: "q1", read: "0" }, { id: "f", from: "q2", to: "q0", read: "1" }] });
   if (kind === "nfa") return normalizeMachine({ type: "NFA", name: "Enthält 01", alphabet: ["0", "1"], states: [{ id: "q0", name: "q0", x: 170, y: 220, start: true }, { id: "q1", name: "q1", x: 390, y: 140 }, { id: "q2", name: "q2", x: 610, y: 220, final: true }], transitions: [{ id: "a", from: "q0", to: "q0", read: "0" }, { id: "b", from: "q0", to: "q0", read: "1" }, { id: "c", from: "q0", to: "q1", read: "0" }, { id: "d", from: "q1", to: "q2", read: "1" }, { id: "e", from: "q2", to: "q2", read: "0" }, { id: "f", from: "q2", to: "q2", read: "1" }] });
-  if (kind === "pda") return normalizeMachine({ type: "PDA", name: "aⁿbⁿ", alphabet: ["a", "b"], stackAlphabet: ["A", "□"], blank: "□", acceptance: "final", states: [{ id: "q0", name: "q0", x: 150, y: 220, start: true }, { id: "q1", name: "q1", x: 390, y: 220 }, { id: "qe", name: "qE", x: 630, y: 220, final: true }], transitions: [{ id: "a", from: "q0", to: "q0", read: "a", pop: "□", push: "A□" }, { id: "b", from: "q0", to: "q0", read: "a", pop: "A", push: "AA" }, { id: "c", from: "q0", to: "q1", read: "b", pop: "A", push: EPSILON }, { id: "d", from: "q1", to: "q1", read: "b", pop: "A", push: EPSILON }, { id: "e", from: "q1", to: "qe", read: EPSILON, pop: "□", push: "□" }] });
-  return normalizeMachine({ type: "TM", name: "Binärer Nachfolger", alphabet: ["0", "1"], blank: "□", states: [{ id: "q0", name: "q0", x: 120, y: 220, start: true }, { id: "q1", name: "q1", x: 340, y: 130 }, { id: "q2", name: "q2", x: 560, y: 220 }, { id: "qe", name: "qE", x: 780, y: 220, final: true }], transitions: [{ id: "a", from: "q0", to: "q0", read: "0", write: "0", move: "R" }, { id: "b", from: "q0", to: "q0", read: "1", write: "1", move: "R" }, { id: "c", from: "q0", to: "q1", read: "□", write: "□", move: "L" }, { id: "d", from: "q1", to: "q1", read: "1", write: "0", move: "L" }, { id: "e", from: "q1", to: "q2", read: "0", write: "1", move: "L" }, { id: "f", from: "q1", to: "qe", read: "□", write: "1", move: "N" }, { id: "g", from: "q2", to: "q2", read: "0", write: "0", move: "L" }, { id: "h", from: "q2", to: "q2", read: "1", write: "1", move: "L" }, { id: "i", from: "q2", to: "qe", read: "□", write: "□", move: "R" }] });
+  const isPda = kind === "pda";
+  const source = isPda ? `# Kellerautomat für Spiegelwörter w#wᴿ
+# Vor dem Trenner wird das Wort im Keller gespeichert.
+# Danach muss jedes Zeichen spiegelbildlich zum Keller passen.
+@alphabet a,b,#
+@nonterminals A,B
+@start q_push
+@final q_accept
+@stack A,B,□
+@initial-stack □
+@accept final
+
+# Phase 1: Eingabezeichen auf den Keller legen
+q_push, a, □ -> q_push, A□
+q_push, b, □ -> q_push, B□
+q_push, a, A -> q_push, AA
+q_push, b, A -> q_push, BA
+q_push, a, B -> q_push, AB
+q_push, b, B -> q_push, BB
+
+# Das Trennzeichen wechselt in die Vergleichsphase
+q_push, #, □ -> q_pop, □
+q_push, #, A -> q_pop, A
+q_push, #, B -> q_pop, B
+
+# Phase 2: passende Zeichen vom Keller entfernen
+q_pop, a, A -> q_pop, ε
+q_pop, b, B -> q_pop, ε
+q_pop, ε, □ -> q_accept, □`
+    : `# Turingmaschine für die Sprache aⁿbⁿcⁿ mit n >= 1
+# Pro Runde werden ein a, ein b und ein c als X, Y, Z markiert.
+@alphabet a,b,c
+@nonterminals X,Y,Z
+@start q0
+@final q_accept
+@blank □
+@head 0
+
+# Nächstes unmarkiertes a suchen und markieren
+q0, X -> q0, X, R
+q0, a -> q1, X, R
+q0, Y -> q4, Y, R
+q0, Z -> q4, Z, R
+
+# Zum nächsten unmarkierten b laufen
+q1, a -> q1, a, R
+q1, Y -> q1, Y, R
+q1, b -> q2, Y, R
+
+# Zum nächsten unmarkierten c laufen
+q2, b -> q2, b, R
+q2, Z -> q2, Z, R
+q2, c -> q3, Z, L
+
+# An den linken Bandrand zurückkehren
+q3, a -> q3, a, L
+q3, b -> q3, b, L
+q3, X -> q3, X, L
+q3, Y -> q3, Y, L
+q3, Z -> q3, Z, L
+q3, □ -> q0, □, R
+
+# Nur noch vollständig markierte b- und c-Blöcke erlauben
+q4, Y -> q4, Y, R
+q4, Z -> q4, Z, R
+q4, □ -> q_accept, □, N`;
+  const seed = normalizeMachine({
+    type: isPda ? "PDA" : "TM", name: isPda ? "Spiegelwort w#wᴿ" : "aⁿbⁿcⁿ erkennen",
+    states: isPda
+      ? [{ id: "qp", name: "q_push", x: 170, y: 220 }, { id: "qo", name: "q_pop", x: 430, y: 220 }, { id: "qa", name: "q_accept", x: 690, y: 220 }]
+      : [{ id: "q0", name: "q0", x: 120, y: 220 }, { id: "q1", name: "q1", x: 320, y: 110 }, { id: "q2", name: "q2", x: 520, y: 110 }, { id: "q3", name: "q3", x: 520, y: 330 }, { id: "q4", name: "q4", x: 720, y: 220 }, { id: "qa", name: "q_accept", x: 900, y: 220 }],
+    transitions: []
+  });
+  const example = parseProgram(source, seed).draft;
+  example.name = seed.name;
+  example.exampleWord = isPda ? "ab#ba" : "aabbcc";
+  example.programSource = source;
+  example.programFingerprint = programFingerprint(example);
+  return example;
 }
 
 // Events -------------------------------------------------------------------
@@ -869,11 +999,17 @@ function initEvents() {
   $("#saveBtn").addEventListener("click", () => persist(true)); $("#exportBtn").addEventListener("click", downloadJson); $("#importBtn").addEventListener("click", () => $("#importFile").click());
   $("#importFile").addEventListener("change", async event => { const file = event.target.files[0]; if (!file) return; try { const imported = normalizeMachine(JSON.parse(await file.text())); commit(() => { machine = imported; selection = null; }, "Automat importiert"); fitGraph(); } catch (error) { toast(error.message); } event.target.value = ""; });
   $("#newBtn").addEventListener("click", () => { if (confirm("Aktuellen Automaten verwerfen?")) commit(() => { machine = newMachine(machine.type); selection = null; }, "Neuer Automat"); });
-  $$("[data-example]").forEach(button => button.addEventListener("click", () => { const example = exampleMachine(button.dataset.example); commit(() => { machine = example; selection = null; }, `Beispiel ${example.name} geladen`); setTimeout(fitGraph, 0); }));
+  $$("[data-example]").forEach(button => button.addEventListener("click", () => {
+    const example = exampleMachine(button.dataset.example);
+    $("#wordInput").value = example.exampleWord || "";
+    commit(() => { machine = example; selection = null; }, `Beispiel ${example.name} geladen`);
+    refreshProgramEditor();
+    setTimeout(fitGraph, 0);
+  }));
   $("#simResetBtn").addEventListener("click", () => resetSimulation()); $("#simStepBtn").addEventListener("click", simulationStep); $("#simPlayBtn").addEventListener("click", togglePlay); $("#wordInput").addEventListener("input", () => resetSimulation());
   $("#initialStack").addEventListener("change", event => commit(() => { machine.initialStack = event.target.value || machine.blank; }, "Startkeller geändert"));
   $("#initialHead").addEventListener("change", event => commit(() => { machine.initialHead = Number(event.target.value) || 0; }, "TM-Kopfposition geändert"));
-  $("#programRefreshBtn").addEventListener("click", refreshProgramEditor);
+  $("#programRefreshBtn").addEventListener("click", () => refreshProgramEditor(true));
   $("#programApplyBtn").addEventListener("click", applyProgram);
   $("#determinizeBtn").addEventListener("click", determinize); $("#completeBtn").addEventListener("click", completeDfa); $("#minimizeBtn").addEventListener("click", minimizeDfa); $("#removeUnreachableBtn").addEventListener("click", removeUnreachable);
   $("#fitBtn").addEventListener("click", fitGraph); $("#tableBtn").addEventListener("click", () => showInfo("Übergangstabelle", transitionTableHtml())); $("#formalBtn").addEventListener("click", () => showInfo("Formale Definition", `<div class="formal-tuple">${esc(formalDefinition())}</div>`)); $("#grammarBtn").addEventListener("click", () => showInfo("Rechtslineare Grammatik", `<pre class="formal-tuple">${esc(grammarText())}</pre>`, "KONVERTIERUNG"));

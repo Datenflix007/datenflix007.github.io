@@ -29,8 +29,8 @@
       <div class="dropdown" id="exampleMenu">
         <button data-example="dfa" type="button">DFA: endet auf 01</button>
         <button data-example="nfa" type="button">NFA: enthält 01</button>
-        <button data-example="pda" type="button">PDA: aⁿbⁿ</button>
-        <button data-example="tm" type="button">TM: binärer Nachfolger</button>
+        <button data-example="pda" type="button">PDA: Spiegelwort w#wᴿ</button>
+        <button data-example="tm" type="button">TM: aⁿbⁿcⁿ erkennen</button>
       </div>
     </div>
     <div class="menu-group">
@@ -94,18 +94,25 @@
         </svg>
       </div>
       <div class="simulator" id="simulator">
-        <div class="sim-input-row">
+        <div class="simulator-head">
+          <div><span class="section-eyebrow">SIMULATION</span><strong id="simMachineTitle">Automat ausführen</strong></div>
+          <div class="sim-actions">
+            <button class="btn" id="simResetBtn" type="button">Reset</button>
+            <button class="btn primary" id="simStepBtn" type="button">Einzelschritt</button>
+            <button class="btn" id="simPlayBtn" type="button">▶ Abspielen</button>
+          </div>
+        </div>
+        <div class="sim-settings">
           <label><span>Eingabewort</span><input id="wordInput" value="001" spellcheck="false"></label>
           <label class="max-steps"><span>Schrittlimit</span><input id="stepLimit" type="number" min="1" max="5000" value="250"></label>
           <label class="machine-option pda-only hidden"><span>Startkeller (Top links)</span><input id="initialStack" value="□" spellcheck="false"></label>
           <label class="machine-option tm-only hidden"><span>Startposition Kopf</span><input id="initialHead" type="number" value="0"></label>
           <label class="speed-option"><span>Tempo</span><select id="simSpeed"><option value="900">Langsam</option><option value="420" selected>Normal</option><option value="140">Schnell</option></select></label>
-          <button class="btn" id="simResetBtn" type="button">Reset</button>
-          <button class="btn primary" id="simStepBtn" type="button">Einzelschritt</button>
-          <button class="btn" id="simPlayBtn" type="button">▶ Abspielen</button>
         </div>
-        <div class="word-tape" id="wordTape"></div>
-        <div class="machine-memory" id="machineMemory"></div>
+        <div class="sim-data-grid">
+          <div class="sim-data-card"><span class="sim-data-label" id="inputDataLabel">EINGABE</span><div class="word-tape" id="wordTape"></div></div>
+          <div class="sim-data-card memory-card"><span class="sim-data-label" id="memoryDataLabel">KONFIGURATION</span><div class="machine-memory" id="machineMemory"></div></div>
+        </div>
         <div class="sim-status idle" id="simStatus">Bereit zur Simulation</div>
       </div>
     </section>
