@@ -31,6 +31,7 @@
         <button data-example="nfa" type="button">NFA: enthält 01</button>
         <button data-example="pda" type="button">PDA: Spiegelwort w#wᴿ</button>
         <button data-example="tm" type="button">TM: aⁿbⁿcⁿ erkennen</button>
+        <button data-example="tm-copy" type="button">TM: Binärmuster kopieren w → w#w</button>
       </div>
     </div>
     <div class="menu-group">
@@ -125,11 +126,17 @@
       </div>
       <div class="tab-pane" id="programPane">
         <div class="program-editor">
-          <div><span class="program-eyebrow">ÜBERGANGSPROGRAMM</span><h3 id="programTitle">DFA-Regeln</h3></div>
+          <div class="program-heading"><div><span class="program-eyebrow">AUTOMATA DSL</span><h3 id="programTitle">DFA-Regeln</h3></div><span class="ide-language">UTF-8 · DSL</span></div>
           <p id="programHelp"></p>
-          <textarea id="programEditor" spellcheck="false" aria-label="Übergangsprogramm"></textarea>
+          <div class="ide-toolbar"><button id="insertCommentBtn" type="button" title="Kommentar einfügen">▷ Kommentar</button><button id="showSuggestionsBtn" type="button" title="Vorschläge öffnen">⌘ Vorschläge</button><span>Strg+Leertaste</span></div>
+          <div class="code-editor-shell">
+            <pre class="line-numbers" id="programLineNumbers" aria-hidden="true">1</pre>
+            <textarea id="programEditor" spellcheck="false" aria-label="Übergangsprogramm" autocomplete="off" autocapitalize="off"></textarea>
+            <div class="code-suggestions hidden" id="programSuggestions" role="listbox"></div>
+          </div>
+          <div class="ide-status"><span id="programCursor">Zeile 1, Spalte 1</span><span>Kommentare: # → ▷</span></div>
           <div class="program-actions"><button class="btn" id="programRefreshBtn" type="button">Aus Graph übernehmen</button><button class="btn primary" id="programApplyBtn" type="button">Programm anwenden</button></div>
-          <div class="program-diagnostics" id="programDiagnostics">Eine Regel pro Zeile. Zeilen mit # sind Kommentare.</div>
+          <div class="program-diagnostics" id="programDiagnostics">Eine Regel pro Zeile. Ein # am Zeilenanfang wird automatisch zu ▷.</div>
         </div>
       </div>
       <div class="tab-pane" id="configsPane"><div class="config-list" id="configList"></div></div>

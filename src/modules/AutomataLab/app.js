@@ -31,6 +31,7 @@ let playTimer = 0;
 let toastTimer = 0;
 let operationLog = [];
 let sim = emptySimulation();
+let programSuggestionIndex = 0;
 
 function emptySimulation() {
   return { configs: [], step: 0, status: "idle", word: "", seen: new Set(), activeTransitions: [], message: "Bereit zur Simulation" };
@@ -724,6 +725,73 @@ function serializeProgram() {
   return `${directives.join("\n")}\n\n${rules.join("\n")}`;
 }
 
+function formatProgramComments(source) {
+  return String(source).replace(/(^|\n)([\t ]*)#(?=[\t ]|$)/g, "$1$2▷");
+}
+
+function updateProgramEditorUi(showSuggestions = false) {
+  const editor = $("#programEditor");
+  const lines = editor.value.split("\n");
+  $("#programLineNumbers").textContent = lines.map((_, index) => index + 1).join("\n");
+  $("#programLineNumbers").scrollTop = editor.scrollTop;
+  const beforeCursor = editor.value.slice(0, editor.selectionStart);
+  const line = beforeCursor.split("\n").length;
+  const column = beforeCursor.length - beforeCursor.lastIndexOf("\n");
+  $("#programCursor").textContent = `Zeile ${line}, Spalte ${column}`;
+  if (showSuggestions) renderProgramSuggestions(true);
+}
+
+function programSuggestions() {
+  const states = machine.states.map(state => ({ label: state.name, detail: "Zustand", insert: state.name }));
+  const directives = [
+    ["@alphabet", "Terminale", "@alphabet "], ["@nonterminals", "Arbeitssymbole", "@nonterminals "],
+    ["@start", "Startzustand", "@start "], ["@final", "Endzustände", "@final "],
+    ["@blank", "TM-Leersymbol", "@blank □"], ["@head", "TM-Kopfposition", "@head 0"],
+    ["@stack", "PDA-Kelleralphabet", "@stack "], ["@initial-stack", "PDA-Startkeller", "@initial-stack □"],
+    ["@accept", "PDA-Akzeptanz", "@accept final"]
+  ].filter(item => machine.type === "PDA" ? !["@blank", "@head"].includes(item[0]) : machine.type === "TM" ? !["@stack", "@initial-stack", "@accept"].includes(item[0]) : !["@blank", "@head", "@stack", "@initial-stack", "@accept"].includes(item[0]))
+    .map(([label, detail, insert]) => ({ label, detail, insert }));
+  const template = machine.type === "TM" ? "q0, 0 -> q1, X, R" : machine.type === "PDA" ? "q0, a, □ -> q1, A□" : "q0, a -> q1";
+  return [...directives, ...states, { label: "Regelvorlage", detail: machine.type, insert: template }, { label: "Kommentar", detail: "wird zu ▷", insert: "# Kommentar" }];
+}
+
+function renderProgramSuggestions(force = false) {
+  const editor = $("#programEditor"), popup = $("#programSuggestions");
+  const before = editor.value.slice(0, editor.selectionStart);
+  const token = before.match(/[^\s,]*$/)?.[0] || "";
+  if (!force && !token.startsWith("@")) { popup.classList.add("hidden"); return; }
+  const query = token.toLowerCase();
+  const items = programSuggestions().filter(item => !query || item.label.toLowerCase().includes(query)).slice(0, 8);
+  programSuggestionIndex = Math.min(programSuggestionIndex, Math.max(0, items.length - 1));
+  popup.innerHTML = items.map((item, index) => `<button class="suggestion-item ${index === programSuggestionIndex ? "active" : ""}" type="button" data-suggestion="${index}"><span>${esc(item.label)}</span><small>${esc(item.detail)}</small></button>`).join("");
+  popup.classList.toggle("hidden", !items.length);
+  popup._items = items;
+}
+
+function applyProgramSuggestion(index = programSuggestionIndex) {
+  const popup = $("#programSuggestions"), item = popup._items?.[index];
+  if (!item) return;
+  const editor = $("#programEditor"), start = editor.selectionStart, before = editor.value.slice(0, start);
+  const tokenLength = before.match(/[^\s,]*$/)?.[0]?.length || 0;
+  editor.setRangeText(item.insert, start - tokenLength, editor.selectionEnd, "end");
+  editor.value = formatProgramComments(editor.value);
+  popup.classList.add("hidden"); editor.focus(); updateProgramEditorUi();
+}
+
+function normalizeEditorComments() {
+  const editor = $("#programEditor"), start = editor.selectionStart, end = editor.selectionEnd;
+  const formattedBefore = formatProgramComments(editor.value.slice(0, start));
+  const formattedSelection = formatProgramComments(editor.value.slice(start, end));
+  editor.value = formatProgramComments(editor.value);
+  editor.setSelectionRange(formattedBefore.length, formattedBefore.length + formattedSelection.length);
+}
+
+function insertProgramText(text) {
+  const editor = $("#programEditor");
+  editor.setRangeText(text, editor.selectionStart, editor.selectionEnd, "end");
+  normalizeEditorComments(); editor.focus(); updateProgramEditorUi();
+}
+
 function programFingerprint(value = machine) {
   const stateNames = new Map(value.states.map(state => [state.id, state.name]));
   return JSON.stringify({
@@ -737,12 +805,13 @@ function programFingerprint(value = machine) {
 function refreshProgramEditor(forceGraph = false) {
   const editor = $("#programEditor");
   const sourceIsCurrent = machine.programSource && machine.programFingerprint === programFingerprint();
-  editor.value = !forceGraph && sourceIsCurrent ? machine.programSource : serializeProgram();
+  editor.value = formatProgramComments(!forceGraph && sourceIsCurrent ? machine.programSource : serializeProgram());
   editor.dataset.machineType = machine.type;
   $("#programDiagnostics").className = "program-diagnostics";
   $("#programDiagnostics").textContent = sourceIsCurrent && !forceGraph
     ? `${machine.transitions.length} kommentierte Beispielregeln geladen.`
     : `${machine.transitions.length} Regeln aus dem Graph übernommen.`;
+  updateProgramEditorUi();
 }
 
 function renderProgramMeta() {
@@ -771,7 +840,7 @@ function parseProgram(text, sourceMachine = machine) {
 
   text.split(/\r?\n/).forEach((raw, index) => {
     const line = raw.trim();
-    if (!line || line.startsWith("#")) return;
+    if (!line || line.startsWith("#") || line.startsWith("▷")) return;
     if (line.startsWith("@")) {
       const match = line.match(/^@(\S+)\s*(.*)$/);
       const key = match?.[1]?.toLowerCase(), value = match?.[2]?.trim() || "";
@@ -818,7 +887,7 @@ function parseProgram(text, sourceMachine = machine) {
 }
 
 function applyProgram() {
-  const source = $("#programEditor").value;
+  const source = formatProgramComments($("#programEditor").value);
   const result = parseProgram(source);
   const diagnostics = $("#programDiagnostics");
   if (result.errors.length) {
@@ -839,6 +908,72 @@ function applyProgram() {
 function exampleMachine(kind) {
   if (kind === "dfa") return normalizeMachine({ type: "DFA", name: "Endet auf 01", alphabet: ["0", "1"], states: [{ id: "q0", name: "q0", x: 170, y: 220, start: true, final: false }, { id: "q1", name: "q1", x: 390, y: 140, start: false, final: false }, { id: "q2", name: "q2", x: 610, y: 220, start: false, final: true }], transitions: [{ id: "a", from: "q0", to: "q1", read: "0" }, { id: "b", from: "q0", to: "q0", read: "1" }, { id: "c", from: "q1", to: "q1", read: "0" }, { id: "d", from: "q1", to: "q2", read: "1" }, { id: "e", from: "q2", to: "q1", read: "0" }, { id: "f", from: "q2", to: "q0", read: "1" }] });
   if (kind === "nfa") return normalizeMachine({ type: "NFA", name: "Enthält 01", alphabet: ["0", "1"], states: [{ id: "q0", name: "q0", x: 170, y: 220, start: true }, { id: "q1", name: "q1", x: 390, y: 140 }, { id: "q2", name: "q2", x: 610, y: 220, final: true }], transitions: [{ id: "a", from: "q0", to: "q0", read: "0" }, { id: "b", from: "q0", to: "q0", read: "1" }, { id: "c", from: "q0", to: "q1", read: "0" }, { id: "d", from: "q1", to: "q2", read: "1" }, { id: "e", from: "q2", to: "q2", read: "0" }, { id: "f", from: "q2", to: "q2", read: "1" }] });
+  if (kind === "tm-copy") {
+    const source = `# Komplexe Einband-TM: Ein Binärmuster w wird als w#w kopiert.
+# Beispiel: Aus 101 entsteht nach dem Halt 101#101.
+# X und Y markieren bereits kopierte Zeichen des Originals.
+@alphabet 0,1,#
+@nonterminals X,Y
+@start q_init
+@final q_accept
+@blank □
+@head 0
+
+# 1. Hinter dem Original einen Trenner anlegen
+q_init, 0 -> q_init, 0, R
+q_init, 1 -> q_init, 1, R
+q_init, □ -> q_rewind, #, L
+q_rewind, 0 -> q_rewind, 0, L
+q_rewind, 1 -> q_rewind, 1, L
+q_rewind, □ -> q_find, □, R
+
+# 2. Nächstes noch nicht kopiertes Zeichen markieren
+q_find, X -> q_find, X, R
+q_find, Y -> q_find, Y, R
+q_find, 0 -> q_seek_0, X, R
+q_find, 1 -> q_seek_1, Y, R
+q_find, # -> q_restore, #, L
+
+# 3a. Für eine markierte 0 bis hinter den Trenner laufen
+q_seek_0, X -> q_seek_0, X, R
+q_seek_0, Y -> q_seek_0, Y, R
+q_seek_0, 0 -> q_seek_0, 0, R
+q_seek_0, 1 -> q_seek_0, 1, R
+q_seek_0, # -> q_append_0, #, R
+
+# 3b. Für eine markierte 1 bis hinter den Trenner laufen
+q_seek_1, X -> q_seek_1, X, R
+q_seek_1, Y -> q_seek_1, Y, R
+q_seek_1, 0 -> q_seek_1, 0, R
+q_seek_1, 1 -> q_seek_1, 1, R
+q_seek_1, # -> q_append_1, #, R
+
+# 4. Zeichen am Ende der Kopie anhängen
+q_append_0, 0 -> q_append_0, 0, R
+q_append_0, 1 -> q_append_0, 1, R
+q_append_0, □ -> q_back, 0, L
+q_append_1, 0 -> q_append_1, 0, R
+q_append_1, 1 -> q_append_1, 1, R
+q_append_1, □ -> q_back, 1, L
+
+# 5. Zum linken Rand zurückkehren und nächste Runde starten
+q_back, 0 -> q_back, 0, L
+q_back, 1 -> q_back, 1, L
+q_back, # -> q_back, #, L
+q_back, X -> q_back, X, L
+q_back, Y -> q_back, Y, L
+q_back, □ -> q_find, □, R
+
+# 6. Markierungen entfernen; auf dem Band bleibt w#w
+q_restore, X -> q_restore, 0, L
+q_restore, Y -> q_restore, 1, L
+q_restore, □ -> q_accept, □, R`;
+    const names = ["q_init", "q_rewind", "q_find", "q_seek_0", "q_seek_1", "q_append_0", "q_append_1", "q_back", "q_restore", "q_accept"];
+    const seed = normalizeMachine({ type: "TM", name: "Binärmuster kopieren w → w#w", states: names.map((name, index) => ({ id: `copy_${index}`, name, x: 130 + (index % 5) * 190, y: 120 + Math.floor(index / 5) * 230 })), transitions: [] });
+    const example = parseProgram(source, seed).draft;
+    example.name = seed.name; example.exampleWord = "101"; example.programSource = source; example.programFingerprint = programFingerprint(example);
+    return example;
+  }
   const isPda = kind === "pda";
   const source = isPda ? `# Kellerautomat für Spiegelwörter w#wᴿ
 # Vor dem Trenner wird das Wort im Keller gespeichert.
@@ -1011,6 +1146,29 @@ function initEvents() {
   $("#initialHead").addEventListener("change", event => commit(() => { machine.initialHead = Number(event.target.value) || 0; }, "TM-Kopfposition geändert"));
   $("#programRefreshBtn").addEventListener("click", () => refreshProgramEditor(true));
   $("#programApplyBtn").addEventListener("click", applyProgram);
+  $("#insertCommentBtn").addEventListener("click", () => insertProgramText("# "));
+  $("#showSuggestionsBtn").addEventListener("click", () => { $("#programEditor").focus(); renderProgramSuggestions(true); });
+  $("#programSuggestions").addEventListener("mousedown", event => {
+    const item = event.target.closest("[data-suggestion]");
+    if (item) { event.preventDefault(); applyProgramSuggestion(Number(item.dataset.suggestion)); }
+  });
+  $("#programEditor").addEventListener("input", () => { normalizeEditorComments(); updateProgramEditorUi(); renderProgramSuggestions(); });
+  $("#programEditor").addEventListener("scroll", event => { $("#programLineNumbers").scrollTop = event.target.scrollTop; });
+  $("#programEditor").addEventListener("click", () => updateProgramEditorUi());
+  $("#programEditor").addEventListener("keyup", event => { if (!["ArrowUp", "ArrowDown"].includes(event.key)) updateProgramEditorUi(); });
+  $("#programEditor").addEventListener("keydown", event => {
+    const popup = $("#programSuggestions"), visible = !popup.classList.contains("hidden");
+    if (event.ctrlKey && event.code === "Space") { event.preventDefault(); renderProgramSuggestions(true); return; }
+    if (visible && ["ArrowDown", "ArrowUp"].includes(event.key)) {
+      event.preventDefault();
+      const length = popup._items?.length || 1;
+      programSuggestionIndex = (programSuggestionIndex + (event.key === "ArrowDown" ? 1 : -1) + length) % length;
+      renderProgramSuggestions(true); return;
+    }
+    if (visible && (event.key === "Enter" || event.key === "Tab")) { event.preventDefault(); applyProgramSuggestion(); return; }
+    if (event.key === "Escape") { popup.classList.add("hidden"); return; }
+    if (event.key === "Tab") { event.preventDefault(); insertProgramText("  "); }
+  });
   $("#determinizeBtn").addEventListener("click", determinize); $("#completeBtn").addEventListener("click", completeDfa); $("#minimizeBtn").addEventListener("click", minimizeDfa); $("#removeUnreachableBtn").addEventListener("click", removeUnreachable);
   $("#fitBtn").addEventListener("click", fitGraph); $("#tableBtn").addEventListener("click", () => showInfo("Übergangstabelle", transitionTableHtml())); $("#formalBtn").addEventListener("click", () => showInfo("Formale Definition", `<div class="formal-tuple">${esc(formalDefinition())}</div>`)); $("#grammarBtn").addEventListener("click", () => showInfo("Rechtslineare Grammatik", `<pre class="formal-tuple">${esc(grammarText())}</pre>`, "KONVERTIERUNG"));
   document.addEventListener("keydown", event => { if (event.key === "Delete" && !["INPUT", "SELECT", "TEXTAREA"].includes(document.activeElement.tagName)) deleteSelection(); if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "z") { event.preventDefault(); event.shiftKey ? redo() : undo(); } if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "y") { event.preventDefault(); redo(); } });
