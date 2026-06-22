@@ -863,6 +863,7 @@ footer {
 
 .thumb--github  { background: linear-gradient(135deg, #090b0f, #13161f); }
 .thumb--green   { background: linear-gradient(135deg, #011c0a, #02291a); }
+.thumb--orange  { background: linear-gradient(135deg, #241005, #3a1b08); }
 .thumb--purple  { background: linear-gradient(135deg, #13001f, #1e0035); }
 .thumb--blue    { background: linear-gradient(135deg, #0f1729, #1e293b); }
 
