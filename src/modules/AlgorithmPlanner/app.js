@@ -16,16 +16,20 @@ const defaults = {
     if: () => ({ id: uid("node"), type: "if", condition: "wert > 0", then: [], else: [] }),
     while: () => ({ id: uid("node"), type: "while", condition: "wert > 0", body: [] }),
     for: () => ({ id: uid("node"), type: "for", variable: "i", start: "0", end: "10", step: "1", body: [] }),
+    call: () => ({ id: uid("node"), type: "call", routineId: "", arguments: "", assignTo: "" }),
     return: () => ({ id: uid("node"), type: "return", expression: "ergebnis" }),
     comment: () => ({ id: uid("node"), type: "comment", text: "Beschreibung des nächsten Schritts" })
 };
 
 function blankState() {
+    const mainId = uid("routine");
     return {
-        version: 1,
+        version: 2,
         name: "Mein Programm",
         view: "structogram",
-        algorithm: [],
+        visualStyle: "neon",
+        activeRoutineId: mainId,
+        routines: [{ id: mainId, name: "algorithm", kind: "main", visibility: "public", parameters: "", algorithm: [], flowComments: [] }],
         classes: [],
         relations: []
     };
@@ -38,6 +42,9 @@ let history = [];
 let future = [];
 let pendingNodeType = null;
 let toastTimer = 0;
+let selectedNodeIds = new Set();
+let zoomLevel = 1;
+let dragInProgress = false;
 
 const diagramCanvas = $("#diagramCanvas");
 const inspector = $("#nodeInspector");
@@ -46,11 +53,36 @@ function snapshot() {
     return JSON.stringify(state);
 }
 
+function activeRoutine() {
+    return state.routines.find(routine => routine.id === state.activeRoutineId) || state.routines[0];
+}
+
+function resetSelection() {
+    selection = null;
+    selectedNodeIds.clear();
+    branchTarget = null;
+}
+
+function persistLocal(showMessage = false) {
+    try {
+        localStorage.setItem(STORAGE_KEY, snapshot());
+        const status = $("#storageStatus");
+        if (status) {
+            status.textContent = `Gespeichert ${new Date().toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" })}`;
+            status.title = `Automatisch im localStorage dieses Browsers gespeichert (${STORAGE_KEY})`;
+        }
+        if (showMessage) toast("Im Browser gespeichert");
+    } catch {
+        toast("Lokales Speichern wurde vom Browser blockiert");
+    }
+}
+
 function commit(mutator, message = "") {
     history.push(snapshot());
     if (history.length > MAX_HISTORY) history.shift();
     future = [];
     mutator();
+    persistLocal();
     render();
     if (message) toast(message);
 }
@@ -59,8 +91,8 @@ function undo() {
     if (!history.length) return;
     future.push(snapshot());
     state = JSON.parse(history.pop());
-    selection = null;
-    branchTarget = null;
+    resetSelection();
+    persistLocal();
     render();
 }
 
@@ -68,8 +100,8 @@ function redo() {
     if (!future.length) return;
     history.push(snapshot());
     state = JSON.parse(future.pop());
-    selection = null;
-    branchTarget = null;
+    resetSelection();
+    persistLocal();
     render();
 }
 
@@ -79,6 +111,11 @@ function toast(message) {
     element.classList.add("show");
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => element.classList.remove("show"), 2100);
+}
+
+function activateInspectorTab(name) {
+    $$(".tab").forEach(item => item.classList.toggle("active", item.dataset.tab === name));
+    $$(".tab-content").forEach(item => item.classList.toggle("active", item.id === `${name}Tab`));
 }
 
 function walkNodes(nodes, visitor, parent = null, branch = "root") {
@@ -97,12 +134,15 @@ function walkNodes(nodes, visitor, parent = null, branch = "root") {
 
 function locateNode(id) {
     let result = null;
-    walkNodes(state.algorithm, (node, container, index, parent, branch) => {
-        if (node.id === id) {
-            result = { node, container, index, parent, branch };
-            return false;
-        }
-    });
+    for (const routine of state.routines) {
+        walkNodes(routine.algorithm, (node, container, index, parent, branch) => {
+            if (node.id === id) {
+                result = { node, container, index, parent, branch, routine };
+                return false;
+            }
+        });
+        if (result) break;
+    }
     return result;
 }
 
@@ -114,9 +154,38 @@ function selectedRelation() {
     return selection?.kind === "relation" ? state.relations.find(item => item.id === selection.id) : null;
 }
 
+function locateFlowComment(id) {
+    for (const routine of state.routines) {
+        const comment = routine.flowComments.find(item => item.id === id);
+        if (comment) return { comment, routine };
+    }
+    return null;
+}
+
+function selectedFlowComment() {
+    return selection?.kind === "flowComment" ? locateFlowComment(selection.id)?.comment : null;
+}
+
+function addFlowComment() {
+    const routine = activeRoutine();
+    const index = routine.flowComments.length;
+    const comment = { id: uid("note"), text: "Hinweis zum Ablauf", x: 455 + (index % 2) * 210, y: 80 + Math.floor(index / 2) * 110 };
+    commit(() => {
+        routine.flowComments.push(comment);
+        selectedNodeIds.clear();
+        selection = { kind: "flowComment", id: comment.id };
+    }, "Freier Kommentar hinzugefügt");
+    activateInspectorTab("properties");
+}
+
 async function addAlgorithmNode(type) {
     if (!defaults[type]) return;
     pendingNodeType = type;
+    const sourceRoutine = activeRoutine();
+    let autoRoutine = null;
+    if (type === "call" && !state.routines.some(routine => routine.id !== sourceRoutine.id)) {
+        autoRoutine = { id: uid("routine"), name: "unterroutine_1", kind: "subroutine", visibility: "private", parameters: "", algorithm: [], flowComments: [] };
+    }
     const selected = selection?.kind === "node" ? locateNode(selection.id) : null;
 
     if (selected?.node.type === "if" && !branchTarget) {
@@ -124,7 +193,7 @@ async function addAlgorithmNode(type) {
         return;
     }
 
-    let destination = state.algorithm;
+    let destination = sourceRoutine.algorithm;
     let index = destination.length;
     if (selected) {
         if (branchTarget && branchTarget.parentId === selected.node.id && ["then", "else"].includes(branchTarget.branch)) {
@@ -143,9 +212,12 @@ async function addAlgorithmNode(type) {
     }
 
     const node = defaults[type]();
+    if (type === "call") node.routineId = (state.routines.find(routine => routine.id !== sourceRoutine.id) || autoRoutine).id;
     commit(() => {
+        if (autoRoutine) state.routines.push(autoRoutine);
         destination.splice(index, 0, node);
         selection = { kind: "node", id: node.id };
+        selectedNodeIds = new Set([node.id]);
         branchTarget = null;
     }, "Baustein eingefügt");
 }
@@ -154,6 +226,12 @@ function completeBranchInsert(branch) {
     const selected = selection?.kind === "node" ? locateNode(selection.id) : null;
     if (!selected || !pendingNodeType) return;
     const node = defaults[pendingNodeType]();
+    let autoRoutine = null;
+    if (pendingNodeType === "call") {
+        const target = state.routines.find(routine => routine.id !== selected.routine.id);
+        autoRoutine = target ? null : { id: uid("routine"), name: `unterroutine_${state.routines.length}`, kind: "subroutine", visibility: "private", parameters: "", algorithm: [], flowComments: [] };
+        node.routineId = (target || autoRoutine).id;
+    }
     let destination;
     let index;
     if (branch === "after") {
@@ -164,8 +242,10 @@ function completeBranchInsert(branch) {
         index = destination.length;
     }
     commit(() => {
+        if (autoRoutine) state.routines.push(autoRoutine);
         destination.splice(index, 0, node);
         selection = { kind: "node", id: node.id };
+        selectedNodeIds = new Set([node.id]);
         branchTarget = null;
     }, "Baustein eingefügt");
     pendingNodeType = null;
@@ -231,31 +311,76 @@ function createRelation() {
     return true;
 }
 
+function addRoutine() {
+    const count = state.routines.length;
+    const routine = { id: uid("routine"), name: `unterroutine_${count}`, kind: "subroutine", visibility: "private", parameters: "", algorithm: [], flowComments: [] };
+    commit(() => {
+        state.routines.push(routine);
+        state.activeRoutineId = routine.id;
+        resetSelection();
+    }, "Unterroutine angelegt");
+}
+
+function deleteActiveRoutine() {
+    if (state.routines.length === 1) {
+        toast("Die einzige Hauptroutine kann nicht gelöscht werden.");
+        return;
+    }
+    const routine = activeRoutine();
+    if (!confirm(`Routine „${routine.name}“ wirklich löschen?`)) return;
+    commit(() => {
+        state.routines = state.routines.filter(item => item.id !== routine.id);
+        if (!state.routines.some(item => item.kind === "main")) state.routines[0].kind = "main";
+        state.activeRoutineId = state.routines[0].id;
+        resetSelection();
+    }, "Routine gelöscht");
+}
+
 function deleteSelection() {
     if (!selection) return;
     commit(() => {
         if (selection.kind === "node") {
-            const found = locateNode(selection.id);
-            if (found) found.container.splice(found.index, 1);
+            const ids = selectedNodeIds.size ? [...selectedNodeIds] : [selection.id];
+            const locations = ids.map(locateNode).filter(Boolean).sort((a, b) => b.index - a.index);
+            for (const found of locations) {
+                if (found.container[found.index]?.id === found.node.id) found.container.splice(found.index, 1);
+                else {
+                    const currentIndex = found.container.findIndex(node => node.id === found.node.id);
+                    if (currentIndex >= 0) found.container.splice(currentIndex, 1);
+                }
+            }
         } else if (selection.kind === "class") {
             state.classes = state.classes.filter(item => item.id !== selection.id);
             state.relations = state.relations.filter(item => item.from !== selection.id && item.to !== selection.id);
         } else if (selection.kind === "relation") {
             state.relations = state.relations.filter(item => item.id !== selection.id);
+        } else if (selection.kind === "flowComment") {
+            const found = locateFlowComment(selection.id);
+            if (found) found.routine.flowComments = found.routine.flowComments.filter(item => item.id !== selection.id);
         }
-        selection = null;
-        branchTarget = null;
+        resetSelection();
     }, "Auswahl gelöscht");
 }
 
 function moveSelection(direction) {
     if (selection?.kind !== "node") return;
-    const found = locateNode(selection.id);
-    if (!found) return;
-    const target = found.index + direction;
-    if (target < 0 || target >= found.container.length) return;
+    const locations = [...selectedNodeIds].map(locateNode).filter(Boolean);
+    if (!locations.length) return;
+    const sameContainer = locations.every(item => item.container === locations[0].container);
+    if (!sameContainer) { toast("Pfeilverschiebung ist nur innerhalb eines Bereichs möglich."); return; }
+    const container = locations[0].container;
+    const indexes = locations.map(item => container.findIndex(node => node.id === item.node.id)).sort((a, b) => a - b);
+    if ((direction < 0 && indexes[0] === 0) || (direction > 0 && indexes[indexes.length - 1] === container.length - 1)) return;
     commit(() => {
-        [found.container[found.index], found.container[target]] = [found.container[target], found.container[found.index]];
+        if (direction < 0) {
+            const before = container[indexes[0] - 1];
+            container.splice(indexes[0] - 1, 1);
+            container.splice(indexes[indexes.length - 1], 0, before);
+        } else {
+            const after = container[indexes[indexes.length - 1] + 1];
+            container.splice(indexes[indexes.length - 1] + 1, 1);
+            container.splice(indexes[0], 0, after);
+        }
     });
 }
 
@@ -267,6 +392,11 @@ function nodeText(node) {
         case "if": return node.condition;
         case "while": return `solange ${node.condition}`;
         case "for": return `${node.variable} = ${node.start} … ${node.end}`;
+        case "call": {
+            const routine = state.routines.find(item => item.id === node.routineId);
+            const call = `${routine?.name || "Unterroutine"}(${node.arguments || ""})`;
+            return node.assignTo ? `${node.assignTo} ← ${call}` : call;
+        }
         case "return": return `Rückgabe ${node.expression}`;
         case "comment": return node.text;
         default: return node.type;
@@ -274,26 +404,27 @@ function nodeText(node) {
 }
 
 function typeLabel(type) {
-    return ({ process: "Verarbeitung", input: "Eingabe", output: "Ausgabe", if: "Verzweigung", while: "Solange-Schleife", for: "Zählschleife", return: "Rückgabe", comment: "Kommentar" })[type] || type;
+    return ({ process: "Verarbeitung", input: "Eingabe", output: "Ausgabe", if: "Verzweigung", while: "Solange-Schleife", for: "Zählschleife", call: "Unterroutinenaufruf", return: "Rückgabe", comment: "Kommentar" })[type] || type;
 }
 
 function renderStructogram() {
     const renderSequence = nodes => nodes.length ? nodes.map(renderNode).join("") : '<div class="empty-branch">Baustein hinzufügen</div>';
     const renderNode = node => {
         const selected = selection?.kind === "node" && selection.id === node.id ? " selected" : "";
+        const multi = selectedNodeIds.has(node.id) ? " multi-selected" : "";
         if (node.type === "if") {
-            return `<div class="struct-block struct-if${selected}" data-node-id="${node.id}"><div class="struct-condition"><span class="block-type">Wenn</span>${escapeHtml(node.condition)}</div><div class="struct-branches"><div class="struct-branch"><div class="branch-label">Dann</div>${renderSequence(node.then)}</div><div class="struct-branch"><div class="branch-label">Sonst</div>${renderSequence(node.else)}</div></div></div>`;
+            return `<div class="struct-block struct-if${selected}${multi}" draggable="true" data-node-id="${node.id}"><div class="struct-condition"><span class="block-type">Wenn</span>${escapeHtml(node.condition)}</div><div class="struct-branches"><div class="struct-branch"><div class="branch-label">Dann</div>${renderSequence(node.then)}</div><div class="struct-branch"><div class="branch-label">Sonst</div>${renderSequence(node.else)}</div></div></div>`;
         }
         if (["while", "for"].includes(node.type)) {
-            return `<div class="struct-block struct-loop${selected}" data-node-id="${node.id}"><div class="loop-header"><span class="block-type">${escapeHtml(typeLabel(node.type))}</span>${escapeHtml(nodeText(node))}</div><div class="loop-body">${renderSequence(node.body)}</div></div>`;
+            return `<div class="struct-block struct-loop${selected}${multi}" draggable="true" data-node-id="${node.id}"><div class="loop-header"><span class="block-type">${escapeHtml(typeLabel(node.type))}</span>${escapeHtml(nodeText(node))}</div><div class="loop-body">${renderSequence(node.body)}</div></div>`;
         }
-        return `<div class="struct-block${node.type === "comment" ? " struct-comment" : ""}${selected}" data-node-id="${node.id}"><span class="block-type">${escapeHtml(typeLabel(node.type))}</span>${escapeHtml(nodeText(node))}</div>`;
+        return `<div class="struct-block${node.type === "comment" ? " struct-comment" : ""}${node.type === "call" ? " struct-call" : ""}${selected}${multi}" draggable="true" data-node-id="${node.id}"><span class="block-type">${escapeHtml(typeLabel(node.type))}</span>${escapeHtml(nodeText(node))}</div>`;
     };
 
-    diagramCanvas.innerHTML = `<div class="structogram"><div class="struct-title">${escapeHtml(state.name)}</div>${renderSequence(state.algorithm)}</div>`;
+    diagramCanvas.innerHTML = `<div class="multi-diagram-grid">${state.routines.map(routine => `<section class="routine-column ${routine.id === state.activeRoutineId ? "active-routine" : ""}" data-routine-id="${routine.id}"><div class="routine-caption">${routine.kind === "main" ? "Hauptalgorithmus" : "Unterroutine"}</div><div class="structogram"><div class="struct-title">${escapeHtml(routine.name)}</div>${renderSequence(routine.algorithm)}</div><div class="drop-at-end" data-drop-routine="${routine.id}">Hier am Ende ablegen</div></section>`).join("")}</div>`;
 }
 
-function renderFlowchart() {
+function buildFlowchart(routine, routineIndex) {
     const placed = [];
     const edges = [];
     const nodeWidth = 210;
@@ -347,14 +478,14 @@ function renderFlowchart() {
 
     const start = { id: "__start", x: 340, y: 20, height: 54 };
     placed.push({ node: { id: "__start", type: "start" }, x: 235, y: 20, width: 210, height: 54 });
-    const result = layoutSequence(state.algorithm, 340, 120, [start]);
+    const result = layoutSequence(routine.algorithm, 340, 120, [start]);
     const endY = Math.max(result.bottom, 150);
     const end = { id: "__end", x: 340, y: endY, height: 54 };
     placed.push({ node: { id: "__end", type: "end" }, x: 235, y: endY, width: 210, height: 54 });
     result.exits.forEach(exit => connect(exit, end));
-    if (!state.algorithm.length) connect(start, end);
+    if (!routine.algorithm.length) connect(start, end);
 
-    const maxX = Math.max(680, ...placed.map(item => item.x + item.width + 50));
+    const maxX = Math.max(680, ...placed.map(item => item.x + item.width + 50), ...routine.flowComments.map(comment => comment.x + 230));
     const minX = Math.min(0, ...placed.map(item => item.x - 50));
     const shift = minX < 0 ? -minX : 0;
     placed.forEach(item => item.x += shift);
@@ -371,18 +502,26 @@ function renderFlowchart() {
         const mid = Math.max(y1 + 24, (y1 + y2) / 2);
         const path = `M ${x1} ${y1} L ${x1} ${mid} L ${x2} ${mid} L ${x2} ${y2}`;
         const label = edge.label ? `<text class="flow-edge-label" x="${x1 + 7}" y="${mid - 5}">${escapeHtml(edge.label)}</text>` : "";
-        return `<path class="flow-edge" d="${path}"></path>${label}`;
+        return `<path class="flow-edge" d="${path}" marker-end="url(#arrow_${routineIndex})"></path>${label}`;
     }).join("");
 
     const nodesHtml = placed.map(item => {
         const id = item.node.id;
         const system = id.startsWith("__");
         const selected = selection?.kind === "node" && selection.id === id ? " selected" : "";
+        const multi = selectedNodeIds.has(id) ? " multi-selected" : "";
         const label = item.node.type === "start" ? "Start" : item.node.type === "end" ? "Ende" : nodeText(item.node);
-        return `<div class="flow-node ${item.node.type}${selected}" ${system ? "" : `data-node-id="${id}"`} style="left:${item.x}px;top:${item.y}px"><span>${escapeHtml(label)}</span></div>`;
+        return `<div class="flow-node ${item.node.type}${selected}${multi}" ${system ? "" : `draggable="true" data-node-id="${id}"`} style="left:${item.x}px;top:${item.y}px"><span>${escapeHtml(label)}</span></div>`;
     }).join("");
+    const commentsHtml = routine.flowComments.map(comment => `<aside class="flow-comment${selection?.kind === "flowComment" && selection.id === comment.id ? " selected" : ""}" data-flow-comment-id="${comment.id}" style="left:${comment.x}px;top:${comment.y}px">${escapeHtml(comment.text)}</aside>`).join("");
+    const flowHeight = Math.max(endY + 130, ...routine.flowComments.map(comment => comment.y + 120));
 
-    diagramCanvas.innerHTML = `<div class="flow-wrap" style="width:${maxX + shift}px;height:${endY + 130}px"><svg class="flow-svg" width="100%" height="100%"><defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#7594aa"></path></marker></defs>${edgeSvg}</svg>${nodesHtml}</div>`;
+    return `<section class="routine-column ${routine.id === state.activeRoutineId ? "active-routine" : ""}" data-routine-id="${routine.id}"><div class="routine-caption">${routine.kind === "main" ? "Hauptalgorithmus" : "Unterroutine"}: ${escapeHtml(routine.name)}</div><div class="flow-wrap" style="width:${maxX + shift}px;height:${flowHeight}px"><svg class="flow-svg" width="100%" height="100%"><defs><marker id="arrow_${routineIndex}" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#7594aa"></path></marker></defs>${edgeSvg}</svg>${nodesHtml}${commentsHtml}</div><div class="drop-at-end" data-drop-routine="${routine.id}">Hier am Ende ablegen</div></section>`;
+}
+
+function renderFlowchart() {
+    diagramCanvas.innerHTML = `<div class="multi-diagram-grid">${state.routines.map(buildFlowchart).join("")}</div>`;
+    bindFlowCommentDrag();
 }
 
 function visibilitySymbol(value) {
@@ -421,6 +560,12 @@ function renderUml() {
 function renderInspector() {
     const empty = $("#emptyInspector");
     if (!selection) {
+        if (state.view !== "uml") {
+            empty.classList.add("hidden");
+            inspector.classList.remove("hidden");
+            renderRoutineInspector();
+            return;
+        }
         empty.classList.remove("hidden");
         inspector.classList.add("hidden");
         return;
@@ -430,7 +575,13 @@ function renderInspector() {
     inspector.classList.remove("hidden");
     if (selection.kind === "node") renderNodeInspector(locateNode(selection.id)?.node);
     else if (selection.kind === "class") renderClassInspector(selectedClass());
+    else if (selection.kind === "flowComment") renderFlowCommentInspector(selectedFlowComment());
     else renderRelationInspector(selectedRelation());
+}
+
+function renderRoutineInspector() {
+    const routine = activeRoutine();
+    inspector.innerHTML = `<div class="form-section"><div class="form-title"><span>${routine.kind === "main" ? "Hauptalgorithmus" : "Unterroutine"}</span><small>Routine</small></div><label><span>Name</span><input data-routine-field="name" value="${escapeHtml(routine.name)}"></label>${routine.kind === "subroutine" ? `<label><span>Sichtbarkeit</span><select data-routine-field="visibility"><option value="private" ${routine.visibility === "private" ? "selected" : ""}>private</option><option value="protected" ${routine.visibility === "protected" ? "selected" : ""}>protected</option><option value="public" ${routine.visibility === "public" ? "selected" : ""}>public</option></select></label><label><span>Parameter</span><input data-routine-field="parameters" value="${escapeHtml(routine.parameters)}" placeholder="wert: int, name: String"></label><small>Parameter werden als <code>name: Typ</code> angegeben und vom Aufrufbaustein mit Argumenten versorgt.</small>` : ""}</div>`;
 }
 
 function field(label, name, value, type = "text", extra = "") {
@@ -449,6 +600,7 @@ function renderNodeInspector(node) {
     if (node.type === "output") content += `${field("Bezeichnung", "label", node.label)}${field("Ausdruck", "expression", node.expression)}`;
     if (["if", "while"].includes(node.type)) content += field("Bedingung", "condition", node.condition);
     if (node.type === "for") content += `${field("Laufvariable", "variable", node.variable)}<div class="inline-fields">${field("Start", "start", node.start)}${field("Ende inkl.", "end", node.end)}</div>${field("Schritt", "step", node.step)}`;
+    if (node.type === "call") content += `<label><span>Zielroutine</span><select name="routineId">${state.routines.map(routine => `<option value="${routine.id}" ${node.routineId === routine.id ? "selected" : ""}>${escapeHtml(routine.name)}</option>`).join("")}</select></label>${field("Argumente", "arguments", node.arguments, "text", 'placeholder="wert, name"')}${field("Ergebnisvariable (optional)", "assignTo", node.assignTo, "text", 'placeholder="ergebnis"')}`;
     if (node.type === "return") content += field("Rückgabewert", "expression", node.expression);
     if (node.type === "comment") content += textarea("Kommentar", "text", node.text);
     content += "</div>";
@@ -469,6 +621,11 @@ function renderRelationInspector(relation) {
     if (!relation) { selection = null; renderInspector(); return; }
     const name = id => state.classes.find(item => item.id === id)?.name || "?";
     inspector.innerHTML = `<div class="form-section"><div class="form-title"><span>UML-Beziehung</span><small>${escapeHtml(name(relation.from))} → ${escapeHtml(name(relation.to))}</small></div><label><span>Typ</span><select name="type">${["association", "inheritance", "aggregation", "composition", "dependency"].map(value => `<option ${relation.type === value ? "selected" : ""}>${value}</option>`).join("")}</select></label>${field("Beschriftung", "label", relation.label)}<div class="inline-fields">${field("Multiplizität von", "fromMultiplicity", relation.fromMultiplicity)}${field("Multiplizität nach", "toMultiplicity", relation.toMultiplicity)}</div></div>`;
+}
+
+function renderFlowCommentInspector(comment) {
+    if (!comment) { resetSelection(); renderInspector(); return; }
+    inspector.innerHTML = `<div class="form-section"><div class="form-title"><span>Freier Kommentar</span><small>Flussdiagramm</small></div>${textarea("Kommentartext", "text", comment.text)}<div class="inline-fields">${field("X-Position", "x", comment.x, "number")}${field("Y-Position", "y", comment.y, "number")}</div><small>Dieser Kommentar dokumentiert den Plan, ist aber nicht mit dem Kontrollfluss verbunden und erzeugt keinen Code.</small></div>`;
 }
 
 function bindUmlDrag() {
@@ -494,6 +651,43 @@ function bindUmlDrag() {
                 element.removeEventListener("pointermove", move);
                 element.removeEventListener("pointerup", up);
                 if (before !== snapshot()) { history.push(before); future = []; }
+                persistLocal();
+                render();
+            };
+            element.addEventListener("pointermove", move);
+            element.addEventListener("pointerup", up);
+        });
+    });
+}
+
+function bindFlowCommentDrag() {
+    $$(".flow-comment", diagramCanvas).forEach(element => {
+        element.addEventListener("pointerdown", event => {
+            if (event.button !== 0) return;
+            event.stopPropagation();
+            const found = locateFlowComment(element.dataset.flowCommentId);
+            if (!found) return;
+            selectedNodeIds.clear();
+            selection = { kind: "flowComment", id: found.comment.id };
+            state.activeRoutineId = found.routine.id;
+            element.classList.add("selected", "dragging");
+            renderInspector();
+            const before = snapshot();
+            const startX = event.clientX;
+            const startY = event.clientY;
+            const originalX = Number(found.comment.x) || 0;
+            const originalY = Number(found.comment.y) || 0;
+            element.setPointerCapture(event.pointerId);
+            const move = moveEvent => {
+                found.comment.x = Math.max(0, originalX + (moveEvent.clientX - startX) / zoomLevel);
+                found.comment.y = Math.max(0, originalY + (moveEvent.clientY - startY) / zoomLevel);
+                element.style.left = `${found.comment.x}px`;
+                element.style.top = `${found.comment.y}px`;
+            };
+            const up = () => {
+                element.removeEventListener("pointermove", move);
+                element.removeEventListener("pointerup", up);
+                if (before !== snapshot()) { history.push(before); future = []; persistLocal(); }
                 render();
             };
             element.addEventListener("pointermove", move);
@@ -506,10 +700,17 @@ function render() {
     $("#projectName").value = state.name;
     $$(".segment").forEach(button => button.classList.toggle("active", button.dataset.view === state.view));
     const uml = state.view === "uml";
+    document.body.classList.toggle("formal-mode", state.visualStyle === "formal");
+    $("#visualStyle").value = state.visualStyle;
     $("#algorithmPalette").classList.toggle("hidden", uml);
     $("#umlPalette").classList.toggle("hidden", !uml);
+    $$(".flow-only").forEach(element => element.classList.toggle("hidden", state.view !== "flowchart"));
+    $$(".algorithm-only").forEach(element => element.classList.toggle("hidden", uml));
+    $("#routineSelect").innerHTML = state.routines.map(routine => `<option value="${routine.id}" ${routine.id === state.activeRoutineId ? "selected" : ""}>${escapeHtml(routine.name)}</option>`).join("");
+    $("#routineName").value = activeRoutine()?.name || "";
+    $("#deleteRoutineBtn").disabled = uml || state.routines.length === 1;
     $("#viewLabel").textContent = ({ structogram: "Struktogramm", flowchart: "Flussdiagramm", uml: "UML-Klassendiagramm" })[state.view];
-    $("#canvasLegend").textContent = uml ? "Klassen können mit der Maus verschoben werden. Linien anklicken, um Beziehungen zu bearbeiten." : "Baustein anklicken, um ihn zu bearbeiten. Die Reihenfolge lässt sich mit den Pfeilen verändern.";
+    $("#canvasLegend").textContent = uml ? "Klassen können mit der Maus verschoben werden. Mausrad zoomt, rechte Maustaste verschiebt die Fläche." : "Strg+Klick wählt mehrere Operationen. Ziehen verschiebt die Auswahl. Mausrad zoomt, rechte Maustaste verschiebt die Fläche.";
     if (state.view === "structogram") renderStructogram();
     else if (state.view === "flowchart") renderFlowchart();
     else renderUml();
@@ -524,35 +725,175 @@ function render() {
 }
 
 function updateInspectorField(target) {
+    if (target.dataset.routineField) {
+        commit(() => { activeRoutine()[target.dataset.routineField] = target.value.trim(); });
+        return;
+    }
     if (!target.name) return;
     const before = snapshot();
     let object = null;
     if (selection?.kind === "node") object = locateNode(selection.id)?.node;
     if (selection?.kind === "class") object = selectedClass();
     if (selection?.kind === "relation") object = selectedRelation();
+    if (selection?.kind === "flowComment") object = selectedFlowComment();
     const memberRow = target.closest("[data-member-id]");
     if (memberRow && object) {
         const collection = memberRow.dataset.memberKind === "attribute" ? object.attributes : object.methods;
         object = collection.find(item => item.id === memberRow.dataset.memberId);
     }
     if (!object) return;
-    object[target.name] = target.type === "checkbox" ? target.checked : target.value;
+    object[target.name] = target.type === "checkbox" ? target.checked : target.type === "number" ? Number(target.value) : target.value;
     history.push(before);
     if (history.length > MAX_HISTORY) history.shift();
     future = [];
+    persistLocal();
     render();
 }
 
-function selectDiagramElement(target) {
+function selectDiagramElement(event) {
+    if (dragInProgress) return;
+    const target = event.target;
     const node = target.closest("[data-node-id]");
+    const flowComment = target.closest("[data-flow-comment-id]");
     const umlClass = target.closest("[data-class-id]");
     const relation = target.closest("[data-relation-id]");
-    if (node) selection = { kind: "node", id: node.dataset.nodeId };
-    else if (umlClass) selection = { kind: "class", id: umlClass.dataset.classId };
-    else if (relation) selection = { kind: "relation", id: relation.dataset.relationId };
-    else return;
+    const routineElement = target.closest("[data-routine-id]");
+    if (flowComment) {
+        selectedNodeIds.clear();
+        selection = { kind: "flowComment", id: flowComment.dataset.flowCommentId };
+        state.activeRoutineId = locateFlowComment(selection.id)?.routine.id || state.activeRoutineId;
+    } else if (node) {
+        const id = node.dataset.nodeId;
+        if (event.ctrlKey || event.metaKey) {
+            if (selectedNodeIds.has(id)) selectedNodeIds.delete(id); else selectedNodeIds.add(id);
+            if (!selectedNodeIds.size) selection = null;
+            else selection = { kind: "node", id: selectedNodeIds.has(id) ? id : [...selectedNodeIds][0] };
+        } else {
+            selection = { kind: "node", id };
+            selectedNodeIds = new Set([id]);
+        }
+        state.activeRoutineId = locateNode(id)?.routine.id || state.activeRoutineId;
+    } else if (umlClass) {
+        selectedNodeIds.clear();
+        selection = { kind: "class", id: umlClass.dataset.classId };
+    } else if (relation) {
+        selectedNodeIds.clear();
+        selection = { kind: "relation", id: relation.dataset.relationId };
+    } else if (routineElement && state.view !== "uml") {
+        state.activeRoutineId = routineElement.dataset.routineId;
+        resetSelection();
+    } else return;
     branchTarget = null;
     render();
+}
+
+function nodeContains(node, targetId) {
+    let found = false;
+    if (node.type === "if") {
+        walkNodes(node.then, child => { if (child.id === targetId) found = true; });
+        walkNodes(node.else, child => { if (child.id === targetId) found = true; });
+    } else if (node.body) walkNodes(node.body, child => { if (child.id === targetId) found = true; });
+    return found;
+}
+
+function orderedMovableNodes() {
+    const result = [];
+    for (const routine of state.routines) {
+        walkNodes(routine.algorithm, node => {
+            if (!selectedNodeIds.has(node.id)) return;
+            let location = locateNode(node.id);
+            let parent = location?.parent;
+            let nestedInSelection = false;
+            while (parent) {
+                if (selectedNodeIds.has(parent.id)) { nestedInSelection = true; break; }
+                parent = locateNode(parent.id)?.parent;
+            }
+            if (!nestedInSelection) result.push(node);
+        });
+    }
+    return result;
+}
+
+function moveSelectedByDrop(targetId, position, targetRoutineId) {
+    const moving = orderedMovableNodes();
+    if (!moving.length) return;
+    const targetLocation = targetId ? locateNode(targetId) : null;
+    if (targetLocation && moving.some(node => node.id === targetId || nodeContains(node, targetId))) {
+        toast("Ein Block kann nicht in sich selbst verschoben werden.");
+        return;
+    }
+    commit(() => {
+        const removals = moving.map(node => locateNode(node.id)).filter(Boolean);
+        const containers = [...new Set(removals.map(item => item.container))];
+        for (const container of containers) {
+            const ids = new Set(removals.filter(item => item.container === container).map(item => item.node.id));
+            for (let index = container.length - 1; index >= 0; index--) if (ids.has(container[index].id)) container.splice(index, 1);
+        }
+        let destination;
+        let insertIndex;
+        if (targetId) {
+            const refreshed = locateNode(targetId);
+            destination = refreshed.container;
+            insertIndex = refreshed.index + (position === "after" ? 1 : 0);
+        } else {
+            const routine = state.routines.find(item => item.id === targetRoutineId) || activeRoutine();
+            destination = routine.algorithm;
+            insertIndex = destination.length;
+        }
+        destination.splice(insertIndex, 0, ...moving);
+        const destinationRoutine = targetId ? locateNode(targetId)?.routine : state.routines.find(item => item.id === targetRoutineId);
+        if (destinationRoutine) state.activeRoutineId = destinationRoutine.id;
+        selection = { kind: "node", id: moving[0].id };
+        selectedNodeIds = new Set(moving.map(node => node.id));
+    }, `${moving.length} Operation${moving.length === 1 ? "" : "en"} verschoben`);
+}
+
+function clearDropIndicators() {
+    $$(".drop-before, .drop-after, .drag-over", diagramCanvas).forEach(element => element.classList.remove("drop-before", "drop-after", "drag-over"));
+}
+
+function initDragAndDrop() {
+    diagramCanvas.addEventListener("dragstart", event => {
+        const element = event.target.closest("[data-node-id]");
+        if (!element || state.view === "uml") return;
+        const id = element.dataset.nodeId;
+        if (!selectedNodeIds.has(id)) {
+            selectedNodeIds = new Set([id]);
+            selection = { kind: "node", id };
+        }
+        dragInProgress = true;
+        event.dataTransfer.effectAllowed = "move";
+        event.dataTransfer.setData("text/plain", [...selectedNodeIds].join(","));
+        requestAnimationFrame(() => element.classList.add("dragging"));
+    });
+    diagramCanvas.addEventListener("dragover", event => {
+        if (!dragInProgress) return;
+        const node = event.target.closest("[data-node-id]");
+        const end = event.target.closest("[data-drop-routine]");
+        if (!node && !end) return;
+        event.preventDefault();
+        clearDropIndicators();
+        if (node) {
+            const position = event.clientY < node.getBoundingClientRect().top + node.getBoundingClientRect().height / 2 ? "before" : "after";
+            node.classList.add(position === "before" ? "drop-before" : "drop-after");
+            node.dataset.dropPosition = position;
+        } else end.classList.add("drag-over");
+    });
+    diagramCanvas.addEventListener("drop", event => {
+        if (!dragInProgress) return;
+        event.preventDefault();
+        const node = event.target.closest("[data-node-id]");
+        const end = event.target.closest("[data-drop-routine]");
+        if (node) moveSelectedByDrop(node.dataset.nodeId, node.dataset.dropPosition || "after", null);
+        else if (end) moveSelectedByDrop(null, "after", end.dataset.dropRoutine);
+        clearDropIndicators();
+        setTimeout(() => { dragInProgress = false; }, 0);
+    });
+    diagramCanvas.addEventListener("dragend", () => {
+        clearDropIndicators();
+        $$(".dragging", diagramCanvas).forEach(element => element.classList.remove("dragging"));
+        setTimeout(() => { dragInProgress = false; }, 0);
+    });
 }
 
 function serializeAndDownload(content, filename, type) {
@@ -565,8 +906,24 @@ function serializeAndDownload(content, filename, type) {
 }
 
 function normalizedImportedState(value) {
-    if (!value || typeof value !== "object" || !Array.isArray(value.algorithm) || !Array.isArray(value.classes) || !Array.isArray(value.relations)) throw new Error("Ungültiges AlgorithmPlanner-Projekt");
-    return { ...blankState(), ...value, name: String(value.name || "Importiertes Projekt"), view: ["structogram", "flowchart", "uml"].includes(value.view) ? value.view : "structogram" };
+    if (!value || typeof value !== "object" || !Array.isArray(value.classes) || !Array.isArray(value.relations)) throw new Error("Ungültiges AlgorithmPlanner-Projekt");
+    const base = blankState();
+    let routines;
+    if (Array.isArray(value.routines) && value.routines.length) {
+        routines = value.routines.map((routine, index) => ({
+            id: String(routine.id || uid("routine")),
+            name: String(routine.name || (index ? `unterroutine_${index}` : "algorithm")),
+            kind: index === 0 || routine.kind === "main" ? "main" : "subroutine",
+            visibility: routine.visibility || (index ? "private" : "public"),
+            parameters: String(routine.parameters || ""),
+            algorithm: Array.isArray(routine.algorithm) ? routine.algorithm : [],
+            flowComments: Array.isArray(routine.flowComments) ? routine.flowComments : []
+        }));
+    } else if (Array.isArray(value.algorithm)) {
+        routines = [{ id: base.activeRoutineId, name: "algorithm", kind: "main", visibility: "public", parameters: "", algorithm: value.algorithm, flowComments: [] }];
+    } else throw new Error("Das Projekt enthält keinen Algorithmus.");
+    const activeRoutineId = routines.some(routine => routine.id === value.activeRoutineId) ? value.activeRoutineId : routines[0].id;
+    return { ...base, ...value, version: 2, name: String(value.name || "Importiertes Projekt"), view: ["structogram", "flowchart", "uml"].includes(value.view) ? value.view : "structogram", visualStyle: ["neon", "formal"].includes(value.visualStyle) ? value.visualStyle : "neon", routines, activeRoutineId };
 }
 
 function loadExample() {
@@ -585,26 +942,27 @@ function loadExample() {
         const valid = defaults.output(); valid.expression = '"Gültige Note"';
         const invalid = defaults.output(); invalid.expression = '"Ungültige Eingabe"';
         decision.then.push(valid); decision.else.push(invalid);
-        example.algorithm = [input, decision];
+        example.routines[0].algorithm = [input, decision];
     }
-    commit(() => { state = example; selection = null; branchTarget = null; }, "Beispiel geladen");
+    commit(() => { state = example; resetSelection(); }, "Beispiel geladen");
 }
 
 function initEvents() {
     $$("[data-view]").forEach(button => button.addEventListener("click", () => {
         state.view = button.dataset.view;
-        selection = null;
-        branchTarget = null;
+        resetSelection();
+        persistLocal();
         render();
     }));
     $$("[data-add]").forEach(button => button.addEventListener("click", () => addAlgorithmNode(button.dataset.add)));
+    $("#addFlowCommentBtn").addEventListener("click", addFlowComment);
     $$("[data-uml-add]").forEach(button => button.addEventListener("click", () => {
         const action = button.dataset.umlAdd;
         if (action === "class") addClass();
         else if (action === "relation") openRelationDialog();
         else addClassMember(action);
     }));
-    diagramCanvas.addEventListener("click", event => selectDiagramElement(event.target));
+    diagramCanvas.addEventListener("click", selectDiagramElement);
     inspector.addEventListener("change", event => updateInspectorField(event.target));
     inspector.addEventListener("click", event => {
         const branch = event.target.closest("[data-branch]");
@@ -632,16 +990,26 @@ function initEvents() {
         if (button.dataset.tab === "code") renderCode();
     }));
     $("#projectName").addEventListener("change", event => commit(() => { state.name = event.target.value.trim() || "Mein Programm"; }));
+    $("#routineSelect").addEventListener("change", event => {
+        state.activeRoutineId = event.target.value;
+        resetSelection();
+        persistLocal();
+        render();
+    });
+    $("#routineName").addEventListener("change", event => commit(() => { activeRoutine().name = event.target.value.trim() || "routine"; }));
+    $("#addRoutineBtn").addEventListener("click", addRoutine);
+    $("#deleteRoutineBtn").addEventListener("click", deleteActiveRoutine);
+    $("#visualStyle").addEventListener("change", event => commit(() => { state.visualStyle = event.target.value; }));
     $("#undoBtn").addEventListener("click", undo);
     $("#redoBtn").addEventListener("click", redo);
     $("#moveUpBtn").addEventListener("click", () => moveSelection(-1));
     $("#moveDownBtn").addEventListener("click", () => moveSelection(1));
     $("#deleteBtn").addEventListener("click", deleteSelection);
     $("#newBtn").addEventListener("click", () => {
-        if (confirm("Das aktuelle Modell verwerfen und neu beginnen?")) commit(() => { state = blankState(); selection = null; }, "Neues Projekt angelegt");
+        if (confirm("Das aktuelle Modell verwerfen und neu beginnen?")) commit(() => { state = blankState(); resetSelection(); }, "Neues Projekt angelegt");
     });
     $("#exampleBtn").addEventListener("click", loadExample);
-    $("#saveBtn").addEventListener("click", () => { localStorage.setItem(STORAGE_KEY, snapshot()); toast("Projekt lokal gespeichert"); });
+    $("#saveBtn").addEventListener("click", () => persistLocal(true));
     $("#exportBtn").addEventListener("click", () => serializeAndDownload(JSON.stringify(state, null, 2), `${safeFileName(state.name)}.algorithm-planner.json`, "application/json"));
     $("#importBtn").addEventListener("click", () => $("#importFile").click());
     $("#importFile").addEventListener("change", async event => {
@@ -649,7 +1017,7 @@ function initEvents() {
         if (!file) return;
         try {
             const imported = normalizedImportedState(JSON.parse(await file.text()));
-            commit(() => { state = imported; selection = null; }, "Projekt importiert");
+            commit(() => { state = imported; resetSelection(); }, "Projekt importiert");
         } catch (error) { toast(error.message); }
         event.target.value = "";
     });
@@ -664,7 +1032,8 @@ function initEvents() {
         const baseName = language === "java" && state.view !== "uml" ? className(state.name) : safeFileName(state.name);
         serializeAndDownload($("#codeOutput").textContent, `${baseName}.${extensions[language]}`, "text/plain;charset=utf-8");
     });
-    $("#fitBtn").addEventListener("click", () => { $("#canvasScroll").scrollTo({ left: 0, top: 0, behavior: "smooth" }); });
+    $("#fitBtn").addEventListener("click", fitCanvas);
+    $("#pdfBtn").addEventListener("click", () => window.print());
     $("#helpBtn").addEventListener("click", () => $("#helpDialog").showModal());
     $("#branchDialog").addEventListener("close", event => { if (["then", "else", "after"].includes(event.target.returnValue)) completeBranchInsert(event.target.returnValue); else pendingNodeType = null; });
     $("#createRelationBtn").addEventListener("click", event => { event.preventDefault(); if (createRelation()) $("#relationDialog").close(); });
@@ -672,6 +1041,68 @@ function initEvents() {
         if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "z") { event.preventDefault(); event.shiftKey ? redo() : undo(); }
         if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "y") { event.preventDefault(); redo(); }
         if (event.key === "Delete" && !["INPUT", "TEXTAREA", "SELECT"].includes(document.activeElement.tagName)) deleteSelection();
+    });
+    initDragAndDrop();
+    initCanvasNavigation();
+}
+
+function applyZoom(nextZoom, clientX = null, clientY = null) {
+    const scroll = $("#canvasScroll");
+    const previous = zoomLevel;
+    const next = Math.max(.35, Math.min(2.25, nextZoom));
+    if (Math.abs(next - previous) < .001) return;
+    const rect = scroll.getBoundingClientRect();
+    const localX = clientX == null ? scroll.clientWidth / 2 : clientX - rect.left;
+    const localY = clientY == null ? scroll.clientHeight / 2 : clientY - rect.top;
+    const contentX = (scroll.scrollLeft + localX) / previous;
+    const contentY = (scroll.scrollTop + localY) / previous;
+    zoomLevel = next;
+    diagramCanvas.style.zoom = String(zoomLevel);
+    scroll.scrollLeft = contentX * next - localX;
+    scroll.scrollTop = contentY * next - localY;
+    $("#zoomLabel").textContent = `${Math.round(zoomLevel * 100)} %`;
+}
+
+function fitCanvas() {
+    const scroll = $("#canvasScroll");
+    diagramCanvas.style.zoom = "1";
+    zoomLevel = 1;
+    const width = Math.max(1, diagramCanvas.scrollWidth);
+    const height = Math.max(1, diagramCanvas.scrollHeight);
+    const target = Math.min(1, (scroll.clientWidth - 24) / width, (scroll.clientHeight - 24) / height);
+    applyZoom(Math.max(.35, target), scroll.getBoundingClientRect().left, scroll.getBoundingClientRect().top);
+    scroll.scrollTo({ left: 0, top: 0, behavior: "smooth" });
+}
+
+function initCanvasNavigation() {
+    const scroll = $("#canvasScroll");
+    scroll.addEventListener("wheel", event => {
+        event.preventDefault();
+        applyZoom(zoomLevel * (event.deltaY < 0 ? 1.1 : .9), event.clientX, event.clientY);
+    }, { passive: false });
+    scroll.addEventListener("contextmenu", event => event.preventDefault());
+    scroll.addEventListener("pointerdown", event => {
+        if (event.button !== 2) return;
+        event.preventDefault();
+        const startX = event.clientX;
+        const startY = event.clientY;
+        const left = scroll.scrollLeft;
+        const top = scroll.scrollTop;
+        scroll.classList.add("panning");
+        scroll.setPointerCapture(event.pointerId);
+        const move = moveEvent => {
+            scroll.scrollLeft = left - (moveEvent.clientX - startX);
+            scroll.scrollTop = top - (moveEvent.clientY - startY);
+        };
+        const stop = () => {
+            scroll.classList.remove("panning");
+            scroll.removeEventListener("pointermove", move);
+            scroll.removeEventListener("pointerup", stop);
+            scroll.removeEventListener("pointercancel", stop);
+        };
+        scroll.addEventListener("pointermove", move);
+        scroll.addEventListener("pointerup", stop);
+        scroll.addEventListener("pointercancel", stop);
     });
 }
 
@@ -702,6 +1133,14 @@ function variableName(value, language) {
     return name;
 }
 
+function routineFunctionName(value, language = "") {
+    let name = String(value || "routine").replace(/[^a-zA-Z0-9_]/g, "_").replace(/^_+|_+$/g, "") || "routine";
+    if (/^\d/.test(name)) name = `routine_${name}`;
+    if (language === "csharp") name = name.charAt(0).toUpperCase() + name.slice(1);
+    if (language === "prolog") name = name.charAt(0).toLowerCase() + name.slice(1);
+    return name;
+}
+
 function expression(value, language) {
     let result = String(value || "").trim();
     if (language === "python") result = result.replace(/&&/g, " and ").replace(/\|\|/g, " or ").replace(/!([^=])/g, "not $1").replace(/\btrue\b/gi, "True").replace(/\bfalse\b/gi, "False");
@@ -712,7 +1151,7 @@ function expression(value, language) {
 function generateImperative(language) {
     const warnings = [];
     let helpers = [];
-    const declared = new Set();
+    let declared = new Set();
     const types = {
         java: { int: "int", float: "double", string: "String", boolean: "boolean" },
         csharp: { int: "int", float: "double", string: "string", boolean: "bool" },
@@ -750,6 +1189,16 @@ function generateImperative(language) {
                 output.push(`${indent(level)}${code.replace(/;?\s*$/, ";")}`);
             }
             if (node.type === "input") output.push(inputLine(node, level));
+            if (node.type === "call") {
+                const target = state.routines.find(routine => routine.id === node.routineId);
+                const call = `${routineFunctionName(target?.name || "routine", language)}(${node.arguments || ""})`;
+                if (node.assignTo) {
+                    const name = variableName(node.assignTo, language);
+                    const declaration = declared.has(name) ? "" : `${language === "cpp" ? "auto" : "var"} `;
+                    declared.add(name);
+                    output.push(`${indent(level)}${declaration}${name} = ${call};`);
+                } else output.push(`${indent(level)}${call};`);
+            }
             if (node.type === "output") {
                 const call = language === "java" ? "System.out.println" : language === "csharp" ? "Console.WriteLine" : "std::cout << ";
                 output.push(language === "cpp" ? `${indent(level)}${call}${expression(node.expression, language)} << std::endl;` : `${indent(level)}${call}(${expression(node.expression, language)});`);
@@ -779,12 +1228,48 @@ function generateImperative(language) {
         return output.join("\n");
     }
 
-    const body = lines(state.algorithm, 2) || `${indent(2)}// TODO: Algorithmus modellieren`;
-    const hasReturn = (() => { let found = false; walkNodes(state.algorithm, node => { if (node.type === "return") found = true; }); return found; })();
     const name = className(state.name);
-    if (language === "java") return { code: `import java.util.Scanner;\n\npublic class ${name} {\n    public static Object algorithm() {\n        Scanner scanner = new Scanner(System.in);\n${body}\n${hasReturn ? "" : "        return null;\n"}    }\n\n    public static void main(String[] args) {\n        algorithm();\n    }\n}\n`, warnings };
-    if (language === "csharp") return { code: `using System;\n\npublic static class ${name}\n{\n    public static object? Algorithm()\n    {\n${body}\n${hasReturn ? "" : "        return null;\n"}    }\n\n    public static void Main()\n    {\n        Algorithm();\n    }\n}\n`, warnings };
-    if (language === "cpp") return { code: `#include <any>\n#include <iostream>\n#include <string>\n\nstd::any algorithm() {\n${body.replace(/^        /gm, "    ")}\n${hasReturn ? "" : "    return {};\n"}}\n\nint main() {\n    algorithm();\n    return 0;\n}\n`, warnings };
+    const hasReturn = routine => { let found = false; walkNodes(routine.algorithm, node => { if (node.type === "return") found = true; }); return found; };
+    if (language === "java") {
+        const methods = state.routines.map(routine => {
+            declared = new Set();
+            const parsedParameters = parseParameters(routine.parameters);
+            parsedParameters.forEach(parameter => declared.add(variableName(parameter.name, "java")));
+            const body = lines(routine.algorithm, 2) || `${indent(2)}// TODO: Algorithmus modellieren`;
+            const parameters = parsedParameters.map(parameter => `${mapType(parameter.type, "java")} ${variableName(parameter.name, "java")}`).join(", ");
+            const visibility = routine.kind === "main" ? "public" : routine.visibility || "private";
+            return `    ${visibility} static Object ${routineFunctionName(routine.name)}(${parameters}) {\n        Scanner scanner = new Scanner(System.in);\n${body}\n${hasReturn(routine) ? "" : "        return null;\n"}    }`;
+        }).join("\n\n");
+        return { code: `import java.util.Scanner;\n\npublic class ${name} {\n${methods}\n\n    public static void main(String[] args) {\n        ${routineFunctionName(state.routines.find(item => item.kind === "main")?.name)}();\n    }\n}\n`, warnings };
+    }
+    if (language === "csharp") {
+        const methods = state.routines.map(routine => {
+            declared = new Set();
+            const parsedParameters = parseParameters(routine.parameters);
+            parsedParameters.forEach(parameter => declared.add(variableName(parameter.name, "csharp")));
+            const body = lines(routine.algorithm, 2) || `${indent(2)}// TODO: Algorithmus modellieren`;
+            const parameters = parsedParameters.map(parameter => `${mapType(parameter.type, "csharp")} ${variableName(parameter.name, "csharp")}`).join(", ");
+            const requestedVisibility = routine.kind === "main" ? "public" : routine.visibility || "private";
+            const visibility = requestedVisibility === "protected" ? "private" : requestedVisibility;
+            return `    ${visibility} static object? ${routineFunctionName(routine.name, "csharp")}(${parameters})\n    {\n${body}\n${hasReturn(routine) ? "" : "        return null;\n"}    }`;
+        }).join("\n\n");
+        return { code: `using System;\n\npublic static class ${name}\n{\n${methods}\n\n    public static void Main()\n    {\n        ${routineFunctionName(state.routines.find(item => item.kind === "main")?.name, "csharp")}();\n    }\n}\n`, warnings };
+    }
+    if (language === "cpp") {
+        const declarations = state.routines.map(routine => {
+            const parameters = parseParameters(routine.parameters).map(parameter => `${mapType(parameter.type, "cpp")} ${variableName(parameter.name, "cpp")}`).join(", ");
+            return `${routine.kind === "subroutine" && routine.visibility === "private" ? "static " : ""}std::any ${routineFunctionName(routine.name)}(${parameters});`;
+        }).join("\n");
+        const functions = state.routines.map(routine => {
+            declared = new Set();
+            const parsedParameters = parseParameters(routine.parameters);
+            parsedParameters.forEach(parameter => declared.add(variableName(parameter.name, "cpp")));
+            const body = (lines(routine.algorithm, 2) || `${indent(2)}// TODO: Algorithmus modellieren`).replace(/^        /gm, "    ");
+            const parameters = parsedParameters.map(parameter => `${mapType(parameter.type, "cpp")} ${variableName(parameter.name, "cpp")}`).join(", ");
+            return `${routine.kind === "subroutine" && routine.visibility === "private" ? "static " : ""}std::any ${routineFunctionName(routine.name)}(${parameters}) {\n${body}\n${hasReturn(routine) ? "" : "    return {};\n"}}`;
+        }).join("\n\n");
+        return { code: `#include <any>\n#include <iostream>\n#include <string>\n\n${declarations}\n\n${functions}\n\nint main() {\n    ${routineFunctionName(state.routines.find(item => item.kind === "main")?.name)}();\n    return 0;\n}\n`, warnings };
+    }
     return { code: helpers.join("\n"), warnings };
 }
 
@@ -800,6 +1285,11 @@ function generatePython() {
                 const converted = node.dataType === "string" ? call : node.dataType === "boolean" ? `${call}.strip().lower() in ("true", "1", "ja", "yes")` : `${casts[node.dataType] || "str"}(${call})`;
                 output.push(`${indent(level)}${variableName(node.variable, "python")} = ${converted}`);
             }
+            if (node.type === "call") {
+                const target = state.routines.find(routine => routine.id === node.routineId);
+                const call = `${routineFunctionName(target?.name || "routine")}(${node.arguments || ""})`;
+                output.push(`${indent(level)}${node.assignTo ? `${variableName(node.assignTo, "python")} = ` : ""}${call}`);
+            }
             if (node.type === "output") output.push(`${indent(level)}print(${expression(node.expression, "python")})`);
             if (node.type === "if") {
                 output.push(`${indent(level)}if ${expression(node.condition, "python")}:`);
@@ -812,11 +1302,13 @@ function generatePython() {
         }
         return output.join("\n");
     }
-    return { code: `def algorithm():\n${lines(state.algorithm, 1) || "    pass"}\n\n\nif __name__ == "__main__":\n    algorithm()\n`, warnings: [] };
+    const functions = state.routines.map(routine => `def ${routineFunctionName(routine.name)}(${parseParameters(routine.parameters).map(parameter => variableName(parameter.name, "python")).join(", ")}):\n${lines(routine.algorithm, 1) || "    pass"}`).join("\n\n\n");
+    const main = state.routines.find(routine => routine.kind === "main") || state.routines[0];
+    return { code: `${functions}\n\n\nif __name__ == "__main__":\n    ${routineFunctionName(main.name)}()\n`, warnings: [] };
 }
 
 function generateJavaScript() {
-    const declared = new Set();
+    let declared = new Set();
     function lines(nodes, level) {
         const output = [];
         for (const node of nodes) {
@@ -834,6 +1326,16 @@ function generateJavaScript() {
                 declared.add(name);
                 output.push(`${indent(level)}const ${name} = ${convert};`);
             }
+            if (node.type === "call") {
+                const target = state.routines.find(routine => routine.id === node.routineId);
+                const call = `${routineFunctionName(target?.name || "routine")}(${node.arguments || ""})`;
+                if (node.assignTo) {
+                    const name = variableName(node.assignTo, "javascript");
+                    const declaration = declared.has(name) ? "" : "let ";
+                    declared.add(name);
+                    output.push(`${indent(level)}${declaration}${name} = ${call};`);
+                } else output.push(`${indent(level)}${call};`);
+            }
             if (node.type === "output") output.push(`${indent(level)}console.log(${node.expression});`);
             if (node.type === "if") { output.push(`${indent(level)}if (${node.condition}) {`); output.push(node.then.length ? lines(node.then, level + 1) : `${indent(level + 1)}// TODO`); if (node.else.length) { output.push(`${indent(level)}} else {`); output.push(lines(node.else, level + 1)); } output.push(`${indent(level)}}`); }
             if (node.type === "while") { output.push(`${indent(level)}while (${node.condition}) {`); output.push(node.body.length ? lines(node.body, level + 1) : `${indent(level + 1)}// TODO: Schleifeninhalt`); output.push(`${indent(level)}}`); }
@@ -842,7 +1344,14 @@ function generateJavaScript() {
         }
         return output.join("\n");
     }
-    return { code: `function algorithm() {\n${lines(state.algorithm, 1) || "    // TODO: Algorithmus modellieren"}\n}\n\nalgorithm();\n`, warnings: ["Eingaben verwenden prompt() und sind für eine Browserumgebung ausgelegt."] };
+    const functions = state.routines.map(routine => {
+        declared = new Set();
+        const parameters = parseParameters(routine.parameters).map(parameter => variableName(parameter.name, "javascript"));
+        parameters.forEach(parameter => declared.add(parameter));
+        return `function ${routineFunctionName(routine.name)}(${parameters.join(", ")}) {\n${lines(routine.algorithm, 1) || "    // TODO: Algorithmus modellieren"}\n}`;
+    }).join("\n\n");
+    const main = state.routines.find(routine => routine.kind === "main") || state.routines[0];
+    return { code: `${functions}\n\n${routineFunctionName(main.name)}();\n`, warnings: ["Eingaben verwenden prompt() und sind für eine Browserumgebung ausgelegt."] };
 }
 
 function prologExpression(value) {
@@ -861,6 +1370,12 @@ function generateProlog() {
                 output.push(`${indent(level)}${match ? `${variableName(match[1], "prolog")} is ${prologExpression(match[2])}` : `% TODO: ${node.code}`},`);
             }
             if (node.type === "input") output.push(`${indent(level)}write(${JSON.stringify(node.prompt || "Eingabe:")}), read(${variableName(node.variable, "prolog")}),`);
+            if (node.type === "call") {
+                const target = state.routines.find(routine => routine.id === node.routineId);
+                const argumentsList = String(node.arguments || "").split(",").map(value => value.trim()).filter(Boolean).map(prologExpression);
+                const result = node.assignTo ? variableName(node.assignTo, "prolog") : "_";
+                output.push(`${indent(level)}${routineFunctionName(target?.name || "routine", "prolog")}(${[...argumentsList, result].join(", ")}),`);
+            }
             if (node.type === "output") output.push(`${indent(level)}writeln(${prologExpression(node.expression)}),`);
             if (node.type === "if") output.push(`${indent(level)}(${prologExpression(node.condition)} ->\n${goals(node.then, level + 1)}\n${indent(level)};\n${goals(node.else, level + 1)}\n${indent(level)}),`);
             if (node.type === "while") {
@@ -873,9 +1388,14 @@ function generateProlog() {
         }
         return output.join("\n");
     }
-    let body = goals(state.algorithm, 1);
-    body = body ? `${body}\n    true` : "    true";
-    return { code: `:- initialization(main, main).\n\nalgorithm(Result) :-\n${body}.\n\nmain :-\n    algorithm(Result),\n    (var(Result) -> true ; format("Ergebnis: ~w~n", [Result])).\n${helpers.length ? `\n${helpers.join("\n\n")}\n` : ""}`, warnings: ["Prolog besitzt ein anderes Ausführungsmodell. Zuweisungen werden als arithmetische is/2-Ausdrücke und Schleifen als Hilfsprädikate erzeugt."] };
+    const predicates = state.routines.map(routine => {
+        let body = goals(routine.algorithm, 1);
+        body = body ? `${body}\n    true` : "    true";
+        const parameters = parseParameters(routine.parameters).map(parameter => variableName(parameter.name, "prolog"));
+        return `${routineFunctionName(routine.name, "prolog")}(${[...parameters, "Result"].join(", ")}) :-\n${body}.`;
+    }).join("\n\n");
+    const mainRoutine = state.routines.find(routine => routine.kind === "main") || state.routines[0];
+    return { code: `:- initialization(main, main).\n\n${predicates}\n\nmain :-\n    ${routineFunctionName(mainRoutine.name, "prolog")}(Result),\n    (var(Result) -> true ; format("Ergebnis: ~w~n", [Result])).\n${helpers.length ? `\n${helpers.join("\n\n")}\n` : ""}`, warnings: ["Prolog besitzt ein anderes Ausführungsmodell. Zuweisungen werden als arithmetische is/2-Ausdrücke und Schleifen als Hilfsprädikate erzeugt."] };
 }
 
 function parseParameters(text) {

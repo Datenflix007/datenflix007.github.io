@@ -19,8 +19,9 @@
             <span><strong>AlgorithmPlanner</strong><small>Visuell planen. Verständlich programmieren.</small></span>
         </a>
         <div class="header-actions">
+            <span class="storage-status" id="storageStatus" title="Automatisch im localStorage dieses Browsers gespeichert">Automatisch lokal</span>
             <button class="btn btn-ghost" id="helpBtn" type="button">Kurzhilfe</button>
-            <button class="btn btn-primary" id="saveBtn" type="button">Lokal speichern</button>
+            <button class="btn btn-primary" id="saveBtn" type="button">Jetzt speichern</button>
         </div>
     </header>
 
@@ -43,7 +44,7 @@
                 <button class="btn btn-ghost" id="exampleBtn" type="button">Beispiel</button>
                 <button class="btn btn-ghost" id="newBtn" type="button">Neu</button>
                 <button class="btn btn-ghost" id="importBtn" type="button">Import</button>
-                <button class="btn btn-ghost" id="exportBtn" type="button">JSON exportieren</button>
+                <button class="btn btn-ghost" id="exportBtn" type="button">Als .json herunterladen</button>
                 <input id="importFile" type="file" accept="application/json,.json" hidden>
             </div>
         </section>
@@ -61,8 +62,10 @@
                     <button class="palette-item" data-add="if" type="button"><span class="shape decision-shape"></span><span><strong>Verzweigung</strong><small>Wenn / Sonst</small></span></button>
                     <button class="palette-item" data-add="while" type="button"><span class="shape loop-shape">↻</span><span><strong>Solange-Schleife</strong><small>While-Bedingung</small></span></button>
                     <button class="palette-item" data-add="for" type="button"><span class="shape loop-shape">#</span><span><strong>Zählschleife</strong><small>Start, Ende, Schritt</small></span></button>
+                    <button class="palette-item" data-add="call" type="button"><span class="shape call-shape">⇢</span><span><strong>Unterroutine</strong><small>Algorithmus aufrufen</small></span></button>
                     <button class="palette-item" data-add="return" type="button"><span class="shape return-shape">↩</span><span><strong>Rückgabe</strong><small>Ergebnis zurückgeben</small></span></button>
                     <button class="palette-item" data-add="comment" type="button"><span class="shape comment-shape">//</span><span><strong>Kommentar</strong><small>Modell dokumentieren</small></span></button>
+                    <button class="palette-item flow-only hidden" id="addFlowCommentBtn" type="button"><span class="shape note-shape">✎</span><span><strong>Freier Kommentar</strong><small>Losgelöst platzieren</small></span></button>
                 </div>
 
                 <div id="umlPalette" class="palette-list hidden">
@@ -80,22 +83,29 @@
 
             <section class="canvas-panel" aria-label="Modellierungsfläche">
                 <div class="canvas-toolbar">
-                    <div>
+                    <div class="canvas-title">
                         <span class="status-dot"></span>
                         <span id="viewLabel">Struktogramm</span>
                     </div>
                     <div class="canvas-actions">
+                        <label class="compact-control algorithm-only"><span>Aktive Routine</span><select id="routineSelect"></select></label>
+                        <label class="compact-control algorithm-only"><span>Routinenname</span><input id="routineName" maxlength="40" value="algorithm"></label>
+                        <button class="icon-btn algorithm-only" id="addRoutineBtn" title="Unterroutine hinzufügen" type="button">+</button>
+                        <button class="icon-btn danger algorithm-only" id="deleteRoutineBtn" title="Aktive Routine löschen" type="button">−</button>
+                        <label class="compact-control"><span>Darstellung</span><select id="visualStyle"><option value="neon">Neon</option><option value="formal">Fachlich</option></select></label>
                         <button class="icon-btn" id="moveUpBtn" title="Nach oben" type="button">↑</button>
                         <button class="icon-btn" id="moveDownBtn" title="Nach unten" type="button">↓</button>
                         <button class="icon-btn danger" id="deleteBtn" title="Auswahl löschen" type="button">×</button>
-                        <button class="btn btn-small btn-ghost" id="fitBtn" type="button">Ansicht zentrieren</button>
+                        <button class="btn btn-small btn-ghost" id="fitBtn" type="button">Einpassen</button>
+                        <span class="zoom-label" id="zoomLabel">100 %</span>
+                        <button class="btn btn-small btn-primary" id="pdfBtn" type="button">PDF / Drucken</button>
                     </div>
                 </div>
                 <div class="canvas-scroll" id="canvasScroll">
                     <div id="diagramCanvas" class="diagram-canvas" tabindex="0"></div>
                 </div>
                 <div class="canvas-legend" id="canvasLegend">
-                    Baustein anklicken, um ihn zu bearbeiten. Bei Verzweigungen kann gezielt in den Dann- oder Sonst-Zweig eingefügt werden.
+                    Strg+Klick wählt mehrere Operationen. Ziehen verschiebt die Auswahl. Mausrad zoomt, rechte Maustaste verschiebt die Arbeitsfläche.
                 </div>
             </section>
 
@@ -170,9 +180,14 @@
                 <li>Wähle oben Struktogramm, Flussdiagramm oder UML-Klassen.</li>
                 <li>Füge links Bausteine hinzu und bearbeite sie rechts im Eigenschaften-Tab.</li>
                 <li>Struktogramm und Flussdiagramm zeigen dasselbe Algorithmusmodell in zwei Darstellungen.</li>
+                <li>Mit „Unterroutine“ rufst du einen anderen Algorithmus mit Argumenten auf; Sichtbarkeit und Parameter bearbeitest du nach Auswahl der Routine.</li>
+                <li>Im Flussdiagramm kannst du freie Kommentare ohne Kontrollflusskante anlegen und beliebig verschieben.</li>
                 <li>Wechsle zum Code-Tab und wähle eine der sechs Zielsprachen.</li>
                 <li>Speichere lokal oder exportiere dein vollständiges Projekt als JSON.</li>
             </ol>
+            <p><strong>Auswahl:</strong> Mit <kbd>Strg</kbd>+Klick wählst du mehrere Operationen. Ziehe eine ausgewählte Operation, um die ganze Auswahl zu verschieben.</p>
+            <p><strong>Navigation:</strong> Das Mausrad zoomt. Mit gedrückter rechter Maustaste verschiebst du den Planungsbereich.</p>
+            <p><strong>Speicherung:</strong> Änderungen werden automatisch im <code>localStorage</code> dieses Browsers gespeichert. Für Gerätewechsel und Backups dient „Als .json herunterladen“.</p>
             <p><strong>Tastatur:</strong> <kbd>Entf</kbd> löscht die Auswahl, <kbd>Strg</kbd>+<kbd>Z</kbd> macht Änderungen rückgängig.</p>
             <div class="modal-actions"><button class="btn btn-primary" value="default">Verstanden</button></div>
         </form>
