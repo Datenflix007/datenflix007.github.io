@@ -8,11 +8,12 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="automata-lab.css">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="program.css">
 </head>
 <body>
   <header class="menubar">
-    <a class="app-title" href="index.html"><span class="app-logo">AL</span><span>AutomataLab<small>Automaten und Berechenbarkeit</small></span></a>
+    <a class="app-title" href="../AlgoDatCourse/index.html"><span class="app-logo">AL</span><span>AutomataLab<small>Automaten und Berechenbarkeit</small></span></a>
     <div class="menu-group">
       <button class="menu-btn" type="button">DATEI</button>
       <div class="dropdown">
@@ -96,6 +97,9 @@
         <div class="sim-input-row">
           <label><span>Eingabewort</span><input id="wordInput" value="001" spellcheck="false"></label>
           <label class="max-steps"><span>Schrittlimit</span><input id="stepLimit" type="number" min="1" max="5000" value="250"></label>
+          <label class="machine-option pda-only hidden"><span>Startkeller (Top links)</span><input id="initialStack" value="□" spellcheck="false"></label>
+          <label class="machine-option tm-only hidden"><span>Startposition Kopf</span><input id="initialHead" type="number" value="0"></label>
+          <label class="speed-option"><span>Tempo</span><select id="simSpeed"><option value="900">Langsam</option><option value="420" selected>Normal</option><option value="140">Schnell</option></select></label>
           <button class="btn" id="simResetBtn" type="button">Reset</button>
           <button class="btn primary" id="simStepBtn" type="button">Einzelschritt</button>
           <button class="btn" id="simPlayBtn" type="button">▶ Abspielen</button>
@@ -107,10 +111,19 @@
     </section>
 
     <aside class="inspector panel">
-      <div class="tabs"><button class="tab active" data-tab="properties" type="button">Eigenschaften</button><button class="tab" data-tab="configs" type="button">Konfigurationen</button><button class="tab" data-tab="log" type="button">Protokoll</button></div>
+      <div class="tabs"><button class="tab active" data-tab="properties" type="button">Eigenschaften</button><button class="tab" data-tab="program" type="button">Programm</button><button class="tab" data-tab="configs" type="button">Konfigurationen</button><button class="tab" data-tab="log" type="button">Protokoll</button></div>
       <div class="tab-pane active" id="propertiesPane">
         <div id="inspectorEmpty" class="empty"><span>◇</span><strong>Nichts ausgewählt</strong><p>Wähle einen Zustand oder Übergang.</p></div>
         <form id="propertyForm" class="property-form hidden"></form>
+      </div>
+      <div class="tab-pane" id="programPane">
+        <div class="program-editor">
+          <div><span class="program-eyebrow">ÜBERGANGSPROGRAMM</span><h3 id="programTitle">DFA-Regeln</h3></div>
+          <p id="programHelp"></p>
+          <textarea id="programEditor" spellcheck="false" aria-label="Übergangsprogramm"></textarea>
+          <div class="program-actions"><button class="btn" id="programRefreshBtn" type="button">Aus Graph übernehmen</button><button class="btn primary" id="programApplyBtn" type="button">Programm anwenden</button></div>
+          <div class="program-diagnostics" id="programDiagnostics">Eine Regel pro Zeile. Zeilen mit # sind Kommentare.</div>
+        </div>
       </div>
       <div class="tab-pane" id="configsPane"><div class="config-list" id="configList"></div></div>
       <div class="tab-pane" id="logPane"><div class="operation-log" id="operationLog"><p>Operationen und Simulationsschritte erscheinen hier.</p></div></div>
@@ -137,6 +150,6 @@
   </dialog>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="automata-lab.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>

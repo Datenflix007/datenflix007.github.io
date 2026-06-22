@@ -11,7 +11,7 @@ const esc = value => String(value ?? "").replace(/[&<>"']/g, char => ({ "&": "&a
 const unique = values => [...new Set(values)];
 
 function newMachine(type = "DFA") {
-  return { version: 1, type, name: `Neuer ${type}`, alphabet: ["0", "1"], stackAlphabet: ["A", "□"], blank: "□", acceptance: "final", states: [], transitions: [] };
+  return { version: 1, type, name: `Neuer ${type}`, alphabet: ["0", "1"], stackAlphabet: ["A", "□"], blank: "□", initialStack: "□", initialHead: 0, acceptance: "final", states: [], transitions: [] };
 }
 
 let machine = newMachine();
@@ -105,6 +105,8 @@ function normalizeMachine(value) {
     alphabet: unique((value.alphabet || []).map(String).filter(Boolean)),
     stackAlphabet: unique((value.stackAlphabet || base.stackAlphabet).map(String).filter(Boolean)),
     blank: String(value.blank || "□"),
+    initialStack: String(value.initialStack ?? value.blank ?? "□"),
+    initialHead: Number(value.initialHead) || 0,
     acceptance: ["final", "empty"].includes(value.acceptance) ? value.acceptance : "final",
     states: value.states.map((state, index) => ({ id: String(state.id || uid("q")), name: String(state.name ?? `q${index}`), x: Number(state.x) || 100 + index * 100, y: Number(state.y) || 150, start: Boolean(state.start), final: Boolean(state.final) })),
     transitions: value.transitions.map(rule => ({ id: String(rule.id || uid("t")), from: String(rule.from), to: String(rule.to), read: normalizeSymbol(rule.read), pop: normalizeSymbol(rule.pop), push: normalizeSymbol(rule.push), write: String(rule.write ?? ""), move: ["L", "R", "N"].includes(rule.move) ? rule.move : "R" }))
@@ -378,12 +380,17 @@ function renderStatus() {
 }
 
 function render() {
+  $$(".pda-only").forEach(element => element.classList.toggle("hidden", machine.type !== "PDA"));
+  $$(".tm-only").forEach(element => element.classList.toggle("hidden", machine.type !== "TM"));
+  $("#initialStack").value = machine.initialStack || machine.blank;
+  $("#initialHead").value = machine.initialHead || 0;
   renderGraph();
   renderInspector();
   renderValidation();
   renderStatus();
   renderSimulation();
   renderLog();
+  renderProgramMeta();
 }
 
 // Simulation ---------------------------------------------------------------
@@ -421,10 +428,10 @@ function startSimulation() {
   sim.word = $("#wordInput").value;
   if (!starts.length) { sim.status = "rejected"; sim.message = "Kein Startzustand definiert"; renderSimulation(); return false; }
   if (["DFA", "NFA"].includes(machine.type)) sim.configs = epsilonClosure(starts.map(state => ({ stateId: state.id, pos: 0, path: [] })));
-  if (machine.type === "PDA") sim.configs = [{ stateId: starts[0].id, pos: 0, stack: [machine.blank], path: [] }];
+  if (machine.type === "PDA") sim.configs = [{ stateId: starts[0].id, pos: 0, stack: [...(machine.initialStack || machine.blank)], path: [] }];
   if (machine.type === "TM") {
     const tape = {}; [...sim.word].forEach((symbol, index) => { tape[index] = symbol; });
-    sim.configs = starts.map(state => ({ stateId: state.id, head: 0, tape, path: [] }));
+    sim.configs = starts.map(state => ({ stateId: state.id, head: Number(machine.initialHead) || 0, tape, path: [] }));
   }
   sim.seen = new Set(sim.configs.map(configKey));
   sim.status = "running"; sim.message = "Startkonfiguration geladen";
@@ -520,7 +527,8 @@ function togglePlay() {
   if (playTimer) { clearInterval(playTimer); playTimer = 0; $("#simPlayBtn").textContent = "▶ Abspielen"; return; }
   if (sim.status !== "running" && !startSimulation()) return;
   $("#simPlayBtn").textContent = "Ⅱ Pause";
-  playTimer = setInterval(() => { simulationStep(); if (sim.status !== "running") { clearInterval(playTimer); playTimer = 0; $("#simPlayBtn").textContent = "▶ Abspielen"; } }, 420);
+  const delay = Math.max(60, Number($("#simSpeed").value) || 420);
+  playTimer = setInterval(() => { simulationStep(); if (sim.status !== "running") { clearInterval(playTimer); playTimer = 0; $("#simPlayBtn").textContent = "▶ Abspielen"; } }, delay);
 }
 
 function configText(config) {
@@ -540,7 +548,10 @@ function renderSimulation() {
   } else {
     const position = first?.pos ?? 0;
     $("#wordTape").innerHTML = (sim.word ? [...sim.word] : [EPSILON]).map((symbol, index) => `<span class="tape-cell ${index < position ? "consumed" : index === position ? "current" : ""}">${esc(symbol)}</span>`).join("");
-    $("#machineMemory").textContent = machine.type === "PDA" ? `Keller (Top links): ${first?.stack.join(" ") || machine.blank}` : `Aktive Zustände: ${unique(sim.configs.map(config => stateLabel(config.stateId))).join(", ") || "–"}`;
+    if (machine.type === "PDA") {
+      const stack = first?.stack || [...(machine.initialStack || machine.blank)];
+      $("#machineMemory").innerHTML = `<div class="stack-stage"><div class="stack-box">${stack.length ? stack.map(symbol => `<span class="stack-cell">${esc(symbol)}</span>`).join("") : '<span class="stack-cell">ε</span>'}</div><div class="stack-caption"><strong>Keller</strong><br>Top oben · ${sim.configs.length} aktive Konfiguration${sim.configs.length === 1 ? "" : "en"}</div></div>`;
+    } else $("#machineMemory").textContent = `Aktive Zustände: ${unique(sim.configs.map(config => stateLabel(config.stateId))).join(", ") || "–"}`;
   }
   $("#configList").innerHTML = sim.configs.length ? sim.configs.map(config => `<div class="config-item ${isAccepted(config) ? "accept" : ""}">${esc(configText(config))}</div>`).join("") : '<div class="empty"><p>Noch keine Konfigurationen.</p></div>';
 }
@@ -661,6 +672,115 @@ function showInfo(title, content, eyebrow = "ANALYSE") {
   $("#infoTitle").textContent = title; $("#infoEyebrow").textContent = eyebrow; $("#infoContent").innerHTML = content; $("#infoDialog").showModal();
 }
 
+// Textueller Programmeditor -------------------------------------------------
+
+function programHelp() {
+  if (machine.type === "PDA") return "PDA: von, eingabe, kellerTop -> nach, ersatzwort. ε steht für keine Eingabe bzw. leeres Ersatzwort.";
+  if (machine.type === "TM") return "TM: von, gelesen -> nach, geschrieben, L|R|N. Die Direktiven konfigurieren Startzustand, Endzustände, Leersymbol und Kopf.";
+  return `${machine.type}: von, symbol -> nach. Beim NFA sind ε-Regeln und mehrere Regeln je Symbol erlaubt.`;
+}
+
+function serializeProgram() {
+  const starts = machine.states.filter(state => state.start).map(state => state.name);
+  const finals = machine.states.filter(state => state.final).map(state => state.name);
+  const directives = [`# AutomataLab ${machine.type}`, `@alphabet ${machine.alphabet.join(",")}`, `@start ${starts.join(",")}`, `@final ${finals.join(",")}`];
+  if (machine.type === "PDA") directives.push(`@stack ${machine.stackAlphabet.join(",")}`, `@initial-stack ${machine.initialStack || machine.blank}`, `@accept ${machine.acceptance}`);
+  if (machine.type === "TM") directives.push(`@blank ${machine.blank}`, `@head ${machine.initialHead}`);
+  const rules = machine.transitions.map(rule => {
+    if (machine.type === "PDA") return `${stateLabel(rule.from)}, ${rule.read}, ${rule.pop} -> ${stateLabel(rule.to)}, ${rule.push}`;
+    if (machine.type === "TM") return `${stateLabel(rule.from)}, ${rule.read} -> ${stateLabel(rule.to)}, ${rule.write}, ${rule.move}`;
+    return `${stateLabel(rule.from)}, ${rule.read} -> ${stateLabel(rule.to)}`;
+  });
+  return `${directives.join("\n")}\n\n${rules.join("\n")}`;
+}
+
+function refreshProgramEditor() {
+  const editor = $("#programEditor");
+  editor.value = serializeProgram();
+  editor.dataset.machineType = machine.type;
+  $("#programDiagnostics").className = "program-diagnostics";
+  $("#programDiagnostics").textContent = `${machine.transitions.length} Regeln aus dem Graph übernommen.`;
+}
+
+function renderProgramMeta() {
+  $("#programTitle").textContent = `${machineKindLabel()}-Programm`;
+  $("#programHelp").textContent = programHelp();
+  if ($("#programEditor").dataset.machineType !== machine.type) refreshProgramEditor();
+}
+
+function parseProgram(text) {
+  const draft = clone(machine);
+  draft.transitions = [];
+  const errors = [];
+  const ruleRows = [];
+  const getOrCreateState = name => {
+    const clean = String(name || "").trim();
+    if (!clean) return null;
+    let state = draft.states.find(item => item.name === clean);
+    if (!state) {
+      const index = draft.states.length;
+      state = { id: uid("q"), name: clean, x: 150 + (index % 4) * 180, y: 130 + Math.floor(index / 4) * 145, start: false, final: false };
+      draft.states.push(state);
+    }
+    return state;
+  };
+  const csv = value => value.split(",").map(part => part.trim()).filter(Boolean);
+
+  text.split(/\r?\n/).forEach((raw, index) => {
+    const line = raw.trim();
+    if (!line || line.startsWith("#")) return;
+    if (line.startsWith("@")) {
+      const match = line.match(/^@(\S+)\s*(.*)$/);
+      const key = match?.[1]?.toLowerCase(), value = match?.[2]?.trim() || "";
+      if (key === "alphabet") draft.alphabet = unique(csv(value));
+      else if (key === "stack" && draft.type === "PDA") draft.stackAlphabet = unique(csv(value));
+      else if (key === "blank" && draft.type === "TM") draft.blank = value || "□";
+      else if (key === "head" && draft.type === "TM") draft.initialHead = Number(value) || 0;
+      else if (key === "initial-stack" && draft.type === "PDA") draft.initialStack = value || draft.blank;
+      else if (key === "accept" && draft.type === "PDA" && ["final", "empty"].includes(value)) draft.acceptance = value;
+      else if (key === "start") {
+        const names = csv(value); if (draft.type !== "NFA" && names.length > 1) errors.push(`Zeile ${index + 1}: nur ein Startzustand erlaubt`);
+        draft.states.forEach(state => { state.start = false; }); names.forEach(name => { const state = getOrCreateState(name); if (state) state.start = true; });
+      } else if (key === "final") {
+        draft.states.forEach(state => { state.final = false; }); csv(value).forEach(name => { const state = getOrCreateState(name); if (state) state.final = true; });
+      } else errors.push(`Zeile ${index + 1}: unbekannte Direktive @${key || "?"}`);
+      return;
+    }
+    const sides = line.split(/\s*->\s*/);
+    if (sides.length !== 2) { errors.push(`Zeile ${index + 1}: „->“ fehlt`); return; }
+    const left = sides[0].split(",").map(value => value.trim());
+    const right = sides[1].split(",").map(value => value.trim());
+    if (["DFA", "NFA"].includes(draft.type) && (left.length !== 2 || right.length !== 1)) errors.push(`Zeile ${index + 1}: erwartet „von, symbol -> nach“`);
+    else if (draft.type === "PDA" && (left.length !== 3 || right.length !== 2)) errors.push(`Zeile ${index + 1}: erwartet „von, eingabe, top -> nach, ersatz“`);
+    else if (draft.type === "TM" && (left.length !== 2 || right.length !== 3 || !["L", "R", "N"].includes(right[2]))) errors.push(`Zeile ${index + 1}: erwartet „von, gelesen -> nach, geschrieben, L|R|N“`);
+    else ruleRows.push({ line: index + 1, left, right });
+  });
+
+  for (const row of ruleRows) {
+    const from = getOrCreateState(row.left[0]), to = getOrCreateState(row.right[0]);
+    if (!from || !to) { errors.push(`Zeile ${row.line}: Zustandsname fehlt`); continue; }
+    const rule = { id: uid("t"), from: from.id, to: to.id, read: normalizeSymbol(row.left[1]), pop: EPSILON, push: EPSILON, write: "", move: "R" };
+    if (draft.type === "PDA") { rule.pop = normalizeSymbol(row.left[2]); rule.push = normalizeSymbol(row.right[1]); }
+    if (draft.type === "TM") { rule.write = row.right[1] || draft.blank; rule.move = row.right[2]; }
+    draft.transitions.push(rule);
+  }
+  return { draft: normalizeMachine(draft), errors };
+}
+
+function applyProgram() {
+  const result = parseProgram($("#programEditor").value);
+  const diagnostics = $("#programDiagnostics");
+  if (result.errors.length) {
+    diagnostics.className = "program-diagnostics error";
+    diagnostics.textContent = result.errors.join("\n");
+    return;
+  }
+  commit(() => { machine = result.draft; selection = null; }, `${result.draft.transitions.length} programmierte Regeln übernommen`);
+  diagnostics.className = "program-diagnostics";
+  diagnostics.textContent = `Programm gültig: ${machine.states.length} Zustände, ${machine.transitions.length} Regeln.`;
+  setTimeout(fitGraph, 0);
+}
+
 // Examples -----------------------------------------------------------------
 
 function exampleMachine(kind) {
@@ -739,7 +859,7 @@ function downloadJson() {
 function initEvents() {
   bindGraphEvents();
   $$(".tool").forEach(button => button.addEventListener("click", () => setTool(button.dataset.tool)));
-  $$(".tab").forEach(button => button.addEventListener("click", () => { $$(".tab").forEach(item => item.classList.toggle("active", item === button)); $$(".tab-pane").forEach(pane => pane.classList.toggle("active", pane.id === `${button.dataset.tab}Pane`)); }));
+  $$(".tab").forEach(button => button.addEventListener("click", () => { $$(".tab").forEach(item => item.classList.toggle("active", item === button)); $$(".tab-pane").forEach(pane => pane.classList.toggle("active", pane.id === `${button.dataset.tab}Pane`)); if (button.dataset.tab === "program") refreshProgramEditor(); }));
   $("#propertyForm").addEventListener("change", event => updateProperty(event.target));
   $("#propertyForm").addEventListener("click", event => { if (event.target.closest("[data-delete]")) deleteSelection(); const select = event.target.closest("[data-select-rule]"); if (select) { selection = { kind: "transition", id: select.dataset.selectRule }; render(); } if (event.target.closest("[data-edit-rule]")) { const rule = transitionById(selection.id); openTransitionDialog(rule.from, rule.to, rule.id); } });
   $("#transitionSubmit").addEventListener("click", event => { event.preventDefault(); submitTransition(); });
@@ -751,6 +871,10 @@ function initEvents() {
   $("#newBtn").addEventListener("click", () => { if (confirm("Aktuellen Automaten verwerfen?")) commit(() => { machine = newMachine(machine.type); selection = null; }, "Neuer Automat"); });
   $$("[data-example]").forEach(button => button.addEventListener("click", () => { const example = exampleMachine(button.dataset.example); commit(() => { machine = example; selection = null; }, `Beispiel ${example.name} geladen`); setTimeout(fitGraph, 0); }));
   $("#simResetBtn").addEventListener("click", () => resetSimulation()); $("#simStepBtn").addEventListener("click", simulationStep); $("#simPlayBtn").addEventListener("click", togglePlay); $("#wordInput").addEventListener("input", () => resetSimulation());
+  $("#initialStack").addEventListener("change", event => commit(() => { machine.initialStack = event.target.value || machine.blank; }, "Startkeller geändert"));
+  $("#initialHead").addEventListener("change", event => commit(() => { machine.initialHead = Number(event.target.value) || 0; }, "TM-Kopfposition geändert"));
+  $("#programRefreshBtn").addEventListener("click", refreshProgramEditor);
+  $("#programApplyBtn").addEventListener("click", applyProgram);
   $("#determinizeBtn").addEventListener("click", determinize); $("#completeBtn").addEventListener("click", completeDfa); $("#minimizeBtn").addEventListener("click", minimizeDfa); $("#removeUnreachableBtn").addEventListener("click", removeUnreachable);
   $("#fitBtn").addEventListener("click", fitGraph); $("#tableBtn").addEventListener("click", () => showInfo("Übergangstabelle", transitionTableHtml())); $("#formalBtn").addEventListener("click", () => showInfo("Formale Definition", `<div class="formal-tuple">${esc(formalDefinition())}</div>`)); $("#grammarBtn").addEventListener("click", () => showInfo("Rechtslineare Grammatik", `<pre class="formal-tuple">${esc(grammarText())}</pre>`, "KONVERTIERUNG"));
   document.addEventListener("keydown", event => { if (event.key === "Delete" && !["INPUT", "SELECT", "TEXTAREA"].includes(document.activeElement.tagName)) deleteSelection(); if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "z") { event.preventDefault(); event.shiftKey ? redo() : undo(); } if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "y") { event.preventDefault(); redo(); } });
