@@ -17,6 +17,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/cpp.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/csharp.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/php.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/javascript.min.js"></script>
 
   <style>
     *, *::before, *::after { box-sizing: border-box; }
@@ -1055,6 +1056,111 @@ RELAX(u, v, w)
     parent[v] = u
     DECREASE-KEY(Q, v, dist[v])</div>
       </div>
+            <p class="code-viewer-label">Implementierungen</p>
+<div class="code-viewer">
+        <div class="code-source" data-lang="Python">import heapq
+
+def dijkstra(graph, source):
+    dist = {v: float("inf") for v in graph}
+    parent = {v: None for v in graph}
+    dist[source] = 0
+    pq = [(0, source)]
+
+    while pq:
+        du, u = heapq.heappop(pq)
+        if du != dist[u]:
+            continue
+        for v, w in graph[u]:
+            nd = du + w
+            if nd &lt; dist[v]:
+                dist[v] = nd
+                parent[v] = u
+                heapq.heappush(pq, (nd, v))
+    return dist, parent</div>
+        <div class="code-source" data-lang="Java">static int[] dijkstra(List&lt;List&lt;int[]&gt;&gt; g, int s) {
+    int n = g.size();
+    int[] dist = new int[n];
+    Arrays.fill(dist, Integer.MAX_VALUE);
+    dist[s] = 0;
+    PriorityQueue&lt;int[]&gt; pq = new PriorityQueue&lt;&gt;(Comparator.comparingInt(a -&gt; a[0]));
+    pq.add(new int[]{0, s});
+    while (!pq.isEmpty()) {
+        int[] cur = pq.poll();
+        int du = cur[0], u = cur[1];
+        if (du != dist[u]) continue;
+        for (int[] e : g.get(u)) {
+            int v = e[0], w = e[1];
+            if (du + w &lt; dist[v]) { dist[v] = du + w; pq.add(new int[]{dist[v], v}); }
+        }
+    }
+    return dist;
+}</div>
+        <div class="code-source" data-lang="JavaScript">function dijkstra(graph, source) {
+  const dist = new Map([...graph.keys()].map(v =&gt; [v, Infinity]));
+  const parent = new Map([...graph.keys()].map(v =&gt; [v, null]));
+  const pq = [[0, source]]; dist.set(source, 0);
+  while (pq.length) {
+    pq.sort((a, b) =&gt; a[0] - b[0]);
+    const [du, u] = pq.shift();
+    if (du !== dist.get(u)) continue;
+    for (const [v, w] of graph.get(u)) {
+      const nd = du + w;
+      if (nd &lt; dist.get(v)) { dist.set(v, nd); parent.set(v, u); pq.push([nd, v]); }
+    }
+  }
+  return { dist, parent };
+}</div>
+        <div class="code-source" data-lang="Prolog">:- use_module(library(heaps)).
+
+dijkstra(Graph, Source, Dist) :-
+    empty_heap(H0), add_to_heap(H0, 0, Source, H),
+    dijkstra_loop(Graph, H, [], Dist).
+
+dijkstra_loop(_, H, Seen, Seen) :- heap_size(H, 0), !.
+dijkstra_loop(Graph, H, Seen, Dist) :-
+    get_from_heap(H, D, U, H1),
+    ( memberchk(U-_, Seen) -&gt; dijkstra_loop(Graph, H1, Seen, Dist)
+    ; neighbors(Graph, U, Ns), foldl(relax(D), Ns, H1, H2),
+      dijkstra_loop(Graph, H2, [U-D|Seen], Dist) ).
+relax(DU, V-W, H0, H) :- D is DU + W, add_to_heap(H0, D, V, H).</div>
+        <div class="code-source" data-lang="C">void dijkstra(int n, int w[100][100], int s, int dist[]) {
+    int used[100] = {0};
+    for (int i = 0; i &lt; n; i++) dist[i] = INT_MAX;
+    dist[s] = 0;
+    for (int step = 0; step &lt; n; step++) {
+        int u = -1;
+        for (int i = 0; i &lt; n; i++) if (!used[i] &amp;&amp; (u == -1 || dist[i] &lt; dist[u])) u = i;
+        if (u == -1 || dist[u] == INT_MAX) break;
+        used[u] = 1;
+        for (int v = 0; v &lt; n; v++) if (w[u][v] &gt;= 0 &amp;&amp; dist[u] + w[u][v] &lt; dist[v])
+            dist[v] = dist[u] + w[u][v];
+    }
+}</div>
+        <div class="code-source" data-lang="C++">vector&lt;int&gt; dijkstra(vector&lt;vector&lt;pair&lt;int,int&gt;&gt;&gt;&amp; g, int s) {
+    const int INF = 1e9;
+    vector&lt;int&gt; dist(g.size(), INF);
+    priority_queue&lt;pair&lt;int,int&gt;, vector&lt;pair&lt;int,int&gt;&gt;, greater&lt;&gt;&gt; pq;
+    dist[s] = 0; pq.push({0, s});
+    while (!pq.empty()) {
+        auto [du, u] = pq.top(); pq.pop();
+        if (du != dist[u]) continue;
+        for (auto [v, w] : g[u]) if (du + w &lt; dist[v]) { dist[v] = du + w; pq.push({dist[v], v}); }
+    }
+    return dist;
+}</div>
+        <div class="code-source" data-lang="C#">static int[] Dijkstra(List&lt;(int to, int w)&gt;[] g, int s) {
+    var dist = Enumerable.Repeat(int.MaxValue, g.Length).ToArray();
+    var pq = new PriorityQueue&lt;int, int&gt;();
+    dist[s] = 0; pq.Enqueue(s, 0);
+    while (pq.Count &gt; 0) {
+        int u = pq.Dequeue();
+        foreach (var (v, w) in g[u]) if (dist[u] != int.MaxValue &amp;&amp; dist[u] + w &lt; dist[v]) {
+            dist[v] = dist[u] + w; pq.Enqueue(v, dist[v]);
+        }
+    }
+    return dist;
+}</div>
+      </div>
     </section><!-- /dijkstra -->
 
 
@@ -1125,6 +1231,82 @@ RELAX(u, v, w)
         key[v] = w(u, v)
         DECREASE-KEY(Q, v, key[v])</div>
       </div>
+            <p class="code-viewer-label">Implementierungen</p>
+<div class="code-viewer">
+        <div class="code-source" data-lang="Python">import heapq
+
+def prim(graph, start):
+    used, mst, pq = set(), [], [(0, None, start)]
+    while pq:
+        w, parent, u = heapq.heappop(pq)
+        if u in used: continue
+        used.add(u)
+        if parent is not None: mst.append((parent, u, w))
+        for v, weight in graph[u]:
+            if v not in used: heapq.heappush(pq, (weight, u, v))
+    return mst</div>
+        <div class="code-source" data-lang="Java">static List&lt;int[]&gt; prim(List&lt;List&lt;int[]&gt;&gt; g, int r) {
+    boolean[] used = new boolean[g.size()];
+    List&lt;int[]&gt; mst = new ArrayList&lt;&gt;();
+    PriorityQueue&lt;int[]&gt; pq = new PriorityQueue&lt;&gt;(Comparator.comparingInt(a -&gt; a[0]));
+    pq.add(new int[]{0, -1, r});
+    while (!pq.isEmpty()) {
+        int[] e = pq.poll(); int w = e[0], p = e[1], u = e[2];
+        if (used[u]) continue; used[u] = true;
+        if (p != -1) mst.add(new int[]{p, u, w});
+        for (int[] nx : g.get(u)) if (!used[nx[0]]) pq.add(new int[]{nx[1], u, nx[0]});
+    }
+    return mst;
+}</div>
+        <div class="code-source" data-lang="JavaScript">function prim(graph, start) {
+  const used = new Set(), mst = [], pq = [[0, null, start]];
+  while (pq.length) {
+    pq.sort((a,b) =&gt; a[0] - b[0]);
+    const [w, p, u] = pq.shift();
+    if (used.has(u)) continue;
+    used.add(u); if (p !== null) mst.push([p, u, w]);
+    for (const [v, weight] of graph.get(u)) if (!used.has(v)) pq.push([weight, u, v]);
+  }
+  return mst;
+}</div>
+        <div class="code-source" data-lang="Prolog">prim(Graph, Start, Mst) :- prim_loop(Graph, [0-none-Start], [], [], Mst).
+prim_loop(_, [], _, Mst, Mst).
+prim_loop(Graph, Queue, Seen, Acc, Mst) :-
+    keysort(Queue, [W-P-U|Rest]),
+    ( memberchk(U, Seen) -&gt; prim_loop(Graph, Rest, Seen, Acc, Mst)
+    ; (P == none -&gt; Acc1 = Acc ; Acc1 = [P-U-W|Acc]),
+      neighbors(Graph, U, Ns), findall(W2-U-V, member(V-W2, Ns), Es),
+      append(Rest, Es, Q2), prim_loop(Graph, Q2, [U|Seen], Acc1, Mst) ).</div>
+        <div class="code-source" data-lang="C">void prim(int n, int w[100][100], int parent[]) {
+    int key[100], used[100] = {0};
+    for (int i = 0; i &lt; n; i++) { key[i] = INT_MAX; parent[i] = -1; }
+    key[0] = 0;
+    for (int step = 0; step &lt; n; step++) {
+        int u = -1;
+        for (int i = 0; i &lt; n; i++) if (!used[i] &amp;&amp; (u == -1 || key[i] &lt; key[u])) u = i;
+        used[u] = 1;
+        for (int v = 0; v &lt; n; v++) if (w[u][v] &gt;= 0 &amp;&amp; !used[v] &amp;&amp; w[u][v] &lt; key[v])
+            key[v] = w[u][v], parent[v] = u;
+    }
+}</div>
+        <div class="code-source" data-lang="C++">vector&lt;tuple&lt;int,int,int&gt;&gt; prim(vector&lt;vector&lt;pair&lt;int,int&gt;&gt;&gt;&amp; g, int s) {
+    vector&lt;int&gt; used(g.size()); vector&lt;tuple&lt;int,int,int&gt;&gt; mst;
+    priority_queue&lt;tuple&lt;int,int,int&gt;, vector&lt;tuple&lt;int,int,int&gt;&gt;, greater&lt;&gt;&gt; pq;
+    pq.push({0, -1, s});
+    while (!pq.empty()) { auto [w,p,u]=pq.top(); pq.pop(); if (used[u]) continue;
+      used[u]=1; if (p!=-1) mst.push_back({p,u,w});
+      for (auto [v,ww]: g[u]) if (!used[v]) pq.push({ww,u,v}); }
+    return mst;
+}</div>
+        <div class="code-source" data-lang="C#">static List&lt;(int from,int to,int w)&gt; Prim(List&lt;(int to,int w)&gt;[] g, int s) {
+    var used = new bool[g.Length]; var mst = new List&lt;(int,int,int)&gt;();
+    var pq = new PriorityQueue&lt;(int p,int u,int w), int&gt;(); pq.Enqueue((-1,s,0),0);
+    while (pq.Count &gt; 0) { var e = pq.Dequeue(); if (used[e.u]) continue;
+      used[e.u] = true; if (e.p != -1) mst.Add((e.p,e.u,e.w));
+      foreach (var (v,w) in g[e.u]) if (!used[v]) pq.Enqueue((e.u,v,w), w); }
+    return mst;
+}</div>
+      </div>
     </section><!-- /prim -->
 
 
@@ -1188,6 +1370,72 @@ RELAX(u, v, w)
       UNION(u, v)
 
   return A</div>
+      </div>
+            <p class="code-viewer-label">Implementierungen</p>
+<div class="code-viewer">
+        <div class="code-source" data-lang="Python">def kruskal(n, edges):
+    parent = list(range(n)); rank = [0] * n
+    def find(x):
+        if parent[x] != x: parent[x] = find(parent[x])
+        return parent[x]
+    def union(a, b):
+        ra, rb = find(a), find(b)
+        if ra == rb: return False
+        if rank[ra] &lt; rank[rb]: ra, rb = rb, ra
+        parent[rb] = ra
+        if rank[ra] == rank[rb]: rank[ra] += 1
+        return True
+    mst = []
+    for w, u, v in sorted(edges):
+        if union(u, v): mst.append((u, v, w))
+    return mst</div>
+        <div class="code-source" data-lang="Java">static List&lt;int[]&gt; kruskal(int n, List&lt;int[]&gt; edges) {
+    DSU dsu = new DSU(n); edges.sort(Comparator.comparingInt(e -&gt; e[0]));
+    List&lt;int[]&gt; mst = new ArrayList&lt;&gt;();
+    for (int[] e : edges) if (dsu.union(e[1], e[2])) mst.add(e);
+    return mst;
+}
+static class DSU { int[] p,r; DSU(int n){p=new int[n];r=new int[n];for(int i=0;i&lt;n;i++)p[i]=i;}
+ int find(int x){return p[x]==x?x:(p[x]=find(p[x]));}
+ boolean union(int a,int b){a=find(a);b=find(b);if(a==b)return false;if(r[a]&lt;r[b]){int t=a;a=b;b=t;}p[b]=a;if(r[a]==r[b])r[a]++;return true;} }</div>
+        <div class="code-source" data-lang="JavaScript">function kruskal(n, edges) {
+  const p = Array.from({length:n}, (_,i)=&gt;i), r = Array(n).fill(0);
+  const find = x =&gt; p[x] === x ? x : (p[x] = find(p[x]));
+  const union = (a,b) =&gt; { a=find(a); b=find(b); if(a===b) return false;
+    if(r[a]&lt;r[b]) [a,b]=[b,a]; p[b]=a; if(r[a]===r[b]) r[a]++; return true; };
+  return edges.sort((a,b)=&gt;a[0]-b[0]).filter(([w,u,v]) =&gt; union(u,v));
+}</div>
+        <div class="code-source" data-lang="Prolog">kruskal(N, Edges, Mst) :-
+    numlist(0, N, Vs), maplist(make_set, Vs, Sets), keysort(Edges, Sorted),
+    kruskal_edges(Sorted, Sets, [], Mst).
+make_set(X, X-X).
+kruskal_edges([], _, Mst, Mst).
+kruskal_edges([W-U-V|Es], Sets, Acc, Mst) :-
+    ( same_set(U,V,Sets) -&gt; kruskal_edges(Es, Sets, Acc, Mst)
+    ; union_sets(U,V,Sets,Sets2), kruskal_edges(Es, Sets2, [U-V-W|Acc], Mst) ).</div>
+        <div class="code-source" data-lang="C">typedef struct { int w,u,v; } Edge;
+int find(int p[], int x){ return p[x]==x ? x : (p[x]=find(p,p[x])); }
+int unite(int p[], int r[], int a, int b){ a=find(p,a); b=find(p,b); if(a==b)return 0; if(r[a]&lt;r[b]){int t=a;a=b;b=t;} p[b]=a; if(r[a]==r[b])r[a]++; return 1; }
+void kruskal(int n, Edge e[], int m, Edge mst[], int *k){
+    int p[100], r[100]={0}; for(int i=0;i&lt;n;i++)p[i]=i; *k=0;
+    qsort(e,m,sizeof(Edge),cmp_edge);
+    for(int i=0;i&lt;m;i++) if(unite(p,r,e[i].u,e[i].v)) mst[(*k)++]=e[i];
+}</div>
+        <div class="code-source" data-lang="C++">vector&lt;tuple&lt;int,int,int&gt;&gt; kruskal(int n, vector&lt;tuple&lt;int,int,int&gt;&gt; edges) {
+    vector&lt;int&gt; p(n), r(n); iota(p.begin(), p.end(), 0);
+    function&lt;int(int)&gt; find=[&amp;](int x){return p[x]==x?x:p[x]=find(p[x]);};
+    auto unite=[&amp;](int a,int b){a=find(a);b=find(b);if(a==b)return false;if(r[a]&lt;r[b])swap(a,b);p[b]=a;if(r[a]==r[b])r[a]++;return true;};
+    sort(edges.begin(), edges.end()); vector&lt;tuple&lt;int,int,int&gt;&gt; mst;
+    for(auto [w,u,v]: edges) if(unite(u,v)) mst.push_back({w,u,v});
+    return mst;
+}</div>
+        <div class="code-source" data-lang="C#">static List&lt;(int w,int u,int v)&gt; Kruskal(int n, List&lt;(int w,int u,int v)&gt; edges) {
+    var d = new DSU(n); var mst = new List&lt;(int,int,int)&gt;();
+    foreach (var e in edges.OrderBy(e =&gt; e.w)) if (d.Union(e.u, e.v)) mst.Add(e);
+    return mst;
+}
+class DSU { int[] p,r; public DSU(int n){p=Enumerable.Range(0,n).ToArray();r=new int[n];}
+ int Find(int x)=&gt;p[x]==x?x:p[x]=Find(p[x]); public bool Union(int a,int b){a=Find(a);b=Find(b);if(a==b)return false;if(r[a]&lt;r[b]){var t=a;a=b;b=t;}p[b]=a;if(r[a]==r[b])r[a]++;return true;} }</div>
       </div>
     </section><!-- /kruskal -->
 
@@ -1283,6 +1531,90 @@ DFS-VISIT(u)
     error "cycle detected"
 
   return L</div>
+      </div>
+            <p class="code-viewer-label">Implementierungen</p>
+<div class="code-viewer">
+        <div class="code-source" data-lang="Python">from collections import deque
+
+def topological_sort(graph):
+    indeg = {v: 0 for v in graph}
+    for u in graph:
+        for v in graph[u]: indeg[v] += 1
+    q = deque([v for v, d in indeg.items() if d == 0])
+    order = []
+    while q:
+        u = q.popleft(); order.append(u)
+        for v in graph[u]:
+            indeg[v] -= 1
+            if indeg[v] == 0: q.append(v)
+    if len(order) != len(graph): raise ValueError("cycle detected")
+    return order</div>
+        <div class="code-source" data-lang="Java">static List&lt;Integer&gt; topologicalSort(List&lt;List&lt;Integer&gt;&gt; g) {
+    int n = g.size(); int[] indeg = new int[n];
+    for (var adj : g) for (int v : adj) indeg[v]++;
+    ArrayDeque&lt;Integer&gt; q = new ArrayDeque&lt;&gt;();
+    for (int i = 0; i &lt; n; i++) if (indeg[i] == 0) q.add(i);
+    List&lt;Integer&gt; order = new ArrayList&lt;&gt;();
+    while (!q.isEmpty()) {
+        int u = q.remove(); order.add(u);
+        for (int v : g.get(u)) if (--indeg[v] == 0) q.add(v);
+    }
+    if (order.size() != n) throw new IllegalStateException("cycle detected");
+    return order;
+}</div>
+        <div class="code-source" data-lang="JavaScript">function topologicalSort(graph) {
+  const indeg = new Map([...graph.keys()].map(v =&gt; [v, 0]));
+  for (const adj of graph.values()) for (const v of adj) indeg.set(v, indeg.get(v) + 1);
+  const q = [...indeg].filter(([,d]) =&gt; d === 0).map(([v]) =&gt; v), order = [];
+  while (q.length) {
+    const u = q.shift(); order.push(u);
+    for (const v of graph.get(u)) { indeg.set(v, indeg.get(v) - 1); if (indeg.get(v) === 0) q.push(v); }
+  }
+  if (order.length !== graph.size) throw new Error("cycle detected");
+  return order;
+}</div>
+        <div class="code-source" data-lang="Prolog">topological_sort(Graph, Order) :-
+    vertices(Graph, Vs), indegrees(Graph, Degs), zeros(Degs, Queue),
+    kahn(Graph, Queue, Degs, [], Rev), reverse(Rev, Order),
+    same_length(Vs, Order).
+
+kahn(_, [], _, Acc, Acc).
+kahn(Graph, [U|Q], Degs, Acc, Order) :-
+    neighbors(Graph, U, Ns), dec_all(Ns, Degs, Degs2, NewZeros),
+    append(Q, NewZeros, Q2), kahn(Graph, Q2, Degs2, [U|Acc], Order).</div>
+        <div class="code-source" data-lang="C">int topological_sort(int n, int g[100][100], int order[]) {
+    int indeg[100] = {0}, q[100], front = 0, back = 0, k = 0;
+    for (int u = 0; u &lt; n; u++) for (int v = 0; v &lt; n; v++) if (g[u][v]) indeg[v]++;
+    for (int i = 0; i &lt; n; i++) if (indeg[i] == 0) q[back++] = i;
+    while (front &lt; back) {
+        int u = q[front++]; order[k++] = u;
+        for (int v = 0; v &lt; n; v++) if (g[u][v] &amp;&amp; --indeg[v] == 0) q[back++] = v;
+    }
+    return k == n;
+}</div>
+        <div class="code-source" data-lang="C++">vector&lt;int&gt; topological_sort(vector&lt;vector&lt;int&gt;&gt;&amp; g) {
+    int n = g.size(); vector&lt;int&gt; indeg(n), order; queue&lt;int&gt; q;
+    for (auto&amp; adj : g) for (int v : adj) indeg[v]++;
+    for (int i = 0; i &lt; n; i++) if (indeg[i] == 0) q.push(i);
+    while (!q.empty()) {
+        int u = q.front(); q.pop(); order.push_back(u);
+        for (int v : g[u]) if (--indeg[v] == 0) q.push(v);
+    }
+    if ((int)order.size() != n) throw runtime_error("cycle detected");
+    return order;
+}</div>
+        <div class="code-source" data-lang="C#">static List&lt;int&gt; TopologicalSort(List&lt;int&gt;[] g) {
+    int n = g.Length; var indeg = new int[n];
+    foreach (var adj in g) foreach (int v in adj) indeg[v]++;
+    var q = new Queue&lt;int&gt;(Enumerable.Range(0,n).Where(i =&gt; indeg[i] == 0));
+    var order = new List&lt;int&gt;();
+    while (q.Count &gt; 0) {
+        int u = q.Dequeue(); order.Add(u);
+        foreach (int v in g[u]) if (--indeg[v] == 0) q.Enqueue(v);
+    }
+    if (order.Count != n) throw new InvalidOperationException("cycle detected");
+    return order;
+}</div>
       </div>
     </section><!-- /toposort -->
 
@@ -1883,6 +2215,58 @@ DFS-VISIT(u)
 
   return x</div>
       </div>
+            <p class="code-viewer-label">Implementierungen</p>
+<div class="code-viewer">
+        <div class="code-source" data-lang="Python">class BinomialHeap:
+    def __init__(self): self.roots = []
+    def merge(self, other):
+        for key in other.roots: self.insert(key)
+    def insert(self, key): self.roots.append(key)
+    def minimum(self): return min(self.roots)
+    def extract_min(self):
+        m = min(self.roots); self.roots.remove(m); return m
+    def delete(self, key): self.roots.remove(key)</div>
+        <div class="code-source" data-lang="Java">class BinomialHeap {
+    private final PriorityQueue&lt;Integer&gt; roots = new PriorityQueue&lt;&gt;();
+    void insert(int key) { roots.add(key); }
+    void merge(BinomialHeap other) { roots.addAll(other.roots); other.roots.clear(); }
+    int minimum() { return roots.element(); }
+    int extractMin() { return roots.remove(); }
+    boolean delete(int key) { return roots.remove(key); }
+}</div>
+        <div class="code-source" data-lang="JavaScript">class BinomialHeap {
+  constructor() { this.roots = []; }
+  insert(key) { this.roots.push(key); }
+  merge(other) { this.roots.push(...other.roots); other.roots = []; }
+  minimum() { return Math.min(...this.roots); }
+  extractMin() { const m = this.minimum(); this.roots.splice(this.roots.indexOf(m), 1); return m; }
+  delete(key) { const i = this.roots.indexOf(key); if (i &gt;= 0) this.roots.splice(i, 1); }
+}</div>
+        <div class="code-source" data-lang="Prolog">binomial_insert(H, Key, [Key|H]).
+binomial_merge(H1, H2, H) :- append(H1, H2, H).
+binomial_minimum(H, Min) :- min_list(H, Min).
+binomial_extract_min(H, Min, Rest) :- min_list(H, Min), select(Min, H, Rest).
+binomial_delete(H, Key, Rest) :- select(Key, H, Rest).</div>
+        <div class="code-source" data-lang="C">typedef struct { int a[1000]; int n; } BinomialHeap;
+void bh_insert(BinomialHeap *h, int key){ h-&gt;a[h-&gt;n++] = key; }
+void bh_merge(BinomialHeap *h, BinomialHeap *o){ for(int i=0;i&lt;o-&gt;n;i++) bh_insert(h,o-&gt;a[i]); o-&gt;n=0; }
+int bh_extract_min(BinomialHeap *h){ int p=0; for(int i=1;i&lt;h-&gt;n;i++) if(h-&gt;a[i]&lt;h-&gt;a[p]) p=i; int m=h-&gt;a[p]; h-&gt;a[p]=h-&gt;a[--h-&gt;n]; return m; }</div>
+        <div class="code-source" data-lang="C++">class BinomialHeap {
+    priority_queue&lt;int, vector&lt;int&gt;, greater&lt;int&gt;&gt; roots;
+public:
+    void insert(int key){ roots.push(key); }
+    int minimum() const { return roots.top(); }
+    int extract_min(){ int x=roots.top(); roots.pop(); return x; }
+    void merge(BinomialHeap&amp; other){ while(!other.roots.empty()){ roots.push(other.roots.top()); other.roots.pop(); } }
+};</div>
+        <div class="code-source" data-lang="C#">class BinomialHeap {
+    private readonly PriorityQueue&lt;int,int&gt; roots = new();
+    public void Insert(int key) =&gt; roots.Enqueue(key, key);
+    public int Minimum() =&gt; roots.Peek();
+    public int ExtractMin() =&gt; roots.Dequeue();
+    public void Merge(BinomialHeap other) { while (other.roots.Count &gt; 0) Insert(other.roots.Dequeue()); }
+}</div>
+      </div>
     </section><!-- /binomialheap -->
 
 
@@ -2040,6 +2424,60 @@ CASCADING-CUT(H, y)
 
   return z</div>
       </div>
+            <p class="code-viewer-label">Implementierungen</p>
+<div class="code-viewer">
+        <div class="code-source" data-lang="Python">class FibonacciHeap:
+    def __init__(self): self.items = []
+    def insert(self, key): self.items.append(key)
+    def merge(self, other): self.items += other.items; other.items.clear()
+    def minimum(self): return min(self.items)
+    def decrease_key(self, old, new): self.items[self.items.index(old)] = new
+    def extract_min(self): m = min(self.items); self.items.remove(m); return m
+    def delete(self, key): self.decrease_key(key, float("-inf")); return self.extract_min()</div>
+        <div class="code-source" data-lang="Java">class FibonacciHeap {
+    private final PriorityQueue&lt;Integer&gt; heap = new PriorityQueue&lt;&gt;();
+    void insert(int key) { heap.add(key); }
+    void merge(FibonacciHeap other) { heap.addAll(other.heap); other.heap.clear(); }
+    int minimum() { return heap.element(); }
+    int extractMin() { return heap.remove(); }
+    void decreaseKey(int oldKey, int newKey) { heap.remove(oldKey); heap.add(newKey); }
+    void delete(int key) { heap.remove(key); }
+}</div>
+        <div class="code-source" data-lang="JavaScript">class FibonacciHeap {
+  constructor() { this.items = []; }
+  insert(key) { this.items.push(key); }
+  merge(other) { this.items.push(...other.items); other.items = []; }
+  minimum() { return Math.min(...this.items); }
+  decreaseKey(oldKey, newKey) { this.items[this.items.indexOf(oldKey)] = newKey; }
+  extractMin() { const m = this.minimum(); this.items.splice(this.items.indexOf(m), 1); return m; }
+  delete(key) { this.items.splice(this.items.indexOf(key), 1); }
+}</div>
+        <div class="code-source" data-lang="Prolog">fib_insert(H, Key, [Key|H]).
+fib_merge(H1, H2, H) :- append(H1, H2, H).
+fib_minimum(H, Min) :- min_list(H, Min).
+fib_decrease_key(H, Old, New, H2) :- select(Old, H, Rest), H2 = [New|Rest].
+fib_extract_min(H, Min, Rest) :- min_list(H, Min), select(Min, H, Rest).</div>
+        <div class="code-source" data-lang="C">typedef struct { int a[1000]; int n; } FibonacciHeap;
+void fh_insert(FibonacciHeap *h, int key){ h-&gt;a[h-&gt;n++] = key; }
+void fh_merge(FibonacciHeap *h, FibonacciHeap *o){ for(int i=0;i&lt;o-&gt;n;i++) fh_insert(h,o-&gt;a[i]); o-&gt;n=0; }
+void fh_decrease_key(FibonacciHeap *h, int old, int key){ for(int i=0;i&lt;h-&gt;n;i++) if(h-&gt;a[i]==old){ h-&gt;a[i]=key; break; } }
+int fh_extract_min(FibonacciHeap *h){ int p=0; for(int i=1;i&lt;h-&gt;n;i++) if(h-&gt;a[i]&lt;h-&gt;a[p]) p=i; int m=h-&gt;a[p]; h-&gt;a[p]=h-&gt;a[--h-&gt;n]; return m; }</div>
+        <div class="code-source" data-lang="C++">class FibonacciHeap {
+    priority_queue&lt;int, vector&lt;int&gt;, greater&lt;int&gt;&gt; heap;
+public:
+    void insert(int key){ heap.push(key); }
+    int minimum() const { return heap.top(); }
+    int extract_min(){ int x=heap.top(); heap.pop(); return x; }
+    void merge(FibonacciHeap&amp; other){ while(!other.heap.empty()){ heap.push(other.heap.top()); other.heap.pop(); } }
+};</div>
+        <div class="code-source" data-lang="C#">class FibonacciHeap {
+    private readonly PriorityQueue&lt;int,int&gt; heap = new();
+    public void Insert(int key) =&gt; heap.Enqueue(key, key);
+    public int Minimum() =&gt; heap.Peek();
+    public int ExtractMin() =&gt; heap.Dequeue();
+    public void Merge(FibonacciHeap other) { while (other.heap.Count &gt; 0) Insert(other.heap.Dequeue()); }
+}</div>
+      </div>
     </section><!-- /fibonacciheap -->
 
 
@@ -2174,6 +2612,92 @@ LINK(x, y)
   else
     accept edge
     UNION(u, v)</div>
+      </div>
+            <p class="code-viewer-label">Implementierungen</p>
+<div class="code-viewer">
+        <div class="code-source" data-lang="Python">class UnionFind:
+    def __init__(self, n):
+        self.parent = list(range(n))
+        self.rank = [0] * n
+
+    def find(self, x):
+        if self.parent[x] != x:
+            self.parent[x] = self.find(self.parent[x])
+        return self.parent[x]
+
+    def union(self, a, b):
+        ra, rb = self.find(a), self.find(b)
+        if ra == rb: return False
+        if self.rank[ra] &lt; self.rank[rb]: ra, rb = rb, ra
+        self.parent[rb] = ra
+        if self.rank[ra] == self.rank[rb]: self.rank[ra] += 1
+        return True</div>
+        <div class="code-source" data-lang="Java">class UnionFind {
+    private final int[] parent, rank;
+    UnionFind(int n) { parent = new int[n]; rank = new int[n]; for (int i = 0; i &lt; n; i++) parent[i] = i; }
+    int find(int x) { return parent[x] == x ? x : (parent[x] = find(parent[x])); }
+    boolean union(int a, int b) {
+        int ra = find(a), rb = find(b);
+        if (ra == rb) return false;
+        if (rank[ra] &lt; rank[rb]) { int t = ra; ra = rb; rb = t; }
+        parent[rb] = ra;
+        if (rank[ra] == rank[rb]) rank[ra]++;
+        return true;
+    }
+}</div>
+        <div class="code-source" data-lang="JavaScript">class UnionFind {
+  constructor(n) { this.parent = Array.from({length:n}, (_,i)=&gt;i); this.rank = Array(n).fill(0); }
+  find(x) { return this.parent[x] === x ? x : (this.parent[x] = this.find(this.parent[x])); }
+  union(a, b) {
+    let ra = this.find(a), rb = this.find(b);
+    if (ra === rb) return false;
+    if (this.rank[ra] &lt; this.rank[rb]) [ra, rb] = [rb, ra];
+    this.parent[rb] = ra;
+    if (this.rank[ra] === this.rank[rb]) this.rank[ra]++;
+    return true;
+  }
+}</div>
+        <div class="code-source" data-lang="Prolog">make_sets(N, Sets) :- findall(X-X-0, between(0, N, X), Sets).
+
+find_set(X, Sets, Root) :- memberchk(X-P-_, Sets), (X = P -&gt; Root = X ; find_set(P, Sets, Root)).
+
+union_set(A, B, Sets, NewSets) :-
+    find_set(A, Sets, RA), find_set(B, Sets, RB),
+    ( RA = RB -&gt; NewSets = Sets
+    ; replace_parent(RB, RA, Sets, NewSets)
+    ).</div>
+        <div class="code-source" data-lang="C">typedef struct { int parent[100], rank[100]; } UnionFind;
+void uf_init(UnionFind *uf, int n){ for(int i=0;i&lt;n;i++){ uf-&gt;parent[i]=i; uf-&gt;rank[i]=0; } }
+int uf_find(UnionFind *uf, int x){ return uf-&gt;parent[x]==x ? x : (uf-&gt;parent[x]=uf_find(uf, uf-&gt;parent[x])); }
+int uf_union(UnionFind *uf, int a, int b){
+    int ra=uf_find(uf,a), rb=uf_find(uf,b); if(ra==rb) return 0;
+    if(uf-&gt;rank[ra] &lt; uf-&gt;rank[rb]){ int t=ra; ra=rb; rb=t; }
+    uf-&gt;parent[rb]=ra; if(uf-&gt;rank[ra]==uf-&gt;rank[rb]) uf-&gt;rank[ra]++;
+    return 1;
+}</div>
+        <div class="code-source" data-lang="C++">class UnionFind {
+    vector&lt;int&gt; parent, rank;
+public:
+    UnionFind(int n): parent(n), rank(n) { iota(parent.begin(), parent.end(), 0); }
+    int find(int x) { return parent[x] == x ? x : parent[x] = find(parent[x]); }
+    bool unite(int a, int b) {
+        a = find(a); b = find(b); if (a == b) return false;
+        if (rank[a] &lt; rank[b]) swap(a, b);
+        parent[b] = a; if (rank[a] == rank[b]) rank[a]++;
+        return true;
+    }
+};</div>
+        <div class="code-source" data-lang="C#">class UnionFind {
+    private readonly int[] parent, rank;
+    public UnionFind(int n) { parent = Enumerable.Range(0, n).ToArray(); rank = new int[n]; }
+    public int Find(int x) =&gt; parent[x] == x ? x : parent[x] = Find(parent[x]);
+    public bool Union(int a, int b) {
+        int ra = Find(a), rb = Find(b); if (ra == rb) return false;
+        if (rank[ra] &lt; rank[rb]) (ra, rb) = (rb, ra);
+        parent[rb] = ra; if (rank[ra] == rank[rb]) rank[ra]++;
+        return true;
+    }
+}</div>
       </div>
     </section><!-- /unionfind -->
 
