@@ -10,7 +10,7 @@
     :root {
       --bg:#07090d; --bar:#10141b; --panel:#141a23; --line:#2a3444;
       --text:#eef2f7; --muted:#8f9bad; --blue:#38bdf8; --green:#22c55e;
-      --yellow:#facc15; --red:#f87171; --top:54px; --drawer:390px;
+      --yellow:#facc15; --red:#f87171; --top:54px; --drawer:400px;
     }
     *{box-sizing:border-box}
     html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;overflow:hidden}
@@ -37,8 +37,11 @@
     .audio-chip.muted{border-color:var(--red);color:#fecaca}
     .frame{position:relative;height:calc(100% - 34px);background:#000}
     iframe,video{width:100%;height:100%;border:0;background:#000;display:block}
-    .placeholder,.note{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:18px;color:var(--muted);font-size:13px;background:rgba(2,6,23,.92);z-index:2}
+    .placeholder,.note{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:18px;color:var(--muted);font-size:13px;background:rgba(2,6,23,.94);z-index:2}
     .placeholder strong,.note strong{color:var(--text);display:block;margin-bottom:4px}.note a{color:var(--blue)}
+    .note .note-actions{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:12px}
+    .note button{height:32px;border:1px solid var(--line);border-radius:8px;background:#0b0f15;color:var(--text);cursor:pointer;padding:0 10px}
+    .note button:hover{border-color:var(--blue)}
     .resize{position:absolute;right:0;bottom:0;width:20px;height:20px;cursor:nwse-resize;opacity:.65;background:linear-gradient(135deg,transparent 50%,var(--blue) 51%,var(--blue) 57%,transparent 58%),linear-gradient(135deg,transparent 68%,#fff 69%,#fff 75%,transparent 76%)}
     .drawer{position:fixed;top:var(--top);left:0;width:var(--drawer);height:calc(100vh - var(--top));background:#0b0f15;border-right:1px solid var(--line);transform:translateX(calc(-1 * var(--drawer)));transition:transform .18s ease;z-index:20;box-shadow:18px 0 40px rgba(0,0,0,.45);display:flex;flex-direction:column}
     .drawer.open{transform:translateX(0)}
@@ -48,22 +51,22 @@
     .sources{display:grid;gap:8px;padding:0 10px 10px}.source{border:1px solid var(--line);border-radius:8px;background:#0b0f15;padding:8px;display:grid;gap:7px}
     .source-label{display:flex;align-items:center;gap:7px;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.04em}.source-label span{color:var(--blue);font-weight:800}
     .input,.type-select{width:100%;height:34px;border:1px solid var(--line);border-radius:7px;background:#07090d;color:var(--text);padding:0 9px;outline:none}
-    .input:focus,.type-select:focus{border-color:var(--blue)}.source-actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}.mini{height:30px;font-size:12px}
+    .input:focus,.type-select:focus{border-color:var(--blue)}.source-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.mini{height:30px;font-size:12px}
     .audio-row{display:grid;grid-template-columns:54px 1fr 44px 44px;gap:7px;align-items:center;color:var(--muted);font-size:12px}.audio-row input[type=range]{width:100%}
     .soundboard{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 10px 10px}.pad{height:44px;border:1px solid var(--line);border-radius:8px;background:#0b0f15;color:var(--text);cursor:pointer;font-weight:700}.pad:hover{border-color:#facc15}.pad:active{transform:scale(.98);background:#171f2b}
     .scrim{display:none;position:fixed;inset:var(--top) 0 0 0;background:rgba(0,0,0,.28);z-index:15}.scrim.show{display:block}
     .modal{display:none;position:fixed;inset:0;z-index:40;background:rgba(0,0,0,.6);place-items:center;padding:20px}
-    .modal.open{display:grid}.modal-card{width:min(760px,96vw);max-height:86vh;overflow:auto;background:#0b0f15;border:1px solid var(--line);border-radius:12px;box-shadow:0 24px 60px rgba(0,0,0,.55)}
+    .modal.open{display:grid}.modal-card{width:min(820px,96vw);max-height:86vh;overflow:auto;background:#0b0f15;border:1px solid var(--line);border-radius:12px;box-shadow:0 24px 60px rgba(0,0,0,.55)}
     .modal-head{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--line);background:var(--panel)}.modal-body{padding:14px 18px;color:#d8dee9;line-height:1.5}.modal-body h3{margin:16px 0 6px}.modal-body p,.modal-body li{color:#cbd5e1}.modal-body code{background:#111827;border:1px solid #1f2937;padding:2px 5px;border-radius:5px}
     code{color:#cbd5e1;font-size:11px}
-    @media(max-width:900px){.status{display:none}.title small{display:none}.select{max-width:110px}:root{--drawer:min(96vw,390px)}}
+    @media(max-width:980px){.status{display:none}.title small{display:none}.select{max-width:110px}:root{--drawer:min(96vw,400px)}}
   </style>
 </head>
 
 <body>
   <header class="topbar">
     <button id="menuBtn" class="menu-btn" title="Menü öffnen"><span class="hamburger"><span></span><span></span><span></span></span></button>
-    <div class="title"><strong>REGIE WALL</strong><small>GitHub Pages · Live Control</small></div>
+    <div class="title"><strong>REGIE WALL</strong><small>GitHub Pages · Login/Local aware</small></div>
     <span class="status"><span class="led"></span> LIVE</span><span id="activeStatus" class="status">4 Monitore</span>
     <div class="toolbar">
       <select id="countSelect" class="select"><option value="2">2 Monitore</option><option value="4" selected>4 Monitore</option><option value="6">6 Monitore</option><option value="8">8 Monitore</option></select>
@@ -84,7 +87,7 @@
     <div class="drawer-body">
       <section class="section">
         <h2>Sources</h2>
-        <p>Typ „Auto“ erkennt YouTube, m3u8/HLS und normale iFrames anhand der URL. Lautstärke/Solo/Mute funktionieren bei YouTube und HLS.</p>
+        <p>„Login-Website“ lädt ohne Sandbox und mit Popups/Formularen. Für lokale IPv4-HTTP-Dienste brauchst du eine HTTP-gehostete Regie Wall oder HTTPS am Dienst.</p>
         <div id="sources" class="sources"></div>
       </section>
 
@@ -98,8 +101,8 @@
       </section>
 
       <section class="section">
-        <h2>Hinweis</h2>
-        <p>WELT ist als HLS/m3u8-Quelle voreingestellt. Falls der Stream später nicht lädt, hat sich die Stream-URL geändert oder der Anbieter blockiert CORS/Zugriff.</p>
+        <h2>Lokale Dienste</h2>
+        <p>GitHub Pages läuft über HTTPS. Browser blockieren darin unsichere Frames wie <code>http://192.168.x.x</code>. Nutze dann HTTP-Hosting im LAN, HTTPS am Gerät oder einen Reverse Proxy.</p>
       </section>
     </div>
   </aside>
@@ -108,20 +111,20 @@
     <div class="modal-card">
       <div class="modal-head"><strong>Kurztutorial</strong><button id="closeHelp" class="icon">×</button></div>
       <div class="modal-body">
-        <h3>1. Quellen einstellen</h3>
-        <p>Öffne links das Menü. Pro Monitor kannst du Titel, Typ und URL setzen. Mit <code>Auto</code> erkennt die Regie Wall YouTube, HLS/m3u8 und normale Websites selbst.</p>
+        <h3>Login-Websites</h3>
+        <p>Wähle als Typ <code>Login-Website</code>. Dann wird der Frame ohne Sandbox geladen. Formulare, Cookies und Login-Popups haben dadurch die besten Chancen.</p>
+        <p>Grenze: Wenn die Zielseite selbst <code>X-Frame-Options</code>, <code>frame-ancestors</code>, blockierte Third-Party-Cookies oder eine Weiterleitung aus dem Frame nutzt, kann die Regie Wall das nicht erzwingen. Nutze dann <code>Login</code>/<code>Öffnen</code>, melde dich im normalen Tab an und lade danach den Frame neu.</p>
 
-        <h3>2. YouTube</h3>
-        <p>Für YouTube kannst du die normale Watch-URL, die Embed-URL oder nur die Video-ID eintragen. Die Seite muss über GitHub Pages/HTTPS laufen, nicht über <code>file://</code>.</p>
+        <h3>IPv4-/LAN-Dienste</h3>
+        <p>Wenn die Regie Wall auf GitHub Pages läuft, ist sie <code>https://...</code>. Ein Dienst wie <code>http://192.168.0.50:8080</code> ist dann Mixed Content und wird als Frame blockiert.</p>
+        <ul>
+          <li>Für LAN-Dienste: Regie Wall im LAN über <code>http://</code> hosten.</li>
+          <li>Oder dem Dienst HTTPS mit gültigem Zertifikat geben.</li>
+          <li>Oder einen Reverse Proxy nutzen, der den lokalen Dienst unter einer HTTPS-Domain bereitstellt.</li>
+        </ul>
 
-        <h3>3. WELT und andere Livestreams</h3>
-        <p>Für TV-Livestreams ist die stabilste Variante eine direkte <code>.m3u8</code>-Adresse mit Typ <code>HLS/m3u8</code>. Normale Website-URLs können iFrames blockieren.</p>
-
-        <h3>4. Tonsteuerung</h3>
-        <p>Im Menü gibt es pro Monitor einen Lautstärke-Regler sowie <code>Mute</code> und <code>Solo</code>. <code>Solo</code> schaltet alle anderen unterstützten Streams stumm. <code>Alle stumm</code> mutet global.</p>
-
-        <h3>5. Layout</h3>
-        <p>Oben kannst du zwischen 2, 4, 6 und 8 Monitoren wechseln. Fenster lassen sich zusätzlich manuell ziehen und rechts unten skalieren.</p>
+        <h3>Tonsteuerung</h3>
+        <p>Mute/Solo/Volume funktionieren bei YouTube und HLS. Bei fremden Website-iFrames ist Tonsteuerung aus Sicherheitsgründen nicht zuverlässig möglich.</p>
       </div>
     </div>
   </div>
@@ -133,23 +136,16 @@
     const DEFAULT_COUNT = 4;
     const DEFAULT_PRESET = "grid";
 
-    /*
-      WEBSITE-/UMGEBUNGSABHÄNGIGE DEFAULTS
-      Du kannst später weitere Presets ergänzen:
-      "username.github.io": [...]
-      "localhost": [...]
-      "default": [...]
-    */
     const SITE_PRESETS = {
       default: [
-        { title: "YOUTUBE LIVE", type: "auto", url: "https://www.youtube.com/embed/IixXpcGrTzo?si=BLhBPSoKsMZ3rMRe", volume: 70, muted: false },
-        { title: "WELT LIVE", type: "hls", url: "https://welt.personalstream.tv/v1/master.m3u8", volume: 70, muted: true },
-        { title: "NAUMBURG", type: "auto", url: "https://www.naumburg.de/de/welterbe.html", volume: 70, muted: true },
-        { title: "WIKIPEDIA", type: "auto", url: "https://www.wikipedia.org", volume: 70, muted: true },
-        { title: "SOURCE 5", type: "auto", url: "", volume: 70, muted: true },
-        { title: "SOURCE 6", type: "auto", url: "", volume: 70, muted: true },
-        { title: "SOURCE 7", type: "auto", url: "", volume: 70, muted: true },
-        { title: "SOURCE 8", type: "auto", url: "", volume: 70, muted: true }
+        { title:"YOUTUBE LIVE", type:"auto", url:"https://www.youtube.com/embed/IixXpcGrTzo?si=BLhBPSoKsMZ3rMRe", volume:70, muted:false },
+        { title:"WELT LIVE", type:"hls", url:"https://welt.personalstream.tv/v1/master.m3u8", volume:70, muted:true },
+        { title:"FEWIS / LOGIN", type:"login", url:"", volume:70, muted:true },
+        { title:"LOKALER DIENST", type:"local", url:"http://192.168.0.1", volume:70, muted:true },
+        { title:"SOURCE 5", type:"auto", url:"", volume:70, muted:true },
+        { title:"SOURCE 6", type:"auto", url:"", volume:70, muted:true },
+        { title:"SOURCE 7", type:"auto", url:"", volume:70, muted:true },
+        { title:"SOURCE 8", type:"auto", url:"", volume:70, muted:true }
       ]
     };
 
@@ -158,7 +154,7 @@
       return structuredClone(SITE_PRESETS[host] || SITE_PRESETS.default);
     }
 
-    const STORAGE_PREFIX = "regie.livecontrol.";
+    const STORAGE_PREFIX = "regie.loginlocal.";
     const wall = document.getElementById("wall");
     const drawer = document.getElementById("drawer");
     const scrim = document.getElementById("scrim");
@@ -191,9 +187,7 @@
     }
 
     function esc(s) {
-      return String(s).replace(/[&<>"']/g, c => ({
-        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
-      }[c]));
+      return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
     }
 
     function normalizeUrl(value) {
@@ -203,21 +197,41 @@
       return "https://" + u;
     }
 
+    function parseUrl(value) {
+      try { return new URL(normalizeUrl(value)); } catch(e) { return null; }
+    }
+
+    function isPrivateIPv4Host(host) {
+      if (!host) return false;
+      if (host === "localhost") return true;
+      if (/^127\./.test(host)) return true;
+      if (/^10\./.test(host)) return true;
+      if (/^192\.168\./.test(host)) return true;
+      if (/^172\.(1[6-9]|2\d|3[0-1])\./.test(host)) return true;
+      return false;
+    }
+
+    function isMixedContentBlocked(urlValue) {
+      const u = parseUrl(urlValue);
+      if (!u) return false;
+      return location.protocol === "https:" && u.protocol === "http:";
+    }
+
     function detectType(source) {
       const declared = source.type || "auto";
       if (declared !== "auto") return declared;
-
       const u = (source.url || "").trim().toLowerCase();
       if (!u) return "iframe";
       if (u.includes("youtube.com") || u.includes("youtu.be") || /^[a-zA-Z0-9_-]{11}$/.test(source.url.trim())) return "youtube";
       if (u.includes(".m3u8") || u.includes("m3u8")) return "hls";
+      const parsed = parseUrl(source.url);
+      if (parsed && isPrivateIPv4Host(parsed.hostname)) return "local";
       return "iframe";
     }
 
     function youtubeId(input) {
       const s = (input || "").trim();
       if (/^[a-zA-Z0-9_-]{11}$/.test(s)) return s;
-
       try {
         const u = new URL(normalizeUrl(s));
         if (u.hostname.includes("youtu.be")) return u.pathname.slice(1).split("/")[0];
@@ -225,23 +239,21 @@
         const m = u.pathname.match(/\/embed\/([a-zA-Z0-9_-]{11})/);
         if (m) return m[1];
       } catch(e) {}
-
       return s;
     }
 
-    function openMenu() { drawer.classList.add("open"); scrim.classList.add("show"); }
-    function closeMenu() { drawer.classList.remove("open"); scrim.classList.remove("show"); }
-    document.getElementById("menuBtn").onclick = openMenu;
-    document.getElementById("closeMenu").onclick = closeMenu;
-    scrim.onclick = closeMenu;
-    document.getElementById("helpBtn").onclick = () => helpModal.classList.add("open");
-    document.getElementById("closeHelp").onclick = () => helpModal.classList.remove("open");
-    helpModal.addEventListener("click", e => { if (e.target === helpModal) helpModal.classList.remove("open"); });
+    function openMenu(){drawer.classList.add("open");scrim.classList.add("show")}
+    function closeMenu(){drawer.classList.remove("open");scrim.classList.remove("show")}
+    document.getElementById("menuBtn").onclick=openMenu;
+    document.getElementById("closeMenu").onclick=closeMenu;
+    scrim.onclick=closeMenu;
+    document.getElementById("helpBtn").onclick=()=>helpModal.classList.add("open");
+    document.getElementById("closeHelp").onclick=()=>helpModal.classList.remove("open");
+    helpModal.addEventListener("click",e=>{if(e.target===helpModal)helpModal.classList.remove("open")});
 
     function createPane(i) {
-      const s = state.sources[i] || { title:`SOURCE ${i + 1}`, type:"auto", url:"", volume:70, muted:true };
+      const s = state.sources[i] || { title:`SOURCE ${i+1}`, type:"auto", url:"", volume:70, muted:true };
       const actualType = detectType(s);
-
       const pane = document.createElement("article");
       pane.className = "pane";
       pane.dataset.index = i;
@@ -252,6 +264,7 @@
           <div class="monitor-title">${esc(s.title || `SOURCE ${i + 1}`)} · ${actualType.toUpperCase()}</div>
           <button class="audio-chip solo ${state.soloIndex === i ? "on" : ""}" title="Nur diesen Stream hören">SOLO</button>
           <button class="audio-chip mute ${isEffectivelyMuted(i) ? "muted" : ""}" title="Stream stumm schalten">MUTE</button>
+          <button class="icon login" title="Login im eigenen Tab">🔐</button>
           <button class="icon reload" title="Neu laden">↻</button>
           <button class="icon open" title="Im neuen Tab öffnen">↗</button>
         </div>
@@ -262,15 +275,23 @@
       renderInsideFrame(pane.querySelector(".frame"), s, i);
 
       pane.querySelector(".reload").onclick = e => { e.stopPropagation(); renderInsideFrame(pane.querySelector(".frame"), s, i); };
-      pane.querySelector(".open").onclick = e => { e.stopPropagation(); const u = normalizeUrl(s.url); if (u) window.open(u, "_blank", "noopener"); };
+      pane.querySelector(".open").onclick = e => { e.stopPropagation(); openSourceUrl(i, false); };
+      pane.querySelector(".login").onclick = e => { e.stopPropagation(); openSourceUrl(i, true); };
       pane.querySelector(".mute").onclick = e => { e.stopPropagation(); toggleMute(i); };
       pane.querySelector(".solo").onclick = e => { e.stopPropagation(); toggleSolo(i); };
 
       pane.addEventListener("pointerdown", () => setActive(pane));
       enableDrag(pane);
       enableResize(pane);
-
       return pane;
+    }
+
+    function openSourceUrl(index, loginMode=false) {
+      const s = state.sources[index];
+      const u = normalizeUrl(s?.url);
+      if (!u) return;
+      const name = loginMode ? `login_${index}` : "_blank";
+      window.open(u, name, "noopener");
     }
 
     function renderInsideFrame(frame, s, index) {
@@ -286,10 +307,27 @@
         return;
       }
 
+      if ((type === "local" || type === "iframe" || type === "login") && isMixedContentBlocked(u)) {
+        const parsed = parseUrl(u);
+        const isLan = parsed && isPrivateIPv4Host(parsed.hostname);
+        frame.innerHTML = `
+          <div class="note">
+            <div>
+              <strong>HTTP über HTTPS blockiert</strong>
+              Diese Regie Wall läuft über HTTPS. Der Dienst <code>${esc(u)}</code> läuft über HTTP und wird deshalb als Frame blockiert.<br>
+              ${isLan ? "Das ist typisch bei lokalen IPv4-/LAN-Diensten." : ""}
+              <div class="note-actions">
+                <button onclick="window.open('${esc(u)}','_blank','noopener')">Im Tab öffnen</button>
+                <button onclick="showLocalAdvice()">Lokale Lösung anzeigen</button>
+              </div>
+            </div>
+          </div>`;
+        return;
+      }
+
       if (type === "youtube") {
         const id = youtubeId(u);
         const playerId = `yt-player-${index}-${Date.now()}`;
-
         const holder = document.createElement("div");
         holder.id = playerId;
         holder.dataset.ytIndex = String(index);
@@ -297,21 +335,14 @@
         holder.style.height = "100%";
         frame.appendChild(holder);
 
-        if (ytApiReady && window.YT && YT.Player) {
-          initYouTubePlayer(index, playerId, id);
-        } else {
-          holder.dataset.videoId = id;
-        }
+        if (ytApiReady && window.YT && YT.Player) initYouTubePlayer(index, playerId, id);
+        else holder.dataset.videoId = id;
         return;
       }
 
       if (type === "hls") {
         const video = document.createElement("video");
-        video.controls = true;
-        video.autoplay = true;
-        video.muted = isEffectivelyMuted(index);
-        video.volume = getEffectiveVolume(index);
-        video.playsInline = true;
+        video.controls = true; video.autoplay = true; video.muted = isEffectivelyMuted(index); video.volume = getEffectiveVolume(index); video.playsInline = true;
         frame.appendChild(video);
         videoPlayers.set(index, video);
 
@@ -325,19 +356,11 @@
           video.addEventListener("loadedmetadata", () => note.remove());
           video.play().catch(() => {});
         } else if (window.Hls && Hls.isSupported()) {
-          const hls = new Hls({ lowLatencyMode: true });
+          const hls = new Hls({ lowLatencyMode:true });
           hls.loadSource(u);
           hls.attachMedia(video);
-          hls.on(Hls.Events.MANIFEST_PARSED, () => {
-            note.remove();
-            applyAudioToIndex(index);
-            video.play().catch(() => {});
-          });
-          hls.on(Hls.Events.ERROR, (event, data) => {
-            if (data.fatal) {
-              note.innerHTML = "<div><strong>HLS lädt nicht.</strong>Prüfe Stream-URL, CORS oder ob die URL noch aktuell ist.</div>";
-            }
-          });
+          hls.on(Hls.Events.MANIFEST_PARSED, () => { note.remove(); applyAudioToIndex(index); video.play().catch(() => {}); });
+          hls.on(Hls.Events.ERROR, (event,data) => { if (data.fatal) note.innerHTML = "<div><strong>HLS lädt nicht.</strong>Prüfe Stream-URL, CORS oder ob die URL noch aktuell ist.</div>"; });
         } else {
           note.innerHTML = "<div><strong>HLS nicht unterstützt.</strong>Dieser Browser kann den Stream hier nicht abspielen.</div>";
         }
@@ -347,6 +370,13 @@
       const iframe = document.createElement("iframe");
       iframe.src = u;
       iframe.referrerPolicy = "strict-origin-when-cross-origin";
+
+      /*
+        Absichtlich KEIN sandbox-Attribut:
+        Login-Formulare, Cookies, SSO-Weiterleitungen und Popups funktionieren so am ehesten.
+        Sicherheitsgrenzen für Cross-Origin gelten trotzdem im Browser.
+      */
+      iframe.allow = "fullscreen; autoplay; clipboard-read; clipboard-write; encrypted-media; picture-in-picture; web-share";
       frame.appendChild(iframe);
 
       const note = document.createElement("div");
@@ -354,359 +384,151 @@
       note.style.display = "none";
       note.innerHTML = `
         <div>
-          <strong>EMBED BLOCKED?</strong>
-          Diese Website erlaubt eventuell keine iFrames.<br>
-          Dann brauchst du eine Embed-URL oder direkte Stream-URL.<br>
-          <a href="${esc(u)}" target="_blank" rel="noopener">Im neuen Tab öffnen</a>
+          <strong>Login oder Embed blockiert?</strong>
+          Falls die Seite im Frame nicht lädt oder Login/SSO scheitert: im normalen Tab anmelden, danach hier neu laden.<br>
+          <div class="note-actions">
+            <button onclick="window.open('${esc(u)}','login_${index}','noopener')">Login im Tab</button>
+            <button onclick="window.open('${esc(u)}','_blank','noopener')">Öffnen</button>
+          </div>
         </div>`;
       frame.appendChild(note);
 
       let loaded = false;
       iframe.addEventListener("load", () => loaded = true);
-      setTimeout(() => { if (!loaded) note.style.display = "grid"; }, 3000);
+      setTimeout(() => { if (!loaded) note.style.display = "grid"; }, 3200);
     }
 
-    function initYouTubePlayer(index, holderId = null, videoId = null) {
-      const holder = holderId
-        ? document.getElementById(holderId)
-        : document.querySelector(`[data-yt-index="${index}"]`);
+    function showLocalAdvice() {
+      helpModal.classList.add("open");
+    }
 
+    function initYouTubePlayer(index, holderId=null, videoId=null) {
+      const holder = holderId ? document.getElementById(holderId) : document.querySelector(`[data-yt-index="${index}"]`);
       if (!holder) return;
-
       const id = videoId || holder.dataset.videoId;
       if (!id) return;
 
       const player = new YT.Player(holder.id, {
-        videoId: id,
-        width: "100%",
-        height: "100%",
-        playerVars: {
-          rel: 0,
-          modestbranding: 1,
-          playsinline: 1,
-          origin: location.origin && location.origin !== "null" ? location.origin : undefined
-        },
-        events: {
-          onReady: () => {
-            ytPlayers.set(index, player);
-            applyAudioToIndex(index);
-          }
-        }
+        videoId:id, width:"100%", height:"100%",
+        playerVars:{rel:0, modestbranding:1, playsinline:1, origin:location.origin && location.origin !== "null" ? location.origin : undefined},
+        events:{onReady:()=>{ytPlayers.set(index, player); applyAudioToIndex(index);}}
       });
     }
 
-    function getEffectiveVolume(index) {
-      const s = state.sources[index];
-      return Math.max(0, Math.min(1, Number((s?.volume ?? 70)) / 100));
+    function getEffectiveVolume(index){const s=state.sources[index];return Math.max(0,Math.min(1,Number((s?.volume ?? 70))/100))}
+    function isEffectivelyMuted(index){const s=state.sources[index];if(!s)return true;if(state.soloIndex>=0 && state.soloIndex!==index)return true;return Boolean(s.muted)}
+    function applyAudioToIndex(index){
+      const muted=isEffectivelyMuted(index), volumePercent=Math.round(getEffectiveVolume(index)*100);
+      const video=videoPlayers.get(index);
+      if(video){video.volume=volumePercent/100;video.muted=muted}
+      const yt=ytPlayers.get(index);
+      if(yt && typeof yt.setVolume==="function"){try{yt.setVolume(volumePercent); muted ? yt.mute() : yt.unMute()}catch(e){}}
+      const pane=wall.querySelector(`.pane[data-index="${index}"]`);
+      if(pane){const muteBtn=pane.querySelector(".mute"), soloBtn=pane.querySelector(".solo"); if(muteBtn)muteBtn.classList.toggle("muted",muted); if(soloBtn)soloBtn.classList.toggle("on",state.soloIndex===index)}
     }
+    function applyAudioAll(){for(let i=0;i<state.count;i++)applyAudioToIndex(i);renderSources();save()}
+    function toggleMute(index){if(!state.sources[index])return;state.sources[index].muted=!state.sources[index].muted;if(state.soloIndex===index && state.sources[index].muted)state.soloIndex=-1;applyAudioAll()}
+    function toggleSolo(index){state.soloIndex=state.soloIndex===index?-1:index;if(state.sources[index])state.sources[index].muted=false;applyAudioAll()}
+    document.getElementById("muteAllBtn").onclick=()=>{state.soloIndex=-1;state.sources.forEach(s=>s.muted=true);applyAudioAll()};
 
-    function isEffectivelyMuted(index) {
-      const s = state.sources[index];
-      if (!s) return true;
-      if (state.soloIndex >= 0 && state.soloIndex !== index) return true;
-      return Boolean(s.muted);
-    }
-
-    function applyAudioToIndex(index) {
-      const muted = isEffectivelyMuted(index);
-      const volumePercent = Math.round(getEffectiveVolume(index) * 100);
-
-      const video = videoPlayers.get(index);
-      if (video) {
-        video.volume = volumePercent / 100;
-        video.muted = muted;
-      }
-
-      const yt = ytPlayers.get(index);
-      if (yt && typeof yt.setVolume === "function") {
-        try {
-          yt.setVolume(volumePercent);
-          muted ? yt.mute() : yt.unMute();
-        } catch(e) {}
-      }
-
-      const pane = wall.querySelector(`.pane[data-index="${index}"]`);
-      if (pane) {
-        const muteBtn = pane.querySelector(".mute");
-        const soloBtn = pane.querySelector(".solo");
-        if (muteBtn) muteBtn.classList.toggle("muted", muted);
-        if (soloBtn) soloBtn.classList.toggle("on", state.soloIndex === index);
-      }
-    }
-
-    function applyAudioAll() {
-      for (let i = 0; i < state.count; i++) applyAudioToIndex(i);
-      renderSources();
-      save();
-    }
-
-    function toggleMute(index) {
-      if (!state.sources[index]) return;
-      state.sources[index].muted = !state.sources[index].muted;
-      if (state.soloIndex === index && state.sources[index].muted) state.soloIndex = -1;
-      applyAudioAll();
-    }
-
-    function toggleSolo(index) {
-      state.soloIndex = state.soloIndex === index ? -1 : index;
-      if (state.sources[index]) state.sources[index].muted = false;
-      applyAudioAll();
-    }
-
-    document.getElementById("muteAllBtn").onclick = () => {
-      state.soloIndex = -1;
-      state.sources.forEach(s => s.muted = true);
-      applyAudioAll();
-    };
-
-    function setActive(pane) {
-      document.querySelectorAll(".pane").forEach(p => p.classList.remove("active"));
-      activePane = pane;
-      if (pane) pane.classList.add("active");
-    }
-
-    function render() {
-      wall.innerHTML = "";
-      ytPlayers.clear();
-      videoPlayers.clear();
-
-      for (let i = 0; i < state.count; i++) wall.appendChild(createPane(i));
-
-      renderSources();
-      countSelect.value = String(state.count);
-      activeStatus.textContent = `${state.count} Monitore`;
-      applyLayout(false);
-      save();
+    function setActive(pane){document.querySelectorAll(".pane").forEach(p=>p.classList.remove("active"));activePane=pane;if(pane)pane.classList.add("active")}
+    function render(){
+      wall.innerHTML="";ytPlayers.clear();videoPlayers.clear();
+      for(let i=0;i<state.count;i++)wall.appendChild(createPane(i));
+      renderSources();countSelect.value=String(state.count);activeStatus.textContent=`${state.count} Monitore`;applyLayout(false);save();
     }
 
     function renderSources() {
       sourcesEl.innerHTML = "";
-
-      for (let i = 0; i < state.count; i++) {
-        if (!state.sources[i]) state.sources[i] = { title:`SOURCE ${i + 1}`, type:"auto", url:"", volume:70, muted:true };
-
-        const s = state.sources[i];
-        const row = document.createElement("div");
-        row.className = "source";
-
-        row.innerHTML = `
-          <div class="source-label"><span>${i + 1}</span> Monitor · ${detectType(s)}</div>
-          <input class="input titleInput" placeholder="Titel" value="${esc(s.title || "")}">
+      for (let i=0;i<state.count;i++) {
+        if(!state.sources[i]) state.sources[i]={title:`SOURCE ${i+1}`,type:"auto",url:"",volume:70,muted:true};
+        const s=state.sources[i];
+        const row=document.createElement("div"); row.className="source";
+        row.innerHTML=`
+          <div class="source-label"><span>${i+1}</span> Monitor · ${detectType(s)}</div>
+          <input class="input titleInput" placeholder="Titel" value="${esc(s.title||"")}">
           <select class="type-select typeInput">
-            <option value="auto"${(s.type || "auto") === "auto" ? " selected" : ""}>Auto erkennen</option>
-            <option value="iframe"${s.type === "iframe" ? " selected" : ""}>iFrame / Website</option>
-            <option value="youtube"${s.type === "youtube" ? " selected" : ""}>YouTube ID / URL</option>
-            <option value="hls"${s.type === "hls" ? " selected" : ""}>HLS / m3u8 Stream</option>
+            <option value="auto"${(s.type||"auto")==="auto"?" selected":""}>Auto erkennen</option>
+            <option value="iframe"${s.type==="iframe"?" selected":""}>iFrame / Website</option>
+            <option value="login"${s.type==="login"?" selected":""}>Login-Website</option>
+            <option value="local"${s.type==="local"?" selected":""}>Lokaler IPv4-Dienst</option>
+            <option value="youtube"${s.type==="youtube"?" selected":""}>YouTube ID / URL</option>
+            <option value="hls"${s.type==="hls"?" selected":""}>HLS / m3u8 Stream</option>
           </select>
-          <input class="input urlInput" placeholder="URL, YouTube-ID oder .m3u8" value="${esc(s.url || "")}">
+          <input class="input urlInput" placeholder="URL, YouTube-ID oder .m3u8" value="${esc(s.url||"")}">
           <div class="audio-row">
             <span>Vol</span>
-            <input class="volInput" type="range" min="0" max="100" value="${Number(s.volume ?? 70)}">
-            <button class="mini muteBtn">${isEffectivelyMuted(i) ? "Unmute" : "Mute"}</button>
-            <button class="mini soloBtn">${state.soloIndex === i ? "Solo aus" : "Solo"}</button>
+            <input class="volInput" type="range" min="0" max="100" value="${Number(s.volume??70)}">
+            <button class="mini muteBtn">${isEffectivelyMuted(i)?"Unmute":"Mute"}</button>
+            <button class="mini soloBtn">${state.soloIndex===i?"Solo aus":"Solo"}</button>
           </div>
           <div class="source-actions">
             <button class="mini load">Laden</button>
+            <button class="mini loginOpen">Login</button>
             <button class="mini open">Öffnen</button>
             <button class="mini clear">Leeren</button>
-          </div>
-        `;
-
-        const title = row.querySelector(".titleInput");
-        const type = row.querySelector(".typeInput");
-        const url = row.querySelector(".urlInput");
-        const vol = row.querySelector(".volInput");
-
-        title.oninput = () => { state.sources[i].title = title.value; updatePane(i); save(); };
-        type.onchange = () => { state.sources[i].type = type.value; updatePane(i); save(); };
-        url.oninput = () => { state.sources[i].url = url.value; save(); };
-        vol.oninput = () => { state.sources[i].volume = Number(vol.value); applyAudioToIndex(i); save(); };
-
-        row.querySelector(".muteBtn").onclick = () => toggleMute(i);
-        row.querySelector(".soloBtn").onclick = () => toggleSolo(i);
-
-        row.querySelector(".load").onclick = () => {
-          state.sources[i].url = url.value;
-          state.sources[i].type = type.value;
-          updatePane(i);
-          save();
-        };
-
-        row.querySelector(".open").onclick = () => {
-          const u = normalizeUrl(url.value);
-          if (u) window.open(u, "_blank", "noopener");
-        };
-
-        row.querySelector(".clear").onclick = () => {
-          state.sources[i].url = "";
-          updatePane(i);
-          save();
-        };
-
+          </div>`;
+        const title=row.querySelector(".titleInput"), type=row.querySelector(".typeInput"), url=row.querySelector(".urlInput"), vol=row.querySelector(".volInput");
+        title.oninput=()=>{state.sources[i].title=title.value;updatePane(i);save()};
+        type.onchange=()=>{state.sources[i].type=type.value;updatePane(i);save()};
+        url.oninput=()=>{state.sources[i].url=url.value;save()};
+        vol.oninput=()=>{state.sources[i].volume=Number(vol.value);applyAudioToIndex(i);save()};
+        row.querySelector(".muteBtn").onclick=()=>toggleMute(i);
+        row.querySelector(".soloBtn").onclick=()=>toggleSolo(i);
+        row.querySelector(".load").onclick=()=>{state.sources[i].url=url.value;state.sources[i].type=type.value;updatePane(i);save()};
+        row.querySelector(".loginOpen").onclick=()=>openSourceUrl(i,true);
+        row.querySelector(".open").onclick=()=>openSourceUrl(i,false);
+        row.querySelector(".clear").onclick=()=>{state.sources[i].url="";updatePane(i);save()};
         sourcesEl.appendChild(row);
       }
     }
 
     function updatePane(i) {
-      const old = wall.querySelector(`.pane[data-index="${i}"]`);
-      if (!old) return;
-
-      const pos = {
-        left: old.style.left,
-        top: old.style.top,
-        width: old.style.width,
-        height: old.style.height
-      };
-
-      const fresh = createPane(i);
-      Object.assign(fresh.style, pos);
-      old.replaceWith(fresh);
+      const old=wall.querySelector(`.pane[data-index="${i}"]`); if(!old)return;
+      const pos={left:old.style.left,top:old.style.top,width:old.style.width,height:old.style.height};
+      const fresh=createPane(i); Object.assign(fresh.style,pos); old.replaceWith(fresh);
     }
 
-    function applyLayout(animated = true) {
-      const panes = [...document.querySelectorAll(".pane")];
-      const W = wall.clientWidth, H = wall.clientHeight, gap = 10, preset = presetSelect.value;
-
-      const set = (p, x, y, w, h) => {
-        if (animated) p.style.transition = "left .18s ease, top .18s ease, width .18s ease, height .18s ease";
-        p.style.left = Math.round(x) + "px";
-        p.style.top = Math.round(y) + "px";
-        p.style.width = Math.round(w) + "px";
-        p.style.height = Math.round(h) + "px";
-        if (animated) setTimeout(() => p.style.transition = "", 220);
-      };
-
-      if (preset === "program" && panes.length >= 2) {
-        const mainW = W * .62;
-        set(panes[0], gap, gap, mainW - gap * 1.5, H - gap * 2);
-        const rest = panes.slice(1);
-        const rh = (H - gap * (rest.length + 1)) / rest.length;
-        rest.forEach((p, i) => set(p, mainW + gap / 2, gap + i * (rh + gap), W - mainW - gap * 1.5, rh));
-        return;
-      }
-
-      if (preset === "wide" && panes.length >= 3) {
-        const topH = H * .55;
-        set(panes[0], gap, gap, W - gap * 2, topH - gap * 1.5);
-        const rest = panes.slice(1);
-        const cw = (W - gap * (rest.length + 1)) / rest.length;
-        rest.forEach((p, i) => set(p, gap + i * (cw + gap), topH + gap / 2, cw, H - topH - gap * 1.5));
-        return;
-      }
-
-      const cols = preset === "stack" ? (state.count <= 4 ? 2 : 4) : (state.count === 2 ? 2 : state.count === 6 ? 3 : state.count === 8 ? 4 : 2);
-      const rows = Math.ceil(state.count / cols);
-
-      panes.forEach((p, i) => {
-        const col = i % cols, row = Math.floor(i / cols);
-        const cw = (W - gap * (cols + 1)) / cols;
-        const rh = (H - gap * (rows + 1)) / rows;
-        set(p, gap + col * (cw + gap), gap + row * (rh + gap), cw, rh);
-      });
+    function applyLayout(animated=true) {
+      const panes=[...document.querySelectorAll(".pane")], W=wall.clientWidth, H=wall.clientHeight, gap=10, preset=presetSelect.value;
+      const set=(p,x,y,w,h)=>{if(animated)p.style.transition="left .18s ease,top .18s ease,width .18s ease,height .18s ease";p.style.left=Math.round(x)+"px";p.style.top=Math.round(y)+"px";p.style.width=Math.round(w)+"px";p.style.height=Math.round(h)+"px";if(animated)setTimeout(()=>p.style.transition="",220)};
+      if(preset==="program"&&panes.length>=2){const mainW=W*.62;set(panes[0],gap,gap,mainW-gap*1.5,H-gap*2);const rest=panes.slice(1),rh=(H-gap*(rest.length+1))/rest.length;rest.forEach((p,i)=>set(p,mainW+gap/2,gap+i*(rh+gap),W-mainW-gap*1.5,rh));return}
+      if(preset==="wide"&&panes.length>=3){const topH=H*.55;set(panes[0],gap,gap,W-gap*2,topH-gap*1.5);const rest=panes.slice(1),cw=(W-gap*(rest.length+1))/rest.length;rest.forEach((p,i)=>set(p,gap+i*(cw+gap),topH+gap/2,cw,H-topH-gap*1.5));return}
+      const cols=preset==="stack"?(state.count<=4?2:4):(state.count===2?2:state.count===6?3:state.count===8?4:2);
+      const rows=Math.ceil(state.count/cols);
+      panes.forEach((p,i)=>{const col=i%cols,row=Math.floor(i/cols),cw=(W-gap*(cols+1))/cols,rh=(H-gap*(rows+1))/rows;set(p,gap+col*(cw+gap),gap+row*(rh+gap),cw,rh)});
     }
 
     function enableDrag(pane) {
-      const head = pane.querySelector(".head");
-      let sx, sy, sl, st;
-
-      head.addEventListener("pointerdown", e => {
-        if (e.target.closest("button")) return;
-        setActive(pane);
-        pane.setPointerCapture(e.pointerId);
-        sx = e.clientX; sy = e.clientY; sl = pane.offsetLeft; st = pane.offsetTop;
-
-        const move = ev => {
-          pane.style.left = clamp(sl + ev.clientX - sx, 0, wall.clientWidth - pane.offsetWidth) + "px";
-          pane.style.top = clamp(st + ev.clientY - sy, 0, wall.clientHeight - pane.offsetHeight) + "px";
-        };
-
-        const up = ev => {
-          pane.releasePointerCapture(ev.pointerId);
-          pane.removeEventListener("pointermove", move);
-          pane.removeEventListener("pointerup", up);
-        };
-
-        pane.addEventListener("pointermove", move);
-        pane.addEventListener("pointerup", up);
+      const head=pane.querySelector(".head"); let sx,sy,sl,st;
+      head.addEventListener("pointerdown",e=>{if(e.target.closest("button"))return;setActive(pane);pane.setPointerCapture(e.pointerId);sx=e.clientX;sy=e.clientY;sl=pane.offsetLeft;st=pane.offsetTop;
+        const move=ev=>{pane.style.left=clamp(sl+ev.clientX-sx,0,wall.clientWidth-pane.offsetWidth)+"px";pane.style.top=clamp(st+ev.clientY-sy,0,wall.clientHeight-pane.offsetHeight)+"px"};
+        const up=ev=>{pane.releasePointerCapture(ev.pointerId);pane.removeEventListener("pointermove",move);pane.removeEventListener("pointerup",up)};
+        pane.addEventListener("pointermove",move);pane.addEventListener("pointerup",up);
       });
     }
-
     function enableResize(pane) {
-      const h = pane.querySelector(".resize");
-      let sx, sy, sw, sh;
-
-      h.addEventListener("pointerdown", e => {
-        e.stopPropagation();
-        setActive(pane);
-        pane.setPointerCapture(e.pointerId);
-        sx = e.clientX; sy = e.clientY; sw = pane.offsetWidth; sh = pane.offsetHeight;
-
-        const move = ev => {
-          pane.style.width = clamp(sw + ev.clientX - sx, 260, wall.clientWidth - pane.offsetLeft) + "px";
-          pane.style.height = clamp(sh + ev.clientY - sy, 180, wall.clientHeight - pane.offsetTop) + "px";
-        };
-
-        const up = ev => {
-          pane.releasePointerCapture(ev.pointerId);
-          pane.removeEventListener("pointermove", move);
-          pane.removeEventListener("pointerup", up);
-        };
-
-        pane.addEventListener("pointermove", move);
-        pane.addEventListener("pointerup", up);
+      const h=pane.querySelector(".resize"); let sx,sy,sw,sh;
+      h.addEventListener("pointerdown",e=>{e.stopPropagation();setActive(pane);pane.setPointerCapture(e.pointerId);sx=e.clientX;sy=e.clientY;sw=pane.offsetWidth;sh=pane.offsetHeight;
+        const move=ev=>{pane.style.width=clamp(sw+ev.clientX-sx,260,wall.clientWidth-pane.offsetLeft)+"px";pane.style.height=clamp(sh+ev.clientY-sy,180,wall.clientHeight-pane.offsetTop)+"px"};
+        const up=ev=>{pane.releasePointerCapture(ev.pointerId);pane.removeEventListener("pointermove",move);pane.removeEventListener("pointerup",up)};
+        pane.addEventListener("pointermove",move);pane.addEventListener("pointerup",up);
       });
     }
+    function clamp(n,min,max){return Math.max(min,Math.min(max,n))}
 
-    function clamp(n, min, max) { return Math.max(min, Math.min(max, n)); }
+    countSelect.onchange=()=>{state.count=Number(countSelect.value);render()};
+    presetSelect.value=localStorage.getItem(STORAGE_PREFIX+"preset")||DEFAULT_PRESET;
+    presetSelect.onchange=()=>{localStorage.setItem(STORAGE_PREFIX+"preset",presetSelect.value);applyLayout(true)};
+    document.getElementById("applyPreset").onclick=()=>applyLayout(true);
+    document.getElementById("resetDefaults").onclick=()=>{state.count=DEFAULT_COUNT;state.sources=getDefaultsForCurrentSite();state.soloIndex=-1;presetSelect.value=DEFAULT_PRESET;localStorage.setItem(STORAGE_PREFIX+"preset",DEFAULT_PRESET);render()};
+    document.getElementById("fullscreenBtn").onclick=async()=>{if(!document.fullscreenElement)await document.documentElement.requestFullscreen();else await document.exitFullscreen()};
+    window.addEventListener("resize",()=>applyLayout(false));
 
-    countSelect.onchange = () => { state.count = Number(countSelect.value); render(); };
-
-    presetSelect.value = localStorage.getItem(STORAGE_PREFIX + "preset") || DEFAULT_PRESET;
-    presetSelect.onchange = () => { localStorage.setItem(STORAGE_PREFIX + "preset", presetSelect.value); applyLayout(true); };
-
-    document.getElementById("applyPreset").onclick = () => applyLayout(true);
-
-    document.getElementById("resetDefaults").onclick = () => {
-      state.count = DEFAULT_COUNT;
-      state.sources = getDefaultsForCurrentSite();
-      state.soloIndex = -1;
-      presetSelect.value = DEFAULT_PRESET;
-      localStorage.setItem(STORAGE_PREFIX + "preset", DEFAULT_PRESET);
-      render();
-    };
-
-    document.getElementById("fullscreenBtn").onclick = async () => {
-      if (!document.fullscreenElement) await document.documentElement.requestFullscreen();
-      else await document.exitFullscreen();
-    };
-
-    window.addEventListener("resize", () => applyLayout(false));
-
-    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-    const audio = new AudioContextClass();
-
-    function tone(freq, dur, type = "sine", gain = .11, delay = 0) {
-      const osc = audio.createOscillator(), g = audio.createGain();
-      osc.type = type; osc.frequency.value = freq; osc.connect(g); g.connect(audio.destination);
-      const t = audio.currentTime + delay;
-      g.gain.setValueAtTime(.001, t);
-      g.gain.linearRampToValueAtTime(gain, t + .01);
-      g.gain.exponentialRampToValueAtTime(.001, t + dur);
-      osc.start(t); osc.stop(t + dur + .03);
-    }
-
-    function play(name) {
-      if (audio.state === "suspended") audio.resume();
-      if (name === "sting") { tone(440,.1,"square"); tone(660,.12,"square",.1,.1); tone(880,.18,"square",.09,.22); }
-      if (name === "alert") { tone(900,.16,"sawtooth"); tone(900,.16,"sawtooth",.11,.22); }
-      if (name === "click") tone(1300,.045,"square",.08);
-      if (name === "ok") { tone(520,.1); tone(780,.16,"sine",.1,.1); }
-      if (name === "count") { tone(700,.07,"square"); tone(700,.07,"square",.1,.15); tone(350,.18,"square",.12,.32); }
-      if (name === "fail") { tone(230,.18,"sawtooth"); tone(160,.25,"sawtooth",.1,.16); }
-    }
-
-    document.querySelectorAll(".pad").forEach(p => p.onclick = () => play(p.dataset.sound));
-
+    const AudioContextClass=window.AudioContext||window.webkitAudioContext; const audio=new AudioContextClass();
+    function tone(freq,dur,type="sine",gain=.11,delay=0){const osc=audio.createOscillator(),g=audio.createGain();osc.type=type;osc.frequency.value=freq;osc.connect(g);g.connect(audio.destination);const t=audio.currentTime+delay;g.gain.setValueAtTime(.001,t);g.gain.linearRampToValueAtTime(gain,t+.01);g.gain.exponentialRampToValueAtTime(.001,t+dur);osc.start(t);osc.stop(t+dur+.03)}
+    function play(name){if(audio.state==="suspended")audio.resume();if(name==="sting"){tone(440,.1,"square");tone(660,.12,"square",.1,.1);tone(880,.18,"square",.09,.22)}if(name==="alert"){tone(900,.16,"sawtooth");tone(900,.16,"sawtooth",.11,.22)}if(name==="click")tone(1300,.045,"square",.08);if(name==="ok"){tone(520,.1);tone(780,.16,"sine",.1,.1)}if(name==="count"){tone(700,.07,"square");tone(700,.07,"square",.1,.15);tone(350,.18,"square",.12,.32)}if(name==="fail"){tone(230,.18,"sawtooth");tone(160,.25,"sawtooth",.1,.16)}}
+    document.querySelectorAll(".pad").forEach(p=>p.onclick=()=>play(p.dataset.sound));
     render();
   </script>
 </body>
