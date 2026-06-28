@@ -66,7 +66,7 @@
 <body>
   <header class="topbar">
     <button id="menuBtn" class="menu-btn" title="Menü öffnen"><span class="hamburger"><span></span><span></span><span></span></span></button>
-    <div class="title"><strong>REGIE WALL</strong><small>GitHub Pages · Login/Local aware</small></div>
+    <div class="title"><strong>REGIE WALL</strong><small>GitHub Pages · EDPweb/Login/Local aware</small></div>
     <span class="status"><span class="led"></span> LIVE</span><span id="activeStatus" class="status">4 Monitore</span>
     <div class="toolbar">
       <select id="countSelect" class="select"><option value="2">2 Monitore</option><option value="4" selected>4 Monitore</option><option value="6">6 Monitore</option><option value="8">8 Monitore</option></select>
@@ -87,7 +87,7 @@
     <div class="drawer-body">
       <section class="section">
         <h2>Sources</h2>
-        <p>„Login-Website“ lädt ohne Sandbox und mit Popups/Formularen. Für lokale IPv4-HTTP-Dienste brauchst du eine HTTP-gehostete Regie Wall oder HTTPS am Dienst.</p>
+        <p>„EDPweb“ und „Login-Website“ laden ohne Sandbox und mit Popups/Formularen. Für lokale IPv4-HTTP-Dienste brauchst du eine HTTP-gehostete Regie Wall oder HTTPS am Dienst.</p>
         <div id="sources" class="sources"></div>
       </section>
 
@@ -102,7 +102,7 @@
 
       <section class="section">
         <h2>Lokale Dienste</h2>
-        <p>GitHub Pages läuft über HTTPS. Browser blockieren darin unsichere Frames wie <code>http://192.168.x.x</code>. Nutze dann HTTP-Hosting im LAN, HTTPS am Gerät oder einen Reverse Proxy.</p>
+        <p>GitHub Pages läuft über HTTPS. Browser blockieren darin unsichere Frames wie <code>http://192.168.x.x</code>. Für EDPweb per Geräte-IP nutze dann HTTP-Hosting im LAN, HTTPS am Gerät oder einen Reverse Proxy.</p>
       </section>
     </div>
   </aside>
@@ -140,8 +140,8 @@
       default: [
         { title:"YOUTUBE LIVE", type:"auto", url:"https://www.youtube.com/embed/IixXpcGrTzo?si=BLhBPSoKsMZ3rMRe", volume:70, muted:false },
         { title:"WELT LIVE", type:"hls", url:"https://welt.personalstream.tv/v1/master.m3u8", volume:70, muted:true },
+        { title:"EDPweb", type:"edpweb", url:"https://192.168.0.1:83", volume:70, muted:true },
         { title:"FEWIS / LOGIN", type:"login", url:"", volume:70, muted:true },
-        { title:"LOKALER DIENST", type:"local", url:"http://192.168.0.1", volume:70, muted:true },
         { title:"SOURCE 5", type:"auto", url:"", volume:70, muted:true },
         { title:"SOURCE 6", type:"auto", url:"", volume:70, muted:true },
         { title:"SOURCE 7", type:"auto", url:"", volume:70, muted:true },
@@ -224,6 +224,7 @@
       if (!u) return "iframe";
       if (u.includes("youtube.com") || u.includes("youtu.be") || /^[a-zA-Z0-9_-]{11}$/.test(source.url.trim())) return "youtube";
       if (u.includes(".m3u8") || u.includes("m3u8")) return "hls";
+      if ((source.title || "").toLowerCase().includes("edpweb") || u.includes("edpweb")) return "edpweb";
       const parsed = parseUrl(source.url);
       if (parsed && isPrivateIPv4Host(parsed.hostname)) return "local";
       return "iframe";
@@ -307,7 +308,7 @@
         return;
       }
 
-      if ((type === "local" || type === "iframe" || type === "login") && isMixedContentBlocked(u)) {
+      if ((type === "local" || type === "iframe" || type === "login" || type === "edpweb") && isMixedContentBlocked(u)) {
         const parsed = parseUrl(u);
         const isLan = parsed && isPrivateIPv4Host(parsed.hostname);
         frame.innerHTML = `
@@ -315,7 +316,7 @@
             <div>
               <strong>HTTP über HTTPS blockiert</strong>
               Diese Regie Wall läuft über HTTPS. Der Dienst <code>${esc(u)}</code> läuft über HTTP und wird deshalb als Frame blockiert.<br>
-              ${isLan ? "Das ist typisch bei lokalen IPv4-/LAN-Diensten." : ""}
+              ${isLan ? "Das ist typisch bei lokalen IPv4-/LAN-Diensten wie EDPweb auf einer Geräte-IP." : ""}
               <div class="note-actions">
                 <button onclick="window.open('${esc(u)}','_blank','noopener')">Im Tab öffnen</button>
                 <button onclick="showLocalAdvice()">Lokale Lösung anzeigen</button>
@@ -367,6 +368,14 @@
         return;
       }
 
+      if (type === "edpweb") {
+        const parsed = parseUrl(u);
+        if (parsed && parsed.protocol === "https:" && isPrivateIPv4Host(parsed.hostname)) {
+          // Browser können bei privaten IPs mit selbstsignierten Zertifikaten zuerst eine Zertifikatsbestätigung verlangen.
+          // Das klappt meist nur im normalen Tab; danach kann der Frame neu geladen werden.
+        }
+      }
+
       const iframe = document.createElement("iframe");
       iframe.src = u;
       iframe.referrerPolicy = "strict-origin-when-cross-origin";
@@ -385,7 +394,7 @@
       note.innerHTML = `
         <div>
           <strong>Login oder Embed blockiert?</strong>
-          Falls die Seite im Frame nicht lädt oder Login/SSO scheitert: im normalen Tab anmelden, danach hier neu laden.<br>
+          Falls die Seite im Frame nicht lädt: im normalen Tab anmelden bzw. Zertifikat/IP bestätigen, danach hier neu laden.<br>
           <div class="note-actions">
             <button onclick="window.open('${esc(u)}','login_${index}','noopener')">Login im Tab</button>
             <button onclick="window.open('${esc(u)}','_blank','noopener')">Öffnen</button>
@@ -451,6 +460,7 @@
             <option value="auto"${(s.type||"auto")==="auto"?" selected":""}>Auto erkennen</option>
             <option value="iframe"${s.type==="iframe"?" selected":""}>iFrame / Website</option>
             <option value="login"${s.type==="login"?" selected":""}>Login-Website</option>
+            <option value="edpweb"${s.type==="edpweb"?" selected":""}>EDPweb</option>
             <option value="local"${s.type==="local"?" selected":""}>Lokaler IPv4-Dienst</option>
             <option value="youtube"${s.type==="youtube"?" selected":""}>YouTube ID / URL</option>
             <option value="hls"${s.type==="hls"?" selected":""}>HLS / m3u8 Stream</option>
