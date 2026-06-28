@@ -8,441 +8,69 @@
 
   <style>
     :root {
-      --bg: #07090d;
-      --bar: #10141b;
-      --panel: #141a23;
-      --line: #2a3444;
-      --text: #eef2f7;
-      --muted: #8f9bad;
-      --blue: #38bdf8;
-      --green: #22c55e;
-      --top: 54px;
-      --drawer: 370px;
+      --bg:#07090d; --bar:#10141b; --panel:#141a23; --line:#2a3444;
+      --text:#eef2f7; --muted:#8f9bad; --blue:#38bdf8; --green:#22c55e;
+      --yellow:#facc15; --red:#f87171; --top:54px; --drawer:390px;
     }
-
-    * { box-sizing: border-box; }
-
-    html, body {
-      height: 100%;
-      margin: 0;
-      background: var(--bg);
-      color: var(--text);
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      overflow: hidden;
-    }
-
-    button, input, select { font: inherit; }
-
-    .topbar {
-      height: var(--top);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 8px 12px;
-      background: var(--bar);
-      border-bottom: 1px solid var(--line);
-    }
-
-    .menu-btn, .btn, .select, .icon, .mini {
-      border: 1px solid var(--line);
-      background: #0b0f15;
-      color: var(--text);
-      border-radius: 8px;
-      cursor: pointer;
-    }
-
-    .menu-btn {
-      width: 38px;
-      height: 38px;
-      display: grid;
-      place-items: center;
-      flex: 0 0 auto;
-    }
-
-    .menu-btn:hover, .btn:hover, .select:hover, .icon:hover, .mini:hover {
-      border-color: var(--blue);
-    }
-
-    .hamburger {
-      width: 18px;
-      height: 12px;
-      display: grid;
-      gap: 3px;
-    }
-
-    .hamburger span {
-      height: 2px;
-      background: var(--text);
-      border-radius: 999px;
-    }
-
-    .title {
-      display: flex;
-      flex-direction: column;
-      line-height: 1.1;
-      min-width: 170px;
-      margin-right: auto;
-    }
-
-    .title strong {
-      font-size: 15px;
-      letter-spacing: .04em;
-    }
-
-    .title small {
-      font-size: 11px;
-      color: var(--muted);
-      margin-top: 3px;
-    }
-
-    .status {
-      height: 26px;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      padding: 0 9px;
-      color: var(--muted);
-      font-size: 12px;
-      background: #0b0f15;
-    }
-
-    .led {
-      width: 8px;
-      height: 8px;
-      border-radius: 999px;
-      background: var(--green);
-      box-shadow: 0 0 9px var(--green);
-    }
-
-    .toolbar {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
-
-    .select, .btn {
-      height: 36px;
-      padding: 0 10px;
-    }
-
-    .btn.blue {
-      border-color: #1d4ed8;
-      background: #0f1d31;
-    }
-
-    .wall {
-      position: absolute;
-      inset: var(--top) 0 0 0;
-      padding: 10px;
-      background:
-        linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px),
-        linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
-        #07090d;
-      background-size: 36px 36px;
-    }
-
-    .pane {
-      position: absolute;
-      min-width: 230px;
-      min-height: 160px;
-      border: 1px solid #334155;
-      border-radius: 10px;
-      background: #020617;
-      overflow: hidden;
-      box-shadow: 0 10px 26px rgba(0,0,0,.45);
-    }
-
-    .pane.active {
-      outline: 2px solid var(--blue);
-      outline-offset: -2px;
-    }
-
-    .head {
-      height: 34px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 0 8px;
-      background: #111827;
-      border-bottom: 1px solid var(--line);
-      cursor: grab;
-      user-select: none;
-    }
-
-    .num {
-      width: 24px;
-      height: 20px;
-      border-radius: 5px;
-      display: grid;
-      place-items: center;
-      background: #0b0f15;
-      border: 1px solid var(--line);
-      color: var(--blue);
-      font-size: 11px;
-      font-weight: 700;
-      flex: 0 0 auto;
-    }
-
-    .monitor-title {
-      font-size: 12px;
-      color: #d8dee9;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      flex: 1;
-    }
-
-    .icon {
-      width: 24px;
-      height: 24px;
-      padding: 0;
-      color: var(--muted);
-    }
-
-    .frame {
-      position: relative;
-      height: calc(100% - 34px);
-      background: #000;
-    }
-
-    iframe, video {
-      width: 100%;
-      height: 100%;
-      border: 0;
-      background: #000;
-      display: block;
-    }
-
-    .placeholder, .note {
-      position: absolute;
-      inset: 0;
-      display: grid;
-      place-items: center;
-      text-align: center;
-      padding: 18px;
-      color: var(--muted);
-      font-size: 13px;
-      background: rgba(2,6,23,.92);
-    }
-
-    .placeholder strong, .note strong {
-      color: var(--text);
-      display: block;
-      margin-bottom: 4px;
-    }
-
-    .note a { color: var(--blue); }
-
-    .resize {
-      position: absolute;
-      right: 0;
-      bottom: 0;
-      width: 20px;
-      height: 20px;
-      cursor: nwse-resize;
-      opacity: .65;
-      background:
-        linear-gradient(135deg, transparent 50%, var(--blue) 51%, var(--blue) 57%, transparent 58%),
-        linear-gradient(135deg, transparent 68%, #fff 69%, #fff 75%, transparent 76%);
-    }
-
-    .drawer {
-      position: fixed;
-      top: var(--top);
-      left: 0;
-      width: var(--drawer);
-      height: calc(100vh - var(--top));
-      background: #0b0f15;
-      border-right: 1px solid var(--line);
-      transform: translateX(calc(-1 * var(--drawer)));
-      transition: transform .18s ease;
-      z-index: 20;
-      box-shadow: 18px 0 40px rgba(0,0,0,.45);
-      display: flex;
-      flex-direction: column;
-    }
-
-    .drawer.open { transform: translateX(0); }
-
-    .drawer-head {
-      height: 46px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 12px;
-      border-bottom: 1px solid var(--line);
-      background: var(--panel);
-    }
-
-    .drawer-head strong {
-      font-size: 13px;
-      letter-spacing: .04em;
-      text-transform: uppercase;
-    }
-
-    .drawer-body {
-      overflow: auto;
-      padding: 12px;
-    }
-
-    .section {
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      background: var(--panel);
-      margin-bottom: 12px;
-      overflow: hidden;
-    }
-
-    .section h2 {
-      margin: 0;
-      padding: 10px 10px 6px;
-      font-size: 13px;
-    }
-
-    .section p {
-      margin: 0;
-      padding: 0 10px 10px;
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.35;
-    }
-
-    .sources {
-      display: grid;
-      gap: 8px;
-      padding: 0 10px 10px;
-    }
-
-    .source {
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: #0b0f15;
-      padding: 8px;
-      display: grid;
-      gap: 6px;
-    }
-
-    .source-label {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      color: var(--muted);
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: .04em;
-    }
-
-    .source-label span {
-      color: var(--blue);
-      font-weight: 800;
-    }
-
-    .input, .type-select {
-      width: 100%;
-      height: 34px;
-      border: 1px solid var(--line);
-      border-radius: 7px;
-      background: #07090d;
-      color: var(--text);
-      padding: 0 9px;
-      outline: none;
-    }
-
-    .input:focus, .type-select:focus {
-      border-color: var(--blue);
-    }
-
-    .source-actions {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 6px;
-    }
-
-    .mini {
-      height: 30px;
-      font-size: 12px;
-    }
-
-    .soundboard {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      padding: 0 10px 10px;
-    }
-
-    .pad {
-      height: 44px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: #0b0f15;
-      color: var(--text);
-      cursor: pointer;
-      font-weight: 700;
-    }
-
-    .pad:hover { border-color: #facc15; }
-
-    .pad:active {
-      transform: scale(.98);
-      background: #171f2b;
-    }
-
-    .scrim {
-      display: none;
-      position: fixed;
-      inset: var(--top) 0 0 0;
-      background: rgba(0,0,0,.28);
-      z-index: 15;
-    }
-
-    .scrim.show { display: block; }
-
-    code {
-      color: #cbd5e1;
-      font-size: 11px;
-    }
-
-    @media(max-width: 820px) {
-      .status { display: none; }
-      .title small { display: none; }
-      .select { max-width: 110px; }
-      :root { --drawer: min(94vw, 370px); }
-    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;overflow:hidden}
+    button,input,select{font:inherit}
+    .topbar{height:var(--top);display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--bar);border-bottom:1px solid var(--line)}
+    .menu-btn,.btn,.select,.icon,.mini{border:1px solid var(--line);background:#0b0f15;color:var(--text);border-radius:8px;cursor:pointer}
+    .menu-btn{width:38px;height:38px;display:grid;place-items:center;flex:0 0 auto}
+    .menu-btn:hover,.btn:hover,.select:hover,.icon:hover,.mini:hover{border-color:var(--blue)}
+    .hamburger{width:18px;height:12px;display:grid;gap:3px}.hamburger span{height:2px;background:var(--text);border-radius:999px}
+    .title{display:flex;flex-direction:column;line-height:1.1;min-width:170px;margin-right:auto}
+    .title strong{font-size:15px;letter-spacing:.04em}.title small{font-size:11px;color:var(--muted);margin-top:3px}
+    .status{height:26px;display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:0 9px;color:var(--muted);font-size:12px;background:#0b0f15;white-space:nowrap}
+    .led{width:8px;height:8px;border-radius:999px;background:var(--green);box-shadow:0 0 9px var(--green)}
+    .toolbar{display:flex;gap:8px;align-items:center}.select,.btn{height:36px;padding:0 10px}.btn.blue{border-color:#1d4ed8;background:#0f1d31}.btn.red{border-color:#7f1d1d;background:#241015}.btn.yellow{border-color:#854d0e;background:#251b0b}
+    .wall{position:absolute;inset:var(--top) 0 0 0;padding:10px;background:linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),#07090d;background-size:36px 36px}
+    .pane{position:absolute;min-width:260px;min-height:180px;border:1px solid #334155;border-radius:10px;background:#020617;overflow:hidden;box-shadow:0 10px 26px rgba(0,0,0,.45)}
+    .pane.active{outline:2px solid var(--blue);outline-offset:-2px}
+    .head{height:34px;display:flex;align-items:center;gap:8px;padding:0 8px;background:#111827;border-bottom:1px solid var(--line);cursor:grab;user-select:none}
+    .num{width:24px;height:20px;border-radius:5px;display:grid;place-items:center;background:#0b0f15;border:1px solid var(--line);color:var(--blue);font-size:11px;font-weight:700;flex:0 0 auto}
+    .monitor-title{font-size:12px;color:#d8dee9;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1}
+    .icon{width:24px;height:24px;padding:0;color:var(--muted)}
+    .audio-chip{height:24px;border:1px solid var(--line);border-radius:6px;background:#0b0f15;color:var(--muted);padding:0 7px;font-size:11px;cursor:pointer}
+    .audio-chip.on{border-color:var(--yellow);color:var(--yellow)}
+    .audio-chip.muted{border-color:var(--red);color:#fecaca}
+    .frame{position:relative;height:calc(100% - 34px);background:#000}
+    iframe,video{width:100%;height:100%;border:0;background:#000;display:block}
+    .placeholder,.note{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:18px;color:var(--muted);font-size:13px;background:rgba(2,6,23,.92);z-index:2}
+    .placeholder strong,.note strong{color:var(--text);display:block;margin-bottom:4px}.note a{color:var(--blue)}
+    .resize{position:absolute;right:0;bottom:0;width:20px;height:20px;cursor:nwse-resize;opacity:.65;background:linear-gradient(135deg,transparent 50%,var(--blue) 51%,var(--blue) 57%,transparent 58%),linear-gradient(135deg,transparent 68%,#fff 69%,#fff 75%,transparent 76%)}
+    .drawer{position:fixed;top:var(--top);left:0;width:var(--drawer);height:calc(100vh - var(--top));background:#0b0f15;border-right:1px solid var(--line);transform:translateX(calc(-1 * var(--drawer)));transition:transform .18s ease;z-index:20;box-shadow:18px 0 40px rgba(0,0,0,.45);display:flex;flex-direction:column}
+    .drawer.open{transform:translateX(0)}
+    .drawer-head{height:46px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;border-bottom:1px solid var(--line);background:var(--panel)}.drawer-head strong{font-size:13px;letter-spacing:.04em;text-transform:uppercase}
+    .drawer-body{overflow:auto;padding:12px}.section{border:1px solid var(--line);border-radius:10px;background:var(--panel);margin-bottom:12px;overflow:hidden}
+    .section h2{margin:0;padding:10px 10px 6px;font-size:13px}.section p{margin:0;padding:0 10px 10px;color:var(--muted);font-size:12px;line-height:1.35}
+    .sources{display:grid;gap:8px;padding:0 10px 10px}.source{border:1px solid var(--line);border-radius:8px;background:#0b0f15;padding:8px;display:grid;gap:7px}
+    .source-label{display:flex;align-items:center;gap:7px;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.04em}.source-label span{color:var(--blue);font-weight:800}
+    .input,.type-select{width:100%;height:34px;border:1px solid var(--line);border-radius:7px;background:#07090d;color:var(--text);padding:0 9px;outline:none}
+    .input:focus,.type-select:focus{border-color:var(--blue)}.source-actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}.mini{height:30px;font-size:12px}
+    .audio-row{display:grid;grid-template-columns:54px 1fr 44px 44px;gap:7px;align-items:center;color:var(--muted);font-size:12px}.audio-row input[type=range]{width:100%}
+    .soundboard{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 10px 10px}.pad{height:44px;border:1px solid var(--line);border-radius:8px;background:#0b0f15;color:var(--text);cursor:pointer;font-weight:700}.pad:hover{border-color:#facc15}.pad:active{transform:scale(.98);background:#171f2b}
+    .scrim{display:none;position:fixed;inset:var(--top) 0 0 0;background:rgba(0,0,0,.28);z-index:15}.scrim.show{display:block}
+    .modal{display:none;position:fixed;inset:0;z-index:40;background:rgba(0,0,0,.6);place-items:center;padding:20px}
+    .modal.open{display:grid}.modal-card{width:min(760px,96vw);max-height:86vh;overflow:auto;background:#0b0f15;border:1px solid var(--line);border-radius:12px;box-shadow:0 24px 60px rgba(0,0,0,.55)}
+    .modal-head{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--line);background:var(--panel)}.modal-body{padding:14px 18px;color:#d8dee9;line-height:1.5}.modal-body h3{margin:16px 0 6px}.modal-body p,.modal-body li{color:#cbd5e1}.modal-body code{background:#111827;border:1px solid #1f2937;padding:2px 5px;border-radius:5px}
+    code{color:#cbd5e1;font-size:11px}
+    @media(max-width:900px){.status{display:none}.title small{display:none}.select{max-width:110px}:root{--drawer:min(96vw,390px)}}
   </style>
 </head>
 
 <body>
   <header class="topbar">
-    <button id="menuBtn" class="menu-btn" title="Menü öffnen">
-      <span class="hamburger"><span></span><span></span><span></span></span>
-    </button>
-
-    <div class="title">
-      <strong>REGIE WALL</strong>
-      <small>GitHub Pages Ready</small>
-    </div>
-
-    <span class="status"><span class="led"></span> LIVE</span>
-    <span id="activeStatus" class="status">4 Monitore</span>
-
+    <button id="menuBtn" class="menu-btn" title="Menü öffnen"><span class="hamburger"><span></span><span></span><span></span></span></button>
+    <div class="title"><strong>REGIE WALL</strong><small>GitHub Pages · Live Control</small></div>
+    <span class="status"><span class="led"></span> LIVE</span><span id="activeStatus" class="status">4 Monitore</span>
     <div class="toolbar">
-      <select id="countSelect" class="select">
-        <option value="2">2 Monitore</option>
-        <option value="4" selected>4 Monitore</option>
-        <option value="6">6 Monitore</option>
-        <option value="8">8 Monitore</option>
-      </select>
-
-      <select id="presetSelect" class="select">
-        <option value="grid">Grid</option>
-        <option value="program">Program + Preview</option>
-        <option value="wide">Breit oben</option>
-        <option value="stack">Kontrollwand</option>
-      </select>
-
+      <select id="countSelect" class="select"><option value="2">2 Monitore</option><option value="4" selected>4 Monitore</option><option value="6">6 Monitore</option><option value="8">8 Monitore</option></select>
+      <select id="presetSelect" class="select"><option value="grid">Grid</option><option value="program">Program + Preview</option><option value="wide">Breit oben</option><option value="stack">Kontrollwand</option></select>
       <button id="applyPreset" class="btn blue">Layout</button>
+      <button id="muteAllBtn" class="btn red">Alle stumm</button>
+      <button id="helpBtn" class="btn yellow">Hilfe</button>
       <button id="resetDefaults" class="btn">Default</button>
       <button id="fullscreenBtn" class="btn">Vollbild</button>
     </div>
@@ -452,102 +80,85 @@
   <div id="scrim" class="scrim"></div>
 
   <aside id="drawer" class="drawer">
-    <div class="drawer-head">
-      <strong>Menü</strong>
-      <button id="closeMenu" class="icon">×</button>
-    </div>
-
+    <div class="drawer-head"><strong>Menü</strong><button id="closeMenu" class="icon">×</button></div>
     <div class="drawer-body">
       <section class="section">
         <h2>Sources</h2>
-        <p>
-          Für YouTube: Typ „YouTube“ wählen und normale Watch-URL, Embed-URL oder Video-ID eintragen.
-          Für Livestreams: Typ „HLS/m3u8“ wählen und eine direkte .m3u8-URL eintragen.
-        </p>
+        <p>Typ „Auto“ erkennt YouTube, m3u8/HLS und normale iFrames anhand der URL. Lautstärke/Solo/Mute funktionieren bei YouTube und HLS.</p>
         <div id="sources" class="sources"></div>
       </section>
 
       <section class="section">
         <h2>Soundboard</h2>
         <div class="soundboard">
-          <button class="pad" data-sound="sting">STING</button>
-          <button class="pad" data-sound="alert">ALERT</button>
-          <button class="pad" data-sound="click">CLICK</button>
-          <button class="pad" data-sound="ok">OK</button>
-          <button class="pad" data-sound="count">COUNT</button>
-          <button class="pad" data-sound="fail">FAIL</button>
+          <button class="pad" data-sound="sting">STING</button><button class="pad" data-sound="alert">ALERT</button>
+          <button class="pad" data-sound="click">CLICK</button><button class="pad" data-sound="ok">OK</button>
+          <button class="pad" data-sound="count">COUNT</button><button class="pad" data-sound="fail">FAIL</button>
         </div>
       </section>
 
       <section class="section">
-        <h2>GitHub Pages</h2>
-        <p>
-          Diese Datei als <code>index.html</code> in ein GitHub-Pages-Repo legen.
-          YouTube-Embeds laufen dann über HTTPS-Origin statt über <code>file://</code>.
-          Normale Websites können iFrames trotzdem blockieren, wenn sie Einbettung nicht erlauben.
-        </p>
+        <h2>Hinweis</h2>
+        <p>WELT ist als HLS/m3u8-Quelle voreingestellt. Falls der Stream später nicht lädt, hat sich die Stream-URL geändert oder der Anbieter blockiert CORS/Zugriff.</p>
       </section>
     </div>
   </aside>
 
+  <div id="helpModal" class="modal">
+    <div class="modal-card">
+      <div class="modal-head"><strong>Kurztutorial</strong><button id="closeHelp" class="icon">×</button></div>
+      <div class="modal-body">
+        <h3>1. Quellen einstellen</h3>
+        <p>Öffne links das Menü. Pro Monitor kannst du Titel, Typ und URL setzen. Mit <code>Auto</code> erkennt die Regie Wall YouTube, HLS/m3u8 und normale Websites selbst.</p>
+
+        <h3>2. YouTube</h3>
+        <p>Für YouTube kannst du die normale Watch-URL, die Embed-URL oder nur die Video-ID eintragen. Die Seite muss über GitHub Pages/HTTPS laufen, nicht über <code>file://</code>.</p>
+
+        <h3>3. WELT und andere Livestreams</h3>
+        <p>Für TV-Livestreams ist die stabilste Variante eine direkte <code>.m3u8</code>-Adresse mit Typ <code>HLS/m3u8</code>. Normale Website-URLs können iFrames blockieren.</p>
+
+        <h3>4. Tonsteuerung</h3>
+        <p>Im Menü gibt es pro Monitor einen Lautstärke-Regler sowie <code>Mute</code> und <code>Solo</code>. <code>Solo</code> schaltet alle anderen unterstützten Streams stumm. <code>Alle stumm</code> mutet global.</p>
+
+        <h3>5. Layout</h3>
+        <p>Oben kannst du zwischen 2, 4, 6 und 8 Monitoren wechseln. Fenster lassen sich zusätzlich manuell ziehen und rechts unten skalieren.</p>
+      </div>
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <script src="https://www.youtube.com/iframe_api"></script>
 
   <script>
     const DEFAULT_COUNT = 4;
     const DEFAULT_PRESET = "grid";
 
     /*
-      DEFAULT-SOURCES
-      Hier deine Standardquellen eintragen.
-      type:
-      - "youtube" für YouTube-ID, Watch-URL oder Embed-URL
-      - "iframe" für normale einbettbare Websites
-      - "hls" für direkte .m3u8/HLS-Streams
+      WEBSITE-/UMGEBUNGSABHÄNGIGE DEFAULTS
+      Du kannst später weitere Presets ergänzen:
+      "username.github.io": [...]
+      "localhost": [...]
+      "default": [...]
     */
-    const defaults = [
-      {
-        title: "YOUTUBE LIVE",
-        type: "youtube",
-        url: "https://www.youtube.com/embed/IixXpcGrTzo?si=BLhBPSoKsMZ3rMRe"
-      },
-      {
-        title: "WIKIPEDIA",
-        type: "iframe",
-        url: "https://www.wikipedia.org"
-      },
-      {
-        title: "HLS STREAM",
-        type: "hls",
-        url: ""
-      },
-      {
-        title: "DASHBOARD",
-        type: "iframe",
-        url: "https://example.org"
-      },
-      {
-        title: "SOURCE 5",
-        type: "iframe",
-        url: ""
-      },
-      {
-        title: "SOURCE 6",
-        type: "iframe",
-        url: ""
-      },
-      {
-        title: "SOURCE 7",
-        type: "iframe",
-        url: ""
-      },
-      {
-        title: "SOURCE 8",
-        type: "iframe",
-        url: ""
-      }
-    ];
+    const SITE_PRESETS = {
+      default: [
+        { title: "YOUTUBE LIVE", type: "auto", url: "https://www.youtube.com/embed/IixXpcGrTzo?si=BLhBPSoKsMZ3rMRe", volume: 70, muted: false },
+        { title: "WELT LIVE", type: "hls", url: "https://welt.personalstream.tv/v1/master.m3u8", volume: 70, muted: true },
+        { title: "NAUMBURG", type: "auto", url: "https://www.naumburg.de/de/welterbe.html", volume: 70, muted: true },
+        { title: "WIKIPEDIA", type: "auto", url: "https://www.wikipedia.org", volume: 70, muted: true },
+        { title: "SOURCE 5", type: "auto", url: "", volume: 70, muted: true },
+        { title: "SOURCE 6", type: "auto", url: "", volume: 70, muted: true },
+        { title: "SOURCE 7", type: "auto", url: "", volume: 70, muted: true },
+        { title: "SOURCE 8", type: "auto", url: "", volume: 70, muted: true }
+      ]
+    };
 
-    const STORAGE_PREFIX = "regie.github.";
+    function getDefaultsForCurrentSite() {
+      const host = location.hostname || "default";
+      return structuredClone(SITE_PRESETS[host] || SITE_PRESETS.default);
+    }
+
+    const STORAGE_PREFIX = "regie.livecontrol.";
     const wall = document.getElementById("wall");
     const drawer = document.getElementById("drawer");
     const scrim = document.getElementById("scrim");
@@ -555,26 +166,33 @@
     const countSelect = document.getElementById("countSelect");
     const presetSelect = document.getElementById("presetSelect");
     const activeStatus = document.getElementById("activeStatus");
+    const helpModal = document.getElementById("helpModal");
 
     let state = {
       count: Number(localStorage.getItem(STORAGE_PREFIX + "count")) || DEFAULT_COUNT,
-      sources: JSON.parse(localStorage.getItem(STORAGE_PREFIX + "sources") || "null") || structuredClone(defaults)
+      sources: JSON.parse(localStorage.getItem(STORAGE_PREFIX + "sources") || "null") || getDefaultsForCurrentSite(),
+      soloIndex: Number(localStorage.getItem(STORAGE_PREFIX + "soloIndex") ?? -1)
     };
 
     let activePane = null;
+    const ytPlayers = new Map();
+    const videoPlayers = new Map();
+    let ytApiReady = false;
+
+    window.onYouTubeIframeAPIReady = function() {
+      ytApiReady = true;
+      document.querySelectorAll("[data-yt-index]").forEach(el => initYouTubePlayer(Number(el.dataset.ytIndex)));
+    };
 
     function save() {
       localStorage.setItem(STORAGE_PREFIX + "count", state.count);
       localStorage.setItem(STORAGE_PREFIX + "sources", JSON.stringify(state.sources));
+      localStorage.setItem(STORAGE_PREFIX + "soloIndex", String(state.soloIndex));
     }
 
     function esc(s) {
       return String(s).replace(/[&<>"']/g, c => ({
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': "&quot;",
-        "'": "&#039;"
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
       }[c]));
     }
 
@@ -585,22 +203,25 @@
       return "https://" + u;
     }
 
+    function detectType(source) {
+      const declared = source.type || "auto";
+      if (declared !== "auto") return declared;
+
+      const u = (source.url || "").trim().toLowerCase();
+      if (!u) return "iframe";
+      if (u.includes("youtube.com") || u.includes("youtu.be") || /^[a-zA-Z0-9_-]{11}$/.test(source.url.trim())) return "youtube";
+      if (u.includes(".m3u8") || u.includes("m3u8")) return "hls";
+      return "iframe";
+    }
+
     function youtubeId(input) {
       const s = (input || "").trim();
-
       if (/^[a-zA-Z0-9_-]{11}$/.test(s)) return s;
 
       try {
         const u = new URL(normalizeUrl(s));
-
-        if (u.hostname.includes("youtu.be")) {
-          return u.pathname.slice(1).split("/")[0];
-        }
-
-        if (u.searchParams.get("v")) {
-          return u.searchParams.get("v");
-        }
-
+        if (u.hostname.includes("youtu.be")) return u.pathname.slice(1).split("/")[0];
+        if (u.searchParams.get("v")) return u.searchParams.get("v");
         const m = u.pathname.match(/\/embed\/([a-zA-Z0-9_-]{11})/);
         if (m) return m[1];
       } catch(e) {}
@@ -608,22 +229,18 @@
       return s;
     }
 
-    function openMenu() {
-      drawer.classList.add("open");
-      scrim.classList.add("show");
-    }
-
-    function closeMenu() {
-      drawer.classList.remove("open");
-      scrim.classList.remove("show");
-    }
-
+    function openMenu() { drawer.classList.add("open"); scrim.classList.add("show"); }
+    function closeMenu() { drawer.classList.remove("open"); scrim.classList.remove("show"); }
     document.getElementById("menuBtn").onclick = openMenu;
     document.getElementById("closeMenu").onclick = closeMenu;
     scrim.onclick = closeMenu;
+    document.getElementById("helpBtn").onclick = () => helpModal.classList.add("open");
+    document.getElementById("closeHelp").onclick = () => helpModal.classList.remove("open");
+    helpModal.addEventListener("click", e => { if (e.target === helpModal) helpModal.classList.remove("open"); });
 
     function createPane(i) {
-      const s = state.sources[i] || { title: `SOURCE ${i + 1}`, type: "iframe", url: "" };
+      const s = state.sources[i] || { title:`SOURCE ${i + 1}`, type:"auto", url:"", volume:70, muted:true };
+      const actualType = detectType(s);
 
       const pane = document.createElement("article");
       pane.className = "pane";
@@ -632,7 +249,9 @@
       pane.innerHTML = `
         <div class="head">
           <div class="num">${i + 1}</div>
-          <div class="monitor-title">${esc(s.title || `SOURCE ${i + 1}`)} · ${(s.type || "iframe").toUpperCase()}</div>
+          <div class="monitor-title">${esc(s.title || `SOURCE ${i + 1}`)} · ${actualType.toUpperCase()}</div>
+          <button class="audio-chip solo ${state.soloIndex === i ? "on" : ""}" title="Nur diesen Stream hören">SOLO</button>
+          <button class="audio-chip mute ${isEffectivelyMuted(i) ? "muted" : ""}" title="Stream stumm schalten">MUTE</button>
           <button class="icon reload" title="Neu laden">↻</button>
           <button class="icon open" title="Im neuen Tab öffnen">↗</button>
         </div>
@@ -640,18 +259,12 @@
         <div class="resize"></div>
       `;
 
-      renderInsideFrame(pane.querySelector(".frame"), s);
+      renderInsideFrame(pane.querySelector(".frame"), s, i);
 
-      pane.querySelector(".reload").onclick = e => {
-        e.stopPropagation();
-        renderInsideFrame(pane.querySelector(".frame"), s);
-      };
-
-      pane.querySelector(".open").onclick = e => {
-        e.stopPropagation();
-        const u = normalizeUrl(s.url);
-        if (u) window.open(u, "_blank", "noopener");
-      };
+      pane.querySelector(".reload").onclick = e => { e.stopPropagation(); renderInsideFrame(pane.querySelector(".frame"), s, i); };
+      pane.querySelector(".open").onclick = e => { e.stopPropagation(); const u = normalizeUrl(s.url); if (u) window.open(u, "_blank", "noopener"); };
+      pane.querySelector(".mute").onclick = e => { e.stopPropagation(); toggleMute(i); };
+      pane.querySelector(".solo").onclick = e => { e.stopPropagation(); toggleSolo(i); };
 
       pane.addEventListener("pointerdown", () => setActive(pane));
       enableDrag(pane);
@@ -660,10 +273,12 @@
       return pane;
     }
 
-    function renderInsideFrame(frame, s) {
+    function renderInsideFrame(frame, s, index) {
       frame.innerHTML = "";
+      ytPlayers.delete(index);
+      videoPlayers.delete(index);
 
-      const type = s.type || "iframe";
+      const type = detectType(s);
       const u = normalizeUrl(s.url);
 
       if (!u) {
@@ -673,20 +288,20 @@
 
       if (type === "youtube") {
         const id = youtubeId(u);
-        const origin = location.origin && location.origin !== "null"
-          ? `&origin=${encodeURIComponent(location.origin)}`
-          : "";
+        const playerId = `yt-player-${index}-${Date.now()}`;
 
-        const src = `https://www.youtube.com/embed/${encodeURIComponent(id)}?rel=0&modestbranding=1&playsinline=1${origin}`;
+        const holder = document.createElement("div");
+        holder.id = playerId;
+        holder.dataset.ytIndex = String(index);
+        holder.style.width = "100%";
+        holder.style.height = "100%";
+        frame.appendChild(holder);
 
-        const iframe = document.createElement("iframe");
-        iframe.src = src;
-        iframe.title = s.title || "YouTube video player";
-        iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
-        iframe.allowFullscreen = true;
-        iframe.referrerPolicy = "strict-origin-when-cross-origin";
-
-        frame.appendChild(iframe);
+        if (ytApiReady && window.YT && YT.Player) {
+          initYouTubePlayer(index, playerId, id);
+        } else {
+          holder.dataset.videoId = id;
+        }
         return;
       }
 
@@ -694,9 +309,11 @@
         const video = document.createElement("video");
         video.controls = true;
         video.autoplay = true;
-        video.muted = true;
+        video.muted = isEffectivelyMuted(index);
+        video.volume = getEffectiveVolume(index);
         video.playsInline = true;
         frame.appendChild(video);
+        videoPlayers.set(index, video);
 
         const note = document.createElement("div");
         note.className = "note";
@@ -713,17 +330,17 @@
           hls.attachMedia(video);
           hls.on(Hls.Events.MANIFEST_PARSED, () => {
             note.remove();
+            applyAudioToIndex(index);
             video.play().catch(() => {});
           });
           hls.on(Hls.Events.ERROR, (event, data) => {
             if (data.fatal) {
-              note.innerHTML = "<div><strong>HLS lädt nicht.</strong>Prüfe direkte .m3u8-URL, CORS und Nutzungsrechte.</div>";
+              note.innerHTML = "<div><strong>HLS lädt nicht.</strong>Prüfe Stream-URL, CORS oder ob die URL noch aktuell ist.</div>";
             }
           });
         } else {
           note.innerHTML = "<div><strong>HLS nicht unterstützt.</strong>Dieser Browser kann den Stream hier nicht abspielen.</div>";
         }
-
         return;
       }
 
@@ -741,17 +358,106 @@
           Diese Website erlaubt eventuell keine iFrames.<br>
           Dann brauchst du eine Embed-URL oder direkte Stream-URL.<br>
           <a href="${esc(u)}" target="_blank" rel="noopener">Im neuen Tab öffnen</a>
-        </div>
-      `;
+        </div>`;
       frame.appendChild(note);
 
       let loaded = false;
       iframe.addEventListener("load", () => loaded = true);
-
-      setTimeout(() => {
-        if (!loaded) note.style.display = "grid";
-      }, 3000);
+      setTimeout(() => { if (!loaded) note.style.display = "grid"; }, 3000);
     }
+
+    function initYouTubePlayer(index, holderId = null, videoId = null) {
+      const holder = holderId
+        ? document.getElementById(holderId)
+        : document.querySelector(`[data-yt-index="${index}"]`);
+
+      if (!holder) return;
+
+      const id = videoId || holder.dataset.videoId;
+      if (!id) return;
+
+      const player = new YT.Player(holder.id, {
+        videoId: id,
+        width: "100%",
+        height: "100%",
+        playerVars: {
+          rel: 0,
+          modestbranding: 1,
+          playsinline: 1,
+          origin: location.origin && location.origin !== "null" ? location.origin : undefined
+        },
+        events: {
+          onReady: () => {
+            ytPlayers.set(index, player);
+            applyAudioToIndex(index);
+          }
+        }
+      });
+    }
+
+    function getEffectiveVolume(index) {
+      const s = state.sources[index];
+      return Math.max(0, Math.min(1, Number((s?.volume ?? 70)) / 100));
+    }
+
+    function isEffectivelyMuted(index) {
+      const s = state.sources[index];
+      if (!s) return true;
+      if (state.soloIndex >= 0 && state.soloIndex !== index) return true;
+      return Boolean(s.muted);
+    }
+
+    function applyAudioToIndex(index) {
+      const muted = isEffectivelyMuted(index);
+      const volumePercent = Math.round(getEffectiveVolume(index) * 100);
+
+      const video = videoPlayers.get(index);
+      if (video) {
+        video.volume = volumePercent / 100;
+        video.muted = muted;
+      }
+
+      const yt = ytPlayers.get(index);
+      if (yt && typeof yt.setVolume === "function") {
+        try {
+          yt.setVolume(volumePercent);
+          muted ? yt.mute() : yt.unMute();
+        } catch(e) {}
+      }
+
+      const pane = wall.querySelector(`.pane[data-index="${index}"]`);
+      if (pane) {
+        const muteBtn = pane.querySelector(".mute");
+        const soloBtn = pane.querySelector(".solo");
+        if (muteBtn) muteBtn.classList.toggle("muted", muted);
+        if (soloBtn) soloBtn.classList.toggle("on", state.soloIndex === index);
+      }
+    }
+
+    function applyAudioAll() {
+      for (let i = 0; i < state.count; i++) applyAudioToIndex(i);
+      renderSources();
+      save();
+    }
+
+    function toggleMute(index) {
+      if (!state.sources[index]) return;
+      state.sources[index].muted = !state.sources[index].muted;
+      if (state.soloIndex === index && state.sources[index].muted) state.soloIndex = -1;
+      applyAudioAll();
+    }
+
+    function toggleSolo(index) {
+      state.soloIndex = state.soloIndex === index ? -1 : index;
+      if (state.sources[index]) state.sources[index].muted = false;
+      applyAudioAll();
+    }
+
+    document.getElementById("muteAllBtn").onclick = () => {
+      state.soloIndex = -1;
+      state.sources.forEach(s => s.muted = true);
+      applyAudioAll();
+    };
 
     function setActive(pane) {
       document.querySelectorAll(".pane").forEach(p => p.classList.remove("active"));
@@ -761,10 +467,10 @@
 
     function render() {
       wall.innerHTML = "";
+      ytPlayers.clear();
+      videoPlayers.clear();
 
-      for (let i = 0; i < state.count; i++) {
-        wall.appendChild(createPane(i));
-      }
+      for (let i = 0; i < state.count; i++) wall.appendChild(createPane(i));
 
       renderSources();
       countSelect.value = String(state.count);
@@ -777,53 +483,47 @@
       sourcesEl.innerHTML = "";
 
       for (let i = 0; i < state.count; i++) {
-        if (!state.sources[i]) {
-          state.sources[i] = { title: `SOURCE ${i + 1}`, type: "iframe", url: "" };
-        }
+        if (!state.sources[i]) state.sources[i] = { title:`SOURCE ${i + 1}`, type:"auto", url:"", volume:70, muted:true };
 
         const s = state.sources[i];
         const row = document.createElement("div");
         row.className = "source";
 
         row.innerHTML = `
-          <div class="source-label"><span>${i + 1}</span> Monitor</div>
-
+          <div class="source-label"><span>${i + 1}</span> Monitor · ${detectType(s)}</div>
           <input class="input titleInput" placeholder="Titel" value="${esc(s.title || "")}">
-
           <select class="type-select typeInput">
-            <option value="iframe"${(s.type || "iframe") === "iframe" ? " selected" : ""}>iFrame / Website</option>
+            <option value="auto"${(s.type || "auto") === "auto" ? " selected" : ""}>Auto erkennen</option>
+            <option value="iframe"${s.type === "iframe" ? " selected" : ""}>iFrame / Website</option>
             <option value="youtube"${s.type === "youtube" ? " selected" : ""}>YouTube ID / URL</option>
             <option value="hls"${s.type === "hls" ? " selected" : ""}>HLS / m3u8 Stream</option>
           </select>
-
           <input class="input urlInput" placeholder="URL, YouTube-ID oder .m3u8" value="${esc(s.url || "")}">
-
+          <div class="audio-row">
+            <span>Vol</span>
+            <input class="volInput" type="range" min="0" max="100" value="${Number(s.volume ?? 70)}">
+            <button class="mini muteBtn">${isEffectivelyMuted(i) ? "Unmute" : "Mute"}</button>
+            <button class="mini soloBtn">${state.soloIndex === i ? "Solo aus" : "Solo"}</button>
+          </div>
           <div class="source-actions">
             <button class="mini load">Laden</button>
             <button class="mini open">Öffnen</button>
+            <button class="mini clear">Leeren</button>
           </div>
         `;
 
         const title = row.querySelector(".titleInput");
         const type = row.querySelector(".typeInput");
         const url = row.querySelector(".urlInput");
+        const vol = row.querySelector(".volInput");
 
-        title.oninput = () => {
-          state.sources[i].title = title.value;
-          updatePane(i);
-          save();
-        };
+        title.oninput = () => { state.sources[i].title = title.value; updatePane(i); save(); };
+        type.onchange = () => { state.sources[i].type = type.value; updatePane(i); save(); };
+        url.oninput = () => { state.sources[i].url = url.value; save(); };
+        vol.oninput = () => { state.sources[i].volume = Number(vol.value); applyAudioToIndex(i); save(); };
 
-        type.onchange = () => {
-          state.sources[i].type = type.value;
-          updatePane(i);
-          save();
-        };
-
-        url.oninput = () => {
-          state.sources[i].url = url.value;
-          save();
-        };
+        row.querySelector(".muteBtn").onclick = () => toggleMute(i);
+        row.querySelector(".soloBtn").onclick = () => toggleSolo(i);
 
         row.querySelector(".load").onclick = () => {
           state.sources[i].url = url.value;
@@ -835,6 +535,12 @@
         row.querySelector(".open").onclick = () => {
           const u = normalizeUrl(url.value);
           if (u) window.open(u, "_blank", "noopener");
+        };
+
+        row.querySelector(".clear").onclick = () => {
+          state.sources[i].url = "";
+          updatePane(i);
+          save();
         };
 
         sourcesEl.appendChild(row);
@@ -859,66 +565,42 @@
 
     function applyLayout(animated = true) {
       const panes = [...document.querySelectorAll(".pane")];
-      const W = wall.clientWidth;
-      const H = wall.clientHeight;
-      const gap = 10;
-      const preset = presetSelect.value;
+      const W = wall.clientWidth, H = wall.clientHeight, gap = 10, preset = presetSelect.value;
 
       const set = (p, x, y, w, h) => {
-        if (animated) {
-          p.style.transition = "left .18s ease, top .18s ease, width .18s ease, height .18s ease";
-        }
-
+        if (animated) p.style.transition = "left .18s ease, top .18s ease, width .18s ease, height .18s ease";
         p.style.left = Math.round(x) + "px";
         p.style.top = Math.round(y) + "px";
         p.style.width = Math.round(w) + "px";
         p.style.height = Math.round(h) + "px";
-
-        if (animated) {
-          setTimeout(() => p.style.transition = "", 220);
-        }
+        if (animated) setTimeout(() => p.style.transition = "", 220);
       };
 
       if (preset === "program" && panes.length >= 2) {
         const mainW = W * .62;
         set(panes[0], gap, gap, mainW - gap * 1.5, H - gap * 2);
-
         const rest = panes.slice(1);
         const rh = (H - gap * (rest.length + 1)) / rest.length;
-
-        rest.forEach((p, i) => {
-          set(p, mainW + gap / 2, gap + i * (rh + gap), W - mainW - gap * 1.5, rh);
-        });
-
+        rest.forEach((p, i) => set(p, mainW + gap / 2, gap + i * (rh + gap), W - mainW - gap * 1.5, rh));
         return;
       }
 
       if (preset === "wide" && panes.length >= 3) {
         const topH = H * .55;
         set(panes[0], gap, gap, W - gap * 2, topH - gap * 1.5);
-
         const rest = panes.slice(1);
         const cw = (W - gap * (rest.length + 1)) / rest.length;
-
-        rest.forEach((p, i) => {
-          set(p, gap + i * (cw + gap), topH + gap / 2, cw, H - topH - gap * 1.5);
-        });
-
+        rest.forEach((p, i) => set(p, gap + i * (cw + gap), topH + gap / 2, cw, H - topH - gap * 1.5));
         return;
       }
 
-      const cols = preset === "stack"
-        ? (state.count <= 4 ? 2 : 4)
-        : (state.count === 2 ? 2 : state.count === 6 ? 3 : state.count === 8 ? 4 : 2);
-
+      const cols = preset === "stack" ? (state.count <= 4 ? 2 : 4) : (state.count === 2 ? 2 : state.count === 6 ? 3 : state.count === 8 ? 4 : 2);
       const rows = Math.ceil(state.count / cols);
 
       panes.forEach((p, i) => {
-        const col = i % cols;
-        const row = Math.floor(i / cols);
+        const col = i % cols, row = Math.floor(i / cols);
         const cw = (W - gap * (cols + 1)) / cols;
         const rh = (H - gap * (rows + 1)) / rows;
-
         set(p, gap + col * (cw + gap), gap + row * (rh + gap), cw, rh);
       });
     }
@@ -929,14 +611,9 @@
 
       head.addEventListener("pointerdown", e => {
         if (e.target.closest("button")) return;
-
         setActive(pane);
         pane.setPointerCapture(e.pointerId);
-
-        sx = e.clientX;
-        sy = e.clientY;
-        sl = pane.offsetLeft;
-        st = pane.offsetTop;
+        sx = e.clientX; sy = e.clientY; sl = pane.offsetLeft; st = pane.offsetTop;
 
         const move = ev => {
           pane.style.left = clamp(sl + ev.clientX - sx, 0, wall.clientWidth - pane.offsetWidth) + "px";
@@ -960,18 +637,13 @@
 
       h.addEventListener("pointerdown", e => {
         e.stopPropagation();
-
         setActive(pane);
         pane.setPointerCapture(e.pointerId);
-
-        sx = e.clientX;
-        sy = e.clientY;
-        sw = pane.offsetWidth;
-        sh = pane.offsetHeight;
+        sx = e.clientX; sy = e.clientY; sw = pane.offsetWidth; sh = pane.offsetHeight;
 
         const move = ev => {
-          pane.style.width = clamp(sw + ev.clientX - sx, 230, wall.clientWidth - pane.offsetLeft) + "px";
-          pane.style.height = clamp(sh + ev.clientY - sy, 160, wall.clientHeight - pane.offsetTop) + "px";
+          pane.style.width = clamp(sw + ev.clientX - sx, 260, wall.clientWidth - pane.offsetLeft) + "px";
+          pane.style.height = clamp(sh + ev.clientY - sy, 180, wall.clientHeight - pane.offsetTop) + "px";
         };
 
         const up = ev => {
@@ -985,38 +657,27 @@
       });
     }
 
-    function clamp(n, min, max) {
-      return Math.max(min, Math.min(max, n));
-    }
+    function clamp(n, min, max) { return Math.max(min, Math.min(max, n)); }
 
-    countSelect.onchange = () => {
-      state.count = Number(countSelect.value);
-      render();
-    };
+    countSelect.onchange = () => { state.count = Number(countSelect.value); render(); };
 
     presetSelect.value = localStorage.getItem(STORAGE_PREFIX + "preset") || DEFAULT_PRESET;
-
-    presetSelect.onchange = () => {
-      localStorage.setItem(STORAGE_PREFIX + "preset", presetSelect.value);
-      applyLayout(true);
-    };
+    presetSelect.onchange = () => { localStorage.setItem(STORAGE_PREFIX + "preset", presetSelect.value); applyLayout(true); };
 
     document.getElementById("applyPreset").onclick = () => applyLayout(true);
 
     document.getElementById("resetDefaults").onclick = () => {
       state.count = DEFAULT_COUNT;
-      state.sources = structuredClone(defaults);
+      state.sources = getDefaultsForCurrentSite();
+      state.soloIndex = -1;
       presetSelect.value = DEFAULT_PRESET;
       localStorage.setItem(STORAGE_PREFIX + "preset", DEFAULT_PRESET);
       render();
     };
 
     document.getElementById("fullscreenBtn").onclick = async () => {
-      if (!document.fullscreenElement) {
-        await document.documentElement.requestFullscreen();
-      } else {
-        await document.exitFullscreen();
-      }
+      if (!document.fullscreenElement) await document.documentElement.requestFullscreen();
+      else await document.exitFullscreen();
     };
 
     window.addEventListener("resize", () => applyLayout(false));
@@ -1025,60 +686,26 @@
     const audio = new AudioContextClass();
 
     function tone(freq, dur, type = "sine", gain = .11, delay = 0) {
-      const osc = audio.createOscillator();
-      const g = audio.createGain();
-
-      osc.type = type;
-      osc.frequency.value = freq;
-      osc.connect(g);
-      g.connect(audio.destination);
-
+      const osc = audio.createOscillator(), g = audio.createGain();
+      osc.type = type; osc.frequency.value = freq; osc.connect(g); g.connect(audio.destination);
       const t = audio.currentTime + delay;
-
       g.gain.setValueAtTime(.001, t);
       g.gain.linearRampToValueAtTime(gain, t + .01);
       g.gain.exponentialRampToValueAtTime(.001, t + dur);
-
-      osc.start(t);
-      osc.stop(t + dur + .03);
+      osc.start(t); osc.stop(t + dur + .03);
     }
 
     function play(name) {
       if (audio.state === "suspended") audio.resume();
-
-      if (name === "sting") {
-        tone(440, .1, "square");
-        tone(660, .12, "square", .1, .1);
-        tone(880, .18, "square", .09, .22);
-      }
-
-      if (name === "alert") {
-        tone(900, .16, "sawtooth");
-        tone(900, .16, "sawtooth", .11, .22);
-      }
-
-      if (name === "click") tone(1300, .045, "square", .08);
-
-      if (name === "ok") {
-        tone(520, .1);
-        tone(780, .16, "sine", .1, .1);
-      }
-
-      if (name === "count") {
-        tone(700, .07, "square");
-        tone(700, .07, "square", .1, .15);
-        tone(350, .18, "square", .12, .32);
-      }
-
-      if (name === "fail") {
-        tone(230, .18, "sawtooth");
-        tone(160, .25, "sawtooth", .1, .16);
-      }
+      if (name === "sting") { tone(440,.1,"square"); tone(660,.12,"square",.1,.1); tone(880,.18,"square",.09,.22); }
+      if (name === "alert") { tone(900,.16,"sawtooth"); tone(900,.16,"sawtooth",.11,.22); }
+      if (name === "click") tone(1300,.045,"square",.08);
+      if (name === "ok") { tone(520,.1); tone(780,.16,"sine",.1,.1); }
+      if (name === "count") { tone(700,.07,"square"); tone(700,.07,"square",.1,.15); tone(350,.18,"square",.12,.32); }
+      if (name === "fail") { tone(230,.18,"sawtooth"); tone(160,.25,"sawtooth",.1,.16); }
     }
 
-    document.querySelectorAll(".pad").forEach(p => {
-      p.onclick = () => play(p.dataset.sound);
-    });
+    document.querySelectorAll(".pad").forEach(p => p.onclick = () => play(p.dataset.sound));
 
     render();
   </script>
