@@ -1,0 +1,1086 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Regie Wall</title>
+
+  <style>
+    :root {
+      --bg: #07090d;
+      --bar: #10141b;
+      --panel: #141a23;
+      --line: #2a3444;
+      --text: #eef2f7;
+      --muted: #8f9bad;
+      --blue: #38bdf8;
+      --green: #22c55e;
+      --top: 54px;
+      --drawer: 370px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      overflow: hidden;
+    }
+
+    button, input, select { font: inherit; }
+
+    .topbar {
+      height: var(--top);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      background: var(--bar);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .menu-btn, .btn, .select, .icon, .mini {
+      border: 1px solid var(--line);
+      background: #0b0f15;
+      color: var(--text);
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .menu-btn {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+    }
+
+    .menu-btn:hover, .btn:hover, .select:hover, .icon:hover, .mini:hover {
+      border-color: var(--blue);
+    }
+
+    .hamburger {
+      width: 18px;
+      height: 12px;
+      display: grid;
+      gap: 3px;
+    }
+
+    .hamburger span {
+      height: 2px;
+      background: var(--text);
+      border-radius: 999px;
+    }
+
+    .title {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.1;
+      min-width: 170px;
+      margin-right: auto;
+    }
+
+    .title strong {
+      font-size: 15px;
+      letter-spacing: .04em;
+    }
+
+    .title small {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+
+    .status {
+      height: 26px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 0 9px;
+      color: var(--muted);
+      font-size: 12px;
+      background: #0b0f15;
+    }
+
+    .led {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--green);
+      box-shadow: 0 0 9px var(--green);
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .select, .btn {
+      height: 36px;
+      padding: 0 10px;
+    }
+
+    .btn.blue {
+      border-color: #1d4ed8;
+      background: #0f1d31;
+    }
+
+    .wall {
+      position: absolute;
+      inset: var(--top) 0 0 0;
+      padding: 10px;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px),
+        linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
+        #07090d;
+      background-size: 36px 36px;
+    }
+
+    .pane {
+      position: absolute;
+      min-width: 230px;
+      min-height: 160px;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      background: #020617;
+      overflow: hidden;
+      box-shadow: 0 10px 26px rgba(0,0,0,.45);
+    }
+
+    .pane.active {
+      outline: 2px solid var(--blue);
+      outline-offset: -2px;
+    }
+
+    .head {
+      height: 34px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 8px;
+      background: #111827;
+      border-bottom: 1px solid var(--line);
+      cursor: grab;
+      user-select: none;
+    }
+
+    .num {
+      width: 24px;
+      height: 20px;
+      border-radius: 5px;
+      display: grid;
+      place-items: center;
+      background: #0b0f15;
+      border: 1px solid var(--line);
+      color: var(--blue);
+      font-size: 11px;
+      font-weight: 700;
+      flex: 0 0 auto;
+    }
+
+    .monitor-title {
+      font-size: 12px;
+      color: #d8dee9;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex: 1;
+    }
+
+    .icon {
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      color: var(--muted);
+    }
+
+    .frame {
+      position: relative;
+      height: calc(100% - 34px);
+      background: #000;
+    }
+
+    iframe, video {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      background: #000;
+      display: block;
+    }
+
+    .placeholder, .note {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 18px;
+      color: var(--muted);
+      font-size: 13px;
+      background: rgba(2,6,23,.92);
+    }
+
+    .placeholder strong, .note strong {
+      color: var(--text);
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .note a { color: var(--blue); }
+
+    .resize {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      width: 20px;
+      height: 20px;
+      cursor: nwse-resize;
+      opacity: .65;
+      background:
+        linear-gradient(135deg, transparent 50%, var(--blue) 51%, var(--blue) 57%, transparent 58%),
+        linear-gradient(135deg, transparent 68%, #fff 69%, #fff 75%, transparent 76%);
+    }
+
+    .drawer {
+      position: fixed;
+      top: var(--top);
+      left: 0;
+      width: var(--drawer);
+      height: calc(100vh - var(--top));
+      background: #0b0f15;
+      border-right: 1px solid var(--line);
+      transform: translateX(calc(-1 * var(--drawer)));
+      transition: transform .18s ease;
+      z-index: 20;
+      box-shadow: 18px 0 40px rgba(0,0,0,.45);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .drawer.open { transform: translateX(0); }
+
+    .drawer-head {
+      height: 46px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px;
+      border-bottom: 1px solid var(--line);
+      background: var(--panel);
+    }
+
+    .drawer-head strong {
+      font-size: 13px;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+
+    .drawer-body {
+      overflow: auto;
+      padding: 12px;
+    }
+
+    .section {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel);
+      margin-bottom: 12px;
+      overflow: hidden;
+    }
+
+    .section h2 {
+      margin: 0;
+      padding: 10px 10px 6px;
+      font-size: 13px;
+    }
+
+    .section p {
+      margin: 0;
+      padding: 0 10px 10px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .sources {
+      display: grid;
+      gap: 8px;
+      padding: 0 10px 10px;
+    }
+
+    .source {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #0b0f15;
+      padding: 8px;
+      display: grid;
+      gap: 6px;
+    }
+
+    .source-label {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+
+    .source-label span {
+      color: var(--blue);
+      font-weight: 800;
+    }
+
+    .input, .type-select {
+      width: 100%;
+      height: 34px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #07090d;
+      color: var(--text);
+      padding: 0 9px;
+      outline: none;
+    }
+
+    .input:focus, .type-select:focus {
+      border-color: var(--blue);
+    }
+
+    .source-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+
+    .mini {
+      height: 30px;
+      font-size: 12px;
+    }
+
+    .soundboard {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      padding: 0 10px 10px;
+    }
+
+    .pad {
+      height: 44px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #0b0f15;
+      color: var(--text);
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .pad:hover { border-color: #facc15; }
+
+    .pad:active {
+      transform: scale(.98);
+      background: #171f2b;
+    }
+
+    .scrim {
+      display: none;
+      position: fixed;
+      inset: var(--top) 0 0 0;
+      background: rgba(0,0,0,.28);
+      z-index: 15;
+    }
+
+    .scrim.show { display: block; }
+
+    code {
+      color: #cbd5e1;
+      font-size: 11px;
+    }
+
+    @media(max-width: 820px) {
+      .status { display: none; }
+      .title small { display: none; }
+      .select { max-width: 110px; }
+      :root { --drawer: min(94vw, 370px); }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="topbar">
+    <button id="menuBtn" class="menu-btn" title="Menü öffnen">
+      <span class="hamburger"><span></span><span></span><span></span></span>
+    </button>
+
+    <div class="title">
+      <strong>REGIE WALL</strong>
+      <small>GitHub Pages Ready</small>
+    </div>
+
+    <span class="status"><span class="led"></span> LIVE</span>
+    <span id="activeStatus" class="status">4 Monitore</span>
+
+    <div class="toolbar">
+      <select id="countSelect" class="select">
+        <option value="2">2 Monitore</option>
+        <option value="4" selected>4 Monitore</option>
+        <option value="6">6 Monitore</option>
+        <option value="8">8 Monitore</option>
+      </select>
+
+      <select id="presetSelect" class="select">
+        <option value="grid">Grid</option>
+        <option value="program">Program + Preview</option>
+        <option value="wide">Breit oben</option>
+        <option value="stack">Kontrollwand</option>
+      </select>
+
+      <button id="applyPreset" class="btn blue">Layout</button>
+      <button id="resetDefaults" class="btn">Default</button>
+      <button id="fullscreenBtn" class="btn">Vollbild</button>
+    </div>
+  </header>
+
+  <section id="wall" class="wall"></section>
+  <div id="scrim" class="scrim"></div>
+
+  <aside id="drawer" class="drawer">
+    <div class="drawer-head">
+      <strong>Menü</strong>
+      <button id="closeMenu" class="icon">×</button>
+    </div>
+
+    <div class="drawer-body">
+      <section class="section">
+        <h2>Sources</h2>
+        <p>
+          Für YouTube: Typ „YouTube“ wählen und normale Watch-URL, Embed-URL oder Video-ID eintragen.
+          Für Livestreams: Typ „HLS/m3u8“ wählen und eine direkte .m3u8-URL eintragen.
+        </p>
+        <div id="sources" class="sources"></div>
+      </section>
+
+      <section class="section">
+        <h2>Soundboard</h2>
+        <div class="soundboard">
+          <button class="pad" data-sound="sting">STING</button>
+          <button class="pad" data-sound="alert">ALERT</button>
+          <button class="pad" data-sound="click">CLICK</button>
+          <button class="pad" data-sound="ok">OK</button>
+          <button class="pad" data-sound="count">COUNT</button>
+          <button class="pad" data-sound="fail">FAIL</button>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>GitHub Pages</h2>
+        <p>
+          Diese Datei als <code>index.html</code> in ein GitHub-Pages-Repo legen.
+          YouTube-Embeds laufen dann über HTTPS-Origin statt über <code>file://</code>.
+          Normale Websites können iFrames trotzdem blockieren, wenn sie Einbettung nicht erlauben.
+        </p>
+      </section>
+    </div>
+  </aside>
+
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+
+  <script>
+    const DEFAULT_COUNT = 4;
+    const DEFAULT_PRESET = "grid";
+
+    /*
+      DEFAULT-SOURCES
+      Hier deine Standardquellen eintragen.
+      type:
+      - "youtube" für YouTube-ID, Watch-URL oder Embed-URL
+      - "iframe" für normale einbettbare Websites
+      - "hls" für direkte .m3u8/HLS-Streams
+    */
+    const defaults = [
+      {
+        title: "YOUTUBE LIVE",
+        type: "youtube",
+        url: "https://www.youtube.com/embed/IixXpcGrTzo?si=BLhBPSoKsMZ3rMRe"
+      },
+      {
+        title: "WIKIPEDIA",
+        type: "iframe",
+        url: "https://www.wikipedia.org"
+      },
+      {
+        title: "HLS STREAM",
+        type: "hls",
+        url: ""
+      },
+      {
+        title: "DASHBOARD",
+        type: "iframe",
+        url: "https://example.org"
+      },
+      {
+        title: "SOURCE 5",
+        type: "iframe",
+        url: ""
+      },
+      {
+        title: "SOURCE 6",
+        type: "iframe",
+        url: ""
+      },
+      {
+        title: "SOURCE 7",
+        type: "iframe",
+        url: ""
+      },
+      {
+        title: "SOURCE 8",
+        type: "iframe",
+        url: ""
+      }
+    ];
+
+    const STORAGE_PREFIX = "regie.github.";
+    const wall = document.getElementById("wall");
+    const drawer = document.getElementById("drawer");
+    const scrim = document.getElementById("scrim");
+    const sourcesEl = document.getElementById("sources");
+    const countSelect = document.getElementById("countSelect");
+    const presetSelect = document.getElementById("presetSelect");
+    const activeStatus = document.getElementById("activeStatus");
+
+    let state = {
+      count: Number(localStorage.getItem(STORAGE_PREFIX + "count")) || DEFAULT_COUNT,
+      sources: JSON.parse(localStorage.getItem(STORAGE_PREFIX + "sources") || "null") || structuredClone(defaults)
+    };
+
+    let activePane = null;
+
+    function save() {
+      localStorage.setItem(STORAGE_PREFIX + "count", state.count);
+      localStorage.setItem(STORAGE_PREFIX + "sources", JSON.stringify(state.sources));
+    }
+
+    function esc(s) {
+      return String(s).replace(/[&<>"']/g, c => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+      }[c]));
+    }
+
+    function normalizeUrl(value) {
+      const u = (value || "").trim();
+      if (!u) return "";
+      if (/^(https?:|file:|\/|\.\/|\.\.\/)/i.test(u)) return u;
+      return "https://" + u;
+    }
+
+    function youtubeId(input) {
+      const s = (input || "").trim();
+
+      if (/^[a-zA-Z0-9_-]{11}$/.test(s)) return s;
+
+      try {
+        const u = new URL(normalizeUrl(s));
+
+        if (u.hostname.includes("youtu.be")) {
+          return u.pathname.slice(1).split("/")[0];
+        }
+
+        if (u.searchParams.get("v")) {
+          return u.searchParams.get("v");
+        }
+
+        const m = u.pathname.match(/\/embed\/([a-zA-Z0-9_-]{11})/);
+        if (m) return m[1];
+      } catch(e) {}
+
+      return s;
+    }
+
+    function openMenu() {
+      drawer.classList.add("open");
+      scrim.classList.add("show");
+    }
+
+    function closeMenu() {
+      drawer.classList.remove("open");
+      scrim.classList.remove("show");
+    }
+
+    document.getElementById("menuBtn").onclick = openMenu;
+    document.getElementById("closeMenu").onclick = closeMenu;
+    scrim.onclick = closeMenu;
+
+    function createPane(i) {
+      const s = state.sources[i] || { title: `SOURCE ${i + 1}`, type: "iframe", url: "" };
+
+      const pane = document.createElement("article");
+      pane.className = "pane";
+      pane.dataset.index = i;
+
+      pane.innerHTML = `
+        <div class="head">
+          <div class="num">${i + 1}</div>
+          <div class="monitor-title">${esc(s.title || `SOURCE ${i + 1}`)} · ${(s.type || "iframe").toUpperCase()}</div>
+          <button class="icon reload" title="Neu laden">↻</button>
+          <button class="icon open" title="Im neuen Tab öffnen">↗</button>
+        </div>
+        <div class="frame"></div>
+        <div class="resize"></div>
+      `;
+
+      renderInsideFrame(pane.querySelector(".frame"), s);
+
+      pane.querySelector(".reload").onclick = e => {
+        e.stopPropagation();
+        renderInsideFrame(pane.querySelector(".frame"), s);
+      };
+
+      pane.querySelector(".open").onclick = e => {
+        e.stopPropagation();
+        const u = normalizeUrl(s.url);
+        if (u) window.open(u, "_blank", "noopener");
+      };
+
+      pane.addEventListener("pointerdown", () => setActive(pane));
+      enableDrag(pane);
+      enableResize(pane);
+
+      return pane;
+    }
+
+    function renderInsideFrame(frame, s) {
+      frame.innerHTML = "";
+
+      const type = s.type || "iframe";
+      const u = normalizeUrl(s.url);
+
+      if (!u) {
+        frame.innerHTML = `<div class="placeholder"><div><strong>NO SIGNAL</strong>Source im Menü setzen</div></div>`;
+        return;
+      }
+
+      if (type === "youtube") {
+        const id = youtubeId(u);
+        const origin = location.origin && location.origin !== "null"
+          ? `&origin=${encodeURIComponent(location.origin)}`
+          : "";
+
+        const src = `https://www.youtube.com/embed/${encodeURIComponent(id)}?rel=0&modestbranding=1&playsinline=1${origin}`;
+
+        const iframe = document.createElement("iframe");
+        iframe.src = src;
+        iframe.title = s.title || "YouTube video player";
+        iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
+        iframe.allowFullscreen = true;
+        iframe.referrerPolicy = "strict-origin-when-cross-origin";
+
+        frame.appendChild(iframe);
+        return;
+      }
+
+      if (type === "hls") {
+        const video = document.createElement("video");
+        video.controls = true;
+        video.autoplay = true;
+        video.muted = true;
+        video.playsInline = true;
+        frame.appendChild(video);
+
+        const note = document.createElement("div");
+        note.className = "note";
+        note.innerHTML = "<div><strong>Lade HLS…</strong>Falls nichts kommt: .m3u8-URL, CORS und Rechte prüfen.</div>";
+        frame.appendChild(note);
+
+        if (video.canPlayType("application/vnd.apple.mpegurl")) {
+          video.src = u;
+          video.addEventListener("loadedmetadata", () => note.remove());
+          video.play().catch(() => {});
+        } else if (window.Hls && Hls.isSupported()) {
+          const hls = new Hls({ lowLatencyMode: true });
+          hls.loadSource(u);
+          hls.attachMedia(video);
+          hls.on(Hls.Events.MANIFEST_PARSED, () => {
+            note.remove();
+            video.play().catch(() => {});
+          });
+          hls.on(Hls.Events.ERROR, (event, data) => {
+            if (data.fatal) {
+              note.innerHTML = "<div><strong>HLS lädt nicht.</strong>Prüfe direkte .m3u8-URL, CORS und Nutzungsrechte.</div>";
+            }
+          });
+        } else {
+          note.innerHTML = "<div><strong>HLS nicht unterstützt.</strong>Dieser Browser kann den Stream hier nicht abspielen.</div>";
+        }
+
+        return;
+      }
+
+      const iframe = document.createElement("iframe");
+      iframe.src = u;
+      iframe.referrerPolicy = "strict-origin-when-cross-origin";
+      frame.appendChild(iframe);
+
+      const note = document.createElement("div");
+      note.className = "note";
+      note.style.display = "none";
+      note.innerHTML = `
+        <div>
+          <strong>EMBED BLOCKED?</strong>
+          Diese Website erlaubt eventuell keine iFrames.<br>
+          Dann brauchst du eine Embed-URL oder direkte Stream-URL.<br>
+          <a href="${esc(u)}" target="_blank" rel="noopener">Im neuen Tab öffnen</a>
+        </div>
+      `;
+      frame.appendChild(note);
+
+      let loaded = false;
+      iframe.addEventListener("load", () => loaded = true);
+
+      setTimeout(() => {
+        if (!loaded) note.style.display = "grid";
+      }, 3000);
+    }
+
+    function setActive(pane) {
+      document.querySelectorAll(".pane").forEach(p => p.classList.remove("active"));
+      activePane = pane;
+      if (pane) pane.classList.add("active");
+    }
+
+    function render() {
+      wall.innerHTML = "";
+
+      for (let i = 0; i < state.count; i++) {
+        wall.appendChild(createPane(i));
+      }
+
+      renderSources();
+      countSelect.value = String(state.count);
+      activeStatus.textContent = `${state.count} Monitore`;
+      applyLayout(false);
+      save();
+    }
+
+    function renderSources() {
+      sourcesEl.innerHTML = "";
+
+      for (let i = 0; i < state.count; i++) {
+        if (!state.sources[i]) {
+          state.sources[i] = { title: `SOURCE ${i + 1}`, type: "iframe", url: "" };
+        }
+
+        const s = state.sources[i];
+        const row = document.createElement("div");
+        row.className = "source";
+
+        row.innerHTML = `
+          <div class="source-label"><span>${i + 1}</span> Monitor</div>
+
+          <input class="input titleInput" placeholder="Titel" value="${esc(s.title || "")}">
+
+          <select class="type-select typeInput">
+            <option value="iframe"${(s.type || "iframe") === "iframe" ? " selected" : ""}>iFrame / Website</option>
+            <option value="youtube"${s.type === "youtube" ? " selected" : ""}>YouTube ID / URL</option>
+            <option value="hls"${s.type === "hls" ? " selected" : ""}>HLS / m3u8 Stream</option>
+          </select>
+
+          <input class="input urlInput" placeholder="URL, YouTube-ID oder .m3u8" value="${esc(s.url || "")}">
+
+          <div class="source-actions">
+            <button class="mini load">Laden</button>
+            <button class="mini open">Öffnen</button>
+          </div>
+        `;
+
+        const title = row.querySelector(".titleInput");
+        const type = row.querySelector(".typeInput");
+        const url = row.querySelector(".urlInput");
+
+        title.oninput = () => {
+          state.sources[i].title = title.value;
+          updatePane(i);
+          save();
+        };
+
+        type.onchange = () => {
+          state.sources[i].type = type.value;
+          updatePane(i);
+          save();
+        };
+
+        url.oninput = () => {
+          state.sources[i].url = url.value;
+          save();
+        };
+
+        row.querySelector(".load").onclick = () => {
+          state.sources[i].url = url.value;
+          state.sources[i].type = type.value;
+          updatePane(i);
+          save();
+        };
+
+        row.querySelector(".open").onclick = () => {
+          const u = normalizeUrl(url.value);
+          if (u) window.open(u, "_blank", "noopener");
+        };
+
+        sourcesEl.appendChild(row);
+      }
+    }
+
+    function updatePane(i) {
+      const old = wall.querySelector(`.pane[data-index="${i}"]`);
+      if (!old) return;
+
+      const pos = {
+        left: old.style.left,
+        top: old.style.top,
+        width: old.style.width,
+        height: old.style.height
+      };
+
+      const fresh = createPane(i);
+      Object.assign(fresh.style, pos);
+      old.replaceWith(fresh);
+    }
+
+    function applyLayout(animated = true) {
+      const panes = [...document.querySelectorAll(".pane")];
+      const W = wall.clientWidth;
+      const H = wall.clientHeight;
+      const gap = 10;
+      const preset = presetSelect.value;
+
+      const set = (p, x, y, w, h) => {
+        if (animated) {
+          p.style.transition = "left .18s ease, top .18s ease, width .18s ease, height .18s ease";
+        }
+
+        p.style.left = Math.round(x) + "px";
+        p.style.top = Math.round(y) + "px";
+        p.style.width = Math.round(w) + "px";
+        p.style.height = Math.round(h) + "px";
+
+        if (animated) {
+          setTimeout(() => p.style.transition = "", 220);
+        }
+      };
+
+      if (preset === "program" && panes.length >= 2) {
+        const mainW = W * .62;
+        set(panes[0], gap, gap, mainW - gap * 1.5, H - gap * 2);
+
+        const rest = panes.slice(1);
+        const rh = (H - gap * (rest.length + 1)) / rest.length;
+
+        rest.forEach((p, i) => {
+          set(p, mainW + gap / 2, gap + i * (rh + gap), W - mainW - gap * 1.5, rh);
+        });
+
+        return;
+      }
+
+      if (preset === "wide" && panes.length >= 3) {
+        const topH = H * .55;
+        set(panes[0], gap, gap, W - gap * 2, topH - gap * 1.5);
+
+        const rest = panes.slice(1);
+        const cw = (W - gap * (rest.length + 1)) / rest.length;
+
+        rest.forEach((p, i) => {
+          set(p, gap + i * (cw + gap), topH + gap / 2, cw, H - topH - gap * 1.5);
+        });
+
+        return;
+      }
+
+      const cols = preset === "stack"
+        ? (state.count <= 4 ? 2 : 4)
+        : (state.count === 2 ? 2 : state.count === 6 ? 3 : state.count === 8 ? 4 : 2);
+
+      const rows = Math.ceil(state.count / cols);
+
+      panes.forEach((p, i) => {
+        const col = i % cols;
+        const row = Math.floor(i / cols);
+        const cw = (W - gap * (cols + 1)) / cols;
+        const rh = (H - gap * (rows + 1)) / rows;
+
+        set(p, gap + col * (cw + gap), gap + row * (rh + gap), cw, rh);
+      });
+    }
+
+    function enableDrag(pane) {
+      const head = pane.querySelector(".head");
+      let sx, sy, sl, st;
+
+      head.addEventListener("pointerdown", e => {
+        if (e.target.closest("button")) return;
+
+        setActive(pane);
+        pane.setPointerCapture(e.pointerId);
+
+        sx = e.clientX;
+        sy = e.clientY;
+        sl = pane.offsetLeft;
+        st = pane.offsetTop;
+
+        const move = ev => {
+          pane.style.left = clamp(sl + ev.clientX - sx, 0, wall.clientWidth - pane.offsetWidth) + "px";
+          pane.style.top = clamp(st + ev.clientY - sy, 0, wall.clientHeight - pane.offsetHeight) + "px";
+        };
+
+        const up = ev => {
+          pane.releasePointerCapture(ev.pointerId);
+          pane.removeEventListener("pointermove", move);
+          pane.removeEventListener("pointerup", up);
+        };
+
+        pane.addEventListener("pointermove", move);
+        pane.addEventListener("pointerup", up);
+      });
+    }
+
+    function enableResize(pane) {
+      const h = pane.querySelector(".resize");
+      let sx, sy, sw, sh;
+
+      h.addEventListener("pointerdown", e => {
+        e.stopPropagation();
+
+        setActive(pane);
+        pane.setPointerCapture(e.pointerId);
+
+        sx = e.clientX;
+        sy = e.clientY;
+        sw = pane.offsetWidth;
+        sh = pane.offsetHeight;
+
+        const move = ev => {
+          pane.style.width = clamp(sw + ev.clientX - sx, 230, wall.clientWidth - pane.offsetLeft) + "px";
+          pane.style.height = clamp(sh + ev.clientY - sy, 160, wall.clientHeight - pane.offsetTop) + "px";
+        };
+
+        const up = ev => {
+          pane.releasePointerCapture(ev.pointerId);
+          pane.removeEventListener("pointermove", move);
+          pane.removeEventListener("pointerup", up);
+        };
+
+        pane.addEventListener("pointermove", move);
+        pane.addEventListener("pointerup", up);
+      });
+    }
+
+    function clamp(n, min, max) {
+      return Math.max(min, Math.min(max, n));
+    }
+
+    countSelect.onchange = () => {
+      state.count = Number(countSelect.value);
+      render();
+    };
+
+    presetSelect.value = localStorage.getItem(STORAGE_PREFIX + "preset") || DEFAULT_PRESET;
+
+    presetSelect.onchange = () => {
+      localStorage.setItem(STORAGE_PREFIX + "preset", presetSelect.value);
+      applyLayout(true);
+    };
+
+    document.getElementById("applyPreset").onclick = () => applyLayout(true);
+
+    document.getElementById("resetDefaults").onclick = () => {
+      state.count = DEFAULT_COUNT;
+      state.sources = structuredClone(defaults);
+      presetSelect.value = DEFAULT_PRESET;
+      localStorage.setItem(STORAGE_PREFIX + "preset", DEFAULT_PRESET);
+      render();
+    };
+
+    document.getElementById("fullscreenBtn").onclick = async () => {
+      if (!document.fullscreenElement) {
+        await document.documentElement.requestFullscreen();
+      } else {
+        await document.exitFullscreen();
+      }
+    };
+
+    window.addEventListener("resize", () => applyLayout(false));
+
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    const audio = new AudioContextClass();
+
+    function tone(freq, dur, type = "sine", gain = .11, delay = 0) {
+      const osc = audio.createOscillator();
+      const g = audio.createGain();
+
+      osc.type = type;
+      osc.frequency.value = freq;
+      osc.connect(g);
+      g.connect(audio.destination);
+
+      const t = audio.currentTime + delay;
+
+      g.gain.setValueAtTime(.001, t);
+      g.gain.linearRampToValueAtTime(gain, t + .01);
+      g.gain.exponentialRampToValueAtTime(.001, t + dur);
+
+      osc.start(t);
+      osc.stop(t + dur + .03);
+    }
+
+    function play(name) {
+      if (audio.state === "suspended") audio.resume();
+
+      if (name === "sting") {
+        tone(440, .1, "square");
+        tone(660, .12, "square", .1, .1);
+        tone(880, .18, "square", .09, .22);
+      }
+
+      if (name === "alert") {
+        tone(900, .16, "sawtooth");
+        tone(900, .16, "sawtooth", .11, .22);
+      }
+
+      if (name === "click") tone(1300, .045, "square", .08);
+
+      if (name === "ok") {
+        tone(520, .1);
+        tone(780, .16, "sine", .1, .1);
+      }
+
+      if (name === "count") {
+        tone(700, .07, "square");
+        tone(700, .07, "square", .1, .15);
+        tone(350, .18, "square", .12, .32);
+      }
+
+      if (name === "fail") {
+        tone(230, .18, "sawtooth");
+        tone(160, .25, "sawtooth", .1, .16);
+      }
+    }
+
+    document.querySelectorAll(".pad").forEach(p => {
+      p.onclick = () => play(p.dataset.sound);
+    });
+
+    render();
+  </script>
+</body>
+</html>
