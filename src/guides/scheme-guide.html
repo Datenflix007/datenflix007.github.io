@@ -1,0 +1,399 @@
+<!doctype html>
+<html lang="de">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Scheme Guide - Felix Staacke</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../styles.css">
+    <style>
+        .guide-article pre {
+            border: 1px solid rgba(167, 139, 250, .18);
+            border-radius: 8px;
+            padding: 14px;
+            background: rgba(2, 6, 23, .72);
+            overflow-x: auto;
+        }
+
+        .guide-article code {
+            font-family: "Cascadia Code", Consolas, monospace;
+        }
+
+        .guide-card {
+            border: 1px solid rgba(148, 163, 184, .24);
+            border-radius: 8px;
+            background: rgba(15, 23, 42, .62);
+            padding: 16px;
+            margin: 20px 0;
+        }
+
+        .guide-card h3 {
+            margin-top: 0;
+        }
+
+        .guide-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 14px;
+            margin: 22px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="container nav">
+            <div class="brand" onclick="location.href='../../index.html'" style="cursor:pointer;">
+                <div class="logo"></div><span>Felix Staacke</span>
+            </div>
+            <nav>
+                <a class="btn" href="../Referenzen.html">Referenzen</a>
+                <a class="btn" href="../projekte.html">Projekte</a>
+                <a class="btn" href="../kontakt.html">Kontakt</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <a class="guide-back" href="../informatikstudium.html">&larr; Zurück zum Informatikstudium</a>
+
+        <section class="page-hero" style="margin-bottom: 0;">
+            <div class="page-hero-bg" style="background:
+                radial-gradient(ellipse at 22% 74%, #a78bfa 0%, transparent 50%),
+                radial-gradient(ellipse at 78% 18%, #22d3ee 0%, transparent 48%),
+                linear-gradient(160deg, #12091f 0%, #102033 100%);"></div>
+            <div class="page-hero-content">
+                <span class="chip">Funktionale Programmierung</span>
+                <span class="chip" style="margin-left: 6px;">Scheme</span>
+                <h1>Scheme Guide für Dummies</h1>
+                <p class="sub">Ein einfacher Einstieg in Scheme als funktionale Sprache mit Listen, Rekursion und Funktionen höherer Ordnung.</p>
+            </div>
+        </section>
+
+        <article class="guide-article">
+            <p><strong>Scheme</strong> ist ein Dialekt von Lisp und gehört zur Familie der funktionalen Sprachen. Anders als bei Prolog steht nicht die logische Schlussfolgerung im Mittelpunkt, sondern die <strong>Auswertung von Funktionen</strong> und die <strong>kompositionale Verarbeitung von Daten</strong>.</p>
+
+            <div class="guide-grid">
+                <div class="guide-card">
+                    <h3>Funktional</h3>
+                    <p>Programme bestehen aus Funktionen, die Daten transformieren.</p>
+                </div>
+                <div class="guide-card">
+                    <h3>Listenbasiert</h3>
+                    <p>Listen sind die zentrale Datenstruktur und werden oft rekursiv verarbeitet.</p>
+                </div>
+                <div class="guide-card">
+                    <h3>Komposition</h3>
+                    <p>Kleine Bausteine werden zu größeren Programmen zusammengesetzt.</p>
+                </div>
+            </div>
+
+            <h2>1. Grundidee</h2>
+            <p>In Scheme definiert man Funktionen und ruft sie mit Argumenten auf. Das Ergebnis entsteht durch Auswertung dieser Funktionen. Das ist sehr direkt und oft sehr kompakt.</p>
+
+            <pre><code>(define (quadrat x)
+  (* x x))
+
+(quadrat 5)</code></pre>
+
+            <pre><code>25</code></pre>
+
+            <h2>2. Warum in Lisp alles als Liste funktioniert</h2>
+            <p>Der zentrale Gedanke von Lisp und damit auch von Scheme ist: <strong>Programme sind Daten und Daten sind Programme</strong>. Das bedeutet, dass du Code nicht als etwas Besonderes neben den Daten ansiehst, sondern als eine Form von Liste, die ausgewertet wird. Eine einfache Liste wie <code>(+ 2 3)</code> ist zunächst einmal nur eine Liste aus Symbolen und Zahlen. Erst wenn der Interpreter diese Liste auswertet, wird daraus ein Funktionsaufruf.</p>
+
+            <p>Das ist der Grund, warum Lisp sehr elegant wirkt: Man arbeitet mit derselben Grundstruktur, mit derselben Listenform, ob man nun Zahlen, Wörter, Ausdrücke, Funktionen oder Programme modelliert.</p>
+
+            <pre><code>42
+'Hallo
+(+ 2 3)
+(list 1 2 3)</code></pre>
+
+            <p>Die erste Zeile ist einfach eine Zahl. Die zweite Zeile ist ein Symbol oder ein Wort. Die dritte Zeile ist eine Liste, die als Funktionsaufruf interpretiert wird. Die vierte Zeile ist eine Liste, die als Datenstruktur verwendet wird.</p>
+
+            <div class="guide-card">
+                <h3>Wichtiger Unterschied</h3>
+                <p>Ein Ausdruck wie <code>(+ 2 3)</code> wird ausgeführt, weil er als Aufruf einer Funktion gelesen wird. Eine Liste wie <code>'(1 2 3)</code> wird dagegen als Datenliste behandelt, weil sie mit einem Apostroph markiert ist.</p>
+            </div>
+
+            <h3>Quote und Datenlisten</h3>
+            <pre><code>(+ 2 3)
+'(+ 2 3)</code></pre>
+
+            <p>Die erste Zeile wird ausgewertet und ergibt <code>5</code>. Die zweite Zeile ist eine Datenliste, die nur den Ausdruck selbst als Liste repräsentiert. Das ist ein sehr charakteristisches Lisp-Muster.</p>
+
+            <h2>3. Prädikate und Bedingungen</h2>
+            <p>In Scheme verwendet man oft <code>if</code> oder <code>cond</code>, um Entscheidungen zu treffen. Ein Prädikat ist dabei einfach ein Ausdruck, der wahr oder falsch ergibt.</p>
+
+            <pre><code>(define (positiv? x)
+  (> x 0))
+
+(positiv? 5)
+(positiv? -2)</code></pre>
+
+            <pre><code>#t
+#f</code></pre>
+
+            <p>Das <code>?</code> am Ende eines Namens ist in Lisp-Style eine Konvention für Prädikate. Es signalisiert: „Diese Funktion liefert einen booleschen Wert.“</p>
+
+            <pre><code>(define (groesser-als-null? x)
+  (if (> x 0)
+      #t
+      #f))</code></pre>
+
+            <h2>4. Listen und Rekursion</h2>
+            <p>Listen sind in Scheme sehr wichtig. Eine typische Lösung ist deshalb oft rekursiv: Basisfall plus rekursiver Fall.</p>
+
+            <pre><code>(define (laenge lst)
+  (if (null? lst)
+      0
+      (+ 1 (laenge (cdr lst)))))
+
+(laenge '(1 2 3 4))</code></pre>
+
+            <pre><code>4</code></pre>
+
+            <h2>5. Funktionen höherer Ordnung</h2>
+            <p>Scheme macht viel mit Funktionen höherer Ordnung wie <code>map</code>, <code>filter</code> und <code>fold</code>.</p>
+
+            <pre><code>(define (verdoppeln lst)
+  (map (lambda (x) (* x 2)) lst))
+
+(verdoppeln '(1 2 3))</code></pre>
+
+            <pre><code>(2 4 6)</code></pre>
+
+            <h2>6. Konstruktoren und Selektoren</h2>
+            <p>In Lisp arbeitet man oft mit Konstruktoren wie <code>cons</code> und Selektoren wie <code>car</code> und <code>cdr</code>. Das ist ein sehr wichtiger Teil der Zusammenfassung: Eine Liste ist ein Paar aus erstem Element und Restliste.</p>
+
+            <pre><code>(define lst '(1 2 3))
+(cons 0 lst)</code></pre>
+
+            <pre><code>(0 1 2 3)</code></pre>
+
+            <pre><code>(car lst)
+(cdr lst)</code></pre>
+
+            <pre><code>1
+(2 3)</code></pre>
+
+            <p><code>car</code> gibt das erste Element, <code>cdr</code> den Rest zurück. Diese beiden Operatoren sind in Lisp sehr fundamental.</p>
+
+            <h2>7. Spezialformen und Auswertung</h2>
+            <p>In Scheme gibt es Ausdrücke, die nicht einfach nur Funktionen sind. Dazu gehören <code>if</code>, <code>define</code>, <code>lambda</code> und <code>quote</code>. Diese werden nicht wie normale Funktionen behandelt, sondern haben eine eigene Auswertungsregel.</p>
+
+            <pre><code>(define x 10)
+(if (> x 5) 'groesser 'kleiner)</code></pre>
+
+            <pre><code>groesser</code></pre>
+
+            <p>Das ist wichtig, weil Scheme eine sehr kleine und zugleich sehr mächtige Sprache ist: Die Syntax ist simpel, aber die Semantik wird durch die Auswertungsregeln bestimmt.</p>
+
+            <h2>8. Vergleich: Prolog vs. Scheme</h2>
+            <table>
+                <thead>
+                    <tr><th>Aspekt</th><th>Prolog</th><th>Scheme</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Zentraler Stil</td><td>Fakten, Regeln, Anfragen</td><td>Funktionen, Daten, Auswertung</td></tr>
+                    <tr><td>Denken</td><td>logisch und relational</td><td>funktional und kompositorisch</td></tr>
+                    <tr><td>Wiederholung</td><td>Rekursion und Backtracking</td><td>Rekursion und Funktionen höherer Ordnung</td></tr>
+                    <tr><td>Typische Stärke</td><td>Regelbasierte Suche</td><td>kompakte Datenverarbeitung</td></tr>
+                </tbody>
+            </table>
+
+            <div class="guide-card">
+                <h3>Merksatz</h3>
+                <p>Prolog fragt: „Was folgt logisch aus diesen Fakten?“ Scheme fragt eher: „Wie kann ich diese Daten mit Funktionen elegant transformieren?“</p>
+            </div>
+
+            <h2>9. So wird aus Scheme wirklich ein praktisches Programm</h2>
+            <p>Der beste Weg, Scheme zu lernen, ist nicht nur „ein paar Ausdrücke lesen“, sondern ein kleines Projekt von Anfang bis Ende durchzudenken. Die Idee ist dabei immer dieselbe: Du stellst dir zuerst ein Problem vor, dann zerlegst du es in kleine Schritte, und dann baust du die Lösung mit kleinen Funktionen auf.</p>
+
+            <p>Ein guter praktischer Ablauf sieht so aus:</p>
+            <ol>
+                <li><strong>Problem beschreiben</strong>: Was soll das Programm tun?</li>
+                <li><strong>Eingaben und Ausgaben festlegen</strong>: Was bekommt die Funktion? Was gibt sie zurück?</li>
+                <li><strong>Kleine Funktionen schreiben</strong>: Nicht sofort alles auf einmal, sondern erst einen kleinen Baustein.</li>
+                <li><strong>Mit Beispielen testen</strong>: Was passiert bei 5, bei 0, bei einer leeren Liste?</li>
+                <li><strong>Schrittweise verallgemeinern</strong>: Aus einem Spezialfall wird eine allgemeine Funktion.</li>
+            </ol>
+
+            <div class="guide-card">
+                <h3>Beispielprojekt: Notenbewertung</h3>
+                <p>Stell dir vor, du willst ein Programm schreiben, das aus einer Note eine Bewertung macht. Das ist ein klassisches Beispiel für eine kleine Regelmaschine.</p>
+                <pre><code>(define (bewerte-note note)
+  (cond
+    [(>= note 90) "sehr gut"]
+    [(>= note 80) "gut"]
+    [(>= note 70) "befriedigend"]
+    [else "nicht bestanden"]))
+
+(bewerte-note 85)</code></pre>
+                <p>Was passiert hier genau? Die Funktion <code>bewerte-note</code> bekommt eine Zahl. Dann schaut <code>cond</code> nacheinander, welche Bedingung zuerst zutrifft. Wenn die Note größer oder gleich 90 ist, gibt es „sehr gut“ zurück. Wenn nicht, wird die nächste Prüfung gemacht. Wenn keine Bedingung passt, kommt der <code>else</code>-Fall.</p>
+            </div>
+
+            <div class="guide-card">
+                <h3>Beispielprojekt: Listen filtern</h3>
+                <p>Ein zweites typisches Projekt ist das Verarbeiten von Listen. Das ist in Scheme besonders wichtig, weil Listen eine zentrale Datenstruktur sind.</p>
+                <pre><code>(define (filter-gerade lst)
+  (cond
+    [(null? lst) '()]
+    [(even? (car lst)) (cons (car lst) (filter-gerade (cdr lst)))]
+    [else (filter-gerade (cdr lst))]))
+
+(filter-gerade '(1 2 3 4 5 6))</code></pre>
+                <p>Die Funktion schaut sich das erste Element an. Ist es gerade, wird es behalten. Ist es ungerade, wird es übersprungen. Danach wird der Rest der Liste weiterverarbeitet. Das ist ein typischer rekursiver Aufbau: Basisfall plus kleiner Schritt.</p>
+            </div>
+
+            <div class="guide-card">
+                <h3>Beispielprojekt: Einfacher Wort- oder Textanalysator</h3>
+                <p>Mit Scheme kannst du auch Text verarbeiten. Ein sehr kleines Beispiel wäre, zu prüfen, ob ein Wort mit einem bestimmten Anfangsbuchstaben beginnt.</p>
+                <pre><code>(define (startet-mit-a? wort)
+  (equal? (substring wort 0 1) "a"))
+
+(startet-mit-a? "apfel")
+(startet-mit-a? "banane")</code></pre>
+                <p>Auch hier sieht man das Prinzip: Ein kleiner Input, eine klare Frage, ein klares Ergebnis. Genau solche kleinen Bausteine sind der Einstieg in größere Programme.</p>
+            </div>
+
+            <p>Diese drei Beispiele zeigen schon sehr gut, warum Scheme so attraktiv ist: Es ist kompakt, klar und sehr gut geeignet für die Verarbeitung von Regeln, Listen und kleinen Transformationen.</p>
+
+            <h2>10. DrRacket installieren und sinnvoll benutzen</h2>
+            <p>Wenn du Scheme wirklich ausprobieren willst, ist <strong>DrRacket</strong> der einfachste Einstieg. Es ist eine Entwicklungsumgebung für Racket und damit auch für Scheme-ähnliche Programmierung. Sie ist besonders angenehm, weil du sofort sehen kannst, was dein Code macht.</p>
+
+            <ol>
+                <li>Öffne deinen Browser und gehe auf <a href="https://racket-lang.org/" target="_blank" rel="noopener">racket-lang.org</a>.</li>
+                <li>Lade den Installer für dein Betriebssystem herunter. Auf Windows ist das meist eine <code>.exe</code>-Datei.</li>
+                <li>Installiere Racket mit den Standardoptionen. Dabei wird auch DrRacket mitinstalliert.</li>
+                <li>Öffne DrRacket. Dort siehst du meist ein Editorfenster und ein Interaktionsfenster.</li>
+                <li>Wähle eine Sprache wie <strong>Racket</strong> oder <strong>Beginning Student</strong>. Für den Anfang ist <strong>Beginning Student</strong> oft besonders gut, weil es dich nicht sofort mit allen Spezialfällen überfordert.</li>
+                <li>Schreibe deinen ersten Code und drücke <strong>Run</strong>.</li>
+            </ol>
+
+            <pre><code>#lang racket
+(+ 2 3)</code></pre>
+
+            <p>Wenn du das ausführst, sollte die Ausgabe <code>5</code> erscheinen. Das ist dein erster echter Lauf eines Scheme-ähnlichen Programms.</p>
+
+            <div class="guide-card">
+                <h3>Wie du in DrRacket typischerweise arbeitest</h3>
+                <p>1. Neues File anlegen<br>2. Code schreiben<br>3. Auf Run klicken<br>4. Ergebnisse im Interaktionsfenster ansehen<br>5. Bei Fehlern den Fehlertext lesen und den Code anpassen</p>
+                <p>Das Wichtigste ist: Nicht sofort alles perfekt machen wollen. Ein kleiner Fehler ist kein Problem. Gerade in Scheme lernt man oft sehr schnell dadurch, dass man den Fehlertext liest und den nächsten Versuch macht.</p>
+            </div>
+
+            <h3>Ein erstes, bewusst einfaches Beispiel</h3>
+            <pre><code>#lang racket
+(define (quadrat x)
+  (* x x))
+
+(quadrat 6)</code></pre>
+
+            <p>Hier definierst du zuerst eine Funktion <code>quadrat</code>. Sie bekommt einen Wert <code>x</code> und gibt dessen Quadrat zurück. Danach rufst du die Funktion mit <code>6</code> auf. Das Ergebnis ist <code>36</code>.</p>
+
+            <h2>11. Vom kleinen Experiment zur echten Anwendung</h2>
+            <p>Ein sehr praktischer Weg ist: <strong>Scheme für die eigentliche Logik</strong> zu verwenden und <strong>Python</strong> als Brücke zu einer Weboberfläche oder einer Cloud-Umgebung zu nutzen. Das ist ein sehr guter Lernweg, weil du dabei nicht nur die funktionale Denkweise lernst, sondern auch einen realistischen Aufbau siehst.</p>
+
+            <p>Die grobe Architektur ist:</p>
+            <pre><code>Browser-UI → Python-API → Scheme-Logik → Ergebnis</code></pre>
+
+            <p>Das heißt: Der Nutzer sieht nur die Oberfläche, aber die eigentliche Entscheidung oder Verarbeitung passiert in der Logik-Schicht. Dadurch bleibt dein Programm sauber getrennt.</p>
+
+            <h3>Schritt 1: Die Logik in Scheme</h3>
+            <pre><code>#lang racket
+(provide berechne-bonus)
+
+(define (berechne-bonus alter)
+  (cond
+    [(< alter 18) 0]
+    [(< alter 65) 50]
+    [else 100]))</code></pre>
+
+            <p>Diese Funktion ist die eigentliche Logik. Sie sagt: Wer unter 18 ist, bekommt keinen Bonus; wer zwischen 18 und 64 ist, bekommt 50; sonst bekommt 100.</p>
+
+            <h3>Schritt 2: Python ruft die Scheme-Logik auf</h3>
+            <pre><code>import subprocess
+
+
+def berechne_bonus(alter: int) -> int:
+    command = ["racket", "-e", f"(require \"logic.rkt\") (display (berechne-bonus {alter}))"]
+    result = subprocess.run(command, capture_output=True, text=True, check=True)
+    return int(result.stdout.strip())
+
+print(berechne_bonus(25))</code></pre>
+
+            <p>Hier wird der Scheme-Code nicht direkt in Python neu geschrieben, sondern von Python aus aufgerufen. Das ist besonders praktisch, wenn du eine bestehende Regel- oder Entscheidungslogik getrennt pflegen möchtest.</p>
+
+            <h3>Schritt 3: Ein kleines Python-Backend mit Flask</h3>
+            <pre><code>from flask import Flask, request, jsonify
+import subprocess
+
+app = Flask(__name__)
+
+@app.post("/bonus")
+def bonus():
+    data = request.get_json()
+    alter = data["alter"]
+    command = ["racket", "-e", f"(require \"logic.rkt\") (display (berechne-bonus {alter}))"]
+    result = subprocess.run(command, capture_output=True, text=True, check=True)
+    return jsonify({"bonus": int(result.stdout.strip())})
+
+if __name__ == "__main__":
+    app.run(debug=True)</code></pre>
+
+            <p>Dieses Backend macht aus deiner kleinen Logik einen echten Dienst, den man über eine URL ansprechen kann. Das ist der Schritt vom „einfachen Skript“ zur „echten Anwendung“.</p>
+
+            <h3>Schritt 4: Eine einfache UI darüber</h3>
+            <pre><code>&lt;input id="alter" type="number" value="25" /&gt;
+&lt;button onclick="senden()"&gt;Bonus berechnen&lt;/button&gt;
+&lt;div id="ergebnis"&gt;&lt;/div&gt;
+
+&lt;script&gt;
+async function senden() {
+  const alter = Number(document.getElementById("alter").value);
+  const response = await fetch("/bonus", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ alter })
+  });
+  const data = await response.json();
+  document.getElementById("ergebnis").textContent = "Bonus: " + data.bonus;
+}
+&lt;/script&gt;</code></pre>
+
+            <p>Damit hast du mit wenig Aufwand eine echte kleine Weboberfläche. Der Nutzer tippt eine Zahl ein, die Website schickt sie an das Backend, das Backend ruft die Scheme-Logik auf, und die Antwort wird angezeigt.</p>
+
+            <h2>12. Was du in der Cloud machen kannst</h2>
+            <p>Wenn du das Ganze online stellen willst, gibt es verschiedene Möglichkeiten. Der wichtigste Gedanke ist: Die Logik bleibt getrennt, und die Oberfläche kann ganz einfach veröffentlicht werden.</p>
+
+            <ul>
+                <li><strong>Python-Backend auf Render, Fly.io oder Railway</strong>: Dort kannst du dein Flask-Backend deployen.</li>
+                <li><strong>Frontend auf GitHub Pages oder Cloudflare Pages</strong>: Dort kannst du die HTML-/JS-Oberfläche kostenlos hosten.</li>
+                <li><strong>Serverlose Funktionen</strong>: Wenn du nur einen kleinen Dienst brauchst, können Cloud-Funktionen sehr elegant sein.</li>
+            </ul>
+
+            <p>Ein typischer Aufbau wäre also:</p>
+            <pre><code>Browser-UI → Python-API → Scheme-Logik → Ergebnis</code></pre>
+
+            <p>Das ist eine sehr gute Architektur für Lernprojekte, weil du dabei die Trennung von <strong>Darstellung</strong>, <strong>Verarbeitung</strong> und <strong>Logik</strong> direkt erleben kannst.</p>
+
+            <h2>13. Mini-Übung</h2>
+            <pre><code>(define (summe lst)
+  (if (null? lst)
+      0
+      (+ (car lst) (summe (cdr lst)))))
+
+(summe '(2 4 6))</code></pre>
+
+            <pre><code>12</code></pre>
+
+            <p>Wenn du möchtest, kannst du als Nächstes ein eigenes Projekt aufbauen: etwa eine kleine Regelmaschine, einen Wortanalysator, ein Quizsystem oder eine kleine Weboberfläche mit Scheme-Logik im Hintergrund.</p>
+        </article>
+    </main>
+
+    <footer>
+        <div class="container">© 2026 Felix Staacke</div>
+    </footer>
+</body>
+
+</html>
