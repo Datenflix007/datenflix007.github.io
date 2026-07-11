@@ -329,6 +329,13 @@ main{flex:1;position:relative;overflow:hidden}
   </div>
 
   <div class="menu-group">
+    <button class="menu-btn">ALGORITHMEN</button>
+    <div class="dropdown" id="dropdownAlgorithms">
+      <button onclick="cmdHeapSort()">Heapsort</button>
+    </div>
+  </div>
+
+  <div class="menu-group">
     <button class="menu-btn">ANZEIGE</button>
     <div class="dropdown">
       <button onclick="toggleSetting('darkMode')"><span class="ck" id="ck-darkMode">✓</span> Dunkelmodus</button>
@@ -1991,6 +1998,24 @@ const PSEUDOCODE = {
         { re: /Position.*korrekt/,     lines: [3,4] },
       ]
     },
+    heapsort: {
+      title: 'Heapsort',
+      code: [
+        'Heapsort(A):',
+        '  Build-Max-Heap(A)',
+        '  heapSize <- length(A)',
+        '  for i <- length(A)-1 downto 1:',
+        '    swap(A[0], A[i])',
+        '    heapSize <- heapSize - 1',
+        '    Max-Heapify(A, 0, heapSize)',
+      ],
+      lineMap: [
+        { re: /Build.*Heap/, lines: [1,2] },
+        { re: /swap A\[0\]/, lines: [3,4] },
+        { re: /heapSize/, lines: [5] },
+        { re: /Heapify|tauscht/, lines: [6] },
+      ]
+    },
   },
   BinomialHeap: {
     insert: {
@@ -2158,6 +2183,7 @@ PSEUDOCODE.MaxHeap = {
   insert:     { ...PSEUDOCODE.MinHeap.insert,     title: 'MaxHeap-Insert'      },
   extractTop: { ...PSEUDOCODE.MinHeap.extractTop, title: 'MaxHeap-Extract-Max' },
   delete:     { ...PSEUDOCODE.MinHeap.delete,     title: 'MaxHeap-Delete'      },
+  heapsort:   { ...PSEUDOCODE.MinHeap.heapsort,   title: 'Heapsort'            },
 };
 PSEUDOCODE.MaxBinomialHeap = {
   insert:     { ...PSEUDOCODE.BinomialHeap.insert,     title: 'MaxBinomial-Insert'      },
@@ -2251,16 +2277,112 @@ function _treeMemoryRecords() {
   return records;
 }
 
+function _fmtMemValue(v) {
+  const decoded = _decodeVal(v);
+  return String(decoded ? decoded._v : (v ?? '')).slice(0,32);
+}
+
+function _arrayCells(items, prefix='A') {
+  return items.map((it, i) => {
+    const active = it.active ? ' active' : '';
+    const note = it.note ? `<span class="mem-idx">${_escH(it.note)}</span>` : '';
+    return `<div class="mem-cell${active}"><span class="mem-idx">${prefix}[${i}]</span><span class="mem-val">${_escH(String(it.key))}</span>${note}</div>`;
+  }).join('');
+}
+
+function _heapMemoryHTML() {
+  const size = structure._heapViewSize ?? structure.data.length;
+  const cells = structure.data.map((d, i) => ({
+    key: d.key,
+    active: highlighted.has(i),
+    note: i < size ? 'heap' : 'sortiert'
+  }));
+  const rows = structure.data.map((d, i) => {
+    const parent = i ? ((i - 1) / 2) | 0 : 'NIL';
+    const left = 2 * i + 1 < size ? 2 * i + 1 : 'NIL';
+    const right = 2 * i + 2 < size ? 2 * i + 2 : 'NIL';
+    const active = highlighted.has(i) ? ' class="active"' : '';
+    return `<tr${active}><td>${i}</td><td>${_escH(String(d.key))}</td><td>${parent}</td><td>${left}</td><td>${right}</td><td>${i < size ? 'Heap' : 'sorted'}</td><td>${_escH(_fmtMemValue(d.value))}</td></tr>`;
+  }).join('');
+  return `
+    <div class="memory-section"><h4>Array A - Heap im Speicher</h4><div class="memory-array">${_arrayCells(cells)}</div></div>
+    <div class="memory-section"><h4>Index-Beziehungen</h4><table class="memory-table">
+      <thead><tr><th>i</th><th>key</th><th>parent</th><th>left</th><th>right</th><th>zone</th><th>value</th></tr></thead>
+      <tbody>${rows}</tbody></table></div>`;
+}
+
+function _hashMemoryHTML() {
+  const cells = structure.table.map((slot, i) => {
+    const key = structure.mode === 'chaining' ? `len ${slot.length}` : slot ? (slot.deleted ? 'DEL' : slot.key) : 'NIL';
+    return { key, active: highlighted.has('h' + i), note: `T[${i}]` };
+  });
+  const rows = structure.table.map((slot, i) => {
+    const active = highlighted.has('h' + i) ? ' class="active"' : '';
+    if (structure.mode === 'chaining') {
+      const chain = slot.map(e => `${e.key}:${_fmtMemValue(e.value)}`).join(' -> ') || 'NIL';
+      return `<tr${active}><td>T[${i}]</td><td>${_escH(String(structure._h1(i)))}</td><td>Liste</td><td>${_escH(chain)}</td></tr>`;
+    }
+    const state = !slot ? 'NIL' : slot.deleted ? 'DELETED' : 'belegt';
+    const key = slot && !slot.deleted ? slot.key : '';
+    const home = slot && !slot.deleted ? slot.home : '';
+    return `<tr${active}><td>T[${i}]</td><td>${_escH(String(key))}</td><td>${_escH(String(home))}</td><td>${state}</td></tr>`;
+  }).join('');
+  return `
+    <div class="memory-section"><h4>Hash-Tabelle T[0..m-1]</h4><div class="memory-array">${_arrayCells(cells, 'T')}</div></div>
+    <div class="memory-section"><h4>${structure.mode === 'chaining' ? 'Buckets mit Verkettung' : 'Offene Adressierung'}</h4><table class="memory-table">
+      <thead>${structure.mode === 'chaining' ? '<tr><th>slot</th><th>h(slot)</th><th>typ</th><th>inhalt</th></tr>' : '<tr><th>slot</th><th>key</th><th>home</th><th>status</th></tr>'}</thead>
+      <tbody>${rows}</tbody></table></div>`;
+}
+
+function _binomialMemoryHTML() {
+  const roots = structure.roots.map((r, i) => ({ key: r ? r.key : 'NIL', active: r && highlighted.has(r._lid), note: `B${i}` }));
+  const rows = [];
+  const go = (n, parent='NIL', addr='') => {
+    if (!n) return;
+    const childKeys = n.children.map(c => c.key).join(', ') || 'NIL';
+    const active = highlighted.has(n._lid) ? ' class="active"' : '';
+    rows.push(`<tr${active}><td>${addr}</td><td>${n.key}</td><td>${n.degree}</td><td>${parent}</td><td>${_escH(childKeys)}</td><td>${_escH(_fmtMemValue(n.value))}</td></tr>`);
+    n.children.forEach((c, i) => go(c, n.key, `${addr}.${i}`));
+  };
+  structure.roots.forEach((r, i) => go(r, 'ROOT', `roots[${i}]`));
+  return `
+    <div class="memory-section"><h4>Root-Array roots[k]</h4><div class="memory-array">${_arrayCells(roots, 'roots')}</div></div>
+    <div class="memory-section"><h4>Knoten-Records</h4><table class="memory-table">
+      <thead><tr><th>addr</th><th>key</th><th>degree</th><th>parent</th><th>children</th><th>value</th></tr></thead>
+      <tbody>${rows.join('')}</tbody></table></div>`;
+}
+
+function _fibMemoryHTML() {
+  const roots = structure.min ? structure._listArr(structure.min) : [];
+  const rootCells = roots.map((r, i) => ({ key: r.key, active: highlighted.has(r._lid), note: r === structure.min ? 'min' : 'root' }));
+  const rows = [];
+  const go = (n, parent='NIL', addr='') => {
+    const children = n.child ? structure._listArr(n.child) : [];
+    const childKeys = children.map(c => c.key).join(', ') || 'NIL';
+    const active = highlighted.has(n._lid) ? ' class="active"' : '';
+    rows.push(`<tr${active}><td>${addr}</td><td>${n.key}</td><td>${n.degree}</td><td>${parent}</td><td>${n.mark ? 'true' : 'false'}</td><td>${_escH(childKeys)}</td><td>${_escH(_fmtMemValue(n.value))}</td></tr>`);
+    children.forEach((c, i) => go(c, n.key, `${addr}.${i}`));
+  };
+  roots.forEach((r, i) => go(r, 'ROOT', `root[${i}]`));
+  return `
+    <div class="memory-section"><h4>Doppelt verkettete Wurzelliste</h4><div class="memory-array">${_arrayCells(rootCells, 'R')}</div></div>
+    <div class="memory-section"><h4>Knoten-Records</h4><table class="memory-table">
+      <thead><tr><th>addr</th><th>key</th><th>degree</th><th>parent</th><th>mark</th><th>children</th><th>value</th></tr></thead>
+      <tbody>${rows.join('')}</tbody></table></div>`;
+}
+
 function _refreshMemoryViewer() {
   const panel = document.getElementById('memoryPanel');
   const el = document.getElementById('memoryLines');
   if (!panel || !el || panel.classList.contains('hidden')) return;
 
   document.getElementById('memoryTitle').textContent = `${structType} - Array Memory`;
-  if (!isSearchTreeStructure(structure)) {
-    el.innerHTML = '<div class="pline log-hint">Array Memory Viewer ist fuer BSTree und RBTree aktiv.</div>';
-    return;
-  }
+  if (!structure) { el.innerHTML = '<div class="pline log-hint">Keine Datenstruktur geladen.</div>'; return; }
+  if (structure instanceof MinHeap) { el.innerHTML = _heapMemoryHTML(); return; }
+  if (structure instanceof HashTable) { el.innerHTML = _hashMemoryHTML(); return; }
+  if (structure instanceof BinomialHeap) { el.innerHTML = _binomialMemoryHTML(); return; }
+  if (structure instanceof FibHeap) { el.innerHTML = _fibMemoryHTML(); return; }
+  if (!isSearchTreeStructure(structure)) { el.innerHTML = '<div class="pline log-hint">Fuer diese Struktur ist noch kein Speicherbild definiert.</div>'; return; }
 
   const records = _treeMemoryRecords();
   if (!records.length) {
@@ -2275,8 +2397,7 @@ function _refreshMemoryViewer() {
   }).join('');
   const rowsHTML = records.map((r, i) => {
     const active = highlighted.has(r.key) ? ' class="active"' : '';
-    const decoded = _decodeVal(r.value);
-    const value = decoded ? decoded._v : (r.value ?? '');
+    const value = _fmtMemValue(r.value);
     return `<tr${active}><td>@${i}</td><td>${_escH(String(r.key))}</td>` +
       (isRB ? `<td>${r.color === 'RED' ? 'R' : 'B'}</td>` : '') +
       `<td>${_escH(String(r.left))}</td><td>${_escH(String(r.right))}</td><td>${_escH(String(r.parent))}</td><td>${_escH(String(value)).slice(0,32)}</td></tr>`;
@@ -2366,6 +2487,8 @@ let structure  = null;        // current data structure
 let structType = 'RBTree';
 let highlighted = new Set();  // highlighted node IDs
 let nodeSchema  = [];         // [{name, type}] – custom tags per node
+
+let _algoRunning = false;
 
 // Viewport
 let zoom = 1.0, panX = 0, panY = 0;
@@ -2714,7 +2837,7 @@ function layoutFibHeap(W) {
 }
 
 function layoutHeap(W) {
-  const nodes=[], edges=[], n=structure.size();
+  const nodes=[], edges=[], n=structure._heapViewSize ?? structure.size();
   if (!n) return {nodes,edges,nilNodes:[]};
   const LH = _getLevelH(), minGap = _nodeHalfW() * 2 + 22;
   function calc(i, x, y, off) {
@@ -3764,6 +3887,92 @@ function askKey(title, cb) {
     if (!isNaN(v)) cb(v);
   });
   setTimeout(()=>document.getElementById('_k')?.focus(),50);
+}
+
+const _sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+async function cmdHeapSort() {
+  if (!need()) return;
+  if (!(structure instanceof MinHeap) || structure instanceof BinomialHeap || structure instanceof FibHeap) {
+    setStatus('⚠ Heapsort ist fuer binaere Heaps aktiv. Waehle MinHeap oder MaxHeap.');
+    return;
+  }
+  if (structure.data.length < 2 || _algoRunning) return;
+
+  _algoRunning = true;
+  highlighted.clear();
+  _currentOp = 'heapsort';
+  openMemoryPanel();
+  openPseudoPanel();
+
+  const isMax = structure instanceof MaxHeap;
+  _startLog(`Heapsort auf ${structType}`, 'heapsort');
+  _log(`Build-${isMax ? 'Max' : 'Min'}-Heap: aktuelles Heap-Array [${structure.data.map(d => d.key).join(', ')}]`);
+  _endLog();
+
+  const better = (i, j, size) =>
+    i < size && j < size && (isMax ? structure.data[i].key > structure.data[j].key : structure.data[i].key < structure.data[j].key);
+  const swap = (i, j) => {
+    [structure.data[i], structure.data[j]] = [structure.data[j], structure.data[i]];
+    highlighted = new Set([i, j]);
+    _refreshMemoryViewer();
+  };
+  const heapify = async (i, size) => {
+    while (true) {
+      const l = 2 * i + 1, r = 2 * i + 2;
+      let best = i;
+      if (better(l, best, size)) best = l;
+      if (better(r, best, size)) best = r;
+      if (best === i) {
+        _startLog(`Heapsort - Heapify(${i})`, 'heapsort');
+        _log(`Heapify stoppt bei Index ${i}: Heap-Eigenschaft erfuellt`);
+        _endLog();
+        highlighted = new Set([i]);
+        _refreshMemoryViewer();
+        await _sleep(420);
+        return;
+      }
+      _startLog(`Heapsort - Heapify(${i})`, 'heapsort');
+      _log(`Heapify: tauscht A[${i}]=${structure.data[i].key} mit A[${best}]=${structure.data[best].key}`);
+      swap(i, best);
+      _endLog();
+      await _sleep(650);
+      i = best;
+    }
+  };
+
+  try {
+    let size = structure.data.length;
+    structure._heapViewSize = size;
+    for (let b = Math.floor(size / 2) - 1; b >= 0; b--) {
+      _startLog(`Heapsort - Build-${isMax ? 'Max' : 'Min'}-Heap`, 'heapsort');
+      _log(`Build-Heap: Heapify bei internem Knoten A[${b}]`);
+      _endLog();
+      await _sleep(350);
+      await heapify(b, size);
+    }
+    for (let i = size - 1; i > 0; i--) {
+      _startLog(`Heapsort - Runde i=${i}`, 'heapsort');
+      _log(`swap A[0]=${structure.data[0].key} mit A[${i}]=${structure.data[i].key}`);
+      swap(0, i);
+      size--;
+      structure._heapViewSize = size;
+      _log(`heapSize <- ${size}; A[${i}..n-1] ist sortierter Bereich`);
+      _endLog();
+      await _sleep(700);
+      await heapify(0, size);
+    }
+    structure._heapViewSize = structure.data.length;
+    highlighted.clear();
+    _refreshMemoryViewer();
+    _startLog('Heapsort abgeschlossen', 'heapsort');
+    _log(`Sortiertes Array: [${structure.data.map(d => d.key).join(', ')}]`);
+    _endLog();
+    setStatus(`✓ Heapsort abgeschlossen: [${structure.data.map(d => d.key).join(', ')}]`);
+  } finally {
+    delete structure._heapViewSize;
+    _algoRunning = false;
+  }
 }
 
 function cmdInsert() {
