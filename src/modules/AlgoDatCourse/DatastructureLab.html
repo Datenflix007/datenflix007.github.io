@@ -1997,7 +1997,13 @@ function layoutRBTree(W) {
 
 function layoutBinomialHeap(W) {
   const nodes = [], edges = [];
-  const trees = structure.roots.filter(r => r !== null);
+  const orderDisplayTree = n => {
+    const ordered = [...n.children]
+      .sort((a, b) => (b.degree - a.degree) || (b.key - a.key) || (a._id - b._id))
+      .map(orderDisplayTree);
+    return { ...n, _model: n, children: ordered };
+  };
+  const trees = structure.roots.filter(r => r !== null).map(orderDisplayTree);
   if (!trees.length) return { nodes, edges, nilNodes: [] };
 
   const BASE = settings.tableView ? TABLE_W + 30 : 80;
@@ -2009,7 +2015,9 @@ function layoutBinomialHeap(W) {
   const assignIds = n => { n._lid = lid++; n.children.forEach(assignIds); };
   trees.forEach(assignIds);
 
-  const treeW = n => n.children.length ? n.children.reduce((s,c) => s + treeW(c), 0) : BASE;
+  const treeW = n => {
+    return n.children.length ? n.children.reduce((s,c) => s + treeW(c), 0) : BASE;
+  };
 
   const widths = trees.map(treeW);
   const totalW = widths.reduce((s,w) => s + w, 0) + GAP * (trees.length - 1);
@@ -2023,7 +2031,7 @@ function layoutBinomialHeap(W) {
 
   const layoutNode = (node, cx, y) => {
     nodes.push({ id: node._lid, x: cx, y, key: node.key, value: node.value,
-                 isRed: false, degree: node.degree, isMin: node === minNode });
+                 isRed: false, degree: node.degree, isMin: node._model === minNode });
     if (!node.children.length) return;
     const cws  = node.children.map(treeW);
     const totC = cws.reduce((s,w) => s+w, 0);
@@ -3276,6 +3284,8 @@ function cmdNew() {
     document.getElementById('tile-' + t).classList.add('selected');
     const heapRow = document.getElementById('_heapTypeRow');
     if (heapRow) heapRow.style.display = (t === 'Heap' || t === 'BinomialHeap' || t === 'FibHeap') ? '' : 'none';
+    const heapType = document.getElementById('_heapType');
+    if (heapType) heapType.value = (t === 'BinomialHeap' || t === 'FibHeap') ? 'min' : 'max';
     document.querySelectorAll('.hash-config-row').forEach(row => row.style.display = (t === 'HashTable') ? '' : 'none');
   };
 
