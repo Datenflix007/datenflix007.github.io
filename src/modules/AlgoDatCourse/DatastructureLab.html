@@ -96,10 +96,10 @@ main{flex:1;position:relative;overflow:hidden}
 .overlay.hidden{display:none}
 .dialog-box{
   background:var(--surface);border:1px solid var(--border);
-  border-radius:12px;padding:26px 28px;min-width:340px;max-width:560px;
+  border-radius:12px;padding:26px 28px;min-width:340px;width:min(720px,calc(100vw - 32px));max-width:720px;
   box-shadow:0 20px 60px rgba(0,0,0,.55)
 }
-#dlgContent{max-height:62vh;overflow-y:auto;padding-right:2px}
+#dlgContent{max-height:62vh;overflow-y:auto;overflow-x:hidden;padding-right:2px}
 .dialog-box h3{margin-bottom:18px;color:var(--accent);font-size:15px;font-weight:700}
 .dialog-field{margin-bottom:13px}
 .dialog-field label{
@@ -136,15 +136,16 @@ main{flex:1;position:relative;overflow:hidden}
 .btn-cancel:hover{border-color:var(--text);color:var(--text)}
 
 /* Structure type tiles */
-.struct-tiles{display:flex;gap:10px;margin-bottom:2px}
+.struct-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(92px,1fr));gap:10px;margin-bottom:2px}
 .struct-tile{
-  flex:1;padding:13px 8px;border:2px solid var(--border);
-  border-radius:9px;cursor:pointer;text-align:center;transition:all .15s
+  min-width:0;min-height:78px;padding:12px 7px;border:2px solid var(--border);
+  border-radius:9px;cursor:pointer;text-align:center;transition:all .15s;
+  display:flex;flex-direction:column;align-items:center;justify-content:center
 }
 .struct-tile:hover{border-color:var(--accent)}
 .struct-tile.selected{border-color:var(--accent);background:rgba(125,211,252,.07)}
 .tile-icon{font-size:22px;margin-bottom:5px}
-.tile-name{font-size:11px;font-weight:700;color:var(--muted)}
+.tile-name{font-size:11px;font-weight:700;color:var(--muted);max-width:100%;overflow-wrap:anywhere;line-height:1.15}
 .struct-tile.selected .tile-name{color:var(--accent)}
 
 /* ── SCHEMA BUILDER ──────────────────────────────────────────── */
@@ -430,7 +431,7 @@ const EXTRA_PSEUDOCODE = {
       lineMap: [
         { re: /folge Vaterzeiger/, lines: [1,2] },
         { re: /Pfadverkuerzung/, lines: [2] },
-        { re: /Repräsentant|Wurzel/, lines: [3] },
+        { re: /Repraesentant|Wurzel/, lines: [3] },
       ]
     },
     union: {
@@ -556,6 +557,157 @@ function _endLog() {
 // ══════════════════════════════════════════════════════════════
 //  RED-BLACK TREE
 // ══════════════════════════════════════════════════════════════
+class BSTree {
+  constructor() {
+    this.NIL = { key:null, value:null, size:0 };
+    this.NIL.left = this.NIL.right = this.NIL.parent = this.NIL;
+    this.root = this.NIL;
+  }
+
+  _find(key) {
+    let x = this.root;
+    while (x !== this.NIL && key !== x.key) {
+      _log(`<b>${key}</b> ${key < x.key ? '&lt;' : '&gt;'} <b>${x.key}</b> -> ${key < x.key ? 'links' : 'rechts'}`);
+      x = key < x.key ? x.left : x.right;
+    }
+    if (x === this.NIL) _log(`<b>${key}</b> nicht gefunden -> NIL erreicht`);
+    else _log(`<b>${key}</b> gefunden`);
+    return x;
+  }
+
+  search(key) { const n = this._find(key); return n === this.NIL ? null : n.value; }
+  isRed()     { return false; }
+  getRoot()   { return this.root === this.NIL ? null : this.root.key; }
+  leftOf(key) { const n = this._find(key); return n !== this.NIL && n.left  !== this.NIL ? n.left.key  : null; }
+  rightOf(key){ const n = this._find(key); return n !== this.NIL && n.right !== this.NIL ? n.right.key : null; }
+
+  _upd(n) { if (n !== this.NIL) n.size = 1 + n.left.size + n.right.size; }
+  _updUp(n) { for (let x = n; x !== this.NIL; x = x.parent) this._upd(x); }
+
+  _min(node=this.root) {
+    if (node === this.NIL) return this.NIL;
+    while (node.left !== this.NIL) { _log(`Minimum: von <b>${node.key}</b> nach links zu <b>${node.left.key}</b>`); node = node.left; }
+    _log(`Minimum bei <b>${node.key}</b>`);
+    return node;
+  }
+  _max(node=this.root) {
+    if (node === this.NIL) return this.NIL;
+    while (node.right !== this.NIL) { _log(`Maximum: von <b>${node.key}</b> nach rechts zu <b>${node.right.key}</b>`); node = node.right; }
+    _log(`Maximum bei <b>${node.key}</b>`);
+    return node;
+  }
+  getMin() { const n = this._min(); return n === this.NIL ? null : n.key; }
+  getMax() { const n = this._max(); return n === this.NIL ? null : n.key; }
+
+  successor(key) {
+    const n = this._find(key); if (n === this.NIL) return null;
+    if (n.right !== this.NIL) { _log(`<b>${key}</b> hat rechten Teilbaum -> TreeMinimum(rechts)`); return this._min(n.right).key; }
+    let y = n.parent, x = n;
+    while (y !== this.NIL && x === y.right) { _log(`<b>${x.key}</b> ist rechtes Kind von <b>${y.key}</b> -> weiter aufsteigen`); x = y; y = y.parent; }
+    if (y !== this.NIL) _log(`Successor ist erster Vorfahr, der von links betreten wird: <b>${y.key}</b>`);
+    return y === this.NIL ? null : y.key;
+  }
+
+  predecessor(key) {
+    const n = this._find(key); if (n === this.NIL) return null;
+    if (n.left !== this.NIL) { _log(`<b>${key}</b> hat linken Teilbaum -> TreeMaximum(links)`); return this._max(n.left).key; }
+    let y = n.parent, x = n;
+    while (y !== this.NIL && x === y.left) { _log(`<b>${x.key}</b> ist linkes Kind von <b>${y.key}</b> -> weiter aufsteigen`); x = y; y = y.parent; }
+    if (y !== this.NIL) _log(`Predecessor ist erster Vorfahr, der von rechts betreten wird: <b>${y.key}</b>`);
+    return y === this.NIL ? null : y.key;
+  }
+
+  insert(key, value) {
+    const z = { key, value, size:1, left:this.NIL, right:this.NIL, parent:this.NIL };
+    let y = this.NIL, x = this.root;
+    while (x !== this.NIL) {
+      y = x;
+      if (key < x.key) { _log(`<b>${key}</b> &lt; <b>${x.key}</b> -> links`); x = x.left; }
+      else if (key > x.key) { _log(`<b>${key}</b> &gt; <b>${x.key}</b> -> rechts`); x = x.right; }
+      else { _log(`<b>${key}</b> bereits vorhanden -> Value aktualisiert`); x.value = value; return; }
+    }
+    z.parent = y;
+    if      (y === this.NIL) { this.root = z; _log(`<b>${key}</b> wird neue Wurzel`); }
+    else if (key < y.key)    { y.left = z;  _log(`<b>${key}</b> als linkes Kind von <b>${y.key}</b> eingefuegt`); }
+    else                     { y.right = z; _log(`<b>${key}</b> als rechtes Kind von <b>${y.key}</b> eingefuegt`); }
+    this._updUp(y);
+  }
+
+  _trans(u, v) {
+    if      (u.parent === this.NIL) this.root = v;
+    else if (u === u.parent.left)   u.parent.left = v;
+    else                            u.parent.right = v;
+    v.parent = u.parent;
+  }
+
+  delete(key) {
+    const z = this._find(key); if (z === this.NIL) return false;
+    let updateFrom = z.parent;
+    if (z.left === this.NIL) {
+      _log(`<b>${key}</b> hat kein linkes Kind -> ersetze durch rechtes Kind`);
+      this._trans(z, z.right);
+    } else if (z.right === this.NIL) {
+      _log(`<b>${key}</b> hat kein rechtes Kind -> ersetze durch linkes Kind`);
+      this._trans(z, z.left);
+    } else {
+      const y = this._min(z.right);
+      _log(`<b>${key}</b> hat zwei Kinder -> Successor <b>${y.key}</b> uebernimmt Position`);
+      updateFrom = y.parent;
+      if (y.parent !== z) {
+        this._trans(y, y.right);
+        y.right = z.right; y.right.parent = y;
+      } else updateFrom = y;
+      this._trans(z, y);
+      y.left = z.left; y.left.parent = y;
+      this._upd(y);
+    }
+    this._updUp(updateFrom);
+    return true;
+  }
+
+  inorder() {
+    const r=[]; const go=n=>{ if(n===this.NIL)return; go(n.left); r.push(n.key); go(n.right); };
+    go(this.root); return r;
+  }
+  preorder() {
+    const r=[]; const go=n=>{ if(n===this.NIL)return; r.push(n.key); go(n.left); go(n.right); };
+    go(this.root); return r;
+  }
+  postorder() {
+    const r=[]; const go=n=>{ if(n===this.NIL)return; go(n.left); go(n.right); r.push(n.key); };
+    go(this.root); return r;
+  }
+
+  greaterThan(x) {
+    const c=n=>{ if(n===this.NIL)return 0; return n.key>x ? 1+n.right.size+c(n.left) : c(n.right); };
+    return c(this.root);
+  }
+  lessThan(x) {
+    const c=n=>{ if(n===this.NIL)return 0; return n.key<x ? 1+n.left.size+c(n.right) : c(n.left); };
+    return c(this.root);
+  }
+  keysGreaterThan(x) {
+    const r=[]; const go=n=>{ if(n===this.NIL)return; if(n.key>x){go(n.left);r.push(n.key);go(n.right);}else go(n.right); };
+    go(this.root); return r;
+  }
+  keysLessThan(x) {
+    const r=[]; const go=n=>{ if(n===this.NIL)return; if(n.key<x){go(n.left);r.push(n.key);go(n.right);}else go(n.left); };
+    go(this.root); return r;
+  }
+
+  isEmpty() { return this.root === this.NIL; }
+  toJSON() { return { type:'BSTree', nodes: this.inorder().map(k => ({k, v: this.search(k)})) }; }
+  static fromJSON(d) {
+    const t = new BSTree();
+    for (const {k,v} of (d.nodes||[])) t.insert(Number(k), v);
+    return t;
+  }
+}
+
+function isSearchTreeStructure(s) {
+  return s instanceof BSTree || s instanceof RBTree;
+}
+
 class RBTree {
   constructor() {
     this.NIL = { key:null, value:null, color:'BLACK', size:0 };
@@ -739,6 +891,14 @@ class RBTree {
 
   inorder() {
     const r=[]; const go=n=>{ if(n===this.NIL)return; go(n.left); r.push(n.key); go(n.right); };
+    go(this.root); return r;
+  }
+  preorder() {
+    const r=[]; const go=n=>{ if(n===this.NIL)return; r.push(n.key); go(n.left); go(n.right); };
+    go(this.root); return r;
+  }
+  postorder() {
+    const r=[]; const go=n=>{ if(n===this.NIL)return; go(n.left); go(n.right); r.push(n.key); };
     go(this.root); return r;
   }
 
@@ -1402,7 +1562,7 @@ class UnionFind {
       if (compress && x.parent !== root.key) { _log(`Pfadverkuerzung: parent[${key}] = ${root.key}`); x.parent = root.key; }
       return root;
     }
-    _log(`FindSet(${key}): Wurzel/Repräsentant <b>${key}</b> erreicht`);
+    _log(`FindSet(${key}): Wurzel/Repraesentant <b>${key}</b> erreicht`);
     return x;
   }
   findSet(key) { const r = this._findNode(key, true); return r ? r.key : null; }
@@ -1445,6 +1605,143 @@ class UnionFind {
 }
 
 const PSEUDOCODE = {
+  BSTree: {
+    insert: {
+      title: 'TreeInsert',
+      code: [
+        'TreeInsert(T, z):',
+        '  y = NIL',
+        '  x = root[T]',
+        '  while x != NIL:',
+        '    y = x',
+        '    if key[z] < key[x]: x = left[x]',
+        '    else: x = right[x]',
+        '  parent[z] = y',
+        '  if y = NIL: root[T] = z',
+        '  else if key[z] < key[y]: left[y] = z',
+        '  else: right[y] = z',
+      ],
+      lineMap: [
+        { re: /-> links/, lines: [3,4,5] },
+        { re: /-> rechts/, lines: [3,4,6] },
+        { re: /neue Wurzel/, lines: [7,8] },
+        { re: /linkes Kind/, lines: [7,9] },
+        { re: /rechtes Kind/, lines: [7,10] },
+        { re: /bereits vorhanden/, lines: [3] },
+      ]
+    },
+    search: {
+      title: 'IterativeTreeSearch',
+      code: [
+        'IterativeTreeSearch(x, k):',
+        '  while x != NIL and k != key[x]:',
+        '    if k < key[x]:',
+        '      x = left[x]',
+        '    else:',
+        '      x = right[x]',
+        '  return x',
+      ],
+      lineMap: [
+        { re: /-> links/, lines: [1,2,3] },
+        { re: /-> rechts/, lines: [1,4,5] },
+        { re: /gefunden|NIL erreicht/, lines: [6] },
+      ]
+    },
+    minimum: {
+      title: 'TreeMinimum',
+      code: [
+        'TreeMinimum(x):',
+        '  while left[x] != NIL:',
+        '    x = left[x]',
+        '  return x',
+      ],
+      lineMap: [
+        { re: /Minimum: von/, lines: [1,2] },
+        { re: /Minimum bei/, lines: [3] },
+      ]
+    },
+    maximum: {
+      title: 'TreeMaximum',
+      code: [
+        'TreeMaximum(x):',
+        '  while right[x] != NIL:',
+        '    x = right[x]',
+        '  return x',
+      ],
+      lineMap: [
+        { re: /Maximum: von/, lines: [1,2] },
+        { re: /Maximum bei/, lines: [3] },
+      ]
+    },
+    successor: {
+      title: 'TreeSuccessor',
+      code: [
+        'TreeSuccessor(x):',
+        '  if right[x] != NIL:',
+        '    return TreeMinimum(right[x])',
+        '  y = parent[x]',
+        '  while y != NIL and x = right[y]:',
+        '    x = y',
+        '    y = parent[y]',
+        '  return y',
+      ],
+      lineMap: [
+        { re: /rechten Teilbaum/, lines: [1,2] },
+        { re: /weiter aufsteigen/, lines: [4,5,6] },
+        { re: /Successor ist/, lines: [7] },
+      ]
+    },
+    predecessor: {
+      title: 'TreePredecessor',
+      code: [
+        'TreePredecessor(x):',
+        '  if left[x] != NIL:',
+        '    return TreeMaximum(left[x])',
+        '  y = parent[x]',
+        '  while y != NIL and x = left[y]:',
+        '    x = y',
+        '    y = parent[y]',
+        '  return y',
+      ],
+      lineMap: [
+        { re: /linken Teilbaum/, lines: [1,2] },
+        { re: /weiter aufsteigen/, lines: [4,5,6] },
+        { re: /Predecessor ist/, lines: [7] },
+      ]
+    },
+    delete: {
+      title: 'TreeDelete',
+      code: [
+        'TreeDelete(T, z):',
+        '  if left[z] = NIL or right[z] = NIL: y = z',
+        '  else: y = TreeSuccessor(z)',
+        '  x = einziges Kind von y oder NIL',
+        '  if x != NIL: parent[x] = parent[y]',
+        '  ersetze y durch x im Baum',
+        '  if y != z:',
+        '    key[z] = key[y]',
+        '    kopiere Satellitendaten',
+        '  return y',
+      ],
+      lineMap: [
+        { re: /kein linkes Kind|kein rechtes Kind/, lines: [1,3,4,5] },
+        { re: /zwei Kinder|Successor/, lines: [2,6,7,8] },
+      ]
+    },
+    traversal: {
+      title: 'Tree-Walk',
+      code: [
+        'InorderTreeWalk(x):   links, wurzel, rechts',
+        'PreorderTreeWalk(x):  wurzel, links, rechts',
+        'PostorderTreeWalk(x): links, rechts, wurzel',
+      ],
+      lineMap: [
+        { re: /Inorder/, lines: [0] },
+        { re: /Preorder/, lines: [1] },
+        { re: /Postorder/, lines: [2] },
+      ]
+    },
+  },
   RBTree: {
     insert: {
       title: 'RB-Insert',
@@ -1897,7 +2194,7 @@ function computeLayout() {
   if (structType === 'HashTable') return layoutHashTable(W);
   if (structType === 'UnionFind') return layoutUnionFind(W);
   if (structure.isEmpty()) return { nodes:[], edges:[], nilNodes:[] };
-  if (structType === 'RBTree')                                               return layoutRBTree(W);
+  if (structType === 'RBTree' || structType === 'BSTree')                    return layoutRBTree(W);
   if (structType === 'BinomialHeap' || structType === 'MaxBinomialHeap')    return layoutBinomialHeap(W);
   if (structType === 'FibHeap'      || structType === 'MaxFibHeap')         return layoutFibHeap(W);
   return layoutHeap(W);
@@ -1946,19 +2243,26 @@ function layoutUnionFind(W) {
     if (x.parent === x.key || !children.has(x.parent)) roots.push(x);
     else children.get(x.parent).push(x);
   }
-  const BASE = settings.tableView ? TABLE_W + 38 : 86;
-  const GAP = settings.tableView ? 34 : 28;
+  roots.sort((a, b) => (b.rank - a.rank) || (a.key - b.key));
+  for (const ch of children.values()) ch.sort((a, b) => a.key - b.key);
+
+  const BASE = settings.tableView ? TABLE_W + 38 : 82;
+  const GAP = settings.tableView ? 34 : 30;
   const LH = _getLevelH();
   const widthOf = x => {
     const ch = children.get(x.key) || [];
     return ch.length ? Math.max(BASE, ch.reduce((s, c) => s + widthOf(c), 0) + GAP * (ch.length - 1)) : BASE;
   };
-  const widths = roots.map(widthOf);
-  const totalW = widths.reduce((s, w) => s + w, 0) + GAP * Math.max(0, roots.length - 1);
-  let x0 = Math.max(GAP, (W - totalW) / 2);
+  const heightOf = x => {
+    const ch = children.get(x.key) || [];
+    return ch.length ? 1 + Math.max(...ch.map(heightOf)) : 1;
+  };
   const place = (x, cx, y) => {
-    nodes.push({ id:x.key, x:cx, y, key:x.key, value:x.value, rank:x.rank, parent:x.parent, isRed:false });
-    const ch = (children.get(x.key) || []).sort((a, b) => a.key - b.key);
+    nodes.push({
+      id:x.key, x:cx, y, key:x.key, value:x.value, rank:x.rank, parent:x.parent,
+      isRed:false, isMin:x.parent === x.key
+    });
+    const ch = children.get(x.key) || [];
     if (!ch.length) return;
     const cws = ch.map(widthOf), tot = cws.reduce((s, w) => s + w, 0) + GAP * (ch.length - 1);
     let cur = cx - tot / 2;
@@ -1969,9 +2273,30 @@ function layoutUnionFind(W) {
       cur += cws[i] + GAP;
     }
   };
-  for (let i = 0; i < roots.length; i++) {
-    place(roots[i], x0 + widths[i] / 2, _startY());
-    x0 += widths[i] + GAP;
+
+  const rows = [];
+  const maxRowW = Math.max(BASE, W - 2 * GAP);
+  for (const root of roots) {
+    const rw = widthOf(root), rh = heightOf(root);
+    let row = rows[rows.length - 1];
+    if (!row || (row.width + GAP + rw > maxRowW && row.roots.length)) {
+      row = { roots: [], widths: [], width: 0, height: 1 };
+      rows.push(row);
+    }
+    row.roots.push(root);
+    row.width += (row.width ? GAP : 0) + rw;
+    row.widths.push(rw);
+    row.height = Math.max(row.height, rh);
+  }
+
+  let y = _startY();
+  for (const row of rows) {
+    let x0 = Math.max(GAP, (W - row.width) / 2);
+    for (let i = 0; i < row.roots.length; i++) {
+      place(row.roots[i], x0 + row.widths[i] / 2, y);
+      x0 += row.widths[i] + GAP;
+    }
+    y += row.height * LH + Math.max(36, LH * 0.45);
   }
   return { nodes, edges, nilNodes:[] };
 }
@@ -1981,17 +2306,50 @@ function layoutRBTree(W) {
   const root = structure.getRoot();
   if (root === null) return {nodes,edges,nilNodes};
 
-  const LH = _getLevelH(), minGap = _nodeHalfW() * 2 + 22;
-  function calc(key, x, y, off) {
-    nodes.push({ id:key, x, y, key, value:structure.search(key), isRed:structure.isRed(key) });
-    const co = Math.max(off/2, minGap);
-    const L=structure.leftOf(key), R=structure.rightOf(key);
-    if (L!==null) { edges.push({fromId:key,toId:L,fromX:x,fromY:y,toX:x-off,toY:y+LH}); calc(L,x-off,y+LH,co); }
-    else nilNodes.push({x:x-off, y:y+LH, parentId:key});
-    if (R!==null) { edges.push({fromId:key,toId:R,fromX:x,fromY:y,toX:x+off,toY:y+LH}); calc(R,x+off,y+LH,co); }
-    else nilNodes.push({x:x+off, y:y+LH, parentId:key});
+  const LH = _getLevelH();
+  const NODE_W = _nodeHalfW() * 2;
+  const BASE = NODE_W + 18;
+  const NIL_W = 30;
+  const GAP = Math.max(18, Math.floor(NODE_W * 0.34));
+  const left = new Map(), right = new Map(), values = new Map(), colors = new Map();
+
+  function collect(key) {
+    if (key === null || left.has(key)) return;
+    values.set(key, structure.search(key));
+    colors.set(key, structure.isRed(key));
+    const L = structure.leftOf(key), R = structure.rightOf(key);
+    left.set(key, L); right.set(key, R);
+    collect(L); collect(R);
   }
-  calc(root, W/2, _startY(), W/4);
+  collect(root);
+
+  function treeW(key) {
+    if (key === null) return NIL_W;
+    const L = left.get(key), R = right.get(key);
+    if (L === null && R === null) return BASE;
+    return Math.max(BASE, treeW(L) + GAP + treeW(R));
+  }
+
+  const totalW = treeW(root);
+  const startX = Math.max(GAP, (W - totalW) / 2);
+  function calc(key, x0, y) {
+    const L = left.get(key), R = right.get(key);
+    const lw = treeW(L), rw = treeW(R), w = Math.max(BASE, lw + GAP + rw);
+    const x = x0 + w / 2;
+    nodes.push({ id:key, x, y, key, value:values.get(key), isRed:colors.get(key) });
+
+    const leftX = x0 + lw / 2;
+    const rightX = x0 + lw + GAP + rw / 2;
+    if (L !== null) {
+      edges.push({fromId:key,toId:L,fromX:x,fromY:y,toX:leftX,toY:y+LH});
+      calc(L, x0, y + LH);
+    } else nilNodes.push({x:leftX, y:y+LH, parentId:key});
+    if (R !== null) {
+      edges.push({fromId:key,toId:R,fromX:x,fromY:y,toX:rightX,toY:y+LH});
+      calc(R, x0 + lw + GAP, y + LH);
+    } else nilNodes.push({x:rightX, y:y+LH, parentId:key});
+  }
+  calc(root, startX, _startY());
   return {nodes,edges,nilNodes};
 }
 
@@ -2489,9 +2847,12 @@ function draw() {
     }
 
     if (structType === 'UnionFind') {
-      ctx.fillStyle = C.rbLabelBlk;
+      ctx.fillStyle = n.isMin ? C.nodeBordMin : C.rbLabelBlk;
       ctx.font = 'bold 9px "Segoe UI",system-ui,sans-serif';
       ctx.fillText(`r${n.rank}`, x, y + RADIUS + 13);
+      ctx.fillStyle = C.valLabel;
+      ctx.font = '9px "Segoe UI",system-ui,sans-serif';
+      ctx.fillText(n.parent === n.key ? 'rep' : `p=${n.parent}`, x, y + RADIUS + 25);
     }
 
     // value label
@@ -2500,7 +2861,7 @@ function draw() {
       ctx.fillStyle = C.valLabel;
       ctx.font = '9px "Segoe UI",system-ui,sans-serif';
       const hasBadge = (structType==='RBTree' && settings.showRB) || structType==='BinomialHeap' || structType==='UnionFind';
-      ctx.fillText(tv, x, y + RADIUS + (hasBadge ? 26 : 15));
+      ctx.fillText(tv, x, y + RADIUS + (structType==='UnionFind' ? 38 : hasBadge ? 26 : 15));
     }
   }
 
@@ -2656,7 +3017,7 @@ function openValueEditor(nodeId) {
   if (!structure) return;
   if (structure instanceof HashTable) return;
   let currentKey, currentVal;
-  if (structure instanceof RBTree) {
+  if (isSearchTreeStructure(structure)) {
     currentKey = nodeId; currentVal = structure.search(nodeId) || '';
   } else if (structure instanceof BinomialHeap || structure instanceof FibHeap) {
     const ln = layout.nodes.find(n => n.id === nodeId); if (!ln) return;
@@ -2670,7 +3031,7 @@ function openValueEditor(nodeId) {
   }
 
   const _save = v => {
-    if      (structure instanceof RBTree)         structure.insert(currentKey, v);
+    if      (isSearchTreeStructure(structure))    structure.insert(currentKey, v);
     else if (structure instanceof BinomialHeap || structure instanceof FibHeap)
                                                  structure.updateValue(currentKey, v);
     else if (structure instanceof UnionFind)      structure.makeSet(currentKey, v);
@@ -2834,7 +3195,7 @@ function buildOpsMenu() {
   drop.innerHTML='';
   document.getElementById('structBadge').textContent=structType;
 
-  const isRBT      = structType === 'RBTree';
+  const isTree     = structType === 'RBTree' || structType === 'BSTree';
   const isBinom    = structType === 'BinomialHeap' || structType === 'MaxBinomialHeap';
   const isFib      = structType === 'FibHeap' || structType === 'MaxFibHeap';
   const isHash     = structType === 'HashTable';
@@ -2842,7 +3203,7 @@ function buildOpsMenu() {
   const isMin      = structType === 'MinHeap';
   const isMaxBinom = structType === 'MaxBinomialHeap';
   const isMaxFib   = structType === 'MaxFibHeap';
-  btn.textContent = isRBT || isHash ? 'DICTIONARY' : isUF ? 'UNION-FIND' : 'HEAP';
+  btn.textContent = isTree || isHash ? 'DICTIONARY' : isUF ? 'UNION-FIND' : 'HEAP';
 
   const items = isHash ? [
     ['➕  Insert',      cmdInsert],
@@ -2855,9 +3216,7 @@ function buildOpsMenu() {
     ['➕  Make-Set',    cmdMakeSet],
     ['🔍  Find-Set',    cmdFindSet],
     ['🔗  Union',       cmdUnion],
-    null,
-    ['❌  Delete',      cmdDelete],
-  ] : isRBT ? [
+  ] : isTree ? [
     ['➕  Insert',      cmdInsert],
     ['❌  Delete',      cmdDelete],
     ['🔍  Search',      cmdSearch],
@@ -2866,6 +3225,10 @@ function buildOpsMenu() {
     ['⬆  Max',          cmdMax],
     ['➡  Successor',    cmdSuccessor],
     ['⬅  Predecessor',  cmdPredecessor],
+    null,
+    ['Inorder',          () => cmdTraversal('inorder')],
+    ['Preorder',         () => cmdTraversal('preorder')],
+    ['Postorder',        () => cmdTraversal('postorder')],
     null,
     ['🟡  greaterThan', () => cmdCount(true)],
     ['🟡  lessThan',    () => cmdCount(false)],
@@ -3075,12 +3438,12 @@ function cmdSearch() {
   if (!need()) return;
   askKey('Search', k => {
     highlighted.clear();
-    if (structure instanceof HashTable) _startLog(`${structType} - Search(${k})`, 'search');
+    if (structure instanceof HashTable || isSearchTreeStructure(structure)) _startLog(`${structType} - Search(${k})`, 'search');
     const v = structure.search(k);
-    if (structure instanceof HashTable) _endLog();
+    if (structure instanceof HashTable || isSearchTreeStructure(structure)) _endLog();
     if (v !== null) {
       let id;
-      if      (structure instanceof RBTree)       id = k;
+      if      (isSearchTreeStructure(structure))  id = k;
       else if (structure instanceof HashTable)    id = structure.slotIdForKey(k);
       else if (structure instanceof UnionFind)    id = k;
       else if (structure instanceof BinomialHeap || structure instanceof FibHeap)
@@ -3137,8 +3500,10 @@ function cmdUnion() {
 function cmdMin() {
   if (!need()) return; highlighted.clear();
   let k, id;
-  if (structure instanceof RBTree) {
+  if (isSearchTreeStructure(structure)) {
+    _startLog(`${structType} - Minimum`, 'minimum');
     k = structure.getMin(); id = k;
+    _endLog();
   } else if (structure instanceof BinomialHeap || structure instanceof FibHeap) {
     const p = structure.peek(); k = p?.key;
     id = layout.nodes.find(n => n.key === k)?.id ?? -1;
@@ -3151,8 +3516,10 @@ function cmdMin() {
 
 function cmdMax() {
   if (!need()) return; highlighted.clear();
-  if (structure instanceof RBTree) {
+  if (isSearchTreeStructure(structure)) {
+    _startLog(`${structType} - Maximum`, 'maximum');
     const k=structure.getMax();
+    _endLog();
     if(k!=null){highlighted.add(k);setStatus(`Maximum: <b>${k}</b>`);}
     else setStatus('Baum ist leer');
   }
@@ -3161,7 +3528,9 @@ function cmdMax() {
 function cmdSuccessor() {
   if (!need()) return;
   askKey('Successor', k=>{ highlighted.clear();
+    if (isSearchTreeStructure(structure)) _startLog(`${structType} - Successor(${k})`, 'successor');
     const s=structure.successor(k);
+    if (isSearchTreeStructure(structure)) _endLog();
     if(s!=null){highlighted.add(s);setStatus(`Successor von ${k}: <b>${s}</b>`);}
     else setStatus('Kein Successor');
   });
@@ -3170,10 +3539,24 @@ function cmdSuccessor() {
 function cmdPredecessor() {
   if (!need()) return;
   askKey('Predecessor', k=>{ highlighted.clear();
+    if (isSearchTreeStructure(structure)) _startLog(`${structType} - Predecessor(${k})`, 'predecessor');
     const p=structure.predecessor(k);
+    if (isSearchTreeStructure(structure)) _endLog();
     if(p!=null){highlighted.add(p);setStatus(`Predecessor von ${k}: <b>${p}</b>`);}
     else setStatus('Kein Predecessor');
   });
+}
+
+function cmdTraversal(kind) {
+  if (!need() || !isSearchTreeStructure(structure)) return;
+  highlighted.clear();
+  const label = kind === 'preorder' ? 'Preorder' : kind === 'postorder' ? 'Postorder' : 'Inorder';
+  _startLog(`${structType} - ${label}`, 'traversal');
+  _log(label);
+  const keys = structure[kind]();
+  _endLog();
+  keys.forEach(k => highlighted.add(k));
+  setStatus(`${label}: <b>${keys.join(', ')}</b>`);
 }
 
 function cmdCount(isGreater) {
@@ -3296,6 +3679,9 @@ function cmdNew() {
         <div class="struct-tile selected" id="tile-RBTree" onclick="_pickTile('RBTree')">
           <div class="tile-icon">🌳</div><div class="tile-name">RBTree</div>
         </div>
+        <div class="struct-tile" id="tile-BSTree" onclick="_pickTile('BSTree')">
+          <div class="tile-icon">BST</div><div class="tile-name">BSTree</div>
+        </div>
         <div class="struct-tile" id="tile-Heap" onclick="_pickTile('Heap')">
           <div class="tile-icon">⬆⬇</div><div class="tile-name">Heap</div>
         </div>
@@ -3349,6 +3735,8 @@ function cmdNew() {
         <option value="">Leere Struktur</option>
         <option value="s">Klein – 7 Knoten</option>
         <option value="m">Mittel – 13 Knoten</option>
+        <option value="g25">Gross – 25 Knoten</option>
+        <option value="g50">Sehr gross – 50 Knoten</option>
         <optgroup label="── Experimentelle Datensätze ──">
           <option value="hist">🗓  Historische Jahreszahlen (9) – empfohlen für RBTree</option>
           <option value="git">🔑  Git-Commit-Hashes (8) – empfohlen für Heap</option>
@@ -3369,17 +3757,34 @@ function cmdNew() {
     const hashM    = parseInt(document.getElementById('_hashM')?.value || '11');
     const hashProbe= document.getElementById('_hashProbe')?.value || 'linear';
     const hashExpr = document.getElementById('_hashExpr')?.value.trim() || 'k % m';
+    const balancedKeys = n => {
+      const out = [];
+      const add = (lo, hi) => {
+        if (lo > hi) return;
+        const mid = Math.floor((lo + hi) / 2);
+        out.push(mid);
+        add(lo, mid - 1);
+        add(mid + 1, hi);
+      };
+      add(1, n);
+      return out;
+    };
     const SMALL=[10,5,15,3,8,12,20];
     const MED  =[15,10,20,8,12,17,25,5,11,14,16,22,27];
+    const LARGE25 = balancedKeys(25);
+    const LARGE50 = balancedKeys(50);
     const rawKeys =
       smp==='s'    ? SMALL.map(k=>({k,v:'Value_'+k})) :
       smp==='m'    ? MED.map(k=>({k,v:'Value_'+k}))   :
+      smp==='g25'  ? LARGE25.map(k=>({k,v:'Value_'+k})) :
+      smp==='g50'  ? LARGE50.map(k=>({k,v:'Value_'+k})) :
       smp==='hist' ? SAMPLE_HIST  :
       smp==='git'  ? SAMPLE_GIT   :
       smp==='prime'? SAMPLE_PRIME : [];
     _dataMode = smp==='hist' ? 'hist' : smp==='git' ? 'git' : 'default';
 
     if      (chosen === 'RBTree')       structType = 'RBTree';
+    else if (chosen === 'BSTree')       structType = 'BSTree';
     else if (chosen === 'Heap')         structType = isMax ? 'MaxHeap' : 'MinHeap';
     else if (chosen === 'BinomialHeap') structType = isMax ? 'MaxBinomialHeap' : 'BinomialHeap';
     else if (chosen === 'FibHeap')      structType = isMax ? 'MaxFibHeap' : 'FibHeap';
@@ -3389,6 +3794,7 @@ function cmdNew() {
     highlighted.clear(); wobble.clear();
     if      (structType === 'HashTable')       structure = new HashTable({ mode:hashMode, m:hashM, probe:hashProbe, hashExpr });
     else if (structType === 'UnionFind')       structure = new UnionFind();
+    else if (structType === 'BSTree')          structure = new BSTree();
     else if (structType === 'MinHeap')         structure = new MinHeap();
     else if (structType === 'MaxHeap')         structure = new MaxHeap();
     else if (structType === 'BinomialHeap')    structure = new BinomialHeap();
@@ -3427,6 +3833,7 @@ function cmdLoad() {
         nodeSchema = d.schema || [];
         structType=d.type;
         if      (structType === 'RBTree')           structure = RBTree.fromJSON(d);
+        else if (structType === 'BSTree')           structure = BSTree.fromJSON(d);
         else if (structType === 'HashTable')        structure = HashTable.fromJSON(d);
         else if (structType === 'UnionFind')        structure = UnionFind.fromJSON(d);
         else if (structType === 'MinHeap')          structure = MinHeap.fromJSON(d);
