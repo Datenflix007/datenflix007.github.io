@@ -1530,8 +1530,9 @@ class HashTable {
   loadFactor() { return this.n / this.m; }
   clusterInfo() {
     const primary = new Set();
+    const primaryId = new Map();
     const secondary = new Map();
-    if (this.mode !== 'open') return { primary, secondary };
+    if (this.mode !== 'open') return { primary, primaryId, secondary };
     const homesAll = new Map();
     for (let s = 0; s < this.m; s++) {
       const e = this.table[s];
@@ -1547,13 +1548,29 @@ class HashTable {
       }
     });
     let i = 0;
+    let pid = 1;
     while (i < this.m) {
       if (!this.table[i] || this.table[i].deleted) { i++; continue; }
       const idxs = [];
       while (i < this.m && this.table[i] && !this.table[i].deleted) idxs.push(i++);
-      if (idxs.length > 1) idxs.forEach(x => primary.add(x));
+      if (idxs.length > 1) {
+        idxs.forEach(x => { primary.add(x); primaryId.set(x, pid); });
+        pid++;
+      }
     }
-    return { primary, secondary };
+    return { primary, primaryId, secondary };
+  }
+  probeTraceForSlot(slotIndex) {
+    if (this.mode !== 'open') return [];
+    const e = this.table[slotIndex];
+    if (!e || e.deleted) return [];
+    const trace = [];
+    for (let i = 0; i < this.m; i++) {
+      const j = this._probe(e.key, i);
+      trace.push({ i, j });
+      if (j === slotIndex) break;
+    }
+    return trace;
   }
   toJSON() {
     return { type:this._typeName(), mode:this.mode, m:this.m, probe:this.probe, c1:this.c1, c2:this.c2, hashExpr:this.hashExpr,
@@ -2232,15 +2249,12 @@ function computeLayout() {
 
 function layoutHashTable(W) {
   const nodes = [], edges = [], m = structure.m;
-  const cellW = settings.tableView ? Math.max(TABLE_W, 220) : 174;
-  const cellH = settings.tableView ? Math.max(_nodeHalfH() * 2, 70) : 70;
-  const gapX = 18, gapY = 20;
-  const cols = Math.max(1, Math.min(m, Math.floor((W - 40) / (cellW + gapX)) || 1));
-  const totalW = cols * cellW + (cols - 1) * gapX;
-  const startX = Math.max(30, (W - totalW) / 2) + cellW / 2;
+  const cellW = 62;
+  const cellH = 26;
+  const tableX = structure.mode === 'chaining' ? Math.max(90, W * 0.23) : Math.max(130, W * 0.34);
+  const topY = _startY() + 18;
   const clusters = structure.clusterInfo();
   for (let i = 0; i < m; i++) {
-    const row = Math.floor(i / cols), col = i % cols;
     const raw = structure.table[i];
     let entries = [];
     let state = 'NIL';
@@ -2254,13 +2268,63 @@ function layoutHashTable(W) {
       state = 'FULL';
     }
     nodes.push({
-      id:'h' + i, x:startX + col * (cellW + gapX), y:_startY() + row * (cellH + gapY),
+      id:'h' + i, x:tableX, y:topY + i * cellH,
       key:i, value:entries.map(e => e.key + ':' + (e.value || '')).join(', '),
       hashCell:true, entries, state, width:cellW, height:cellH, isRed:false,
-      cluster1:clusters.primary.has(i), cluster2:clusters.secondary.get(i) || null
+      cluster1:clusters.primary.has(i), cluster1Id:clusters.primaryId.get(i) || null,
+      cluster2:clusters.secondary.get(i) || null,
+      probeTrace:structure.probeTraceForSlot(i),
+      home:entries[0]?.home
     });
   }
-  return { nodes, edges, nilNodes:[] };
+  const hashMeta = {
+    mode: structure.mode, tableX, topY, cellW, cellH, m,
+    probeName: structure._probeName(), hashExpr: structure.hashExpr,
+    chains: [], clusterBands: [], secondaryBands: [], probeCallouts: []
+  };
+
+  if (structure.mode === 'chaining') {
+    for (let i = 0; i < m; i++) {
+      const bucket = structure.table[i];
+      if (!bucket.length) continue;
+      const y = topY + i * cellH;
+      const boxes = bucket.map((e, j) => ({
+        key:e.key, value:e.value, x:tableX + cellW / 2 + 72 + j * 112, y
+      }));
+      hashMeta.chains.push({ slot:i, y, boxes });
+    }
+  } else {
+    const byPrimary = new Map();
+    clusters.primaryId.forEach((id, slot) => {
+      if (!byPrimary.has(id)) byPrimary.set(id, []);
+      byPrimary.get(id).push(slot);
+    });
+    byPrimary.forEach((slots, id) => {
+      const min = Math.min(...slots), max = Math.max(...slots);
+      hashMeta.clusterBands.push({ id, from:min, to:max, label:'Cluster 1. Art', probability:`${slots.length + 1}/${m}` });
+    });
+    const bySecondary = new Map();
+    clusters.secondary.forEach((id, slot) => {
+      if (!bySecondary.has(id)) bySecondary.set(id, []);
+      bySecondary.get(id).push(slot);
+    });
+    bySecondary.forEach((slots, id) => {
+      const min = Math.min(...slots), max = Math.max(...slots);
+      hashMeta.secondaryBands.push({ id, from:min, to:max, label:'Cluster 2. Art' });
+    });
+    for (let i = 0; i < m; i++) {
+      const e = structure.table[i];
+      if (!e || e.deleted) continue;
+      const trace = structure.probeTraceForSlot(i);
+      if (trace.length > 1 || clusters.secondary.has(i)) {
+        hashMeta.probeCallouts.push({
+          slot:i, key:e.key, home:e.home,
+          text: trace.map(t => `h(${e.key},${t.i})=${t.j}`).join('   ')
+        });
+      }
+    }
+  }
+  return { nodes, edges, nilNodes:[], hashMeta };
 }
 
 function layoutUnionFind(W) {
@@ -2630,46 +2694,127 @@ function _drawHashCell(ctx, n, x, y, isHl, C) {
     g.addColorStop(1, 'rgba(251,191,36,0)');
     ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, W / 2 + 24, 0, Math.PI * 2); ctx.fill();
   }
-  ctx.fillStyle = 'rgba(0,0,0,.25)';
-  roundRect(ctx, rx + 2, ry + 3, W, H, 7); ctx.fill();
   const isDeleted = n.state === 'DELETED';
   const isFull = n.entries && n.entries.length;
-  ctx.fillStyle = isDeleted ? 'rgba(251,146,60,.20)' : isFull ? C.nodeFillMin : C.nodeFillBlk;
-  roundRect(ctx, rx, ry, W, H, 7); ctx.fill();
+  const isOpen = structure.mode === 'open';
+  ctx.fillStyle = isDeleted ? 'rgba(251,146,60,.20)'
+                : isFull ? 'rgba(255,255,255,.94)'
+                : 'rgba(255,255,255,.78)';
+  ctx.fillRect(rx, ry, W, H);
   if (n.cluster1) {
-    ctx.fillStyle = 'rgba(251,191,36,.18)';
-    roundRect(ctx, rx + 3, ry + 3, W - 6, H - 6, 6); ctx.fill();
+    ctx.save();
+    ctx.beginPath(); ctx.rect(rx, ry, W, H); ctx.clip();
+    ctx.strokeStyle = 'rgba(20,20,20,.30)'; ctx.lineWidth = 1;
+    for (let d = -H; d < W + H; d += 7) {
+      ctx.beginPath(); ctx.moveTo(rx + d, ry + H); ctx.lineTo(rx + d + H, ry); ctx.stroke();
+    }
+    ctx.restore();
   }
   if (n.cluster2) {
-    ctx.fillStyle = 'rgba(167,139,250,.22)';
-    roundRect(ctx, rx + 8, ry + 8, W - 16, H - 16, 5); ctx.fill();
+    ctx.fillStyle = 'rgba(167,139,250,.20)';
+    ctx.fillRect(rx + 2, ry + 2, W - 4, H - 4);
   }
-  ctx.strokeStyle = isDeleted ? '#fb923c' : isFull ? C.nodeBordMin : C.nodeBordBlk;
-  ctx.lineWidth = 1.6; roundRect(ctx, rx, ry, W, H, 7); ctx.stroke();
-  ctx.fillStyle = 'rgba(190,210,245,.72)';
-  ctx.font = 'bold 10px "Segoe UI",system-ui,sans-serif';
-  ctx.textAlign = 'left'; ctx.textBaseline = 'top';
-  ctx.fillText('T[' + n.key + ']', rx + 8, ry + 7);
-  ctx.textAlign = 'right';
-  ctx.fillText(n.state, rx + W - 8, ry + 7);
-  ctx.fillStyle = '#fff';
-  ctx.font = '11px "Segoe UI",system-ui,sans-serif';
-  ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
-  const txt = n.entries && n.entries.length
-    ? n.entries.map(e => e.key + ':' + truncateVal(e.value || '', 9) + (e.home !== undefined ? ' h=' + e.home : '')).join('  ->  ')
+  ctx.strokeStyle = isDeleted ? '#d97706' : '#667085';
+  ctx.lineWidth = 1; ctx.strokeRect(rx, ry, W, H);
+
+  const content = n.entries && n.entries.length
+    ? (isOpen ? String(n.entries[0].key) : '')
     : (isDeleted ? 'DELETED' : 'NIL');
-  ctx.fillText(truncateVal(txt, Math.floor(W / 7)), rx + 8, y + 2);
-  ctx.font = 'bold 9px "Segoe UI",system-ui,sans-serif';
-  ctx.textBaseline = 'bottom';
-  if (n.cluster1) {
-    ctx.fillStyle = '#f59e0b';
-    ctx.fillText('Cluster 1. Art', rx + 8, ry + H - 7);
+  ctx.fillStyle = isDeleted ? '#9a3412' : '#111827';
+  ctx.font = isDeleted ? 'bold 8px "Segoe UI",system-ui,sans-serif' : 'bold 12px "Segoe UI",system-ui,sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(content, x, y);
+}
+
+function _drawHashDiagram(ctx, meta, C, drawArrowHead) {
+  if (!meta) return;
+  const { tableX, topY, cellW, cellH, m } = meta;
+  const left = tableX - cellW / 2;
+  const right = tableX + cellW / 2;
+  const bottom = topY + (m - 1) * cellH + cellH / 2;
+  const top = topY - cellH / 2;
+
+  ctx.save();
+  ctx.fillStyle = C.rbLabelBlk;
+  ctx.font = 'bold 12px "Segoe UI",system-ui,sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+  ctx.fillText('T[0..m-1]', tableX, top - 8);
+  ctx.font = '11px "Segoe UI",system-ui,sans-serif';
+  ctx.fillText(`h'(k) = ${meta.hashExpr}`, tableX, bottom + 22);
+
+  ctx.fillStyle = C.rbLabelBlk;
+  ctx.font = '10px "Segoe UI",system-ui,sans-serif';
+  ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+  for (let i = 0; i < m; i++) ctx.fillText(String(i), left - 8, topY + i * cellH);
+
+  const arrowColor = settings.darkMode ? 'rgba(226,232,244,.74)' : 'rgba(17,24,39,.72)';
+  ctx.strokeStyle = arrowColor; ctx.lineWidth = 1.2; ctx.setLineDash([]);
+
+  if (meta.mode === 'chaining') {
+    ctx.fillStyle = C.rbLabelBlk;
+    ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+    ctx.font = 'bold 13px "Segoe UI",system-ui,sans-serif';
+    ctx.fillText('Hashing mit Verkettung', right + 54, top - 4);
+    for (const chain of meta.chains) {
+      let fromX = right, fromY = chain.y;
+      for (const box of chain.boxes) {
+        const bx = box.x - 28, by = box.y - 15;
+        ctx.beginPath(); ctx.moveTo(fromX, fromY); ctx.lineTo(bx, box.y); ctx.stroke();
+        drawArrowHead(bx, box.y, Math.atan2(box.y - fromY, bx - fromX), arrowColor);
+        ctx.fillStyle = 'rgba(255,255,255,.92)';
+        ctx.fillRect(bx, by, 56, 30);
+        ctx.strokeStyle = '#667085'; ctx.strokeRect(bx, by, 56, 30);
+        ctx.beginPath(); ctx.moveTo(bx + 34, by); ctx.lineTo(bx + 34, by + 30); ctx.stroke();
+        ctx.fillStyle = '#111827';
+        ctx.font = 'italic 13px Georgia,serif';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText(`k${box.key}`, bx + 17, box.y);
+        fromX = bx + 56; fromY = box.y;
+      }
+    }
+  } else {
+    ctx.fillStyle = C.rbLabelBlk;
+    ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+    ctx.font = 'bold 13px "Segoe UI",system-ui,sans-serif';
+    ctx.fillText(meta.probeName, right + 68, top - 4);
+    ctx.font = '11px "Segoe UI",system-ui,sans-serif';
+    ctx.fillText('Sondierungsfolge: h(k,i)', right + 68, top + 16);
+
+    const bracket = (x, y1, y2, color, label, align='left') => {
+      ctx.strokeStyle = color; ctx.lineWidth = 1.8; ctx.setLineDash([]);
+      ctx.beginPath();
+      ctx.moveTo(x, y1); ctx.quadraticCurveTo(x + 10, y1, x + 10, y1 + 10);
+      ctx.lineTo(x + 10, y2 - 10); ctx.quadraticCurveTo(x + 10, y2, x, y2);
+      ctx.stroke();
+      ctx.fillStyle = color; ctx.font = 'bold 11px "Segoe UI",system-ui,sans-serif';
+      ctx.textAlign = align; ctx.textBaseline = 'middle';
+      ctx.fillText(label, align === 'left' ? x + 18 : x - 8, (y1 + y2) / 2);
+    };
+    for (const b of meta.clusterBands) {
+      bracket(right + 10, topY + b.from * cellH - cellH / 2, topY + b.to * cellH + cellH / 2, '#d97706', b.label);
+      ctx.fillStyle = '#d97706';
+      ctx.font = '10px "Segoe UI",system-ui,sans-serif';
+      ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+      ctx.fillText(`P(naechster Treffer) = ${b.probability}`, right + 28, topY + b.to * cellH + cellH / 2 + 8);
+    }
+    for (const b of meta.secondaryBands) {
+      bracket(left - 18, topY + b.from * cellH - cellH / 2, topY + b.to * cellH + cellH / 2, '#7c3aed', b.label, 'right');
+    }
+    let calloutY = top + 58;
+    for (const c of meta.probeCallouts.slice(0, 7)) {
+      const sy = topY + c.slot * cellH;
+      const tx = right + 84;
+      ctx.strokeStyle = 'rgba(100,116,139,.55)';
+      ctx.beginPath(); ctx.moveTo(right, sy); ctx.lineTo(tx - 8, calloutY + 6); ctx.stroke();
+      drawArrowHead(right, sy, Math.atan2(sy - (calloutY + 6), right - (tx - 8)), 'rgba(100,116,139,.55)');
+      ctx.fillStyle = C.rbLabelBlk;
+      ctx.font = '11px "Segoe UI",system-ui,sans-serif';
+      ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+      ctx.fillText(c.text, tx, calloutY);
+      calloutY += 22;
+    }
   }
-  if (n.cluster2) {
-    ctx.fillStyle = '#a78bfa';
-    ctx.textAlign = 'right';
-    ctx.fillText('Cluster 2. Art', rx + W - 8, ry + H - 7);
-  }
+  ctx.restore();
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -2768,6 +2913,8 @@ function draw() {
     ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
     if (e.directed) drawArrowHead(x2, y2, Math.atan2(y2 - y1, x2 - x1), C.edge);
   }
+
+  if (layout.hashMeta) _drawHashDiagram(ctx, layout.hashMeta, C, drawArrowHead);
 
   // ── root list arrows (BinomialHeap / FibHeap) ────────────
   if (layout.rootListEdges && layout.rootListEdges.length) {
@@ -3847,6 +3994,7 @@ function cmdNew() {
           <option value="hist">🗓  Historische Jahreszahlen (9) – empfohlen für RBTree</option>
           <option value="git">🔑  Git-Commit-Hashes (8) – empfohlen für Heap</option>
           <option value="prime">📐  Primzahlen (11) – empfohlen für Heap</option>
+          <option value="hashcluster">Hash-Cluster (5) – empfohlen für HashTable</option>
         </optgroup>
       </select>
     </div>
@@ -3880,6 +4028,7 @@ function cmdNew() {
     const MED  =[15,10,20,8,12,17,25,5,11,14,16,22,27];
     const LARGE25 = balancedKeys(25);
     const LARGE50 = balancedKeys(50);
+    const HASH_CLUSTER = [2,13,24,35,46];
     const rawKeys =
       smp==='s'    ? SMALL.map(k=>({k,v:'Value_'+k})) :
       smp==='m'    ? MED.map(k=>({k,v:'Value_'+k}))   :
@@ -3887,7 +4036,8 @@ function cmdNew() {
       smp==='g50'  ? LARGE50.map(k=>({k,v:'Value_'+k})) :
       smp==='hist' ? SAMPLE_HIST  :
       smp==='git'  ? SAMPLE_GIT   :
-      smp==='prime'? SAMPLE_PRIME : [];
+      smp==='prime'? SAMPLE_PRIME :
+      smp==='hashcluster' ? HASH_CLUSTER.map(k=>({k,v:'Value_'+k})) : [];
     _dataMode = smp==='hist' ? 'hist' : smp==='git' ? 'git' : 'default';
 
     if      (chosen === 'RBTree')       structType = 'RBTree';
