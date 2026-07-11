@@ -122,6 +122,17 @@ main{flex:1;position:relative;overflow:hidden}
 }
 .browse-btn:hover{border-color:var(--accent)}
 .dialog-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:22px}
+.node-action-row{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));
+  gap:7px;margin:8px 0 14px
+}
+.node-action-row button{
+  background:var(--surface2);border:1px solid var(--border);color:var(--text);
+  border-radius:7px;padding:8px 10px;font-size:12px;font-weight:700;
+  cursor:pointer;transition:border-color .1s,color .1s,background .1s
+}
+.node-action-row button:hover{border-color:var(--accent);color:var(--accent)}
+.node-action-row .danger:hover{border-color:var(--red);color:var(--red)}
 .btn-ok{
   background:var(--accent);color:#000;border:none;
   padding:9px 22px;border-radius:7px;font-weight:700;
@@ -161,10 +172,23 @@ main{flex:1;position:relative;overflow:hidden}
 
 /* ── OP LOG ──────────────────────────────────────────────────── */
 #opLog{
-  min-height:54px;max-height:120px;overflow-y:auto;
+  height:var(--oplog-h,86px);min-height:54px;max-height:55vh;overflow-y:auto;
   background:var(--surface);border-top:1px solid var(--border);
   padding:5px 16px 7px;flex-shrink:0;
   font-family:'Segoe UI',system-ui,sans-serif;font-size:11.5px;line-height:1.7;
+}
+#opLogResize{
+  height:9px;flex-shrink:0;cursor:ns-resize;position:relative;
+  background:linear-gradient(to bottom,transparent,rgba(0,0,0,.08));
+  touch-action:none;z-index:50;
+}
+#opLogResize::before{
+  content:"";position:absolute;left:50%;top:3px;transform:translateX(-50%);
+  width:76px;height:3px;border-radius:99px;background:var(--border);
+  transition:background .12s,width .12s
+}
+#opLogResize:hover::before,#opLogResize.dragging::before{
+  width:104px;background:var(--accent)
 }
 .log-header{color:var(--accent);font-weight:700;display:block;margin-bottom:1px}
 .log-step{color:var(--muted);display:block}
@@ -181,6 +205,44 @@ main{flex:1;position:relative;overflow:hidden}
   resize:both;min-width:240px;min-height:100px;
 }
 .pseudo-panel.hidden{display:none}
+.memory-panel{
+  position:fixed;top:50px;left:18px;width:430px;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);box-shadow:0 14px 44px rgba(0,0,0,.55);
+  z-index:790;display:flex;flex-direction:column;
+  max-height:calc(100vh - 120px);overflow:hidden;
+  resize:both;min-width:280px;min-height:150px;
+}
+.memory-panel.hidden{display:none}
+.memory-toolbar{
+  display:flex;align-items:center;gap:8px;padding:7px 10px;
+  background:var(--surface2);border-bottom:1px solid var(--border);
+  flex-shrink:0;cursor:move;-webkit-user-select:none;user-select:none
+}
+.memory-title{font-size:11px;font-weight:700;color:var(--accent);flex:1}
+.memory-close{
+  background:none;border:none;color:var(--muted);font-size:15px;
+  cursor:pointer;padding:0 3px;line-height:1;transition:color .1s
+}
+.memory-close:hover{color:var(--red)}
+#memoryLines{overflow:auto;padding:10px;font-size:11px;line-height:1.45}
+.memory-section{margin-bottom:12px}
+.memory-section h4{
+  font-size:11px;color:var(--accent);margin-bottom:6px;
+  text-transform:uppercase;letter-spacing:.06em
+}
+.memory-array{display:flex;flex-wrap:wrap;gap:6px}
+.mem-cell{
+  min-width:54px;border:1px solid var(--border);border-radius:6px;overflow:hidden;
+  background:var(--surface2)
+}
+.mem-cell.active{border-color:var(--yellow);box-shadow:0 0 0 1px rgba(251,191,36,.5)}
+.mem-idx{display:block;padding:2px 5px;color:var(--muted);border-bottom:1px solid var(--border);font-family:'Cascadia Code','Consolas',monospace}
+.mem-val{display:block;padding:5px;text-align:center;font-weight:800;color:var(--text)}
+.memory-table{width:100%;border-collapse:collapse;font-family:'Cascadia Code','Consolas',monospace}
+.memory-table th,.memory-table td{border-bottom:1px solid var(--border);padding:4px 5px;text-align:left;white-space:nowrap}
+.memory-table th{color:var(--muted);font-weight:700}
+.memory-table tr.active td{background:rgba(251,191,36,.12);color:var(--yellow)}
 .pseudo-toolbar{
   display:flex;align-items:center;gap:6px;padding:7px 10px;
   background:var(--surface2);border-bottom:1px solid var(--border);
@@ -276,6 +338,7 @@ main{flex:1;position:relative;overflow:hidden}
       <button onclick="toggleSetting('tableView')"><span class="ck" id="ck-tableView"> </span> Tabellen-Ansicht</button>
       <hr>
       <button onclick="openPseudoPanel()">📋 Pseudocode-Fenster</button>
+      <button onclick="openMemoryPanel()">▦ Array Memory Viewer</button>
     </div>
   </div>
 
@@ -286,6 +349,7 @@ main{flex:1;position:relative;overflow:hidden}
   <canvas id="canvas"></canvas>
 </main>
 
+<div id="opLogResize" title="Erklärfeld größer oder kleiner ziehen"></div>
 <div id="opLog"><span class="log-hint">Führe eine Operation aus — hier erscheint die Schritt-für-Schritt-Erklärung.</span></div>
 
 <footer class="statusbar">
@@ -315,6 +379,14 @@ main{flex:1;position:relative;overflow:hidden}
     <button type="button" class="pseudo-close" id="pseudoClose" title="Schließen">✕</button>
   </div>
   <div id="pseudoLines"></div>
+</div>
+
+<div id="memoryPanel" class="memory-panel hidden">
+  <div class="memory-toolbar" id="memoryDragBar">
+    <span class="memory-title" id="memoryTitle">Array Memory Viewer</span>
+    <button type="button" class="memory-close" id="memoryClose" title="Schließen">✕</button>
+  </div>
+  <div id="memoryLines"></div>
 </div>
 
 <div id="tutorialOverlay" class="tutorial-overlay">
@@ -575,6 +647,7 @@ function _endLog() {
   el.innerHTML = `<span class="log-header">${_opLog[0] || ''}</span>` +
     steps.map(s => `<span class="log-step">▸ ${s}</span>`).join('');
   startPseudoAnim();
+  _refreshMemoryViewer();
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -2144,6 +2217,85 @@ function _refreshPseudo() {
     : '<div class="pline log-hint">Führe eine Operation aus …</div>';
 }
 
+function memoryVisible() {
+  return !document.getElementById('memoryPanel').classList.contains('hidden');
+}
+
+function openMemoryPanel() {
+  document.getElementById('memoryPanel').classList.remove('hidden');
+  _refreshMemoryViewer();
+}
+
+function _closeMemoryPanel() {
+  document.getElementById('memoryPanel').classList.add('hidden');
+}
+
+function _treeMemoryRecords() {
+  if (!isSearchTreeStructure(structure)) return [];
+  const nil = structure.NIL;
+  const records = [];
+  const walk = n => {
+    if (!n || n === nil) return;
+    walk(n.left);
+    records.push({
+      key: n.key,
+      value: n.value ?? '',
+      left: n.left && n.left !== nil ? n.left.key : 'NIL',
+      right: n.right && n.right !== nil ? n.right.key : 'NIL',
+      parent: n.parent && n.parent !== nil ? n.parent.key : 'NIL',
+      color: n.color || ''
+    });
+    walk(n.right);
+  };
+  walk(structure.root);
+  return records;
+}
+
+function _refreshMemoryViewer() {
+  const panel = document.getElementById('memoryPanel');
+  const el = document.getElementById('memoryLines');
+  if (!panel || !el || panel.classList.contains('hidden')) return;
+
+  document.getElementById('memoryTitle').textContent = `${structType} - Array Memory`;
+  if (!isSearchTreeStructure(structure)) {
+    el.innerHTML = '<div class="pline log-hint">Array Memory Viewer ist fuer BSTree und RBTree aktiv.</div>';
+    return;
+  }
+
+  const records = _treeMemoryRecords();
+  if (!records.length) {
+    el.innerHTML = '<div class="pline log-hint">Leerer Suchbaum.</div>';
+    return;
+  }
+
+  const isRB = structType === 'RBTree';
+  const arrayHTML = records.map((r, i) => {
+    const active = highlighted.has(r.key) ? ' active' : '';
+    return `<div class="mem-cell${active}"><span class="mem-idx">A[${i}]</span><span class="mem-val">${_escH(String(r.key))}</span></div>`;
+  }).join('');
+  const rowsHTML = records.map((r, i) => {
+    const active = highlighted.has(r.key) ? ' class="active"' : '';
+    const decoded = _decodeVal(r.value);
+    const value = decoded ? decoded._v : (r.value ?? '');
+    return `<tr${active}><td>@${i}</td><td>${_escH(String(r.key))}</td>` +
+      (isRB ? `<td>${r.color === 'RED' ? 'R' : 'B'}</td>` : '') +
+      `<td>${_escH(String(r.left))}</td><td>${_escH(String(r.right))}</td><td>${_escH(String(r.parent))}</td><td>${_escH(String(value)).slice(0,32)}</td></tr>`;
+  }).join('');
+
+  el.innerHTML = `
+    <div class="memory-section">
+      <h4>Array A - Inorder-Speicherbild</h4>
+      <div class="memory-array">${arrayHTML}</div>
+    </div>
+    <div class="memory-section">
+      <h4>Record-Speicher</h4>
+      <table class="memory-table">
+        <thead><tr><th>addr</th><th>key</th>${isRB ? '<th>c</th>' : ''}<th>left</th><th>right</th><th>parent</th><th>value</th></tr></thead>
+        <tbody>${rowsHTML}</tbody>
+      </table>
+    </div>`;
+}
+
 function _hlLines(idxs) {
   document.querySelectorAll('#pseudoLines .pline').forEach(el => {
     const i = +el.dataset.line;
@@ -2279,7 +2431,7 @@ function layoutHashTable(W) {
   }
   const hashMeta = {
     mode: structure.mode, tableX, topY, cellW, cellH, m,
-    probeName: structure._probeName(), hashExpr: structure.hashExpr,
+    probe: structure.probe, probeName: structure._probeName(), hashExpr: structure.hashExpr,
     chains: [], clusterBands: [], secondaryBands: [], probeCallouts: []
   };
 
@@ -2310,19 +2462,21 @@ function layoutHashTable(W) {
     });
     bySecondary.forEach((slots, id) => {
       const min = Math.min(...slots), max = Math.max(...slots);
-      hashMeta.secondaryBands.push({ id, from:min, to:max, label:'Cluster 2. Art' });
+      hashMeta.secondaryBands.push({ id, from:min, to:max, slots:[...slots].sort((a,b)=>a-b), label:'Cluster 2. Art' });
     });
-    for (let i = 0; i < m; i++) {
-      const e = structure.table[i];
-      if (!e || e.deleted) continue;
-      const trace = structure.probeTraceForSlot(i);
-      if (trace.length > 1 || clusters.secondary.has(i)) {
-        hashMeta.probeCallouts.push({
-          slot:i, key:e.key, home:e.home,
-          text: trace.map(t => `h(${e.key},${t.i})=${t.j}`).join('   ')
-        });
-      }
-    }
+    bySecondary.forEach((slots, id) => {
+      const slot = Math.max(...slots);
+      const e = structure.table[slot];
+      if (!e || e.deleted) return;
+      const trace = structure.probeTraceForSlot(slot);
+      const keys = slots.map(s => structure.table[s]).filter(x => x && !x.deleted).map(x => x.key).sort((a,b)=>a-b);
+      hashMeta.probeCallouts.push({
+        slot, key:e.key, home:e.home, keys,
+        text: structure.probe === 'quadratic'
+          ? `h'=${e.home}: ${keys.join(', ')}`
+          : `h(${e.key},i): ${trace.map(t => t.j).join(' -> ')}`
+      });
+    });
   }
   return { nodes, edges, nilNodes:[], hashMeta };
 }
@@ -2555,8 +2709,8 @@ function layoutFibHeap(W) {
   const rootListEdges = [];
   for (let i = 0; i < trees.length - 1; i++)
     rootListEdges.push({ fromId: trees[i]._lid, toId: trees[i + 1]._lid });
-  const rootListStart = trees.length ? trees[0]._lid : null;
-  return { nodes, edges, nilNodes: [], rootListEdges, rootListStart };
+  const minPointerId = structure.min ? structure.min._lid : null;
+  return { nodes, edges, nilNodes: [], rootListEdges, rootListKind: 'fib', minPointerId };
 }
 
 function layoutHeap(W) {
@@ -2701,7 +2855,7 @@ function _drawHashCell(ctx, n, x, y, isHl, C) {
                 : isFull ? 'rgba(255,255,255,.94)'
                 : 'rgba(255,255,255,.78)';
   ctx.fillRect(rx, ry, W, H);
-  if (n.cluster1) {
+  if (n.cluster1 && structure.probe !== 'quadratic') {
     ctx.save();
     ctx.beginPath(); ctx.rect(rx, ry, W, H); ctx.clip();
     ctx.strokeStyle = 'rgba(20,20,20,.30)'; ctx.lineWidth = 1;
@@ -2711,7 +2865,7 @@ function _drawHashCell(ctx, n, x, y, isHl, C) {
     ctx.restore();
   }
   if (n.cluster2) {
-    ctx.fillStyle = 'rgba(167,139,250,.20)';
+    ctx.fillStyle = 'rgba(167,139,250,.10)';
     ctx.fillRect(rx + 2, ry + 2, W - 4, H - 4);
   }
   ctx.strokeStyle = isDeleted ? '#d97706' : '#667085';
@@ -2773,12 +2927,11 @@ function _drawHashDiagram(ctx, meta, C, drawArrowHead) {
       }
     }
   } else {
+    const isQuadratic = meta.probe === 'quadratic';
     ctx.fillStyle = C.rbLabelBlk;
     ctx.textAlign = 'left'; ctx.textBaseline = 'top';
     ctx.font = 'bold 13px "Segoe UI",system-ui,sans-serif';
     ctx.fillText(meta.probeName, right + 68, top - 4);
-    ctx.font = '11px "Segoe UI",system-ui,sans-serif';
-    ctx.fillText('Sondierungsfolge: h(k,i)', right + 68, top + 16);
 
     const bracket = (x, y1, y2, color, label, align='left') => {
       ctx.strokeStyle = color; ctx.lineWidth = 1.8; ctx.setLineDash([]);
@@ -2790,20 +2943,61 @@ function _drawHashDiagram(ctx, meta, C, drawArrowHead) {
       ctx.textAlign = align; ctx.textBaseline = 'middle';
       ctx.fillText(label, align === 'left' ? x + 18 : x - 8, (y1 + y2) / 2);
     };
-    for (const b of meta.clusterBands) {
-      bracket(right + 10, topY + b.from * cellH - cellH / 2, topY + b.to * cellH + cellH / 2, '#d97706', b.label);
-      ctx.fillStyle = '#d97706';
-      ctx.font = '10px "Segoe UI",system-ui,sans-serif';
+    if (!isQuadratic) {
+      for (const b of meta.clusterBands) {
+        bracket(right + 10, topY + b.from * cellH - cellH / 2, topY + b.to * cellH + cellH / 2, '#d97706', b.label);
+        ctx.fillStyle = '#d97706';
+        ctx.font = '10px "Segoe UI",system-ui,sans-serif';
+        ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+        ctx.fillText(`P = ${b.probability}`, right + 24, topY + b.to * cellH + cellH / 2 + 6);
+      }
+    }
+    for (const b of meta.secondaryBands.slice(0, 1)) {
+      const bx = isQuadratic ? right + 18 : left - 18;
+      if (!isQuadratic) {
+        bracket(bx, topY + b.from * cellH - cellH / 2, topY + b.to * cellH + cellH / 2, '#7c3aed', b.label, 'right');
+        continue;
+      }
+      const labelX = right + 170;
+      const labelY = top + 54;
+      const slots = b.slots || [];
+      ctx.fillStyle = '#7c3aed';
+      ctx.font = 'bold 12px "Segoe UI",system-ui,sans-serif';
       ctx.textAlign = 'left'; ctx.textBaseline = 'top';
-      ctx.fillText(`P(naechster Treffer) = ${b.probability}`, right + 28, topY + b.to * cellH + cellH / 2 + 8);
+      ctx.fillText('Cluster 2. Art', labelX, labelY);
+      ctx.font = '11px "Segoe UI",system-ui,sans-serif';
+      ctx.fillText("gleicher Startwert h'(k)", labelX, labelY + 18);
+      ctx.strokeStyle = 'rgba(124,58,237,.50)';
+      ctx.lineWidth = 1.5;
+      for (const slot of slots) {
+        const sy = topY + slot * cellH;
+        ctx.strokeRect(left - 3, sy - cellH / 2 + 3, cellW + 6, cellH - 6);
+        ctx.beginPath();
+        ctx.moveTo(right + 4, sy);
+        ctx.lineTo(labelX - 12, labelY + 14);
+        ctx.stroke();
+      }
+      if (isQuadratic) {
+        const y1 = slots.length ? topY + slots[0] * cellH : topY + b.from * cellH;
+        const y2 = slots.length > 1 ? topY + slots[1] * cellH : topY + b.to * cellH;
+        ctx.strokeStyle = 'rgba(124,58,237,.22)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(right + 70, y1); ctx.lineTo(right + 70, y2);
+        ctx.moveTo(right + 70, y1); ctx.lineTo(right + 120, y1);
+        ctx.moveTo(right + 70, y2); ctx.lineTo(right + 120, y2);
+        ctx.stroke();
+        ctx.fillStyle = '#7c3aed';
+        ctx.font = '11px Georgia,serif';
+        ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+        ctx.fillText('c1 + c2', right + 78, y1 + (y2 - y1) * 0.35);
+        ctx.fillText('c1 + 3 c2', right + 78, y1 + (y2 - y1) * 0.70);
+      }
     }
-    for (const b of meta.secondaryBands) {
-      bracket(left - 18, topY + b.from * cellH - cellH / 2, topY + b.to * cellH + cellH / 2, '#7c3aed', b.label, 'right');
-    }
-    let calloutY = top + 58;
-    for (const c of meta.probeCallouts.slice(0, 7)) {
+    let calloutY = isQuadratic ? top + 106 : top + 24;
+    for (const c of meta.probeCallouts.slice(0, isQuadratic ? 1 : 2)) {
       const sy = topY + c.slot * cellH;
-      const tx = right + 84;
+      const tx = isQuadratic ? right + 190 : right + 84;
       ctx.strokeStyle = 'rgba(100,116,139,.55)';
       ctx.beginPath(); ctx.moveTo(right, sy); ctx.lineTo(tx - 8, calloutY + 6); ctx.stroke();
       drawArrowHead(right, sy, Math.atan2(sy - (calloutY + 6), right - (tx - 8)), 'rgba(100,116,139,.55)');
@@ -2811,7 +3005,11 @@ function _drawHashDiagram(ctx, meta, C, drawArrowHead) {
       ctx.font = '11px "Segoe UI",system-ui,sans-serif';
       ctx.textAlign = 'left'; ctx.textBaseline = 'top';
       ctx.fillText(c.text, tx, calloutY);
-      calloutY += 22;
+      if (isQuadratic && c.keys?.length) {
+        ctx.font = '10px "Segoe UI",system-ui,sans-serif';
+        ctx.fillText('gleiche Sondierungsfolge', tx, calloutY + 15);
+      }
+      calloutY += 20;
     }
   }
   ctx.restore();
@@ -2916,8 +3114,9 @@ function draw() {
 
   if (layout.hashMeta) _drawHashDiagram(ctx, layout.hashMeta, C, drawArrowHead);
 
-  // ── root list arrows (BinomialHeap / FibHeap) ────────────
+  // ── root list links (BinomialHeap / FibHeap) ────────────
   if (layout.rootListEdges && layout.rootListEdges.length) {
+    const isFibRootList = layout.rootListKind === 'fib';
     const rlColor = dm ? 'rgba(125,211,252,0.65)' : 'rgba(2,132,199,0.65)';
     ctx.strokeStyle = rlColor; ctx.lineWidth = 1.8; ctx.setLineDash([]);
     for (const e of layout.rootListEdges) {
@@ -2928,7 +3127,7 @@ function draw() {
       const x2 = tn.x + wx(e.toId)  - _eHW;
       const y2 = tn.y + wy(e.toId);
       ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
-      drawArrowHead(x2, y2, Math.atan2(y2 - y1, x2 - x1), rlColor);
+      if (!isFibRootList) drawArrowHead(x2, y2, Math.atan2(y2 - y1, x2 - x1), rlColor);
     }
   }
 
@@ -2942,6 +3141,23 @@ function draw() {
       ctx.strokeStyle = rlColor; ctx.lineWidth = 1.8; ctx.setLineDash([]);
       ctx.beginPath(); ctx.moveTo(x1, ny); ctx.lineTo(x2, ny); ctx.stroke();
       drawArrowHead(x2, ny, 0, rlColor);
+    }
+  }
+
+  if (layout.minPointerId != null) {
+    const mn = nodeMap.get(layout.minPointerId);
+    if (mn) {
+      const ptrColor = dm ? 'rgba(74,222,128,0.9)' : 'rgba(22,163,74,0.9)';
+      const nx = mn.x + wx(mn.id), ny = mn.y + wy(mn.id);
+      const y1 = ny - _eHH - 46, y2 = ny - _eHH;
+      const label = structType === 'MaxFibHeap' ? 'max' : 'min';
+      ctx.strokeStyle = ptrColor; ctx.lineWidth = 2; ctx.setLineDash([]);
+      ctx.beginPath(); ctx.moveTo(nx, y1); ctx.lineTo(nx, y2); ctx.stroke();
+      drawArrowHead(nx, y2, Math.PI / 2, ptrColor);
+      ctx.fillStyle = ptrColor;
+      ctx.font = 'bold 11px "Segoe UI", system-ui, sans-serif';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+      ctx.fillText(label, nx, y1 - 4);
     }
   }
 
@@ -3204,6 +3420,68 @@ canvas.addEventListener('mouseleave', () => {
 // ══════════════════════════════════════════════════════════════
 //  VALUE EDITOR  (click on node)
 // ══════════════════════════════════════════════════════════════
+function _nodeDirectActionsHTML(key) {
+  if (!structure || structure instanceof HashTable) return '';
+  const canDelete = typeof structure.delete === 'function';
+  const canChangeKey = structure instanceof FibHeap;
+  if (!canDelete && !canChangeKey) return '';
+  const changeLabel = structType === 'MaxFibHeap' ? 'Increase Key' : 'Decrease Key';
+  return `<div class="dialog-field">
+    <label>Direktoperationen</label>
+    <div class="node-action-row">
+      ${canDelete ? `<button type="button" class="danger" onclick="_nodeDeleteDirect(${key})">Delete</button>` : ''}
+      ${canChangeKey ? `<button type="button" onclick="_nodeChangeKeyDirect(${key})">${changeLabel}</button>` : ''}
+    </div>
+  </div>`;
+}
+
+function _nodeDeleteDirect(key) {
+  if (!need() || typeof structure.delete !== 'function') return;
+  closeDialog();
+  highlighted.clear();
+  _startLog(`${structType} - Delete(${key})`, 'delete');
+  const ok = structure.delete(key);
+  _endLog();
+  setStatus(ok ? `✓ ${key} gelöscht` : `✗ ${key} nicht gefunden`);
+}
+
+function _nodeChangeKeyDirect(oldK) {
+  if (!need() || !(structure instanceof FibHeap)) return;
+  closeDialog();
+  const isMax = structType === 'MaxFibHeap';
+  const dlgTitle = isMax ? 'Increase Key' : 'Decrease Key';
+  const hint = isMax ? 'muss größer sein' : 'muss kleiner sein';
+  showDialog(dlgTitle, `
+    <div class="dialog-field">
+      <label>Aktueller Key</label>
+      <input type="number" id="_dk" step="1" value="${oldK}">
+    </div>
+    <div class="dialog-field">
+      <label>Neuer Key (${hint})</label>
+      <input type="number" id="_nk" step="1">
+    </div>`, () => {
+    const curK = parseInt(document.getElementById('_dk').value);
+    const newK = parseInt(document.getElementById('_nk').value);
+    if (isNaN(curK) || isNaN(newK)) return;
+    if (isMax ? newK <= curK : newK >= curK) {
+      setStatus(`⚠ Neuer Key muss ${isMax ? 'größer' : 'kleiner'} als alter Key sein`);
+      return;
+    }
+    highlighted.clear();
+    _startLog(`${structType} - ${isMax ? 'IncreaseKey' : 'DecreaseKey'}(${curK} -> ${newK})`, 'decreaseKey');
+    if (structure.decreaseKey(curK, newK)) {
+      const ln = layout.nodes.find(n => n.key === newK);
+      if (ln) highlighted.add(ln.id);
+      _endLog();
+      setStatus(`✓ ${isMax ? 'Increase' : 'Decrease'} Key: ${curK} -> ${newK}`);
+    } else {
+      _endLog();
+      setStatus(`✗ Key ${curK} nicht gefunden`);
+    }
+  });
+  setTimeout(() => document.getElementById('_nk')?.focus(), 50);
+}
+
 function openValueEditor(nodeId) {
   if (!structure) return;
   if (structure instanceof HashTable) return;
@@ -3220,6 +3498,9 @@ function openValueEditor(nodeId) {
     const d = structure.data[nodeId]; if (!d) return;
     currentKey = d.key; currentVal = d.value || '';
   }
+  highlighted.clear();
+  highlighted.add(isSearchTreeStructure(structure) || structure instanceof UnionFind ? currentKey : nodeId);
+  _refreshMemoryViewer();
 
   const _save = v => {
     if      (isSearchTreeStructure(structure))    structure.insert(currentKey, v);
@@ -3227,6 +3508,7 @@ function openValueEditor(nodeId) {
                                                  structure.updateValue(currentKey, v);
     else if (structure instanceof UnionFind)      structure.makeSet(currentKey, v);
     else                                         structure.data[nodeId].value = v;
+    _refreshMemoryViewer();
     const label = _dataMode==='hist' ? _fmtHistKey(currentKey) : currentKey;
     setStatus(`✓ Key ${label} → ${v.length>40?v.slice(0,40)+'…':v}`);
   };
@@ -3242,6 +3524,7 @@ function openValueEditor(nodeId) {
         <label>Datum</label>
         <input type="text" value="${dispKey}" readonly style="opacity:.5;cursor:default">
       </div>
+      ${_nodeDirectActionsHTML(currentKey)}
       <div class="dialog-field">
         <label>Titel</label>
         <input type="text" id="_vTitle" value="${safeT}">
@@ -3272,6 +3555,7 @@ function openValueEditor(nodeId) {
         <label>Commit-Hash (Dezimal)</label>
         <input type="text" value="${currentKey}" readonly style="opacity:.5;cursor:default">
       </div>
+      ${_nodeDirectActionsHTML(currentKey)}
       <div class="dialog-field">
         <label>Commit-Message</label>
         <input type="text" id="_vMsg" value="${safeM}">
@@ -3305,6 +3589,7 @@ function openValueEditor(nodeId) {
       <label>Key</label>
       <input type="text" value="${currentKey}" readonly style="opacity:.5;cursor:default">
     </div>
+    ${_nodeDirectActionsHTML(currentKey)}
     <div class="dialog-field">
       <label>Value (Text, URL oder Dateipfad)</label>
       <div class="input-row">
@@ -4270,9 +4555,54 @@ canvas.addEventListener('touchend', e => {
   }
 }, { passive: false });
 
+// ── Op-Log: resize from top edge ───────────────────────────────
+(function() {
+  const handle = document.getElementById('opLogResize');
+  const log = document.getElementById('opLog');
+  if (!handle || !log) return;
+
+  const MIN_H = 54;
+  const STORE_KEY = 'dslOpLogHeight';
+  const maxH = () => Math.max(MIN_H, Math.floor(window.innerHeight * 0.55));
+  const clamp = h => Math.max(MIN_H, Math.min(maxH(), Math.round(h)));
+  const setHeight = (h, persist = true) => {
+    const next = clamp(h);
+    log.style.height = `${next}px`;
+    document.documentElement.style.setProperty('--oplog-h', `${next}px`);
+    if (persist) localStorage.setItem(STORE_KEY, String(next));
+  };
+
+  const saved = Number(localStorage.getItem(STORE_KEY));
+  if (Number.isFinite(saved) && saved > 0) setHeight(saved, false);
+
+  let startY = 0, startH = 0;
+  handle.addEventListener('pointerdown', e => {
+    if (e.button != null && e.button !== 0) return;
+    e.preventDefault();
+    startY = e.clientY;
+    startH = log.getBoundingClientRect().height;
+    handle.classList.add('dragging');
+    handle.setPointerCapture?.(e.pointerId);
+  });
+  handle.addEventListener('pointermove', e => {
+    if (!handle.classList.contains('dragging')) return;
+    setHeight(startH + (startY - e.clientY), false);
+  });
+  const stopResize = e => {
+    if (!handle.classList.contains('dragging')) return;
+    handle.classList.remove('dragging');
+    handle.releasePointerCapture?.(e.pointerId);
+    setHeight(log.getBoundingClientRect().height, true);
+  };
+  handle.addEventListener('pointerup', stopResize);
+  handle.addEventListener('pointercancel', stopResize);
+  window.addEventListener('resize', () => setHeight(log.getBoundingClientRect().height, true));
+})();
+
 // ── Pseudo-Panel: Events ──────────────────────────────────────
 document.getElementById('pseudoStepBtn').addEventListener('click', _stepPseudo);
 document.getElementById('pseudoClose').addEventListener('click', _closePseudoPanel);
+document.getElementById('memoryClose').addEventListener('click', _closeMemoryPanel);
 document.querySelectorAll('.pseudo-spd').forEach(btn => {
   btn.addEventListener('click', () => {
     _pseudoSpeed = btn.dataset.spd;
@@ -4306,6 +4636,29 @@ document.querySelectorAll('.pseudo-spd').forEach(btn => {
     };
     document.addEventListener('mousemove', onMove);
     document.addEventListener('mouseup',   onUp);
+  });
+})();
+
+// ── Memory-Panel: Drag ─────────────────────────────────────────
+(function() {
+  const bar = document.getElementById('memoryDragBar');
+  const panel = document.getElementById('memoryPanel');
+  let ox = 0, oy = 0;
+  bar.addEventListener('mousedown', e => {
+    if (e.target.closest('button')) return;
+    const r = panel.getBoundingClientRect();
+    ox = e.clientX - r.left; oy = e.clientY - r.top;
+    const onMove = ev => {
+      panel.style.left = (ev.clientX - ox) + 'px';
+      panel.style.top = (ev.clientY - oy) + 'px';
+      panel.style.right = 'auto';
+    };
+    const onUp = () => {
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+    };
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
   });
 })();
 </script>
