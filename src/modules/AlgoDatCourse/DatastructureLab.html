@@ -455,6 +455,29 @@ const EXTRA_PSEUDOCODE = {
         { re: /gleicher Rang/, lines: [8,9] },
       ]
     },
+    edges: {
+      title: 'EDGES(V)',
+      code: [
+        'EDGES(V):',
+        '  for i = 1 to 2k do MAKE-SET(v_i)',
+        '  E := empty set',
+        '  for i = 1 to k do',
+        '    if FindSet(v_{2i}) != FindSet(v_{2i-1}):',
+        '      E := E union {{v_{2i}, v_{2i-1}}}',
+        '      Union(v_{2i}, v_{2i-1})',
+        '  for i = 1 to 2k-2 do',
+        '    if FindSet(v_i) != FindSet(v_{i+2}):',
+        '      E := E union {{v_i, v_{i+2}}}',
+        '      Union(v_i, v_{i+2})',
+      ],
+      lineMap: [
+        { re: /EDGES: MakeSet/, lines: [1] },
+        { re: /erste Runde/, lines: [3,4] },
+        { re: /E := E union.*erste/, lines: [5,6] },
+        { re: /zweite Runde/, lines: [7,8] },
+        { re: /E := E union.*zweite/, lines: [9,10] },
+      ]
+    },
     delete: {
       title: 'UnionFind-Delete',
       code: [
@@ -1544,7 +1567,11 @@ class HashTable {
 }
 
 class UnionFind {
-  constructor() { this.items = new Map(); }
+  constructor({ pathCompression=true } = {}) {
+    this.items = new Map();
+    this.pathCompression = pathCompression;
+    this.generatedEdges = [];
+  }
   insert(key, value) { return this.makeSet(key, value); }
   makeSet(key, value='') {
     if (this.items.has(key)) { this.items.get(key).value = value || this.items.get(key).value; _log(`MakeSet(${key}): Element existiert bereits`); return false; }
@@ -1565,12 +1592,13 @@ class UnionFind {
     _log(`FindSet(${key}): Wurzel/Repraesentant <b>${key}</b> erreicht`);
     return x;
   }
-  findSet(key) { const r = this._findNode(key, true); return r ? r.key : null; }
+  findSet(key) { const r = this._findNode(key, this.pathCompression); return r ? r.key : null; }
+  findSetRaw(key) { const r = this._findNode(key, false); return r ? r.key : null; }
   search(key) { const x = this.items.get(key); return x ? x.value : null; }
   union(xKey, yKey) {
     if (!this.items.has(xKey) || !this.items.has(yKey)) return false;
     _log(`DSFUnion(${xKey}, ${yKey}): Link(FindSet(${xKey}), FindSet(${yKey}))`);
-    const x = this._findNode(xKey, true), y = this._findNode(yKey, true);
+    const x = this._findNode(xKey, this.pathCompression), y = this._findNode(yKey, this.pathCompression);
     if (!x || !y) return false;
     if (x.key === y.key) { _log(`Beide Elemente haben bereits Repräsentant <b>${x.key}</b>`); return true; }
     this._link(x, y); return true;
@@ -1592,14 +1620,16 @@ class UnionFind {
   }
   size() { return this.items.size; }
   isEmpty() { return this.items.size === 0; }
-  toJSON() { return { type:'UnionFind', nodes:[...this.items.values()].map(x => ({ k:x.key, v:x.value, parent:x.parent, rank:x.rank })) }; }
+  toJSON() { return { type:'UnionFind', pathCompression:this.pathCompression, generatedEdges:this.generatedEdges, nodes:[...this.items.values()].map(x => ({ k:x.key, v:x.value, parent:x.parent, rank:x.rank })) }; }
   static fromJSON(d) {
-    const uf = new UnionFind();
+    const uf = new UnionFind({ pathCompression: d.pathCompression !== false });
+    uf.generatedEdges = Array.isArray(d.generatedEdges) ? d.generatedEdges : [];
     for (const { k, v } of (d.nodes || [])) uf.makeSet(Number(k), v);
     for (const { k, parent, rank } of (d.nodes || [])) {
       const x = uf.items.get(Number(k));
       if (x) { x.parent = Number(parent); x.rank = Number(rank) || 0; }
     }
+    for (const x of uf.items.values()) if (!uf.items.has(x.parent)) x.parent = x.key;
     return uf;
   }
 }
@@ -2268,7 +2298,7 @@ function layoutUnionFind(W) {
     let cur = cx - tot / 2;
     for (let i = 0; i < ch.length; i++) {
       const ccx = cur + cws[i] / 2;
-      edges.push({ fromId:x.key, toId:ch[i].key, fromX:cx, fromY:y, toX:ccx, toY:y + LH });
+      edges.push({ fromId:ch[i].key, toId:x.key, directed:true, fromX:ccx, fromY:y + LH, toX:cx, toY:y });
       place(ch[i], ccx, y + LH);
       cur += cws[i] + GAP;
     }
@@ -2294,6 +2324,7 @@ function layoutUnionFind(W) {
     let x0 = Math.max(GAP, (W - row.width) / 2);
     for (let i = 0; i < row.roots.length; i++) {
       place(row.roots[i], x0 + row.widths[i] / 2, y);
+      edges.push({ fromId:row.roots[i].key, toId:row.roots[i].key, directed:true, self:true });
       x0 += row.widths[i] + GAP;
     }
     y += row.height * LH + Math.max(36, LH * 0.45);
@@ -2705,12 +2736,37 @@ function draw() {
   // ── edges ──────────────────────────────────────────────────
   const _eHH = _nodeHalfH(), _eHW = _nodeHalfW();
   ctx.strokeStyle = C.edge; ctx.lineWidth = 2.5; ctx.setLineDash([]);
+  const drawArrowHead = (x2, y2, ang, color) => {
+    const aLen = 9, aW = 0.38;
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(x2, y2);
+    ctx.lineTo(x2 - aLen * Math.cos(ang - aW), y2 - aLen * Math.sin(ang - aW));
+    ctx.lineTo(x2 - aLen * Math.cos(ang + aW), y2 - aLen * Math.sin(ang + aW));
+    ctx.closePath();
+    ctx.fill();
+  };
   for (const e of layout.edges) {
     const fn=nodeMap.get(e.fromId), tn=nodeMap.get(e.toId); if(!fn||!tn) continue;
-    ctx.beginPath();
-    ctx.moveTo(fn.x+wx(e.fromId), fn.y+wy(e.fromId)+_eHH);
-    ctx.lineTo(tn.x+wx(e.toId),  tn.y+wy(e.toId)  -_eHH);
-    ctx.stroke();
+    if (e.self) {
+      const x = fn.x + wx(e.fromId), y = fn.y + wy(e.fromId);
+      const r = _eHH + 12;
+      ctx.beginPath();
+      ctx.arc(x + _eHW * 0.48, y - _eHH * 0.48, r * 0.42, Math.PI * 0.82, Math.PI * 2.28);
+      ctx.stroke();
+      drawArrowHead(x + _eHW * 0.82, y - _eHH * 0.16, Math.PI * 0.78, C.edge);
+      continue;
+    }
+    let x1, y1, x2, y2;
+    if (e.directed) {
+      x1 = fn.x + wx(e.fromId); y1 = fn.y + wy(e.fromId) - _eHH;
+      x2 = tn.x + wx(e.toId);   y2 = tn.y + wy(e.toId)   + _eHH;
+    } else {
+      x1 = fn.x + wx(e.fromId); y1 = fn.y + wy(e.fromId) + _eHH;
+      x2 = tn.x + wx(e.toId);   y2 = tn.y + wy(e.toId)   - _eHH;
+    }
+    ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+    if (e.directed) drawArrowHead(x2, y2, Math.atan2(y2 - y1, x2 - x1), C.edge);
   }
 
   // ── root list arrows (BinomialHeap / FibHeap) ────────────
@@ -2725,13 +2781,7 @@ function draw() {
       const x2 = tn.x + wx(e.toId)  - _eHW;
       const y2 = tn.y + wy(e.toId);
       ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
-      const ang = Math.atan2(y2 - y1, x2 - x1), aLen = 9, aW = 0.38;
-      ctx.fillStyle = rlColor;
-      ctx.beginPath();
-      ctx.moveTo(x2, y2);
-      ctx.lineTo(x2 - aLen * Math.cos(ang - aW), y2 - aLen * Math.sin(ang - aW));
-      ctx.lineTo(x2 - aLen * Math.cos(ang + aW), y2 - aLen * Math.sin(ang + aW));
-      ctx.closePath(); ctx.fill();
+      drawArrowHead(x2, y2, Math.atan2(y2 - y1, x2 - x1), rlColor);
     }
   }
 
@@ -2744,13 +2794,7 @@ function draw() {
       const x1 = nx - _eHW - 38, x2 = nx - _eHW;
       ctx.strokeStyle = rlColor; ctx.lineWidth = 1.8; ctx.setLineDash([]);
       ctx.beginPath(); ctx.moveTo(x1, ny); ctx.lineTo(x2, ny); ctx.stroke();
-      const aLen = 9, aW = 0.38;
-      ctx.fillStyle = rlColor;
-      ctx.beginPath();
-      ctx.moveTo(x2, ny);
-      ctx.lineTo(x2 - aLen * Math.cos(-aW), ny - aLen * Math.sin(-aW));
-      ctx.lineTo(x2 - aLen * Math.cos(+aW), ny - aLen * Math.sin(+aW));
-      ctx.closePath(); ctx.fill();
+      drawArrowHead(x2, ny, 0, rlColor);
     }
   }
 
@@ -3216,6 +3260,8 @@ function buildOpsMenu() {
     ['➕  Make-Set',    cmdMakeSet],
     ['🔍  Find-Set',    cmdFindSet],
     ['🔗  Union',       cmdUnion],
+    null,
+    ['EDGES(V)',        cmdEdgesFromV],
   ] : isTree ? [
     ['➕  Insert',      cmdInsert],
     ['❌  Delete',      cmdDelete],
@@ -3497,6 +3543,58 @@ function cmdUnion() {
   setTimeout(()=>document.getElementById('_ux')?.focus(),50);
 }
 
+function cmdEdgesFromV() {
+  if (!need() || !(structure instanceof UnionFind)) return;
+  showDialog('EDGES(V)', `
+    <div class="dialog-field">
+      <label>V = v1, v2, ..., v2k (gerade Anzahl)</label>
+      <textarea id="_edgeV" rows="6" style="width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:8px;border-radius:7px;resize:vertical;font-family:monospace;font-size:12px" placeholder="1, 2, 3, 4, 5, 6"></textarea>
+    </div>`, () => {
+    const V = document.getElementById('_edgeV').value
+      .split(/[\s,;]+/).map(Number).filter(n => Number.isInteger(n));
+    if (!V.length || V.length % 2 !== 0) {
+      setStatus('⚠ EDGES(V) braucht eine gerade Anzahl von Ganzzahlen');
+      return;
+    }
+
+    const compress = structure.pathCompression !== false;
+    structure = new UnionFind({ pathCompression: compress });
+    highlighted.clear(); wobble.clear();
+    _startLog(`${structType} - EDGES(V)`, 'edges');
+
+    for (const v of V) {
+      _log(`EDGES: MakeSet(${v})`);
+      structure.makeSet(v, 'Value_' + v);
+    }
+
+    const E = [];
+    const addEdgeIfSeparate = (a, b, roundLabel) => {
+      _log(`${roundLabel}: pruefe FindSet(${a}) != FindSet(${b})`);
+      const ra = structure.findSet(a);
+      const rb = structure.findSet(b);
+      if (ra !== rb) {
+        E.push([a, b]);
+        _log(`E := E union {{${a}, ${b}}} (${roundLabel})`);
+        structure.union(a, b);
+      } else {
+        _log(`FindSet(${a}) = FindSet(${b}) = ${ra} -> keine Kante`);
+      }
+    };
+
+    const k = V.length / 2;
+    for (let i = 0; i < k; i++) addEdgeIfSeparate(V[2*i + 1], V[2*i], 'erste Runde');
+    for (let i = 0; i < V.length - 2; i++) addEdgeIfSeparate(V[i], V[i + 2], 'zweite Runde');
+
+    structure.generatedEdges = E;
+    _endLog();
+    buildOpsMenu();
+    V.forEach(v => highlighted.add(v));
+    const edgeText = E.length ? E.map(([a,b]) => `{${a},${b}}`).join(', ') : '∅';
+    setStatus(`E = { ${edgeText} }`);
+  });
+  setTimeout(()=>document.getElementById('_edgeV')?.focus(),50);
+}
+
 function cmdMin() {
   if (!need()) return; highlighted.clear();
   let k, id;
@@ -3670,6 +3768,7 @@ function cmdNew() {
     const heapType = document.getElementById('_heapType');
     if (heapType) heapType.value = (t === 'BinomialHeap' || t === 'FibHeap') ? 'min' : 'max';
     document.querySelectorAll('.hash-config-row').forEach(row => row.style.display = (t === 'HashTable') ? '' : 'none');
+    document.querySelectorAll('.uf-config-row').forEach(row => row.style.display = (t === 'UnionFind') ? '' : 'none');
   };
 
   showDialog('Neue Struktur', `
@@ -3729,6 +3828,13 @@ function cmdNew() {
         <option value="double">Doppeltes Hashing</option>
       </select>
     </div>
+    <div class="dialog-field uf-config-row" style="display:none">
+      <label>Find-Set</label>
+      <select id="_ufCompression">
+        <option value="on" selected>Mit Pfadverkuerzung</option>
+        <option value="off">Ohne Pfadverkuerzung</option>
+      </select>
+    </div>
     <div class="dialog-field">
       <label>Beispielwerte</label>
       <select id="_smp">
@@ -3757,6 +3863,7 @@ function cmdNew() {
     const hashM    = parseInt(document.getElementById('_hashM')?.value || '11');
     const hashProbe= document.getElementById('_hashProbe')?.value || 'linear';
     const hashExpr = document.getElementById('_hashExpr')?.value.trim() || 'k % m';
+    const ufCompression = (document.getElementById('_ufCompression')?.value || 'on') === 'on';
     const balancedKeys = n => {
       const out = [];
       const add = (lo, hi) => {
@@ -3793,7 +3900,7 @@ function cmdNew() {
 
     highlighted.clear(); wobble.clear();
     if      (structType === 'HashTable')       structure = new HashTable({ mode:hashMode, m:hashM, probe:hashProbe, hashExpr });
-    else if (structType === 'UnionFind')       structure = new UnionFind();
+    else if (structType === 'UnionFind')       structure = new UnionFind({ pathCompression: ufCompression });
     else if (structType === 'BSTree')          structure = new BSTree();
     else if (structType === 'MinHeap')         structure = new MinHeap();
     else if (structType === 'MaxHeap')         structure = new MaxHeap();
