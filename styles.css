@@ -48,20 +48,21 @@
     box-sizing: border-box
 }
 
-html,
-body {
+html {
     min-height: 100%;
 }
 
 body {
+    min-height: 100%;
     margin: 0;
     font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
     background: var(--bg);
     color: var(--text);
     overflow-x: hidden;
     overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
     -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
 }
 
 a {
@@ -71,6 +72,65 @@ a {
 img {
     max-width: 100%;
     display: block
+}
+
+.small-text.grey-text {
+    color: #9ca3af;
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.link-like {
+    cursor: pointer;
+    color: inherit;
+    text-decoration: underline;
+}
+
+.hero-note {
+    font-size: 1rem;
+    color: #9ca3af;
+    line-height: 1.6;
+    margin: 1.2rem 0 0;
+}
+
+.hero-note-link {
+    color: inherit;
+    text-decoration: underline;
+}
+
+.hero-note-link:hover,
+.hero-note-link:focus {
+    color: var(--accent);
+}
+
+.timeline-media .avatar-border {
+    width: 150px;
+}
+
+.timeline-media img {
+    width: 100%;
+    display: block;
+}
+
+.cat-card-bg--studium {
+    background:
+        radial-gradient(ellipse at 25% 75%, #0ea5e9 0%, transparent 52%),
+        radial-gradient(ellipse at 78% 18%, #6366f1 0%, transparent 50%),
+        linear-gradient(160deg, #0f1729 0%, #1e293b 100%);
+}
+
+.cat-card-bg--geschichte {
+    background:
+        radial-gradient(ellipse at 25% 75%, #0ea5e9 0%, transparent 52%),
+        radial-gradient(ellipse at 78% 18%, #6366f1 0%, transparent 50%),
+        linear-gradient(160deg, #0f1729 0%, #1e293b 100%);
+}
+
+.cat-card-bg--guides {
+    background:
+        radial-gradient(ellipse at 25% 75%, #22c55e 0%, transparent 52%),
+        radial-gradient(ellipse at 78% 18%, #06b6d4 0%, transparent 50%),
+        linear-gradient(160deg, #011c0a 0%, #02291a 100%);
 }
 
 .muted {
@@ -691,8 +751,6 @@ footer {
     overflow-x: auto;
     scroll-snap-type: x mandatory;
     scroll-behavior: smooth;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
     padding: 16px 4px;
     flex: 1;
 }
@@ -926,8 +984,8 @@ footer {
     position: absolute;
     left: 50%;
     top: 50%;
-    width: 2500px;
-    height: 1620px;
+    width: 3400px;
+    height: 2400px;
     transform: translate(-50%, -50%) scale(.72);
     transform-origin: center center;
 }
@@ -997,7 +1055,7 @@ footer {
     font-weight: 700;
     line-height: 1.15;
     width: max-content;
-    max-width: 160px;
+    max-width: 170px;
     min-width: 66px;
     text-align: center;
     box-shadow: 0 10px 26px rgba(2,6,23,.36);
