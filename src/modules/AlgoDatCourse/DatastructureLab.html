@@ -214,6 +214,37 @@ main{flex:1;position:relative;overflow:hidden}
   resize:both;min-width:280px;min-height:150px;
 }
 .memory-panel.hidden{display:none}
+.code-panel{
+  position:fixed;bottom:42px;right:18px;width:min(760px,calc(100vw - 36px));
+  height:min(460px,calc(100vh - 96px));background:var(--surface);
+  border:1px solid var(--border);border-radius:var(--radius);
+  box-shadow:0 14px 44px rgba(0,0,0,.55);z-index:805;
+  display:grid;grid-template-rows:auto 1fr 138px;overflow:hidden;resize:both;
+  min-width:320px;min-height:260px
+}
+.code-panel.hidden{display:none}
+.code-toolbar{
+  display:flex;align-items:center;gap:8px;padding:7px 10px;
+  background:var(--surface2);border-bottom:1px solid var(--border);
+  cursor:move;-webkit-user-select:none;user-select:none
+}
+.code-title{font-size:12px;font-weight:800;color:var(--accent);letter-spacing:.04em;margin-right:auto}
+.code-run,.code-close,.code-template{
+  background:var(--surface);border:1px solid var(--border);color:var(--text);
+  border-radius:6px;padding:5px 9px;font-size:12px;font-weight:700;cursor:pointer
+}
+.code-run{background:var(--accent);color:#071016;border-color:var(--accent)}
+.code-run:hover,.code-close:hover,.code-template:hover{opacity:.86}
+.code-editor{
+  width:100%;height:100%;resize:none;border:none;outline:none;
+  background:#0a0f16;color:var(--text);padding:12px 14px;
+  font:12px/1.55 'Cascadia Code','Consolas',monospace
+}
+.terminal{
+  border-top:1px solid var(--border);background:#05080d;color:#b8f7c6;
+  overflow:auto;padding:9px 12px;font:12px/1.55 'Cascadia Code','Consolas',monospace;
+  white-space:pre-wrap
+}
 .memory-toolbar{
   display:flex;align-items:center;gap:8px;padding:7px 10px;
   background:var(--surface2);border-bottom:1px solid var(--border);
@@ -332,6 +363,12 @@ main{flex:1;position:relative;overflow:hidden}
     <button class="menu-btn">ALGORITHMEN</button>
     <div class="dropdown" id="dropdownAlgorithms">
       <button onclick="cmdHeapSort()">Heapsort</button>
+      <button onclick="cmdSelection()">Selection</button>
+      <hr>
+      <button onclick="cmdTopologicalSort()">Topological Sort</button>
+      <button onclick="cmdPrim()">Prim</button>
+      <button onclick="cmdKruskal()">Kruskal</button>
+      <button onclick="cmdDijkstra()">Dijkstra</button>
     </div>
   </div>
 
@@ -345,6 +382,7 @@ main{flex:1;position:relative;overflow:hidden}
       <button onclick="toggleSetting('tableView')"><span class="ck" id="ck-tableView"> </span> Tabellen-Ansicht</button>
       <hr>
       <button onclick="openPseudoPanel()">📋 Pseudocode-Fenster</button>
+      <button onclick="openCodePanel()">Pseudocode Editor + Terminal</button>
       <button onclick="openMemoryPanel()">▦ Array Memory Viewer</button>
     </div>
   </div>
@@ -394,6 +432,17 @@ main{flex:1;position:relative;overflow:hidden}
     <button type="button" class="memory-close" id="memoryClose" title="Schließen">✕</button>
   </div>
   <div id="memoryLines"></div>
+</div>
+
+<div id="codePanel" class="code-panel hidden">
+  <div class="code-toolbar" id="codeDragBar">
+    <span class="code-title">Pseudocode Editor + Terminal</span>
+    <button type="button" class="code-template" onclick="loadCodeTemplate()">Template</button>
+    <button type="button" class="code-run" onclick="runPseudoProgram()">Run</button>
+    <button type="button" class="code-close" id="codeClose" title="SchlieÃŸen">âœ•</button>
+  </div>
+  <textarea id="codeEditor" class="code-editor" spellcheck="false"></textarea>
+  <pre id="terminal" class="terminal">Bereit.</pre>
 </div>
 
 <div id="tutorialOverlay" class="tutorial-overlay">
@@ -1731,6 +1780,141 @@ class UnionFind {
   }
 }
 
+class GraphStructure {
+  constructor({ directed=false } = {}) {
+    this.directed = directed;
+    this.vertices = new Map();
+    this.edges = [];
+    this.lastAlgorithm = null;
+  }
+  insert(key, value='') { return this.addVertex(key, value); }
+  addVertex(key, value='') {
+    if (this.vertices.has(key)) { this.vertices.get(key).value = value || this.vertices.get(key).value; return false; }
+    this.vertices.set(key, { key, value });
+    _log(`AddVertex(${key})`);
+    return true;
+  }
+  addEdge(u, v, w=1) {
+    this.addVertex(u, 'v' + u);
+    this.addVertex(v, 'v' + v);
+    const old = this.edges.find(e => e.u === u && e.v === v || (!this.directed && e.u === v && e.v === u));
+    if (old) { old.w = Number(w) || 1; return old; }
+    const edge = { u, v, w:Number(w) || 1 };
+    this.edges.push(edge);
+    this.lastAlgorithm = null;
+    _log(`AddEdge(${u}, ${v}, w=${edge.w})`);
+    return edge;
+  }
+  setDirected(flag) {
+    this.directed = !!flag;
+    this.lastAlgorithm = null;
+    _log(`Graph ist jetzt ${this.directed ? 'gerichtet' : 'ungerichtet'}`);
+  }
+  delete(key) {
+    if (!this.vertices.delete(key)) return false;
+    this.edges = this.edges.filter(e => e.u !== key && e.v !== key);
+    return true;
+  }
+  search(key) { const v = this.vertices.get(key); return v ? v.value : null; }
+  size() { return this.vertices.size; }
+  isEmpty() { return this.vertices.size === 0; }
+  vertexKeys() { return [...this.vertices.keys()].sort((a,b)=>a-b); }
+  neighbors(u, { undirected=false } = {}) {
+    const out = [];
+    for (const e of this.edges) {
+      if (e.u === u) out.push({ to:e.v, w:e.w, edge:e });
+      if ((undirected || !this.directed) && e.v === u) out.push({ to:e.u, w:e.w, edge:e });
+    }
+    return out.sort((a,b)=>a.to-b.to);
+  }
+  topologicalSort() {
+    const indeg = new Map(this.vertexKeys().map(k => [k, 0]));
+    for (const e of this.edges) indeg.set(e.v, (indeg.get(e.v) || 0) + 1);
+    const q = [...indeg.entries()].filter(([,d]) => d === 0).map(([k]) => k).sort((a,b)=>a-b);
+    const order = [];
+    _log(`Initialisiere indeg[v]; Queue = [${q.join(', ')}]`);
+    while (q.length) {
+      const u = q.shift();
+      order.push(u);
+      _log(`entnehme ${u}; fuege ${u} zur topologischen Ordnung hinzu`);
+      for (const { to:v } of this.neighbors(u)) {
+        indeg.set(v, indeg.get(v) - 1);
+        _log(`dekrementiere indeg[${v}] -> ${indeg.get(v)}`);
+        if (indeg.get(v) === 0) { q.push(v); q.sort((a,b)=>a-b); _log(`${v} hat indeg 0 -> Queue`); }
+      }
+    }
+    this.lastAlgorithm = { type:'topological', vertices:order, edges:[] };
+    return { order, hasCycle:order.length !== this.vertices.size };
+  }
+  dijkstra(source) {
+    if (!this.vertices.has(source)) return null;
+    const dist = new Map(this.vertexKeys().map(k => [k, Infinity]));
+    const prev = new Map();
+    const done = new Set();
+    dist.set(source, 0);
+    _log(`Initialize-Single-Source: d[${source}] = 0, alle anderen Infinity`);
+    while (done.size < this.vertices.size) {
+      let u = null, best = Infinity;
+      for (const [k, d] of dist) if (!done.has(k) && d < best) { u = k; best = d; }
+      if (u == null) break;
+      done.add(u);
+      _log(`Extract-Min: ${u} mit d=${best}`);
+      for (const { to:v, w, edge } of this.neighbors(u)) {
+        if (dist.get(v) > dist.get(u) + w) {
+          dist.set(v, dist.get(u) + w); prev.set(v, u);
+          _log(`Relax(${u}, ${v}): d[${v}] <- ${dist.get(v)} via Gewicht ${w}`);
+          edge._alg = true;
+        }
+      }
+    }
+    const treeEdges = [...prev.entries()].map(([v,u]) => ({ u, v }));
+    this.lastAlgorithm = { type:'dijkstra', source, vertices:[...done], edges:treeEdges, dist:Object.fromEntries(dist) };
+    return { dist, prev };
+  }
+  prim(source=this.vertexKeys()[0]) {
+    if (!this.vertices.has(source)) return null;
+    const inTree = new Set([source]);
+    const mst = [];
+    _log(`Prim: Start bei ${source}; S = {${source}}`);
+    while (inTree.size < this.vertices.size) {
+      let best = null;
+      for (const u of inTree) for (const n of this.neighbors(u, { undirected:true })) {
+        if (inTree.has(n.to)) continue;
+        if (!best || n.w < best.w) best = { u, v:n.to, w:n.w };
+      }
+      if (!best) break;
+      mst.push(best); inTree.add(best.v);
+      _log(`waehle leichteste Schnittkante (${best.u}, ${best.v}) mit w=${best.w}`);
+    }
+    this.lastAlgorithm = { type:'prim', source, vertices:[...inTree], edges:mst };
+    return mst;
+  }
+  kruskal() {
+    const uf = new UnionFind();
+    for (const v of this.vertexKeys()) uf.makeSet(v, 'v' + v);
+    const sorted = [...this.edges].sort((a,b)=>a.w-b.w || a.u-b.u || a.v-b.v);
+    const mst = [];
+    _log('Kruskal: sortiere Kanten nach Gewicht und initialisiere Make-Set fuer alle Knoten');
+    for (const e of sorted) {
+      const ru = uf.findSet(e.u), rv = uf.findSet(e.v);
+      _log(`pruefe (${e.u}, ${e.v}) w=${e.w}: FindSet=${ru}/${rv}`);
+      if (ru !== rv) { mst.push(e); uf.union(e.u, e.v); _log(`nehme Kante (${e.u}, ${e.v}) in MST auf`); }
+      else _log(`verwerfe (${e.u}, ${e.v}) wegen Zyklus`);
+    }
+    this.lastAlgorithm = { type:'kruskal', vertices:this.vertexKeys(), edges:mst };
+    return mst;
+  }
+  toJSON() {
+    return { type:'Graph', directed:this.directed, nodes:this.vertexKeys().map(k => ({ k, v:this.search(k) })), edges:this.edges };
+  }
+  static fromJSON(d) {
+    const g = new GraphStructure({ directed:!!d.directed });
+    for (const { k, v } of (d.nodes || [])) g.addVertex(Number(k), v);
+    for (const e of (d.edges || [])) g.addEdge(Number(e.u), Number(e.v), Number(e.w) || 1);
+    return g;
+  }
+}
+
 const PSEUDOCODE = {
   BSTree: {
     insert: {
@@ -2200,6 +2384,101 @@ PSEUDOCODE.MaxFibHeap = {
 };
 PSEUDOCODE.HashTable = EXTRA_PSEUDOCODE.HashTable;
 PSEUDOCODE.UnionFind = EXTRA_PSEUDOCODE.UnionFind;
+PSEUDOCODE.Graph = {
+  addEdge: {
+    title: 'Graph AddEdge',
+    code: ['AddEdge(G, u, v, w):', '  V = V union {u, v}', '  E = E union {(u, v, w)}'],
+    lineMap: [{ re:/AddVertex/, lines:[1] }, { re:/AddEdge/, lines:[2] }]
+  },
+  topological: {
+    title: 'Topological-Sort',
+    code: [
+      'Topological-Sort(G):',
+      '  berechne indeg[v] fuer alle v',
+      '  Q = alle Knoten mit indeg 0',
+      '  while Q nicht leer:',
+      '    u = Dequeue(Q)',
+      '    Ausgabe u',
+      '    for v in Adj[u]:',
+      '      indeg[v] = indeg[v] - 1',
+      '      if indeg[v] = 0: Enqueue(Q, v)',
+    ],
+    lineMap: [
+      { re:/Initialisiere indeg/, lines:[1,2] },
+      { re:/entnehme/, lines:[3,4,5] },
+      { re:/dekrementiere/, lines:[6,7] },
+      { re:/Queue/, lines:[8] },
+    ]
+  },
+  dijkstra: {
+    title: 'Dijkstra',
+    code: [
+      'Dijkstra(G, s):',
+      '  Initialize-Single-Source(G, s)',
+      '  S = empty set',
+      '  Q = V[G]',
+      '  while Q nicht leer:',
+      '    u = Extract-Min(Q)',
+      '    S = S union {u}',
+      '    for v in Adj[u]:',
+      '      Relax(u, v, w)',
+    ],
+    lineMap: [
+      { re:/Initialize-Single-Source/, lines:[1,2,3] },
+      { re:/Extract-Min/, lines:[4,5,6] },
+      { re:/Relax/, lines:[7,8] },
+    ]
+  },
+  prim: {
+    title: 'Prim',
+    code: [
+      'Prim(G, r):',
+      '  S = {r}',
+      '  T = empty set',
+      '  while S != V:',
+      '    waehle leichteste Schnittkante (u, v)',
+      '    T = T union {(u, v)}',
+      '    S = S union {v}',
+    ],
+    lineMap: [
+      { re:/Start/, lines:[1,2] },
+      { re:/Schnittkante/, lines:[3,4,5,6] },
+    ]
+  },
+  kruskal: {
+    title: 'Kruskal',
+    code: [
+      'Kruskal(G):',
+      '  for v in V: Make-Set(v)',
+      '  sortiere E nach Gewicht',
+      '  for (u, v) in E:',
+      '    if FindSet(u) != FindSet(v):',
+      '      T = T union {(u, v)}',
+      '      Union(u, v)',
+    ],
+    lineMap: [
+      { re:/Make-Set|sortiere/, lines:[1,2] },
+      { re:/pruefe/, lines:[3,4] },
+      { re:/nehme Kante/, lines:[5,6] },
+      { re:/verwerfe/, lines:[4] },
+    ]
+  },
+};
+PSEUDOCODE.MinHeap.selection = PSEUDOCODE.MaxHeap.selection = {
+  title: 'Selection / k-tes Element',
+  code: [
+    'Selection(A, k):',
+    '  baue Heap aus A',
+    '  repeat k times:',
+    '    x = Extract-Min/Max(H)',
+    '  return x',
+  ],
+  lineMap: [
+    { re:/Build|baue Heap/, lines:[1] },
+    { re:/Extract|Rang/, lines:[2,3] },
+    { re:/return|Ergebnis/, lines:[4] },
+  ]
+};
 
 // ══════════════════════════════════════════════════════════════
 //  PSEUDO PANEL – ENGINE
@@ -2371,6 +2650,26 @@ function _fibMemoryHTML() {
       <tbody>${rows.join('')}</tbody></table></div>`;
 }
 
+function _graphMemoryHTML() {
+  const verts = structure.vertexKeys();
+  const cells = verts.map(k => ({ key:k, active:highlighted.has(k), note:'V' }));
+  const edgeRows = structure.edges.map((e, i) => {
+    const active = highlighted.has(`e:${e.u}:${e.v}`) ? ' class="active"' : '';
+    return `<tr${active}><td>E[${i}]</td><td>${e.u}</td><td>${e.v}</td><td>${e.w}</td></tr>`;
+  }).join('');
+  const adjRows = verts.map(k => {
+    const adj = structure.neighbors(k).map(n => `${n.to}(w=${n.w})`).join(', ') || 'NIL';
+    const dist = structure.lastAlgorithm?.dist?.[k];
+    return `<tr><td>Adj[${k}]</td><td>${_escH(adj)}</td><td>${dist == null ? '' : dist}</td></tr>`;
+  }).join('');
+  return `
+    <div class="memory-section"><h4>Vertex-Array V</h4><div class="memory-array">${_arrayCells(cells, 'V')}</div></div>
+    <div class="memory-section"><h4>Edge-Array</h4><table class="memory-table">
+      <thead><tr><th>addr</th><th>u</th><th>v</th><th>w</th></tr></thead><tbody>${edgeRows}</tbody></table></div>
+    <div class="memory-section"><h4>Adjazenzlisten</h4><table class="memory-table">
+      <thead><tr><th>slot</th><th>neighbors</th><th>d</th></tr></thead><tbody>${adjRows}</tbody></table></div>`;
+}
+
 function _refreshMemoryViewer() {
   const panel = document.getElementById('memoryPanel');
   const el = document.getElementById('memoryLines');
@@ -2382,6 +2681,7 @@ function _refreshMemoryViewer() {
   if (structure instanceof HashTable) { el.innerHTML = _hashMemoryHTML(); return; }
   if (structure instanceof BinomialHeap) { el.innerHTML = _binomialMemoryHTML(); return; }
   if (structure instanceof FibHeap) { el.innerHTML = _fibMemoryHTML(); return; }
+  if (structure instanceof GraphStructure) { el.innerHTML = _graphMemoryHTML(); return; }
   if (!isSearchTreeStructure(structure)) { el.innerHTML = '<div class="pline log-hint">Fuer diese Struktur ist noch kein Speicherbild definiert.</div>'; return; }
 
   const records = _treeMemoryRecords();
@@ -2489,6 +2789,8 @@ let highlighted = new Set();  // highlighted node IDs
 let nodeSchema  = [];         // [{name, type}] – custom tags per node
 
 let _algoRunning = false;
+let _graphEdgeMode = false;
+let _graphEdgeFrom = null;
 
 // Viewport
 let zoom = 1.0, panX = 0, panY = 0;
@@ -2515,6 +2817,7 @@ function computeLayout() {
   if (!structure) return { nodes:[], edges:[], nilNodes:[] };
   if (structType === 'HashTable') return layoutHashTable(W);
   if (structType === 'UnionFind') return layoutUnionFind(W);
+  if (structType === 'Graph') return layoutGraph(W);
   if (structure.isEmpty()) return { nodes:[], edges:[], nilNodes:[] };
   if (structType === 'RBTree' || structType === 'BSTree')                    return layoutRBTree(W);
   if (structType === 'BinomialHeap' || structType === 'MaxBinomialHeap')    return layoutBinomialHeap(W);
@@ -2669,6 +2972,30 @@ function layoutUnionFind(W) {
       x0 += row.widths[i] + GAP;
     }
     y += row.height * LH + Math.max(36, LH * 0.45);
+  }
+  return { nodes, edges, nilNodes:[] };
+}
+
+function layoutGraph(W) {
+  const nodes = [], edges = [];
+  const keys = structure.vertexKeys();
+  if (!keys.length) return { nodes, edges, nilNodes:[] };
+  const cx = W / 2;
+  const cy = _startY() + Math.max(120, Math.min(260, keys.length * 20));
+  const rad = Math.max(120, Math.min(310, 58 + keys.length * 24));
+  keys.forEach((k, i) => {
+    const a = -Math.PI / 2 + i * Math.PI * 2 / keys.length;
+    nodes.push({
+      id:k, key:k, value:structure.search(k), x:cx + Math.cos(a) * rad, y:cy + Math.sin(a) * rad,
+      isRed:false, isMin:structure.lastAlgorithm?.vertices?.includes(k)
+    });
+  });
+  const pos = new Map(nodes.map(n => [n.id, n]));
+  for (const e of structure.edges) {
+    const u = pos.get(e.u), v = pos.get(e.v);
+    if (!u || !v) continue;
+    const alg = structure.lastAlgorithm?.edges?.some(a => a.u === e.u && a.v === e.v || (!structure.directed && a.u === e.v && a.v === e.u));
+    edges.push({ fromId:e.u, toId:e.v, fromX:u.x, fromY:u.y, toX:v.x, toY:v.y, directed:structure.directed, weight:e.w, alg });
   }
   return { nodes, edges, nilNodes:[] };
 }
@@ -3214,6 +3541,8 @@ function draw() {
   };
   for (const e of layout.edges) {
     const fn=nodeMap.get(e.fromId), tn=nodeMap.get(e.toId); if(!fn||!tn) continue;
+    ctx.strokeStyle = e.alg ? (dm ? '#fbbf24' : '#d97706') : C.edge;
+    ctx.lineWidth = e.alg ? 4 : 2.5;
     if (e.self) {
       const x = fn.x + wx(e.fromId), y = fn.y + wy(e.fromId);
       const r = _eHH + 12;
@@ -3231,8 +3560,27 @@ function draw() {
       x1 = fn.x + wx(e.fromId); y1 = fn.y + wy(e.fromId) + _eHH;
       x2 = tn.x + wx(e.toId);   y2 = tn.y + wy(e.toId)   - _eHH;
     }
+    if (e.weight != null) {
+      const cx1 = fn.x + wx(e.fromId), cy1 = fn.y + wy(e.fromId);
+      const cx2 = tn.x + wx(e.toId), cy2 = tn.y + wy(e.toId);
+      const ang = Math.atan2(cy2 - cy1, cx2 - cx1);
+      const pad = settings.tableView ? Math.max(_eHW, _eHH) : RADIUS + 4;
+      x1 = cx1 + Math.cos(ang) * pad;
+      y1 = cy1 + Math.sin(ang) * pad;
+      x2 = cx2 - Math.cos(ang) * pad;
+      y2 = cy2 - Math.sin(ang) * pad;
+    }
     ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
-    if (e.directed) drawArrowHead(x2, y2, Math.atan2(y2 - y1, x2 - x1), C.edge);
+    if (e.directed) drawArrowHead(x2, y2, Math.atan2(y2 - y1, x2 - x1), ctx.strokeStyle);
+    if (e.weight != null) {
+      const mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
+      ctx.fillStyle = dm ? '#0b0d10' : '#f0f4f8';
+      roundRect(ctx, mx - 14, my - 10, 28, 20, 5); ctx.fill();
+      ctx.fillStyle = e.alg ? (dm ? '#fbbf24' : '#b45309') : C.emptyText;
+      ctx.font = 'bold 10px "Segoe UI",system-ui,sans-serif';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(String(e.weight), mx, my);
+    }
   }
 
   if (layout.hashMeta) _drawHashDiagram(ctx, layout.hashMeta, C, drawArrowHead);
@@ -3425,6 +3773,66 @@ function nodeAt(sx, sy) {
   return null;
 }
 
+function _nextGraphKey() {
+  if (!(structure instanceof GraphStructure)) return 1;
+  let k = 1;
+  const used = new Set(structure.vertexKeys());
+  while (used.has(k)) k++;
+  return k;
+}
+
+function _promptGraphVertex(defaultKey=_nextGraphKey()) {
+  if (!(structure instanceof GraphStructure)) return;
+  showDialog('Graph Vertex', `
+    <div class="dialog-field"><label>Schluessel / Key</label><input type="number" id="_clkVertexKey" step="1" value="${defaultKey}"></div>
+    <div class="dialog-field"><label>Value</label><input type="text" id="_clkVertexValue" value="v${defaultKey}"></div>`, () => {
+    const k = parseInt(document.getElementById('_clkVertexKey').value);
+    if (Number.isNaN(k)) return;
+    const v = document.getElementById('_clkVertexValue').value || ('v' + k);
+    _startLog(`${structType} - AddVertex(${k})`, 'addEdge');
+    structure.addVertex(k, v);
+    _endLog();
+    highlighted.clear(); highlighted.add(k);
+    _refreshMemoryViewer();
+    setStatus(`Vertex <b>${k}</b> erstellt. ${_graphEdgeMode ? 'Jetzt zwei Knoten fuer eine Kante anklicken.' : 'Kantenmodus im GRAPH-Menue aktivieren.'}`);
+  });
+  setTimeout(()=>document.getElementById('_clkVertexKey')?.focus(),50);
+}
+
+function _promptGraphEdge(u, v) {
+  if (!(structure instanceof GraphStructure)) return;
+  showDialog(structure.directed ? `Kante ${u} -> ${v}` : `Kante ${u} - ${v}`, `
+    <div class="dialog-field"><label>Gewicht</label><input type="number" id="_clkEdgeWeight" step="1" value="1"></div>`, () => {
+    const w = parseInt(document.getElementById('_clkEdgeWeight').value);
+    _startLog(`${structType} - AddEdge(${u}, ${v})`, 'addEdge');
+    structure.addEdge(u, v, Number.isNaN(w) ? 1 : w);
+    _endLog();
+    highlighted.clear(); highlighted.add(u); highlighted.add(v); highlighted.add(`e:${u}:${v}`);
+    _graphEdgeFrom = null;
+    _refreshMemoryViewer();
+    setStatus(`Kante <b>${u}${structure.directed ? ' -> ' : ' - '}${v}</b> mit Gewicht <b>${Number.isNaN(w) ? 1 : w}</b> erstellt.`);
+  });
+  setTimeout(()=>document.getElementById('_clkEdgeWeight')?.focus(),50);
+}
+
+function _handleGraphClick(n) {
+  if (!(structure instanceof GraphStructure)) return false;
+  if (!n) { _promptGraphVertex(); return true; }
+  if (!_graphEdgeMode) return false;
+  if (_graphEdgeFrom == null) {
+    _graphEdgeFrom = n.key;
+    highlighted.clear(); highlighted.add(n.key);
+    setStatus(`Startknoten <b>${n.key}</b> gewaehlt. Jetzt Zielknoten anklicken.`);
+    return true;
+  }
+  if (_graphEdgeFrom === n.key) {
+    setStatus('Start und Ziel sind gleich; waehle einen anderen Zielknoten.');
+    return true;
+  }
+  _promptGraphEdge(_graphEdgeFrom, n.key);
+  return true;
+}
+
 // ══════════════════════════════════════════════════════════════
 //  MOUSE  –  drag / click / wobble
 // ══════════════════════════════════════════════════════════════
@@ -3438,7 +3846,11 @@ canvas.addEventListener('mousedown', e => {
   }
   if (e.button!==0) return;
   const r=canvas.getBoundingClientRect(), mx=e.clientX-r.left, my=e.clientY-r.top;
-  const n=nodeAt(mx,my); if(!n) return;
+  const n=nodeAt(mx,my);
+  if (!n) {
+    if (structure instanceof GraphStructure) _handleGraphClick(null);
+    return;
+  }
   const s=wobble.get(n.id)||[0,0,0,0];
   wobble.set(n.id,s); s[2]=0; s[3]=0;
   drag={id:n.id, startX:mx, startY:my, initOX:s[0], initOY:s[1], moved:false};
@@ -3512,6 +3924,10 @@ canvas.addEventListener('mouseup', e => {
   } else {
     wobble.delete(drag.id);
     const id=drag.id;
+    if (structure instanceof GraphStructure && _handleGraphClick({ key:id })) {
+      drag = null;
+      return;
+    }
     setTimeout(()=>openValueEditor(id),10);
   }
   drag=null;
@@ -3617,12 +4033,15 @@ function openValueEditor(nodeId) {
   } else if (structure instanceof UnionFind) {
     const item = structure.items.get(nodeId); if (!item) return;
     currentKey = item.key; currentVal = item.value || '';
+  } else if (structure instanceof GraphStructure) {
+    const item = structure.vertices.get(nodeId); if (!item) return;
+    currentKey = item.key; currentVal = item.value || '';
   } else {
     const d = structure.data[nodeId]; if (!d) return;
     currentKey = d.key; currentVal = d.value || '';
   }
   highlighted.clear();
-  highlighted.add(isSearchTreeStructure(structure) || structure instanceof UnionFind ? currentKey : nodeId);
+  highlighted.add(isSearchTreeStructure(structure) || structure instanceof UnionFind || structure instanceof GraphStructure ? currentKey : nodeId);
   _refreshMemoryViewer();
 
   const _save = v => {
@@ -3630,6 +4049,7 @@ function openValueEditor(nodeId) {
     else if (structure instanceof BinomialHeap || structure instanceof FibHeap)
                                                  structure.updateValue(currentKey, v);
     else if (structure instanceof UnionFind)      structure.makeSet(currentKey, v);
+    else if (structure instanceof GraphStructure) structure.addVertex(currentKey, v);
     else                                         structure.data[nodeId].value = v;
     _refreshMemoryViewer();
     const label = _dataMode==='hist' ? _fmtHistKey(currentKey) : currentKey;
@@ -3799,12 +4219,25 @@ function buildOpsMenu() {
   const isFib      = structType === 'FibHeap' || structType === 'MaxFibHeap';
   const isHash     = structType === 'HashTable';
   const isUF       = structType === 'UnionFind';
+  const isGraph    = structType === 'Graph';
   const isMin      = structType === 'MinHeap';
   const isMaxBinom = structType === 'MaxBinomialHeap';
   const isMaxFib   = structType === 'MaxFibHeap';
-  btn.textContent = isTree || isHash ? 'DICTIONARY' : isUF ? 'UNION-FIND' : 'HEAP';
+  btn.textContent = isTree || isHash ? 'DICTIONARY' : isUF ? 'UNION-FIND' : isGraph ? 'GRAPH' : 'HEAP';
 
-  const items = isHash ? [
+  const items = isGraph ? [
+    ['Add Vertex',       cmdGraphVertex],
+    ['Add Edge',         cmdGraphEdge],
+    [structure?.directed ? 'Als ungerichtet' : 'Als gerichtet', cmdGraphToggleDirected],
+    [_graphEdgeMode ? 'Kantenmodus: AN' : 'Kantenmodus: AUS', cmdGraphEdgeMode],
+    ['🔍  Search',       cmdSearch],
+    ['❌  Delete Vertex', cmdDelete],
+    null,
+    ['Topological Sort', cmdTopologicalSort],
+    ['Prim',             cmdPrim],
+    ['Kruskal',          cmdKruskal],
+    ['Dijkstra',         cmdDijkstra],
+  ] : isHash ? [
     ['➕  Insert',      cmdInsert],
     ['➕  Multi Insert', cmdMultiInsert],
     ['ƒ  Hashfunktion', cmdHashConfig],
@@ -3975,6 +4408,194 @@ async function cmdHeapSort() {
   }
 }
 
+function cmdSelection() {
+  if (!need()) return;
+  if (!(structure instanceof MinHeap) || structure instanceof BinomialHeap || structure instanceof FibHeap) {
+    setStatus('⚠ Selection ist hier fuer binaere Heaps umgesetzt. Waehle MinHeap oder MaxHeap.');
+    return;
+  }
+  showDialog('Selection', `
+    <div class="dialog-field">
+      <label>Rang k (1-basiert)</label>
+      <input type="number" id="_selK" min="1" step="1" value="1">
+    </div>`, () => {
+    const k = parseInt(document.getElementById('_selK').value);
+    if (!Number.isInteger(k) || k < 1 || k > structure.data.length) return;
+    const tmp = structure instanceof MaxHeap ? MaxHeap.fromJSON(structure.toJSON()) : MinHeap.fromJSON(structure.toJSON());
+    let out = null;
+    highlighted.clear();
+    _startLog(`${structType} - Selection(${k})`, 'selection');
+    _log(`baue Heap aus aktuellem Array [${structure.data.map(d => d.key).join(', ')}]`);
+    for (let i = 1; i <= k; i++) {
+      out = tmp.extractTop();
+      _log(`Rang ${i}: Extract -> ${out ? out.key : 'NIL'}`);
+    }
+    _log(`return ${out ? out.key : 'NIL'}`);
+    _endLog();
+    const idx = structure.data.findIndex(d => out && d.key === out.key);
+    if (idx >= 0) highlighted.add(idx);
+    setStatus(out ? `Selection(${k}) = <b>${out.key}</b>` : 'Selection ohne Ergebnis');
+  });
+  setTimeout(()=>document.getElementById('_selK')?.focus(),50);
+}
+
+function cmdGraphVertex() {
+  if (!need() || !(structure instanceof GraphStructure)) return;
+  showDialog('Add Vertex', `
+    <div class="dialog-field"><label>Vertex</label><input type="number" id="_gv" step="1"></div>
+    <div class="dialog-field"><label>Value</label><input type="text" id="_gval" placeholder="v"></div>`, () => {
+    const v = parseInt(document.getElementById('_gv').value);
+    if (Number.isNaN(v)) return;
+    highlighted.clear();
+    _startLog(`${structType} - AddVertex(${v})`, 'addEdge');
+    structure.addVertex(v, document.getElementById('_gval').value || ('v' + v));
+    _endLog();
+    highlighted.add(v);
+    setStatus(`✓ Vertex ${v}`);
+  });
+  setTimeout(()=>document.getElementById('_gv')?.focus(),50);
+}
+
+function cmdGraphEdge() {
+  if (!need() || !(structure instanceof GraphStructure)) return;
+  showDialog('Add Edge', `
+    <div class="dialog-field"><label>u</label><input type="number" id="_geu" step="1"></div>
+    <div class="dialog-field"><label>v</label><input type="number" id="_gev" step="1"></div>
+    <div class="dialog-field"><label>Gewicht w</label><input type="number" id="_gew" step="1" value="1"></div>`, () => {
+    const u = parseInt(document.getElementById('_geu').value);
+    const v = parseInt(document.getElementById('_gev').value);
+    const w = parseInt(document.getElementById('_gew').value);
+    if (Number.isNaN(u) || Number.isNaN(v)) return;
+    highlighted.clear();
+    _startLog(`${structType} - AddEdge(${u}, ${v})`, 'addEdge');
+    structure.addEdge(u, v, Number.isNaN(w) ? 1 : w);
+    structure.lastAlgorithm = null;
+    _endLog();
+    highlighted.add(u); highlighted.add(v); highlighted.add(`e:${u}:${v}`);
+    setStatus(`✓ Edge (${u}, ${v})`);
+  });
+  setTimeout(()=>document.getElementById('_geu')?.focus(),50);
+}
+
+function cmdGraphToggleDirected() {
+  if (!need() || !(structure instanceof GraphStructure)) return;
+  _startLog(`${structType} - Graph-Typ`, 'addEdge');
+  structure.setDirected(!structure.directed);
+  _endLog();
+  buildOpsMenu();
+  setStatus(`Graph ist jetzt <b>${structure.directed ? 'gerichtet' : 'ungerichtet'}</b>.`);
+}
+
+function cmdGraphEdgeMode() {
+  if (!need() || !(structure instanceof GraphStructure)) return;
+  _graphEdgeMode = !_graphEdgeMode;
+  _graphEdgeFrom = null;
+  highlighted.clear();
+  buildOpsMenu();
+  setStatus(_graphEdgeMode
+    ? 'Kantenmodus: erst Startknoten, dann Zielknoten anklicken. Freie Flaeche erzeugt einen neuen Knoten.'
+    : 'Kantenmodus aus.');
+}
+
+function _loadGraphPreset(kind='weighted') {
+  highlighted.clear(); wobble.clear();
+  _graphEdgeMode = false; _graphEdgeFrom = null;
+  structure = new GraphStructure({ directed: kind === 'dag' });
+  structType = 'Graph';
+  const sample = kind === 'dag' ? SAMPLE_DAG : SAMPLE_GRAPH;
+  sample.nodes.forEach(({ k, v }) => structure.addVertex(k, v));
+  sample.edges.forEach(e => structure.addEdge(e.u, e.v, e.w));
+  buildOpsMenu();
+  openMemoryPanel();
+  setStatus(kind === 'dag'
+    ? 'DAG-Preset geladen: gerichtete Kanten sind sichtbar. ALGORITHMEN > Topological Sort.'
+    : 'Gewichteter Graph geladen: geeignet fuer Prim, Kruskal und Dijkstra.');
+}
+
+function _newGraphBlank(directed=false) {
+  highlighted.clear(); wobble.clear();
+  _graphEdgeMode = true; _graphEdgeFrom = null;
+  structure = new GraphStructure({ directed });
+  structType = 'Graph';
+  buildOpsMenu();
+  setStatus(`${directed ? 'Gerichteter' : 'Ungerichteter'} Graph erstellt. Klicke freie Flaeche fuer Knoten, dann zwei Knoten fuer eine Kante.`);
+}
+
+function _algorithmSetupHint(kind) {
+  const isTopo = kind === 'topological';
+  const title = isTopo ? 'Topological Sort braucht einen gerichteten Graphen.'
+              : kind === 'dijkstra' ? 'Dijkstra braucht einen gewichteten Graphen.'
+              : 'Prim/Kruskal brauchen einen gewichteten ungerichteten Graphen.';
+  const preset = isTopo
+    ? `<button class="btn-ok" style="padding:5px 10px;margin-left:8px" onclick="_loadGraphPreset('dag')">DAG-Preset laden</button>`
+    : `<button class="btn-ok" style="padding:5px 10px;margin-left:8px" onclick="_loadGraphPreset('weighted')">Graph-Preset laden</button>`;
+  const blank = isTopo
+    ? `<button class="btn-cancel" style="padding:5px 10px;margin-left:6px" onclick="_newGraphBlank(true)">Gerichteten Graph bauen</button>`
+    : `<button class="btn-cancel" style="padding:5px 10px;margin-left:6px" onclick="_newGraphBlank(false)">Ungerichteten Graph bauen</button>`;
+  setStatus(`⚠ ${title} ${preset}${blank}`);
+}
+
+function _needGraph(kind='graph') {
+  if (!need()) return false;
+  if (!(structure instanceof GraphStructure)) { _algorithmSetupHint(kind); return false; }
+  if (kind === 'topological' && !structure.directed) { _algorithmSetupHint(kind); return false; }
+  if ((kind === 'prim' || kind === 'kruskal') && structure.directed) { _algorithmSetupHint(kind); return false; }
+  return true;
+}
+
+function _highlightGraphResult(result) {
+  highlighted.clear();
+  const alg = structure.lastAlgorithm;
+  (alg?.vertices || []).forEach(v => highlighted.add(v));
+  (alg?.edges || []).forEach(e => highlighted.add(`e:${e.u}:${e.v}`));
+  _refreshMemoryViewer();
+}
+
+function cmdTopologicalSort() {
+  if (!_needGraph('topological')) return;
+  highlighted.clear();
+  _startLog(`${structType} - Topological Sort`, 'topological');
+  const r = structure.topologicalSort();
+  _endLog();
+  _highlightGraphResult(r);
+  setStatus(r.hasCycle ? `⚠ Zyklus erkannt; Teilordnung: ${r.order.join(', ')}` : `Topological Sort: <b>${r.order.join(', ')}</b>`);
+}
+
+function cmdPrim() {
+  if (!_needGraph('prim')) return;
+  askKey('Prim Startknoten', s => {
+    _startLog(`${structType} - Prim(${s})`, 'prim');
+    const mst = structure.prim(s);
+    _endLog();
+    _highlightGraphResult(mst);
+    const weight = (mst || []).reduce((sum,e)=>sum+e.w,0);
+    setStatus(mst ? `Prim MST Gewicht: <b>${weight}</b>` : 'Startknoten fehlt');
+  });
+}
+
+function cmdKruskal() {
+  if (!_needGraph('kruskal')) return;
+  _startLog(`${structType} - Kruskal`, 'kruskal');
+  const mst = structure.kruskal();
+  _endLog();
+  _highlightGraphResult(mst);
+  const weight = mst.reduce((sum,e)=>sum+e.w,0);
+  setStatus(`Kruskal MST Gewicht: <b>${weight}</b>`);
+}
+
+function cmdDijkstra() {
+  if (!_needGraph('dijkstra')) return;
+  askKey('Dijkstra Startknoten', s => {
+    _startLog(`${structType} - Dijkstra(${s})`, 'dijkstra');
+    const r = structure.dijkstra(s);
+    _endLog();
+    _highlightGraphResult(r);
+    if (!r) { setStatus('Startknoten fehlt'); return; }
+    const dist = [...r.dist.entries()].map(([k,d]) => `${k}:${d === Infinity ? '∞' : d}`).join('  ');
+    setStatus(`Dijkstra d[]: <b>${dist}</b>`);
+  });
+}
+
 function cmdInsert() {
   if (!need()) return;
   const extraFields = nodeSchema.map((tag, i) => {
@@ -4133,6 +4754,7 @@ function cmdSearch() {
       if      (isSearchTreeStructure(structure))  id = k;
       else if (structure instanceof HashTable)    id = structure.slotIdForKey(k);
       else if (structure instanceof UnionFind)    id = k;
+      else if (structure instanceof GraphStructure) id = k;
       else if (structure instanceof BinomialHeap || structure instanceof FibHeap)
                                                    id = layout.nodes.find(n => n.key === k)?.id ?? -1;
       else                                         id = structure.data.findIndex(d => d.key === k);
@@ -4410,6 +5032,7 @@ function cmdNew() {
     if (heapType) heapType.value = (t === 'BinomialHeap' || t === 'FibHeap') ? 'min' : 'max';
     document.querySelectorAll('.hash-config-row').forEach(row => row.style.display = (t === 'HashTable') ? '' : 'none');
     document.querySelectorAll('.uf-config-row').forEach(row => row.style.display = (t === 'UnionFind') ? '' : 'none');
+    document.querySelectorAll('.graph-config-row').forEach(row => row.style.display = (t === 'Graph') ? '' : 'none');
   };
 
   showDialog('Neue Struktur', `
@@ -4437,7 +5060,17 @@ function cmdNew() {
         <div class="struct-tile" id="tile-UnionFind" onclick="_pickTile('UnionFind')">
           <div class="tile-icon">UF</div><div class="tile-name">UnionFind</div>
         </div>
+        <div class="struct-tile" id="tile-Graph" onclick="_pickTile('Graph')">
+          <div class="tile-icon">G</div><div class="tile-name">Graph</div>
+        </div>
       </div>
+    </div>
+    <div class="dialog-field graph-config-row" style="display:none">
+      <label>Graph-Typ</label>
+      <select id="_graphDirected">
+        <option value="off" selected>Ungerichtet / MST</option>
+        <option value="on">Gerichtet / Topological Sort</option>
+      </select>
     </div>
     <div class="dialog-field" id="_heapTypeRow" style="display:none">
       <label>Heap-Typ</label>
@@ -4489,6 +5122,8 @@ function cmdNew() {
           <option value="git">🔑  Git-Commit-Hashes (8) – empfohlen für Heap</option>
           <option value="prime">📐  Primzahlen (11) – empfohlen für Heap</option>
           <option value="hashcluster">Hash-Cluster (5) – empfohlen für HashTable</option>
+          <option value="graphmst">Gewichteter Graph – empfohlen für Prim/Kruskal/Dijkstra</option>
+          <option value="dag">DAG – empfohlen für Topological Sort</option>
         </optgroup>
       </select>
     </div>
@@ -4506,6 +5141,7 @@ function cmdNew() {
     const hashProbe= document.getElementById('_hashProbe')?.value || 'linear';
     const hashExpr = document.getElementById('_hashExpr')?.value.trim() || 'k % m';
     const ufCompression = (document.getElementById('_ufCompression')?.value || 'on') === 'on';
+    const graphDirected = (document.getElementById('_graphDirected')?.value || 'off') === 'on' || smp === 'dag';
     const balancedKeys = n => {
       const out = [];
       const add = (lo, hi) => {
@@ -4531,7 +5167,9 @@ function cmdNew() {
       smp==='hist' ? SAMPLE_HIST  :
       smp==='git'  ? SAMPLE_GIT   :
       smp==='prime'? SAMPLE_PRIME :
-      smp==='hashcluster' ? HASH_CLUSTER.map(k=>({k,v:'Value_'+k})) : [];
+      smp==='hashcluster' ? HASH_CLUSTER.map(k=>({k,v:'Value_'+k})) :
+      smp==='graphmst' ? SAMPLE_GRAPH.nodes :
+      smp==='dag' ? SAMPLE_DAG.nodes : [];
     _dataMode = smp==='hist' ? 'hist' : smp==='git' ? 'git' : 'default';
 
     if      (chosen === 'RBTree')       structType = 'RBTree';
@@ -4541,10 +5179,12 @@ function cmdNew() {
     else if (chosen === 'FibHeap')      structType = isMax ? 'MaxFibHeap' : 'FibHeap';
     else if (chosen === 'HashTable')    structType = 'HashTable';
     else if (chosen === 'UnionFind')    structType = 'UnionFind';
+    else if (chosen === 'Graph')        structType = 'Graph';
 
     highlighted.clear(); wobble.clear();
     if      (structType === 'HashTable')       structure = new HashTable({ mode:hashMode, m:hashM, probe:hashProbe, hashExpr });
     else if (structType === 'UnionFind')       structure = new UnionFind({ pathCompression: ufCompression });
+    else if (structType === 'Graph')           structure = new GraphStructure({ directed: graphDirected });
     else if (structType === 'BSTree')          structure = new BSTree();
     else if (structType === 'MinHeap')         structure = new MinHeap();
     else if (structType === 'MaxHeap')         structure = new MaxHeap();
@@ -4555,6 +5195,10 @@ function cmdNew() {
     else                                       structure = new RBTree();
 
     rawKeys.forEach(({k,v}) => structure.insert(k, v));
+    if (structType === 'Graph') {
+      const edges = smp === 'dag' ? SAMPLE_DAG.edges : smp === 'graphmst' ? SAMPLE_GRAPH.edges : [];
+      edges.forEach(e => structure.addEdge(e.u, e.v, e.w));
+    }
     buildOpsMenu();
     setStatus(`✓ Neuer ${structType} erstellt${rawKeys.length?' mit '+rawKeys.length+' Beispielknoten':''}`);
   });
@@ -4587,6 +5231,7 @@ function cmdLoad() {
         else if (structType === 'BSTree')           structure = BSTree.fromJSON(d);
         else if (structType === 'HashTable')        structure = HashTable.fromJSON(d);
         else if (structType === 'UnionFind')        structure = UnionFind.fromJSON(d);
+        else if (structType === 'Graph')            structure = GraphStructure.fromJSON(d);
         else if (structType === 'MinHeap')          structure = MinHeap.fromJSON(d);
         else if (structType === 'MaxHeap')          structure = MaxHeap.fromJSON(d);
         else if (structType === 'BinomialHeap')     structure = BinomialHeap.fromJSON(d);
@@ -4652,6 +5297,22 @@ const SAMPLE_PRIME = [
   {k:17,v:'Primzahl'},{k:19,v:'Primzahl'},{k:23,v:'Primzahl'},
   {k:29,v:'Primzahl'},{k:31,v:'Primzahl'},
 ];
+const SAMPLE_GRAPH = {
+  nodes: [1,2,3,4,5,6].map(k => ({ k, v:'v' + k })),
+  edges: [
+    {u:1,v:2,w:7},{u:1,v:3,w:9},{u:1,v:6,w:14},
+    {u:2,v:3,w:10},{u:2,v:4,w:15},{u:3,v:4,w:11},
+    {u:3,v:6,w:2},{u:4,v:5,w:6},{u:5,v:6,w:9},
+  ]
+};
+const SAMPLE_DAG = {
+  nodes: [1,2,3,4,5,6,7].map(k => ({ k, v:'v' + k })),
+  edges: [
+    {u:1,v:2,w:1},{u:1,v:3,w:1},{u:2,v:4,w:1},
+    {u:3,v:4,w:1},{u:3,v:5,w:1},{u:4,v:6,w:1},
+    {u:5,v:6,w:1},{u:6,v:7,w:1},
+  ]
+};
 
 // ── Data-mode helpers ─────────────────────────────────────────
 let _dataMode = 'default'; // 'default' | 'hist' | 'git'
@@ -4694,6 +5355,108 @@ function _md2html(md) {
 // ══════════════════════════════════════════════════════════════
 //  INIT
 // ══════════════════════════════════════════════════════════════
+function openCodePanel() {
+  document.getElementById('codePanel').classList.remove('hidden');
+  if (!document.getElementById('codeEditor').value.trim()) loadCodeTemplate();
+}
+
+function _closeCodePanel() {
+  document.getElementById('codePanel').classList.add('hidden');
+}
+
+function loadCodeTemplate() {
+  document.getElementById('codeEditor').value = [
+    '# Kommandos: insert k [value], delete k, search k, print expr, return expr',
+    '# Algorithmen: heapsort, selection k, addedge u v w, topo, prim s, kruskal, dijkstra s',
+    'print type',
+    'insert 42 demo',
+    'search 42',
+    'return size',
+  ].join('\n');
+}
+
+function _term(text) {
+  const t = document.getElementById('terminal');
+  t.textContent += text + '\n';
+  t.scrollTop = t.scrollHeight;
+}
+
+function _programValue(expr) {
+  expr = String(expr || '').trim();
+  if (expr === 'type') return structType;
+  if (expr === 'size') return structure?.size?.() ?? 0;
+  if (expr === 'keys') {
+    if (structure instanceof MinHeap) return '[' + structure.data.map(d => d.key).join(', ') + ']';
+    if (structure instanceof GraphStructure) return '[' + structure.vertexKeys().join(', ') + ']';
+    if (structure instanceof HashTable) return '[' + structure.entries().map(e => e.key).join(', ') + ']';
+    if (structure instanceof UnionFind) return '[' + [...structure.items.keys()].join(', ') + ']';
+    if (isSearchTreeStructure(structure)) return '[' + structure.inorder().join(', ') + ']';
+  }
+  if (/^-?\d+$/.test(expr)) return Number(expr);
+  return expr;
+}
+
+function runPseudoProgram() {
+  if (!need()) return;
+  const src = document.getElementById('codeEditor').value.split(/\r?\n/);
+  document.getElementById('terminal').textContent = '';
+  _term(`$ run (${structType})`);
+  for (let lineNo = 0; lineNo < src.length; lineNo++) {
+    const raw = src[lineNo].trim();
+    if (!raw || raw.startsWith('#') || raw.startsWith('//')) continue;
+    const parts = raw.split(/\s+/);
+    const cmd = parts[0].toLowerCase();
+    try {
+      if (cmd === 'print') {
+        _term(String(_programValue(raw.slice(parts[0].length))));
+      } else if (cmd === 'return') {
+        _term('return ' + String(_programValue(raw.slice(parts[0].length))));
+        break;
+      } else if (cmd === 'insert' || cmd === 'makeset') {
+        const k = Number(parts[1]); if (!Number.isFinite(k)) throw new Error('key fehlt');
+        _startLog(`Editor - ${cmd}(${k})`, cmd === 'makeset' ? 'makeSet' : 'insert');
+        if (cmd === 'makeset' && structure instanceof UnionFind) structure.makeSet(k, parts.slice(2).join(' ') || ('Value_' + k));
+        else structure.insert(k, parts.slice(2).join(' ') || ('Value_' + k));
+        _endLog(); highlighted.add(k); _term(`ok ${cmd} ${k}`);
+      } else if (cmd === 'delete') {
+        const k = Number(parts[1]); _startLog(`Editor - Delete(${k})`, 'delete');
+        _term(String(structure.delete(k))); _endLog();
+      } else if (cmd === 'search') {
+        const k = Number(parts[1]); _startLog(`Editor - Search(${k})`, 'search');
+        _term(String(structure.search(k))); _endLog(); highlighted.add(k);
+      } else if (cmd === 'union' && structure instanceof UnionFind) {
+        const a = Number(parts[1]), b = Number(parts[2]); _startLog(`Editor - Union(${a}, ${b})`, 'union');
+        _term(String(structure.union(a,b))); _endLog(); highlighted.add(a); highlighted.add(b);
+      } else if (cmd === 'addedge' && structure instanceof GraphStructure) {
+        const u = Number(parts[1]), v = Number(parts[2]), w = Number(parts[3] || 1);
+        _startLog(`Editor - AddEdge(${u}, ${v})`, 'addEdge'); structure.addEdge(u,v,w); _endLog();
+        highlighted.add(u); highlighted.add(v); highlighted.add(`e:${u}:${v}`); _term(`ok edge ${u}-${v} w=${w}`);
+      } else if (cmd === 'heapsort') {
+        cmdHeapSort(); _term('heapsort gestartet');
+      } else if (cmd === 'selection') {
+        _term('selection bitte ueber ALGORITHMEN > Selection mit Dialog ausfuehren');
+      } else if ((cmd === 'topo' || cmd === 'topological') && structure instanceof GraphStructure) {
+        _startLog('Editor - Topological Sort', 'topological'); const r = structure.topologicalSort(); _endLog(); _highlightGraphResult(r);
+        _term(r.order.join(', '));
+      } else if (cmd === 'prim' && structure instanceof GraphStructure) {
+        const s = Number(parts[1]); _startLog(`Editor - Prim(${s})`, 'prim'); const r = structure.prim(s); _endLog(); _highlightGraphResult(r);
+        _term('weight ' + (r || []).reduce((a,e)=>a+e.w,0));
+      } else if (cmd === 'kruskal' && structure instanceof GraphStructure) {
+        _startLog('Editor - Kruskal', 'kruskal'); const r = structure.kruskal(); _endLog(); _highlightGraphResult(r);
+        _term('weight ' + r.reduce((a,e)=>a+e.w,0));
+      } else if (cmd === 'dijkstra' && structure instanceof GraphStructure) {
+        const s = Number(parts[1]); _startLog(`Editor - Dijkstra(${s})`, 'dijkstra'); const r = structure.dijkstra(s); _endLog(); _highlightGraphResult(r);
+        _term(r ? [...r.dist.entries()].map(([k,d]) => `${k}:${d === Infinity ? 'inf' : d}`).join(' ') : 'source missing');
+      } else {
+        _term(`line ${lineNo + 1}: unbekannt oder fuer ${structType} nicht verfuegbar -> ${raw}`);
+      }
+    } catch (err) {
+      _term(`line ${lineNo + 1}: ${err.message}`);
+    }
+  }
+  _refreshMemoryViewer();
+}
+
 structure = new RBTree();
 [15,10,20,8,12,17,25,5,11,14,16,22,27].forEach(k=>structure.insert(k,'Value_'+k));
 buildOpsMenu();
@@ -4812,6 +5575,7 @@ canvas.addEventListener('touchend', e => {
 document.getElementById('pseudoStepBtn').addEventListener('click', _stepPseudo);
 document.getElementById('pseudoClose').addEventListener('click', _closePseudoPanel);
 document.getElementById('memoryClose').addEventListener('click', _closeMemoryPanel);
+document.getElementById('codeClose').addEventListener('click', _closeCodePanel);
 document.querySelectorAll('.pseudo-spd').forEach(btn => {
   btn.addEventListener('click', () => {
     _pseudoSpeed = btn.dataset.spd;
@@ -4861,6 +5625,29 @@ document.querySelectorAll('.pseudo-spd').forEach(btn => {
       panel.style.left = (ev.clientX - ox) + 'px';
       panel.style.top = (ev.clientY - oy) + 'px';
       panel.style.right = 'auto';
+    };
+    const onUp = () => {
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+    };
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+  });
+})();
+
+(function() {
+  const bar = document.getElementById('codeDragBar');
+  const panel = document.getElementById('codePanel');
+  let ox = 0, oy = 0;
+  bar.addEventListener('mousedown', e => {
+    if (e.target.closest('button')) return;
+    const r = panel.getBoundingClientRect();
+    ox = e.clientX - r.left; oy = e.clientY - r.top;
+    const onMove = ev => {
+      panel.style.left = (ev.clientX - ox) + 'px';
+      panel.style.top = (ev.clientY - oy) + 'px';
+      panel.style.right = 'auto';
+      panel.style.bottom = 'auto';
     };
     const onUp = () => {
       document.removeEventListener('mousemove', onMove);
