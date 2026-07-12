@@ -50,7 +50,7 @@
 
 html,
 body {
-    height: 100%
+    min-height: 100%;
 }
 
 body {
@@ -58,6 +58,10 @@ body {
     font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
     background: var(--bg);
     color: var(--text);
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    -webkit-text-size-adjust: 100%;
 }
 
 a {
@@ -909,6 +913,7 @@ footer {
     border-bottom: 1px solid rgba(125,211,252,.12);
     box-shadow: none;
     touch-action: none;
+    -webkit-user-select: none;
     user-select: none;
     cursor: grab;
 }
@@ -921,8 +926,8 @@ footer {
     position: absolute;
     left: 50%;
     top: 50%;
-    width: 2400px;
-    height: 1300px;
+    width: 2500px;
+    height: 1620px;
     transform: translate(-50%, -50%) scale(.72);
     transform-origin: center center;
 }
@@ -1297,8 +1302,9 @@ footer {
         align-items: start;
     }
     .knowledge-stage {
-        height: 720px;
-        min-height: 720px;
+        height: min(720px, 76vh);
+        min-height: 560px;
+        touch-action: pan-y pinch-zoom;
     }
     .search-core {
         width: min(320px, calc(100% - 24px));
@@ -1314,6 +1320,12 @@ footer {
     .knowledge-zoom-tools {
         right: 12px;
         bottom: 12px;
+    }
+}
+
+@media (hover: none) and (pointer: coarse) {
+    .knowledge-stage {
+        touch-action: pan-y pinch-zoom;
     }
 }
 

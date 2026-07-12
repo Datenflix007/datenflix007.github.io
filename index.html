@@ -510,6 +510,17 @@
                 edges.push({ key, from, to, weight });
             }
 
+            function findNodeByTitle(title) {
+                const needle = normalize(title);
+                return nodes.find((node) => normalize(node.title) === needle);
+            }
+
+            function addConceptEdge(fromTitle, toTitle, weight = 1.1) {
+                const from = findNodeByTitle(fromTitle);
+                const to = findNodeByTitle(toTitle);
+                if (from && to) addEdge(from.id, to.id, weight);
+            }
+
             function shouldSkipEdge(from, to) {
                 if (from.includes('lautstaerke') || to.includes('lautstaerke')) return true;
                 const a = nodes.find((node) => node.id === from);
@@ -959,15 +970,29 @@
 
             stage.addEventListener('pointerdown', (event) => {
                 if (event.button !== 0 || event.target.closest('.graph-node, .search-core, .knowledge-zoom-tools, .knowledge-filter-panel, a, input, button')) return;
-                drag = { id: event.pointerId, x: event.clientX, y: event.clientY, baseX: view.x, baseY: view.y };
-                stage.setPointerCapture(event.pointerId);
+                const pendingTouch = event.pointerType === 'touch' || window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+                drag = { id: event.pointerId, x: event.clientX, y: event.clientY, baseX: view.x, baseY: view.y, pendingTouch };
+                if (!pendingTouch) stage.setPointerCapture(event.pointerId);
             });
 
             stage.addEventListener('pointermove', (event) => {
                 if (!drag || drag.id !== event.pointerId) return;
+                const dx = event.clientX - drag.x;
+                const dy = event.clientY - drag.y;
+                if (drag.pendingTouch) {
+                    const absX = Math.abs(dx);
+                    const absY = Math.abs(dy);
+                    if (absY > Math.max(12, absX * 1.15)) {
+                        drag = null;
+                        return;
+                    }
+                    if (absX < 8 && absY < 8) return;
+                    drag.pendingTouch = false;
+                    stage.setPointerCapture(event.pointerId);
+                }
                 setView({
-                    x: drag.baseX + event.clientX - drag.x,
-                    y: drag.baseY + event.clientY - drag.y,
+                    x: drag.baseX + dx,
+                    y: drag.baseY + dy,
                     scale: view.scale
                 });
             });
@@ -1084,22 +1109,74 @@
                         }
                     }));
 
-                    infopediaEntries.forEach((entry) => {
-                        entry.related.forEach((relatedId) => {
-                            const target = nodes.find((node) => node.id === `infopedia-${relatedId}`);
-                            if (target) addEdge(entry.id, target.id, 1.4);
-                        });
-                    });
+                    [
+                        ['Abstrakter Datentyp (ADT)', 'Dictionary', 1.25],
+                        ['Abstrakter Datentyp (ADT)', 'Array und Index-Speicherbild', 1.15],
+                        ['Abstrakter Datentyp (ADT)', 'Invariante', 1.0],
+                        ['Abstrakter Datentyp (ADT)', 'Asymptotische Laufzeit', 1.0],
+
+                        ['Asymptotische Laufzeit', 'Mastertheorem', 1.1],
+                        ['Mastertheorem', 'Mergesort', 1.0],
+                        ['Mastertheorem', 'Quicksort', 1.0],
+
+                        ['Sortierverfahren', 'Heapsort', 1.2],
+                        ['Sortierverfahren', 'Mergesort', 1.2],
+                        ['Sortierverfahren', 'Quicksort', 1.2],
+                        ['Sortierverfahren', 'Counting Sort', 1.2],
+                        ['Sortierverfahren', 'Radixsort', 1.2],
+                        ['Counting Sort', 'Radixsort', 1.0],
+                        ['Quicksort', 'Selection / k-tes Element', 1.0],
+
+                        ['Array und Index-Speicherbild', 'Binärer Heap', 1.05],
+                        ['Array und Index-Speicherbild', 'Hash-Tabelle', 1.05],
+                        ['Array und Index-Speicherbild', 'Counting Sort', 0.95],
+                        ['Binärer Heap', 'Heapsort', 1.15],
+
+                        ['Dictionary', 'Hash-Tabelle', 1.15],
+                        ['Dictionary', 'Binärer Suchbaum', 1.15],
+                        ['Dictionary', 'Rot-Schwarz-Baum', 1.05],
+                        ['Hash-Tabelle', 'Hashfunktion', 1.2],
+                        ['Hash-Tabelle', 'Hashing mit Verkettung', 1.1],
+                        ['Hash-Tabelle', 'Offene Adressierung', 1.1],
+                        ['Offene Adressierung', 'Cluster beim Hashing', 1.0],
+                        ['Offene Adressierung', 'DELETED-Markierung', 1.0],
+
+                        ['Binärer Suchbaum', 'Tree-Walk / Traversierung', 1.05],
+                        ['Binärer Suchbaum', 'Rotation', 1.0],
+                        ['Binärer Suchbaum', 'Rot-Schwarz-Baum', 1.2],
+                        ['Rot-Schwarz-Baum', 'Rotation', 1.15],
+
+                        ['Priority Queue', 'Binärer Heap', 1.15],
+                        ['Priority Queue', 'Binomialheap', 1.1],
+                        ['Priority Queue', 'Fibonacci-Heap', 1.1],
+                        ['Binomialheap', 'Fibonacci-Heap', 0.95],
+                        ['Fibonacci-Heap', 'Decrease-Key', 1.05],
+
+                        ['Graph', 'Breitensuche (BFS)', 1.1],
+                        ['Graph', 'Tiefensuche (DFS)', 1.1],
+                        ['Graph', 'DAG', 1.05],
+                        ['Graph', 'Kürzeste Wege', 1.1],
+                        ['Graph', 'Minimaler Spannbaum', 1.1],
+                        ['DAG', 'Topological Sort', 1.15],
+                        ['Tiefensuche (DFS)', 'Topological Sort', 1.0],
+                        ['Kürzeste Wege', 'Relaxation', 1.1],
+                        ['Kürzeste Wege', 'Algorithmus von Dijkstra', 1.15],
+                        ['Relaxation', 'Algorithmus von Dijkstra', 1.05],
+                        ['Algorithmus von Dijkstra', 'Priority Queue', 1.0],
+                        ['Algorithmus von Dijkstra', 'Decrease-Key', 1.0],
+                        ['Minimaler Spannbaum', 'Algorithmus von Prim', 1.15],
+                        ['Minimaler Spannbaum', 'Algorithmus von Kruskal', 1.15],
+                        ['Algorithmus von Prim', 'Priority Queue', 1.0],
+                        ['Algorithmus von Kruskal', 'Union-Find / Disjoint Set Union', 1.05],
+
+                        ['Union-Find / Disjoint Set Union', 'Union by Rank', 1.15],
+                        ['Union-Find / Disjoint Set Union', 'Pfadkompression', 1.15]
+                    ].forEach(([from, to, weight]) => addConceptEdge(from, to, weight));
 
                     addEdge('automata-course', 'automata-vorwort', 1.2);
                     addEdge('automata-course', 'automata-chomsky', 1.2);
                     addEdge('automata-course', 'automata-berechenbarkeit', 1.2);
-                    addEdge('automata-course', 'automata-dfa', 1.2);
-                    addEdge('automata-course', 'automata-nfa', 1.2);
-                    addEdge('automata-course', 'automata-pda', 1.2);
-                    addEdge('automata-course', 'automata-tm', 1.2);
-                    addEdge('automata-course', 'automata-beweise', 1.2);
-                    addEdge('automata-course', 'automata-wortlaut', 1.2);
+                    addEdge('automata-course', 'automata-wortlaut', 1.0);
                     addEdge('automata-dfa', 'automata-nfa', 1.0);
                     addEdge('automata-nfa', 'automata-beweise', 1.0);
                     addEdge('automata-chomsky', 'automata-dfa', 1.0);
