@@ -54,69 +54,15 @@
             </div>
         </section>
 
-        <!-- ── Category Slider ──────────────────────────────────── -->
-        <section class="cat-section">
-            <p class="section-label">Themenbereiche</p>
-            <div class="slider-wrapper">
-                <button type="button" class="slider-btn" id="catPrev" aria-label="Zurück">&#8592;</button>
-                <div class="slider-track" id="catSlider">
-
-                    <a class="cat-card" href="src/informatikstudium.html">
-                        <div class="cat-card-bg" style="background:
-                            radial-gradient(ellipse at 25% 75%, #0ea5e9 0%, transparent 52%),
-                            radial-gradient(ellipse at 78% 18%, #6366f1 0%, transparent 50%),
-                            linear-gradient(160deg, #0f1729 0%, #1e293b 100%);"></div>
-                        <div class="cat-deco">🎓</div>
-                        <div class="cat-overlay">
-                            <span class="cat-label">Studium</span>
-                            <h3>Aus dem Informatikstudium</h3>
-                            <p>Theorie, Projekte und Erkenntnisse auf dem Weg zum Staatsexamen</p>
-                        </div>
-                    </a>
-
-                    <a class="cat-card" href="src/informatikstudium.html">
-                        <div class="cat-card-bg" style="background:
-                            radial-gradient(ellipse at 25% 75%, #0ea5e9 0%, transparent 52%),
-                            radial-gradient(ellipse at 78% 18%, #6366f1 0%, transparent 50%),
-                            linear-gradient(160deg, #0f1729 0%, #1e293b 100%);"></div>
-                        <div class="cat-deco">🎓</div>
-                        <div class="cat-overlay">
-                            <span class="cat-label">Studium</span>
-                            <h3>Aus dem Geschichtsstudium</h3>
-                            <p>Irgendwas über das Geschichtsstudium</p>
-                        </div>
-                    </a>
-
-                    <a class="cat-card" href="src/weitere-guides.html">
-                        <div class="cat-card-bg" style="background:
-                            radial-gradient(ellipse at 25% 75%, #22c55e 0%, transparent 52%),
-                            radial-gradient(ellipse at 78% 18%, #06b6d4 0%, transparent 50%),
-                            linear-gradient(160deg, #011c0a 0%, #02291a 100%);"></div>
-                        <div class="cat-deco">📚</div>
-                        <div class="cat-overlay">
-                            <span class="cat-label">Tutorials</span>
-                            <h3>Weitere Informatik-Guides</h3>
-                            <p>Tools, Tipps und Anleitungen rund um die Informatik</p>
-                        </div>
-                    </a>
-
-                </div>
-                <button type="button" class="slider-btn" id="catNext" aria-label="Vor">&#8594;</button>
-            </div>
-            <div class="slider-dots" id="catDots"></div>
-        </section>
-
-        
-
         <!-- ── Timeline ──────────────────────────────────────────── -->
-        <section class="timeline">
+        <section class="timeline timeline-legacy" aria-hidden="true">
 
             <article class="timeline-item left poster-entry">
                 <div class="timeline-content">
                     <h3>Wissenschaftliches Plakat: Wenn Zeit Leben rettet.</h3>
                     <p>07.06.2026<br /><br /></p>
                     <p>
-                        Im Rahmen des Studiums wurde das Modul "Informatik und Gesellschaft" belegt, in dem verschiedene ein wissenschaftliches Plakat erstellt wurde. Das Plakat und weiterführende Texte finden Sie in diesem <a href="src/modules/WennZeitÜberLebenEntscheidet/index.html" target="_blank">Artikel</a>.  
+                        Im Rahmen des Studiums wurde das Modul "Informatik und Gesellschaft" belegt, in dem verschiedene ein wissenschaftliches Plakat erstellt wurde. Das Plakat und weiterführende Texte finden Sie in diesem <a href="src/modules/WennZeitÜberLebenEntscheidet/index.html" target="_blank">Artikel</a>.
                     </p>
                 </div>
                 <div class="timeline-media">
@@ -141,8 +87,206 @@
                 </div>
             </article>
 
-          
-            
+            <article class="timeline-item left">
+                <div class="timeline-content">
+                    <h3>Basic Knowledge Graph</h3>
+                    <p>25.04.2026<br /><br /></p>
+                    <p>
+                        Ein Repository rund um den Aufbau eines einfachen Knowledge Graphs. Das Projekt ist <a href="https://github.com/Datenflix007/Basic-Knowledge-Graph">auf Github</a> einsehbar.
+                    </p>
+                </div>
+                <div class="timeline-media">
+                    <div class="avatar-border" style="width: 150px;">
+                        <img src="media/projekte/bkg.png" alt="Basic Knowledge Graph" style="width: 150px;">
+                    </div>
+                </div>
+            </article>
+
+            <article class="timeline-item right">
+                <div class="timeline-media">
+                    <div class="avatar-border" style="width: 150px;">
+                        <img src="src/modules/DAB_naturerlebniszentrum/img/icon.png" alt="Icon Naturerlebniszentrum" style="width: 150px;">
+                    </div>
+                </div>
+                <div class="timeline-content">
+                    <h3>Digitales Arbeitsblatt: Der Jenaer Wald und wir</h3>
+                    <p>20.04.2026<br /><br /></p>
+                    <p>
+                        Ein interaktives digitales Arbeitsblatt für einen Workshop zur Geschichte des Jenaer Waldes. Schülerinnen und Schüler erkunden historische Forstberufe, recherchieren eigenständig und sammeln ihre Beobachtungen auf einem integrierten Notizblatt. <a href="src/modules/DAB_naturerlebniszentrum/index.html">Zum Arbeitsblatt</a>.
+                    </p>
+                </div>
+            </article>
+
+            <article class="timeline-item left">
+                <div class="timeline-content">
+                    <h3>MySQL-Trainee-Ground</h3>
+                    <p>17.01.2026<br /><br /></p>
+                    <p>
+                        Via Docker wird hier die mysql und phpmyadmin Umgebung bereitgestellt, um SQL-Kenntnisse zu erlernen und zu vertiefen. Es sind verschiedene Übungsaufgaben integriert, die das Arbeiten mit Datenbanken erleichtern sollen. Das Projekt ist <a href="https://github.com/Datenflix007/MySQL_TraineeGround">auf Github</a>.
+                    </p>
+                </div>
+                <div class="timeline-media">
+                    <div class="avatar-border" style="width: 150px;">
+                        <img src="https://www.drwindows.de/news/wp-content/uploads/2020/04/mysql.workbench_pgb.png" alt="MySQL Workbench" style="width: 150px;">
+                    </div>
+                </div>
+            </article>
+
+            <article class="timeline-item right">
+                <div class="timeline-media">
+                    <div class="avatar-border" style="width: 150px;">
+                        <img src="https://github.com/Datenflix007/jenaCraftImages/raw/main/images/header.jpg" style="width: 150px;" alt="JenaCraft"/>
+                    </div>
+                </div>
+                <div class="timeline-content">
+                    <h3>JenaCraft - Schülerergebnisse</h3>
+                    <p>08.01.2026<br /><br /></p>
+                    <p>
+                        Im Rahmen der Tätigkeit als wissenschaftliche Hilfskraft in dem DHLabor der Professur Digital-Humanites wurden "Jena-Craft"-Workshops abgehalten. Für das volle Erlebnis der Ergebnispräsentation checken Sie die Webseite <a href="https://4dcity.org/intro">4dcity</a> aus. Für die reine Ergebnissammlung der Workshops schauen Sie sich die <a href="https://github.com/Datenflix007/jenaCraftImages">Ergebnisse</a> an.
+                    </p>
+                </div>
+            </article>
+
+            <article class="timeline-item left">
+                <div class="timeline-content">
+                    <h3>PnP: Schatz des Naumburger Meisters</h3>
+                    <p>18.10.2025<br /><br /></p>
+                    <p>
+                        Dieses PNP-Spiel wurde für einen PNP-Spiele-Abend entworfen und entwickelt. Darin wird die Historie des fiktiven Gerüchtes über den Schatz des Naumburger Meisters ergründet. Darin müssen verschiedene Figuren (Geschichtsstudent, Bürgermeister, Archivar, Dompropst etc.) kooperieren, Anträge ausfüllen und Rätsel lösen, aber auch der Intrige eines geheimnisvollen Loge entziehen. Das Spielmaterial ist <a href="https://github.com/Datenflix007/pnp_thesaurusMagistriNaumburgensis">auf Github</a> einsehbar.
+                    </p>
+                </div>
+                <div class="timeline-media">
+                    <div class="avatar-border" style="width: 150px;">
+                        <img src="https://github.com/Datenflix007/pnp_thesaurusMagistriNaumburgensis/raw/main/images/siegel.png" style="width: 150px;" alt="PnP Siegel">
+                    </div>
+                </div>
+            </article>
+
+        </section>
+
+        <section class="knowledge-graph-section">
+            <div class="knowledge-stage-shell">
+                <div class="knowledge-stage" id="knowledgeStage">
+                    <div class="knowledge-pan" id="knowledgePan">
+                        <svg id="knowledgeSvg" viewBox="0 0 2400 1300" preserveAspectRatio="none" aria-hidden="true"></svg>
+                        <div id="knowledgeClusters"></div>
+                        <div id="knowledgeNodes"></div>
+                        <div class="search-core">
+                            <label for="repoSearch">Seiteninhalt durchsuchen</label>
+                            <input id="repoSearch" type="search" placeholder="z. B. Projekte, AlgoDat, Kontakt ..." />
+                            <div class="suggestions" id="repoSuggestions"></div>
+                        </div>
+                    </div>
+                    <div class="knowledge-zoom-tools" aria-label="Graph-Navigation">
+                        <button type="button" id="graphZoomOut" aria-label="Rauszoomen">-</button>
+                        <button type="button" id="graphReset" aria-label="Ansicht zurücksetzen">1:1</button>
+                        <button type="button" id="graphZoomIn" aria-label="Reinzoomen">+</button>
+                    </div>
+                    <div class="knowledge-filter-panel" aria-label="Wissensgraph filtern">
+                        <div class="knowledge-filter-title">Filter</div>
+                        <div class="knowledge-filter-chips" id="knowledgeFilterChips">
+                            <button type="button" data-filter="studium">Studium</button>
+                            <button type="button" data-filter="guide">Guide</button>
+                            <button type="button" data-filter="projekt">Projekt</button>
+                            <button type="button" data-filter="referenz">Referenz</button>
+                            <button type="button" data-filter="tool">Tool</button>
+                            <button type="button" data-filter="algodat">AlgoDat</button>
+                            <button type="button" data-filter="automatentheorie">Automatentheorie</button>
+                            <button type="button" data-filter="arbeitsblatt">Digitales Arbeitsblatt</button>
+                        </div>
+                        <label class="knowledge-tag-search">
+                            <span>Schlagwort</span>
+                            <input id="knowledgeTagSearch" type="search" placeholder="z. B. Studium, Referenz ..." />
+                        </label>
+                        <button type="button" class="knowledge-filter-reset" id="knowledgeFilterReset">Filter löschen</button>
+                    </div>
+                </div>
+            </div>
+            <div class="knowledge-status" id="graphStatus">Lade Wissensgraph aus dem Repository …</div>
+        </section>
+
+        <section class="cat-section">
+        <p class="section-label">Themenbereiche</p>
+        <div class="slider-wrapper">
+            <button type="button" class="slider-btn" id="catPrev" aria-label="Zurück">&#8592;</button>
+            <div class="slider-track" id="catSlider">
+
+                <a class="cat-card" href="src/informatikstudium.html">
+                    <div class="cat-card-bg" style="background:
+                        radial-gradient(ellipse at 25% 75%, #0ea5e9 0%, transparent 52%),
+                        radial-gradient(ellipse at 78% 18%, #6366f1 0%, transparent 50%),
+                        linear-gradient(160deg, #0f1729 0%, #1e293b 100%);"></div>
+                    <div class="cat-deco">🎓</div>
+                    <div class="cat-overlay">
+                        <span class="cat-label">Studium</span>
+                        <h3>Aus dem Informatikstudium</h3>
+                        <p>Theorie, Projekte und Erkenntnisse auf dem Weg zum Staatsexamen</p>
+                    </div>
+                </a>
+
+                <a class="cat-card" href="src/informatikstudium.html">
+                    <div class="cat-card-bg" style="background:
+                        radial-gradient(ellipse at 25% 75%, #0ea5e9 0%, transparent 52%),
+                        radial-gradient(ellipse at 78% 18%, #6366f1 0%, transparent 50%),
+                        linear-gradient(160deg, #0f1729 0%, #1e293b 100%);"></div>
+                    <div class="cat-deco">🎓</div>
+                    <div class="cat-overlay">
+                        <span class="cat-label">Studium</span>
+                        <h3>Aus dem Geschichtsstudium</h3>
+                        <p>Irgendwas über das Geschichtsstudium</p>
+                    </div>
+                </a>
+
+                <a class="cat-card" href="src/weitere-guides.html">
+                    <div class="cat-card-bg" style="background:
+                        radial-gradient(ellipse at 25% 75%, #22c55e 0%, transparent 52%),
+                        radial-gradient(ellipse at 78% 18%, #06b6d4 0%, transparent 50%),
+                        linear-gradient(160deg, #011c0a 0%, #02291a 100%);"></div>
+                    <div class="cat-deco">📚</div>
+                    <div class="cat-overlay">
+                        <span class="cat-label">Tutorials</span>
+                        <h3>Weitere Informatik-Guides</h3>
+                        <p>Tools, Tipps und Anleitungen rund um die Informatik</p>
+                    </div>
+                </a>
+
+            </div>
+            <button type="button" class="slider-btn" id="catNext" aria-label="Vor">&#8594;</button>
+        </div>
+        <div class="slider-dots" id="catDots"></div>
+    </section>
+
+    <section class="timeline">
+
+            <article class="timeline-item left poster-entry">
+                <div class="timeline-content">
+                    <h3>Wissenschaftliches Plakat: Wenn Zeit Leben rettet.</h3>
+                    <p>07.06.2026<br /><br /></p>
+                    <p>
+                        Im Rahmen des Studiums wurde das Modul "Informatik und Gesellschaft" belegt, in dem verschiedene ein wissenschaftliches Plakat erstellt wurde. Das Plakat und weiterführende Texte finden Sie in diesem <a href="src/modules/WennZeitÜberLebenEntscheidet/index.html" target="_blank">Artikel</a>.
+                    </p>
+                </div>
+                <div class="timeline-media">
+                    <div class="avatar-border poster-image" style="width: 150px;">
+                        <img src="media/projekte/iug.png" alt="Wissenschaftliches Plakat">
+                    </div>
+                </div>
+            </article>
+
+            <article class="timeline-item right">
+                <div class="timeline-media">
+                    <div class="avatar-border" style="width: 150px;">
+                        <img src="media/projekte/fheap.png" alt="Fibonacci Heap Visualisierung" style="width: 150px;">
+                    </div>
+                </div>
+                <div class="timeline-content">
+                    <h3>AlgoDat-Kurs</h3>
+                    <p>Wintersemester 2025/2026<br /><br /></p>
+                    <p>
+                        Ein interaktiver Selbstlernkurs zu den Grundlagen der Algorithmen und Datenstrukturen – von Sortierverfahren über Graphentheorie bis hin zu komplexen Heap-Strukturen wie dem Fibonacci-Heap. Alle Konzepte werden mit Visualisierungen, Pseudocode und konkreten Beispielen aufbereitet. Der Kurs richtet sich an Studierende, die die Vorlesungsinhalte vertiefen oder eigenständig einsteigen möchten. <a href="src/modules/AlgoDatCourse/index.html" target="_blank">Zum Kurs</a>.
+                    </p>
+                </div>
+            </article>
 
             <article class="timeline-item left">
                 <div class="timeline-content">
@@ -242,6 +386,14 @@
             return text.length;
         }
 
+        function escapeHtml(value) {
+            return String(value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/\"/g, '&quot;');
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             const q1 = document.getElementById('quote');
             const q2 = document.getElementById('quote2');
@@ -255,54 +407,605 @@
             const dotsEl  = document.getElementById('catDots');
             const btnPrev = document.getElementById('catPrev');
             const btnNext = document.getElementById('catNext');
-            if (!track) return;
+            if (track) {
+                const cards = Array.from(track.querySelectorAll('.cat-card'));
+                const count = cards.length;
+                let current = 0;
 
-            const cards = Array.from(track.querySelectorAll('.cat-card'));
-            const count = cards.length;
-            let current = 0;
+                const dots = cards.map((_, i) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'dot' + (i === 0 ? ' active' : '');
+                    btn.setAttribute('aria-label', `Karte ${i + 1}`);
+                    btn.addEventListener('click', () => goTo(i));
+                    dotsEl.appendChild(btn);
+                    return btn;
+                });
 
-            // Build dot buttons
-            const dots = cards.map((_, i) => {
-                const btn = document.createElement('button');
-                btn.className = 'dot' + (i === 0 ? ' active' : '');
-                btn.setAttribute('aria-label', `Karte ${i + 1}`);
-                btn.addEventListener('click', () => goTo(i));
-                dotsEl.appendChild(btn);
-                return btn;
-            });
+                function goTo(idx) {
+                    current = (idx + count) % count;
+                    const card = cards[current];
+                    track.scrollTo({ left: card.offsetLeft - track.offsetLeft - 4, behavior: 'smooth' });
+                    dots.forEach((d, i) => d.classList.toggle('active', i === current));
+                }
 
-            function goTo(idx) {
-                current = (idx + count) % count;
-                const card = cards[current];
-                track.scrollTo({ left: card.offsetLeft - track.offsetLeft - 4, behavior: 'smooth' });
-                dots.forEach((d, i) => d.classList.toggle('active', i === current));
+                function startAuto() { return setInterval(() => goTo(current + 1), 4500); }
+                let autoTimer = startAuto();
+                track.addEventListener('mouseenter', () => clearInterval(autoTimer));
+                track.addEventListener('touchstart', () => clearInterval(autoTimer), { passive: true });
+                track.addEventListener('mouseleave', () => { autoTimer = startAuto(); });
+
+                btnPrev.addEventListener('click', () => { goTo(current - 1); clearInterval(autoTimer); autoTimer = startAuto(); });
+                btnNext.addEventListener('click', () => { goTo(current + 1); clearInterval(autoTimer); autoTimer = startAuto(); });
+
+                let scrollTimer;
+                track.addEventListener('scroll', () => {
+                    clearTimeout(scrollTimer);
+                    scrollTimer = setTimeout(() => {
+                        let closest = 0, minDist = Infinity;
+                        cards.forEach((card, i) => {
+                            const dist = Math.abs(card.offsetLeft - track.offsetLeft - track.scrollLeft);
+                            if (dist < minDist) { minDist = dist; closest = i; }
+                        });
+                        current = closest;
+                        dots.forEach((d, i) => d.classList.toggle('active', i === current));
+                    }, 80);
+                });
             }
 
-            // Auto-advance
-            function startAuto() { return setInterval(() => goTo(current + 1), 4500); }
-            let autoTimer = startAuto();
-            track.addEventListener('mouseenter', () => clearInterval(autoTimer));
-            track.addEventListener('touchstart', () => clearInterval(autoTimer), { passive: true });
-            track.addEventListener('mouseleave', () => { autoTimer = startAuto(); });
-
-            btnPrev.addEventListener('click', () => { goTo(current - 1); clearInterval(autoTimer); autoTimer = startAuto(); });
-            btnNext.addEventListener('click', () => { goTo(current + 1); clearInterval(autoTimer); autoTimer = startAuto(); });
-
-            // Sync dots on manual scroll / swipe
-            let scrollTimer;
-            track.addEventListener('scroll', () => {
-                clearTimeout(scrollTimer);
-                scrollTimer = setTimeout(() => {
-                    let closest = 0, minDist = Infinity;
-                    cards.forEach((card, i) => {
-                        const dist = Math.abs(card.offsetLeft - track.offsetLeft - track.scrollLeft);
-                        if (dist < minDist) { minDist = dist; closest = i; }
-                    });
-                    current = closest;
-                    dots.forEach((d, i) => d.classList.toggle('active', i === current));
-                }, 80);
-            });
+            initKnowledgeGraph();
         });
+
+        async function initKnowledgeGraph() {
+            const stage = document.getElementById('knowledgeStage');
+            const pan = document.getElementById('knowledgePan');
+            const svg = document.getElementById('knowledgeSvg');
+            const clustersHost = document.getElementById('knowledgeClusters');
+            const nodesHost = document.getElementById('knowledgeNodes');
+            const searchInput = document.getElementById('repoSearch');
+            const suggestions = document.getElementById('repoSuggestions');
+            const status = document.getElementById('graphStatus');
+            const filterChips = document.getElementById('knowledgeFilterChips');
+            const tagSearch = document.getElementById('knowledgeTagSearch');
+            const filterReset = document.getElementById('knowledgeFilterReset');
+            const zoomOut = document.getElementById('graphZoomOut');
+            const zoomIn = document.getElementById('graphZoomIn');
+            const resetView = document.getElementById('graphReset');
+            if (!stage || !pan || !svg || !clustersHost || !nodesHost || !searchInput || !suggestions || !status || !filterChips || !tagSearch || !filterReset) return;
+
+            const repo = { owner: 'datenflix007', repo: 'datenflix007.github.io', branch: 'main' };
+            const graphSize = { width: 2400, height: 1300 };
+            let nodes = [];
+            let edges = [];
+            let selectedId = null;
+            let drag = null;
+            let view = { x: 0, y: 0, scale: 0.72 };
+            const activeFilters = new Set();
+            const nodeMap = new Map();
+            const contentCache = new Map();
+
+            const normalize = (value) => String(value || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+            function createNode(path, title, kind, summary = '') {
+                const id = path.replace(/[^a-z0-9]+/gi, '-').replace(/(^-|-$)/g, '').toLowerCase() || 'node';
+                const node = { id, path, title, kind, summary, source: 'live' };
+                nodes.push(node);
+                nodeMap.set(path, node);
+                return node;
+            }
+
+            function addEdge(from, to, weight = 1) {
+                if (!from || !to || from === to) return;
+                const key = [from, to].sort().join('|');
+                if (edges.some((edge) => edge.key === key)) return;
+                edges.push({ key, from, to, weight });
+            }
+
+            function setView(next) {
+                view = {
+                    x: Number.isFinite(next.x) ? next.x : view.x,
+                    y: Number.isFinite(next.y) ? next.y : view.y,
+                    scale: Math.min(2.4, Math.max(0.32, Number.isFinite(next.scale) ? next.scale : view.scale))
+                };
+                pan.style.transform = `translate(calc(-50% + ${view.x}px), calc(-50% + ${view.y}px)) scale(${view.scale})`;
+            }
+
+            function resetGraphView() {
+                setView({ x: 0, y: 0, scale: 0.72 });
+            }
+
+            function zoomGraph(multiplier, originX = stage.clientWidth / 2, originY = stage.clientHeight / 2) {
+                const nextScale = Math.min(2.4, Math.max(0.32, view.scale * multiplier));
+                const rect = stage.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2 + view.x;
+                const centerY = rect.top + rect.height / 2 + view.y;
+                const dx = originX + rect.left - centerX;
+                const dy = originY + rect.top - centerY;
+                const ratio = nextScale / view.scale;
+                setView({
+                    scale: nextScale,
+                    x: view.x - dx * (ratio - 1),
+                    y: view.y - dy * (ratio - 1)
+                });
+            }
+
+            function inferTitle(path) {
+                const clean = path.replace(/^\//, '').replace(/\\/g, '/');
+                const parts = clean.split('/').filter(Boolean);
+                const last = parts[parts.length - 1] || 'Start';
+                const base = last.replace(/\.(html|md|txt)$/i, '');
+                const fallback = base === 'index' && parts.length > 1 ? parts[parts.length - 2] : base;
+                return fallback.replace(/[-_]+/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase());
+            }
+
+            function inferKind(path) {
+                if (path.startsWith('src/modules/')) return 'Modul';
+                if (path.startsWith('src/guides/')) return 'Guide';
+                if (path.startsWith('src/')) return 'Seite';
+                if (path.startsWith('README')) return 'Projekt';
+                return 'Inhalt';
+            }
+
+            async function fetchText(path) {
+                if (contentCache.has(path)) return contentCache.get(path);
+                const url = `https://raw.githubusercontent.com/${repo.owner}/${repo.repo}/${repo.branch}/${path}`;
+                const response = await fetch(url);
+                if (!response.ok) throw new Error(`Konnte ${path} nicht laden`);
+                const text = await response.text();
+                contentCache.set(path, text);
+                return text;
+            }
+
+            function extractSummary(text, path) {
+                const stripped = String(text || '')
+                    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+                    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+                    .replace(/<[^>]+>/g, ' ')
+                    .replace(/&[a-z]+;/gi, ' ')
+                    .replace(/\s+/g, ' ')
+                    .trim();
+                const fromMeta = stripped.match(/description\s*[:=]\s*([^.;]{1,140})/i);
+                if (fromMeta && fromMeta[1]) return fromMeta[1].trim();
+                const firstSentence = stripped.split(/[.!?\n]/).find(Boolean);
+                if (firstSentence) {
+                    return firstSentence.slice(0, 180).trim();
+                }
+                return `${inferTitle(path)} steht als Inhalt im Repository bereit.`;
+            }
+
+            function resolveRelativePath(fromPath, target) {
+                if (!target || /^(https?:|mailto:|tel:|javascript:|#)/i.test(target)) return null;
+                const withoutQuery = target.split('?')[0].split('#')[0].replace(/^\.\//, '');
+                if (!withoutQuery) return null;
+                const fromDir = fromPath.split('/').slice(0, -1).join('/');
+                const normalized = withoutQuery.replace(/\\/g, '/');
+                const full = normalized.startsWith('/') ? normalized.replace(/^\//, '') : `${fromDir ? `${fromDir}/` : ''}${normalized}`;
+                const parts = full.split('/').filter(Boolean);
+                const stack = [];
+                for (const part of parts) {
+                    if (part === '.') continue;
+                    if (part === '..') stack.pop();
+                    else stack.push(part);
+                }
+                return stack.join('/');
+            }
+
+            function extractLocalLinks(text) {
+                if (!text) return [];
+                const matches = [...text.matchAll(/(?:href|src)=["']([^"']+)["']/gi)].map((m) => m[1]);
+                return matches.filter((link) => !/^(https?:|mailto:|tel:|javascript:|#)/i.test(link));
+            }
+
+            function nodeCategory(node) {
+                const text = normalize(`${node.kind} ${node.title} ${node.path}`);
+                if (text.includes('referenz') || text.includes('jenacraft') || text.includes('gothacraft') || text.includes('publication') || text.includes('publikation') || text.includes('minecraft in der lehre')) return 'references';
+                if (text.includes('infopedia') || text.includes('algodat') || text.includes('algorithm') || text.includes('sort') || text.includes('heap') || text.includes('baum') || text.includes('graph')) return 'algodat';
+                if (text.includes('guide')) return 'guides';
+                if (text.includes('dab') || text.includes('arbeitsblatt') || text.includes('naturerlebniszentrum') || text.includes('alltagslabor')) return 'worksheets';
+                if (text.includes('tool') || text.includes('generator') || text.includes('maker') || text.includes('viewer') || text.includes('qrgenerator') || text.includes('automata') || text.includes('visualiser') || text.includes('planner') || text.includes('notebook')) return 'tools';
+                if (text.includes('projekt') || text.includes('readme') || text.includes('scrum') || text.includes('mysql') || text.includes('pnp') || text.includes('holo')) return 'projects';
+                return 'pages';
+            }
+
+            function nodeTags(node) {
+                const text = normalize(`${node.kind} ${node.title} ${node.path} ${node.summary}`);
+                const category = nodeCategory(node);
+                const tags = new Set([category, categoryLabel(category), node.kind, node.title, node.path]);
+                if (category === 'references') tags.add('referenz').add('publikation').add('literatur');
+                if (category === 'projects') tags.add('projekt');
+                if (category === 'tools') tags.add('tool');
+                if (category === 'guides') tags.add('guide');
+                if (category === 'worksheets') tags.add('arbeitsblatt').add('digitales arbeitsblatt');
+                if (category === 'algodat') tags.add('algodat').add('algorithmen').add('datenstrukturen');
+                if (text.includes('studium') || text.includes('informatikstudium') || text.includes('geschichtsstudium') || text.includes('lehramt')) tags.add('studium');
+                if (text.includes('automata') || text.includes('automat') || text.includes('endlicher automat') || text.includes('formale sprache')) tags.add('automatentheorie');
+                if (text.includes('dab') || text.includes('arbeitsblatt')) tags.add('digitales arbeitsblatt');
+                if (text.includes('jena') || text.includes('gotha') || text.includes('minecraft')) tags.add('lehrkonzept');
+                return [...tags].map(normalize).filter(Boolean);
+            }
+
+            function categoryLabel(category) {
+                return {
+                    algodat: 'AlgoDat / InfoPedia',
+                    references: 'Referenzen / Publikationen',
+                    worksheets: 'Digitale Arbeitsblaetter',
+                    tools: 'Tools',
+                    projects: 'Projekte',
+                    guides: 'Guides',
+                    pages: 'Seiten'
+                }[category] || 'Inhalte';
+            }
+
+            function graphPosition(node, index, groupIndex, groupSize) {
+                const boxes = {
+                    algodat: { x: 1180, y: 70, w: 1140, h: 700 },
+                    references: { x: 1740, y: 820, w: 560, h: 360 },
+                    worksheets: { x: 70, y: 120, w: 560, h: 400 },
+                    tools: { x: 690, y: 820, w: 620, h: 360 },
+                    projects: { x: 80, y: 650, w: 560, h: 500 },
+                    guides: { x: 1330, y: 900, w: 380, h: 290 },
+                    pages: { x: 650, y: 160, w: 470, h: 500 }
+                };
+                const category = nodeCategory(node);
+                const box = boxes[category] || boxes.pages;
+                const cols = Math.max(2, Math.ceil(Math.sqrt(groupSize * (box.w / box.h))));
+                const rows = Math.max(1, Math.ceil(groupSize / cols));
+                const col = groupIndex % cols;
+                const row = Math.floor(groupIndex / cols);
+                const cellW = box.w / cols;
+                const cellH = box.h / rows;
+                let x = box.x + cellW * (col + 0.5);
+                let y = box.y + cellH * (row + 0.5);
+                const jitter = ((index % 3) - 1) * 7;
+                const searchDx = (x - graphSize.width / 2) / 330;
+                const searchDy = (y - graphSize.height / 2) / 270;
+                if ((searchDx * searchDx) + (searchDy * searchDy) < 1) {
+                    x += category === 'pages' ? -170 : 170;
+                    y += y < graphSize.height / 2 ? -80 : 80;
+                }
+                return {
+                    x: Math.max(70, Math.min(graphSize.width - 70, x + jitter)),
+                    y: Math.max(60, Math.min(graphSize.height - 60, y - jitter * 0.4))
+                };
+            }
+
+            function nodeUrl(node) {
+                if (!node || !node.path) return null;
+                if (/^https?:/i.test(node.path)) return node.path;
+                const [pathPart, hashPart] = node.path.split('#');
+                const hash = hashPart ? `#${hashPart}` : '';
+                if (/\.(html)$/i.test(pathPart)) return `${pathPart}${hash}`;
+                if (/\.(md|txt)$/i.test(pathPart)) {
+                    return `https://github.com/${repo.owner}/${repo.repo}/blob/${repo.branch}/${pathPart}${hash}`;
+                }
+                return `${pathPart}${hash}`;
+            }
+
+            function navigateToNode(id) {
+                const node = nodes.find((entry) => entry.id === id);
+                const url = nodeUrl(node);
+                if (!url) return;
+                window.location.href = url;
+            }
+
+            function filteredNodes(query = '') {
+                const q = normalize(query).trim();
+                const tagQuery = normalize(tagSearch.value).trim();
+                const filters = [...activeFilters].map(normalize);
+                const matches = nodes.filter((node) => {
+                    const tags = nodeTags(node);
+                    const haystack = normalize(`${node.title} ${node.path} ${node.summary} ${node.kind} ${tags.join(' ')}`);
+                    if (q && !haystack.includes(q)) return false;
+                    if (tagQuery && !haystack.includes(tagQuery)) return false;
+                    if (filters.length && !filters.every((filter) => tags.some((tag) => tag.includes(filter)) || haystack.includes(filter))) return false;
+                    return true;
+                });
+                return matches;
+            }
+
+            function syncFilterButtons() {
+                filterChips.querySelectorAll('button[data-filter]').forEach((button) => {
+                    button.classList.toggle('active', activeFilters.has(button.dataset.filter));
+                });
+            }
+
+            function renderSuggestions(query = searchInput.value) {
+                const normalized = normalize(query).trim();
+                if (!normalized) {
+                    suggestions.style.display = 'none';
+                    return;
+                }
+                const list = filteredNodes(query).slice(0, 18);
+                suggestions.innerHTML = list.map((node) => `<button type="button" data-id="${node.id}">${escapeHtml(node.title)}<span>${escapeHtml(categoryLabel(nodeCategory(node)))}</span></button>`).join('');
+                suggestions.style.display = list.length ? 'block' : 'none';
+                suggestions.querySelectorAll('button').forEach((button) => {
+                    button.addEventListener('click', () => navigateToNode(button.dataset.id));
+                });
+            }
+
+            function renderGraph(query = searchInput.value) {
+                const list = filteredNodes(query);
+                const visibleIds = new Set(list.map((node) => node.id));
+                svg.innerHTML = '';
+                clustersHost.innerHTML = '';
+                nodesHost.innerHTML = '';
+                const groups = new Map();
+                nodes.forEach((node) => {
+                    const category = nodeCategory(node);
+                    const group = groups.get(category) || [];
+                    group.push(node);
+                    groups.set(category, group);
+                });
+                const positions = new Map();
+                nodes.forEach((node, index) => {
+                    const group = groups.get(nodeCategory(node)) || [node];
+                    positions.set(node.id, graphPosition(node, index, group.indexOf(node), group.length));
+                });
+
+                const clusterBoxes = {
+                    algodat: { x: 1180, y: 70, w: 1140, h: 700 },
+                    references: { x: 1740, y: 820, w: 560, h: 360 },
+                    worksheets: { x: 70, y: 120, w: 560, h: 400 },
+                    tools: { x: 690, y: 820, w: 620, h: 360 },
+                    projects: { x: 80, y: 650, w: 560, h: 500 },
+                    guides: { x: 1330, y: 900, w: 380, h: 290 },
+                    pages: { x: 650, y: 160, w: 470, h: 500 }
+                };
+                Object.entries(clusterBoxes).forEach(([category, box]) => {
+                    if (!list.some((node) => nodeCategory(node) === category)) return;
+                    const halo = document.createElement('div');
+                    halo.className = `knowledge-cluster ${category}`;
+                    halo.style.left = `${box.x}px`;
+                    halo.style.top = `${box.y}px`;
+                    halo.style.width = `${box.w}px`;
+                    halo.style.height = `${box.h}px`;
+                    halo.innerHTML = `<span>${escapeHtml(categoryLabel(category))}</span>`;
+                    clustersHost.appendChild(halo);
+                });
+
+                edges.forEach((edge) => {
+                    if (!visibleIds.has(edge.from) || !visibleIds.has(edge.to)) return;
+                    const fromPos = positions.get(edge.from);
+                    const toPos = positions.get(edge.to);
+                    if (!fromPos || !toPos) return;
+                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    line.setAttribute('x1', fromPos.x);
+                    line.setAttribute('y1', fromPos.y);
+                    line.setAttribute('x2', toPos.x);
+                    line.setAttribute('y2', toPos.y);
+                    line.setAttribute('stroke', 'rgba(125, 211, 252, 0.24)');
+                    line.setAttribute('stroke-width', edge.weight > 1 ? '0.28' : '0.16');
+                    line.setAttribute('vector-effect', 'non-scaling-stroke');
+                    svg.appendChild(line);
+                });
+
+                list.forEach((node, index) => {
+                    const position = positions.get(node.id) || graphPosition(node, index, index, list.length);
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = `graph-node ${node.kind.toLowerCase()} ${nodeCategory(node)}${selectedId === node.id ? ' active' : ''}`;
+                    btn.style.left = `${position.x}px`;
+                    btn.style.top = `${position.y}px`;
+                    btn.textContent = node.title;
+                    btn.title = nodeUrl(node) || node.title;
+                    btn.addEventListener('click', () => navigateToNode(node.id));
+                    nodesHost.appendChild(btn);
+                });
+
+                renderSuggestions(query);
+                syncFilterButtons();
+            }
+
+            function selectNode(id) {
+                selectedId = id;
+                const node = nodes.find((entry) => entry.id === id);
+                if (node) {
+                    searchInput.value = node.title;
+                }
+                renderGraph(searchInput.value);
+            }
+
+            searchInput.addEventListener('input', () => {
+                renderGraph(searchInput.value);
+            });
+
+            searchInput.addEventListener('keydown', (event) => {
+                if (event.key !== 'Enter') return;
+                const first = filteredNodes(searchInput.value)[0];
+                if (first) navigateToNode(first.id);
+            });
+
+            filterChips.addEventListener('click', (event) => {
+                const button = event.target.closest('button[data-filter]');
+                if (!button) return;
+                const filter = button.dataset.filter;
+                if (activeFilters.has(filter)) activeFilters.delete(filter);
+                else activeFilters.add(filter);
+                renderGraph(searchInput.value);
+            });
+
+            tagSearch.addEventListener('input', () => {
+                renderGraph(searchInput.value);
+            });
+
+            tagSearch.addEventListener('keydown', (event) => {
+                if (event.key !== 'Enter') return;
+                const first = filteredNodes(searchInput.value)[0];
+                if (first) navigateToNode(first.id);
+            });
+
+            filterReset.addEventListener('click', () => {
+                activeFilters.clear();
+                tagSearch.value = '';
+                renderGraph(searchInput.value);
+            });
+
+            stage.addEventListener('wheel', (event) => {
+                event.preventDefault();
+                zoomGraph(event.deltaY < 0 ? 1.12 : 0.88, event.clientX - stage.getBoundingClientRect().left, event.clientY - stage.getBoundingClientRect().top);
+            }, { passive: false });
+
+            stage.addEventListener('pointerdown', (event) => {
+                if (event.button !== 0 || event.target.closest('.graph-node, .search-core, .knowledge-zoom-tools, .knowledge-filter-panel, a, input, button')) return;
+                drag = { id: event.pointerId, x: event.clientX, y: event.clientY, baseX: view.x, baseY: view.y };
+                stage.setPointerCapture(event.pointerId);
+            });
+
+            stage.addEventListener('pointermove', (event) => {
+                if (!drag || drag.id !== event.pointerId) return;
+                setView({
+                    x: drag.baseX + event.clientX - drag.x,
+                    y: drag.baseY + event.clientY - drag.y,
+                    scale: view.scale
+                });
+            });
+
+            stage.addEventListener('pointerup', (event) => {
+                if (drag && drag.id === event.pointerId) drag = null;
+            });
+
+            stage.addEventListener('pointercancel', () => {
+                drag = null;
+            });
+
+            zoomOut?.addEventListener('click', () => zoomGraph(0.86));
+            zoomIn?.addEventListener('click', () => zoomGraph(1.16));
+            resetView?.addEventListener('click', resetGraphView);
+
+            async function loadInfopediaEntries() {
+                try {
+                    const raw = await fetchText('src/modules/AlgoDatCourse/infopedia.html');
+                    const match = raw.match(/const entries\s*=\s*(\[[\s\S]*?\]);/);
+                    if (!match) return [];
+                    const parsed = new Function('return ' + match[1])();
+                    return parsed.map((entry) => ({
+                        id: `infopedia-${entry.id}`,
+                        path: `src/modules/AlgoDatCourse/infopedia.html#${entry.id}`,
+                        title: entry.title,
+                        kind: 'Infopedia',
+                        summary: entry.explanation?.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim() || entry.definition?.replace(/<[^>]+>/g, ' ').slice(0, 140),
+                        source: 'Infopedia',
+                        links: entry.links || [],
+                        related: entry.related || []
+                    }));
+                } catch (error) {
+                    return [];
+                }
+            }
+
+            async function loadGraph() {
+                status.textContent = 'Lade Wissensgraph aus dem Repository …';
+                try {
+                    const treeResponse = await fetch(`https://api.github.com/repos/${repo.owner}/${repo.repo}/git/trees/${repo.branch}?recursive=1`);
+                    if (!treeResponse.ok) throw new Error('GitHub API nicht erreichbar');
+                    const treeData = await treeResponse.json();
+                    const files = Array.isArray(treeData.tree) ? treeData.tree.filter((entry) => entry.type === 'blob' && /\.(html|md|txt)$/i.test(entry.path)) : [];
+                    const relevantFiles = files.filter((entry) => !entry.path.startsWith('media/') && !entry.path.startsWith('fonts/') && !entry.path.startsWith('script') && !entry.path.startsWith('Editor/'));
+
+                    const infopediaEntries = await loadInfopediaEntries();
+                    infopediaEntries.forEach((entry) => {
+                        nodes.push(entry);
+                        nodeMap.set(entry.path, entry);
+                    });
+
+                    [
+                        ['publication-jenacraft', 'JenaCraft', 'Publikation', 'Publikation eines Lehrkonzeptes: Die Stadt der Zukunft.', 'src/Referenzen.html#jenacraft'],
+                        ['publication-gothacraft', 'GothaCraft', 'Publikation', 'Publikation eines Lehrkonzeptes: Die Stadt der Zukunft.', 'src/Referenzen.html#gothacraft'],
+                        ['publication-minecraft-heritage', 'Minecraft in der Lehre', 'Publikation', 'Lehrkonzepte und Publikationen zu Minecraft, Stadtgeschichte und kulturellem Erbe.', 'src/Referenzen.html#lehrkonzepte']
+                    ].forEach(([id, title, kind, summary, path]) => {
+                        if (nodes.some((node) => node.id === id || node.path === path)) return;
+                        const node = { id, path, title, kind, summary, source: 'manual' };
+                        nodes.push(node);
+                        nodeMap.set(path, node);
+                    });
+
+                    relevantFiles.forEach((entry) => {
+                        if (nodeMap.has(entry.path)) return;
+                        const node = createNode(entry.path, inferTitle(entry.path), inferKind(entry.path));
+                        const parentPath = entry.path.split('/').slice(0, -1).join('/');
+                        if (parentPath && nodeMap.has(parentPath)) {
+                            addEdge(node.id, nodeMap.get(parentPath).id, 0.8);
+                        }
+                    });
+
+                    const contentFiles = relevantFiles;
+                    await Promise.all(contentFiles.map(async (entry) => {
+                        try {
+                            const text = await fetchText(entry.path);
+                            const node = nodeMap.get(entry.path);
+                            if (node) {
+                                node.summary = extractSummary(text, entry.path);
+                                node.text = text;
+                            }
+                        } catch (error) {
+                            // ignore and keep fallback summary
+                        }
+                    }));
+
+                    nodes.forEach((node) => {
+                        if (!node.text) return;
+                        const links = extractLocalLinks(node.text);
+                        links.forEach((link) => {
+                            const resolved = resolveRelativePath(node.path, link);
+                            if (!resolved) return;
+                            const targetNode = nodeMap.get(resolved) || nodeMap.get(`src/modules/AlgoDatCourse/infopedia.html#${resolved}`);
+                            if (targetNode) {
+                                addEdge(node.id, targetNode.id, 1.4);
+                            }
+                        });
+                    });
+
+                    infopediaEntries.forEach((entry) => {
+                        entry.related.forEach((relatedId) => {
+                            const target = nodes.find((node) => node.id === `infopedia-${relatedId}`);
+                            if (target) addEdge(entry.id, target.id, 1.4);
+                        });
+                        entry.links.forEach((link) => {
+                            if (!link || /^(https?:|mailto:|tel:|javascript:|#)/i.test(link)) return;
+                            const target = nodeMap.get(link.replace(/^\.\//, ''));
+                            if (target) addEdge(entry.id, target.id, 1.2);
+                        });
+                    });
+
+                    const byFolder = new Map();
+                    nodes.filter((node) => node.path && !node.path.startsWith('src/modules/AlgoDatCourse/infopedia.html#')).forEach((node) => {
+                        const folder = node.path.split('/').slice(0, -1).join('/');
+                        if (!folder) return;
+                        const list = byFolder.get(folder) || [];
+                        list.push(node);
+                        byFolder.set(folder, list);
+                    });
+                    byFolder.forEach((group) => {
+                        for (let i = 0; i < group.length - 1; i += 1) {
+                            addEdge(group[i].id, group[i + 1].id, 0.6);
+                        }
+                    });
+
+                    const referencesNode = nodeMap.get('src/Referenzen.html');
+                    ['publication-jenacraft', 'publication-gothacraft', 'publication-minecraft-heritage'].forEach((id) => {
+                        if (referencesNode) addEdge(id, referencesNode.id, 1.5);
+                    });
+
+                    status.textContent = `${nodes.length} Inhalte geladen · aktualisiert aus dem aktuellen Repository-Stand`;
+                    selectedId = nodes[0]?.id || null;
+                    resetGraphView();
+                    renderGraph(searchInput.value);
+                } catch (error) {
+                    status.textContent = 'Der Wissensgraph konnte nicht live geladen werden. Die Seite zeigt die statische Struktur an.';
+                    if (!nodes.length) {
+                        createNode('index.html', 'Startseite', 'Seite', 'Die Startseite der GitHub-Page.');
+                        createNode('src/projekte.html', 'Projekte', 'Seite', 'Projektübersicht.');
+                        createNode('src/kontakt.html', 'Kontakt', 'Seite', 'Kontaktseite.');
+                        createNode('src/modules/AlgoDatCourse/index.html', 'AlgoDat', 'Modul', 'Interaktiver Lernkurs.');
+                        nodes.push({ id: 'publication-jenacraft', path: 'src/Referenzen.html#jenacraft', title: 'JenaCraft', kind: 'Publikation', summary: 'Publikation eines Lehrkonzeptes: Die Stadt der Zukunft.', source: 'manual' });
+                        selectedId = nodes[0]?.id || null;
+                        resetGraphView();
+                        renderGraph(searchInput.value);
+                    }
+                }
+            }
+
+            loadGraph();
+        }
     </script>
 </body>
 </html>
