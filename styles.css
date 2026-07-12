@@ -973,6 +973,7 @@ footer {
 .knowledge-cluster.algodat { border-color: rgba(96,165,250,.18); }
 .knowledge-cluster.references { border-color: rgba(246,195,91,.2); }
 .knowledge-cluster.worksheets { border-color: rgba(52,211,153,.18); }
+.knowledge-cluster.automata { border-color: rgba(168,85,247,.24); }
 .knowledge-cluster.tools { border-color: rgba(34,211,238,.18); }
 .knowledge-cluster.projects { border-color: rgba(167,139,250,.16); }
 .knowledge-cluster.guides { border-color: rgba(139,209,124,.2); }
@@ -1017,6 +1018,7 @@ footer {
 .graph-node.pages { background: rgba(25, 35, 55, .95); }
 .graph-node.projects { background: rgba(39, 48, 31, .95); }
 .graph-node.tools { background: rgba(20, 50, 58, .95); }
+.graph-node.automata { background: rgba(45, 32, 72, .95); }
 .graph-node.guides { background: rgba(38, 51, 29, .95); }
 .graph-node.references,
 .graph-node.publikation { background: rgba(58, 45, 22, .95); }

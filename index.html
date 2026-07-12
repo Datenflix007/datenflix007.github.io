@@ -473,7 +473,16 @@
             if (!stage || !pan || !svg || !clustersHost || !nodesHost || !searchInput || !suggestions || !status || !filterChips || !tagSearch || !filterReset) return;
 
             const repo = { owner: 'datenflix007', repo: 'datenflix007.github.io', branch: 'main' };
-            const graphSize = { width: 2400, height: 1300 };
+            const graphSize = { width: 2500, height: 1620 };
+            const clusterBoxes = {
+                worksheets: { x: 90, y: 150, w: 520, h: 330 },
+                algodat: { x: 760, y: 40, w: 860, h: 460 },
+                automata: { x: 1710, y: 90, w: 610, h: 450 },
+                projects: { x: 120, y: 650, w: 560, h: 430 },
+                references: { x: 1640, y: 650, w: 680, h: 430 },
+                tools: { x: 560, y: 1140, w: 790, h: 390 },
+                guides: { x: 1530, y: 1140, w: 550, h: 390 }
+            };
             let nodes = [];
             let edges = [];
             let selectedId = null;
@@ -495,9 +504,50 @@
 
             function addEdge(from, to, weight = 1) {
                 if (!from || !to || from === to) return;
+                if (shouldSkipEdge(from, to)) return;
                 const key = [from, to].sort().join('|');
                 if (edges.some((edge) => edge.key === key)) return;
                 edges.push({ key, from, to, weight });
+            }
+
+            function shouldSkipEdge(from, to) {
+                if (from.includes('lautstaerke') || to.includes('lautstaerke')) return true;
+                const a = nodes.find((node) => node.id === from);
+                const b = nodes.find((node) => node.id === to);
+                if (!a || !b) return true;
+                const aCategory = nodeCategory(a);
+                const bCategory = nodeCategory(b);
+                if (aCategory !== bCategory) return true;
+                if (['tools', 'projects', 'guides', 'worksheets'].includes(aCategory)) return true;
+                if (aCategory === 'references' && bCategory === 'references') {
+                    const allowed = new Set([
+                        ['paper-commitment-cultural-heritage', 'publication-jenacraft'].sort().join('|'),
+                        ['paper-urban-history-minecraft-chatgpt', 'publication-jenacraft'].sort().join('|'),
+                        ['publication-gothacraft', 'publication-jenacraft'].sort().join('|')
+                    ]);
+                    return !allowed.has([from, to].sort().join('|'));
+                }
+                if (aCategory === 'automata' && bCategory === 'automata') {
+                    const allowed = new Set([
+                        ['automata-course', 'automata-vorwort'].sort().join('|'),
+                        ['automata-course', 'automata-chomsky'].sort().join('|'),
+                        ['automata-course', 'automata-berechenbarkeit'].sort().join('|'),
+                        ['automata-course', 'automata-dfa'].sort().join('|'),
+                        ['automata-course', 'automata-nfa'].sort().join('|'),
+                        ['automata-course', 'automata-pda'].sort().join('|'),
+                        ['automata-course', 'automata-tm'].sort().join('|'),
+                        ['automata-course', 'automata-beweise'].sort().join('|'),
+                        ['automata-course', 'automata-wortlaut'].sort().join('|'),
+                        ['automata-dfa', 'automata-nfa'].sort().join('|'),
+                        ['automata-nfa', 'automata-beweise'].sort().join('|'),
+                        ['automata-chomsky', 'automata-dfa'].sort().join('|'),
+                        ['automata-chomsky', 'automata-pda'].sort().join('|'),
+                        ['automata-chomsky', 'automata-tm'].sort().join('|'),
+                        ['automata-berechenbarkeit', 'automata-tm'].sort().join('|')
+                    ]);
+                    return !allowed.has([from, to].sort().join('|'));
+                }
+                return false;
             }
 
             function setView(next) {
@@ -533,8 +583,33 @@
                 const parts = clean.split('/').filter(Boolean);
                 const last = parts[parts.length - 1] || 'Start';
                 const base = last.replace(/\.(html|md|txt)$/i, '');
+                if (/^readme$/i.test(base) && parts.length > 1) {
+                    return displayName(parts[parts.length - 2]);
+                }
                 const fallback = base === 'index' && parts.length > 1 ? parts[parts.length - 2] : base;
-                return fallback.replace(/[-_]+/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase());
+                return displayName(fallback);
+            }
+
+            function displayName(value) {
+                const aliases = {
+                    'AlltagsLabor': 'Alltagslabor',
+                    'DAB_naturerlebniszentrum': 'Der Jenaer Wald und wir',
+                    'AlgoDatCourse': 'Algorithmen und Datenstrukturen',
+                    'DatastructureLab': 'DatastructureLab',
+                    'AutomataLab': 'AutomataLab',
+                    'markdownGenerator': 'Markdown-Generator',
+                    'manuscriptMaker': 'Manuskript-Maker',
+                    'memeMaker': 'Meme-Maker',
+                    'qrgenerator': 'QR-Generator',
+                    'scrum4school': 'Scrum 4 School',
+                    'SchoolNotebook': 'School-Notebook',
+                    'tivisualiser': 'TIVisualizer',
+                    'titrainer': 'TI-Trainer',
+                    'AlgorithmPlanner': 'AlgorithmPlanner',
+                    'WennZeitÜberLebenEntscheidet': 'Wenn Zeit über Leben entscheidet'
+                };
+                if (aliases[value]) return aliases[value];
+                return String(value || 'Inhalt').replace(/[-_]+/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase());
             }
 
             function inferKind(path) {
@@ -597,13 +672,31 @@
 
             function nodeCategory(node) {
                 const text = normalize(`${node.kind} ${node.title} ${node.path}`);
+                const kind = normalize(node.kind);
+                if (kind === 'publikation') return 'references';
+                if (kind === 'projekt') return 'projects';
+                if (kind === 'automatentheorie') return 'automata';
+                if (kind === 'tool') return 'tools';
+                if (kind === 'guide') return 'guides';
                 if (text.includes('referenz') || text.includes('jenacraft') || text.includes('gothacraft') || text.includes('publication') || text.includes('publikation') || text.includes('minecraft in der lehre')) return 'references';
+                if (text.includes('automatencourse') || text.includes('titrainer/automaten') || text.includes('titrainer/rote-boxen') || text.includes('chomsky') || text.includes('berechenbarkeit') || text.includes('dfa') || text.includes('nfa') || text.includes('pda') || text.includes('turingmaschine')) return 'automata';
                 if (text.includes('infopedia') || text.includes('algodat') || text.includes('algorithm') || text.includes('sort') || text.includes('heap') || text.includes('baum') || text.includes('graph')) return 'algodat';
                 if (text.includes('guide')) return 'guides';
-                if (text.includes('dab') || text.includes('arbeitsblatt') || text.includes('naturerlebniszentrum') || text.includes('alltagslabor')) return 'worksheets';
+                if (text.includes('dab naturerlebniszentrum') || text.includes('der jenaer wald') || text.includes('naturerlebniszentrum')) return 'worksheets';
                 if (text.includes('tool') || text.includes('generator') || text.includes('maker') || text.includes('viewer') || text.includes('qrgenerator') || text.includes('automata') || text.includes('visualiser') || text.includes('planner') || text.includes('notebook')) return 'tools';
-                if (text.includes('projekt') || text.includes('readme') || text.includes('scrum') || text.includes('mysql') || text.includes('pnp') || text.includes('holo')) return 'projects';
+                if (text.includes('alltagslabor') || text.includes('scrum') || text.includes('mysql') || text.includes('pnp') || text.includes('holo')) return 'projects';
                 return 'pages';
+            }
+
+            function nodeSubgroup(node) {
+                const text = normalize(`${node.title} ${node.path} ${node.summary}`);
+                if (text.includes('algodat') || text.includes('datenstruktur') || text.includes('sort') || text.includes('heap') || text.includes('baum')) return 'algodat';
+                if (text.includes('automata') || text.includes('automat') || text.includes('turing') || text.includes('formale')) return 'automata';
+                if (text.includes('jena') || text.includes('gotha') || text.includes('minecraft') || text.includes('heritage') || text.includes('kumbra') || text.includes('urban history') || text.includes('lindenring')) return 'heritage';
+                if (text.includes('generator') || text.includes('maker') || text.includes('viewer') || text.includes('visualiser')) return 'creator-tools';
+                if (text.includes('schule') || text.includes('school') || text.includes('arbeitsblatt') || text.includes('lehre')) return 'education';
+                if (text.includes('guide') || text.includes('kurs')) return 'learning';
+                return nodeCategory(node);
             }
 
             function nodeTags(node) {
@@ -613,11 +706,12 @@
                 if (category === 'references') tags.add('referenz').add('publikation').add('literatur');
                 if (category === 'projects') tags.add('projekt');
                 if (category === 'tools') tags.add('tool');
+                if (category === 'automata') tags.add('automatentheorie').add('automaten').add('formale sprachen');
                 if (category === 'guides') tags.add('guide');
                 if (category === 'worksheets') tags.add('arbeitsblatt').add('digitales arbeitsblatt');
                 if (category === 'algodat') tags.add('algodat').add('algorithmen').add('datenstrukturen');
                 if (text.includes('studium') || text.includes('informatikstudium') || text.includes('geschichtsstudium') || text.includes('lehramt')) tags.add('studium');
-                if (text.includes('automata') || text.includes('automat') || text.includes('endlicher automat') || text.includes('formale sprache')) tags.add('automatentheorie');
+                if (category === 'automata' || text.includes('endlicher automat') || text.includes('kellerautomat') || text.includes('turingmaschine') || text.includes('formale sprache')) tags.add('automatentheorie');
                 if (text.includes('dab') || text.includes('arbeitsblatt')) tags.add('digitales arbeitsblatt');
                 if (text.includes('jena') || text.includes('gotha') || text.includes('minecraft')) tags.add('lehrkonzept');
                 return [...tags].map(normalize).filter(Boolean);
@@ -625,46 +719,51 @@
 
             function categoryLabel(category) {
                 return {
-                    algodat: 'AlgoDat / InfoPedia',
+                    algodat: 'Algorithmen und Datenstrukturen',
                     references: 'Referenzen / Publikationen',
-                    worksheets: 'Digitale Arbeitsblaetter',
+                    worksheets: 'Digitale Arbeitsblätter',
+                    automata: 'Automatentheorie',
                     tools: 'Tools',
                     projects: 'Projekte',
-                    guides: 'Guides',
-                    pages: 'Seiten'
+                    guides: 'Guides'
                 }[category] || 'Inhalte';
             }
 
             function graphPosition(node, index, groupIndex, groupSize) {
-                const boxes = {
-                    algodat: { x: 1180, y: 70, w: 1140, h: 700 },
-                    references: { x: 1740, y: 820, w: 560, h: 360 },
-                    worksheets: { x: 70, y: 120, w: 560, h: 400 },
-                    tools: { x: 690, y: 820, w: 620, h: 360 },
-                    projects: { x: 80, y: 650, w: 560, h: 500 },
-                    guides: { x: 1330, y: 900, w: 380, h: 290 },
-                    pages: { x: 650, y: 160, w: 470, h: 500 }
-                };
                 const category = nodeCategory(node);
-                const box = boxes[category] || boxes.pages;
-                const cols = Math.max(2, Math.ceil(Math.sqrt(groupSize * (box.w / box.h))));
+                const box = clusterBoxes[category];
+                if (!box) return { x: -1000, y: -1000 };
+                const padX = Math.min(120, box.w * 0.18);
+                const padTop = 66;
+                const padBottom = 52;
+                const innerW = Math.max(120, box.w - padX * 2);
+                const innerH = Math.max(90, box.h - padTop - padBottom);
+                const cols = Math.max(2, Math.ceil(Math.sqrt(groupSize * (innerW / innerH))));
                 const rows = Math.max(1, Math.ceil(groupSize / cols));
                 const col = groupIndex % cols;
                 const row = Math.floor(groupIndex / cols);
-                const cellW = box.w / cols;
-                const cellH = box.h / rows;
-                let x = box.x + cellW * (col + 0.5);
-                let y = box.y + cellH * (row + 0.5);
+                const cellW = innerW / cols;
+                const cellH = innerH / rows;
+                let x = box.x + padX + cellW * (col + 0.5);
+                let y = box.y + padTop + cellH * (row + 0.5);
+                const subgroupOffsets = {
+                    algodat: { algodat: [0, -12], automata: [-80, 20], learning: [80, 20] },
+                    references: { heritage: [-70, -10], references: [70, 20] },
+                    automata: { automata: [0, -12], learning: [0, 50] },
+                    tools: { automata: [-80, -20], 'creator-tools': [70, -12], education: [0, 46], algodat: [-24, -42] },
+                    projects: { education: [-70, -36], heritage: [70, 24], projects: [0, 50] },
+                    guides: { learning: [0, -18], guides: [0, 42] },
+                    worksheets: { education: [0, 0], worksheets: [0, 0] }
+                };
+                const offset = subgroupOffsets[category]?.[nodeSubgroup(node)] || [0, 0];
+                x += offset[0];
+                y += offset[1];
                 const jitter = ((index % 3) - 1) * 7;
-                const searchDx = (x - graphSize.width / 2) / 330;
-                const searchDy = (y - graphSize.height / 2) / 270;
-                if ((searchDx * searchDx) + (searchDy * searchDy) < 1) {
-                    x += category === 'pages' ? -170 : 170;
-                    y += y < graphSize.height / 2 ? -80 : 80;
-                }
+                x += jitter;
+                y -= jitter * 0.4;
                 return {
-                    x: Math.max(70, Math.min(graphSize.width - 70, x + jitter)),
-                    y: Math.max(60, Math.min(graphSize.height - 60, y - jitter * 0.4))
+                    x: Math.max(box.x + padX, Math.min(box.x + box.w - padX, x)),
+                    y: Math.max(box.y + padTop, Math.min(box.y + box.h - padBottom, y))
                 };
             }
 
@@ -680,6 +779,18 @@
                 return `${pathPart}${hash}`;
             }
 
+            function shouldKeepRepoFile(path) {
+                const normalized = path.replace(/\\/g, '/');
+                if (normalized === 'index.html') return false;
+                if (normalized === 'README.md') return false;
+                if (normalized === 'src/projekte.html' || normalized === 'src/Referenzen.html' || normalized === 'src/kontakt.html' || normalized === 'src/informatikstudium.html') return false;
+                if (normalized.startsWith('src/modules/DAB_naturerlebniszentrum/') && normalized !== 'src/modules/DAB_naturerlebniszentrum/index.html') return false;
+                if (normalized.startsWith('src/modules/AlltagsLabor/') && normalized !== 'src/modules/AlltagsLabor/index.html') return false;
+                if (normalized.startsWith('src/modules/scrum4school/') && normalized !== 'src/modules/scrum4school/index.html') return false;
+                if (/\.(md|txt)$/i.test(normalized) && !normalized.startsWith('src/guides/')) return false;
+                return true;
+            }
+
             function navigateToNode(id) {
                 const node = nodes.find((entry) => entry.id === id);
                 const url = nodeUrl(node);
@@ -692,11 +803,12 @@
                 const tagQuery = normalize(tagSearch.value).trim();
                 const filters = [...activeFilters].map(normalize);
                 const matches = nodes.filter((node) => {
+                    if (nodeCategory(node) === 'pages') return false;
                     const tags = nodeTags(node);
                     const haystack = normalize(`${node.title} ${node.path} ${node.summary} ${node.kind} ${tags.join(' ')}`);
                     if (q && !haystack.includes(q)) return false;
                     if (tagQuery && !haystack.includes(tagQuery)) return false;
-                    if (filters.length && !filters.every((filter) => tags.some((tag) => tag.includes(filter)) || haystack.includes(filter))) return false;
+                    if (filters.length && !filters.every((filter) => tags.some((tag) => tag === filter || tag.includes(filter)))) return false;
                     return true;
                 });
                 return matches;
@@ -731,25 +843,18 @@
                 const groups = new Map();
                 nodes.forEach((node) => {
                     const category = nodeCategory(node);
+                    if (category === 'pages') return;
                     const group = groups.get(category) || [];
                     group.push(node);
                     groups.set(category, group);
                 });
                 const positions = new Map();
                 nodes.forEach((node, index) => {
+                    if (nodeCategory(node) === 'pages') return;
                     const group = groups.get(nodeCategory(node)) || [node];
                     positions.set(node.id, graphPosition(node, index, group.indexOf(node), group.length));
                 });
 
-                const clusterBoxes = {
-                    algodat: { x: 1180, y: 70, w: 1140, h: 700 },
-                    references: { x: 1740, y: 820, w: 560, h: 360 },
-                    worksheets: { x: 70, y: 120, w: 560, h: 400 },
-                    tools: { x: 690, y: 820, w: 620, h: 360 },
-                    projects: { x: 80, y: 650, w: 560, h: 500 },
-                    guides: { x: 1330, y: 900, w: 380, h: 290 },
-                    pages: { x: 650, y: 160, w: 470, h: 500 }
-                };
                 Object.entries(clusterBoxes).forEach(([category, box]) => {
                     if (!list.some((node) => nodeCategory(node) === category)) return;
                     const halo = document.createElement('div');
@@ -766,6 +871,8 @@
                     if (!visibleIds.has(edge.from) || !visibleIds.has(edge.to)) return;
                     const fromPos = positions.get(edge.from);
                     const toPos = positions.get(edge.to);
+                    const fromNode = nodes.find((entry) => entry.id === edge.from);
+                    const toNode = nodes.find((entry) => entry.id === edge.to);
                     if (!fromPos || !toPos) return;
                     const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
                     line.setAttribute('x1', fromPos.x);
@@ -775,6 +882,10 @@
                     line.setAttribute('stroke', 'rgba(125, 211, 252, 0.24)');
                     line.setAttribute('stroke-width', edge.weight > 1 ? '0.28' : '0.16');
                     line.setAttribute('vector-effect', 'non-scaling-stroke');
+                    line.dataset.from = edge.from;
+                    line.dataset.to = edge.to;
+                    line.dataset.fromCategory = fromNode ? nodeCategory(fromNode) : '';
+                    line.dataset.toCategory = toNode ? nodeCategory(toNode) : '';
                     svg.appendChild(line);
                 });
 
@@ -787,6 +898,8 @@
                     btn.style.top = `${position.y}px`;
                     btn.textContent = node.title;
                     btn.title = nodeUrl(node) || node.title;
+                    btn.dataset.id = node.id;
+                    btn.dataset.category = nodeCategory(node);
                     btn.addEventListener('click', () => navigateToNode(node.id));
                     nodesHost.appendChild(btn);
                 });
@@ -899,7 +1012,7 @@
                     if (!treeResponse.ok) throw new Error('GitHub API nicht erreichbar');
                     const treeData = await treeResponse.json();
                     const files = Array.isArray(treeData.tree) ? treeData.tree.filter((entry) => entry.type === 'blob' && /\.(html|md|txt)$/i.test(entry.path)) : [];
-                    const relevantFiles = files.filter((entry) => !entry.path.startsWith('media/') && !entry.path.startsWith('fonts/') && !entry.path.startsWith('script') && !entry.path.startsWith('Editor/'));
+                    const relevantFiles = files.filter((entry) => !entry.path.startsWith('media/') && !entry.path.startsWith('fonts/') && !entry.path.startsWith('script') && !entry.path.startsWith('Editor/') && shouldKeepRepoFile(entry.path));
 
                     const infopediaEntries = await loadInfopediaEntries();
                     infopediaEntries.forEach((entry) => {
@@ -908,11 +1021,45 @@
                     });
 
                     [
+                        ['project-alltagslabor', 'Alltagslabor', 'Projekt', 'Projekt aus Digitales Lehren und Lernen in der Werkstattschule Jena.', 'src/modules/AlltagsLabor/index.html'],
+                        ['project-edsp', 'EDSp', 'Projekt', 'Einsatz-Leit-Software als Projektarbeit.', 'https://github.com/Datenflix007/EinsatzDisponierungSoftware'],
+                        ['project-lautstaerke-visualisierung', 'Lautstärke-Visualisierung', 'Projekt', 'Unity-Projekt zur Visualisierung von Lautstärke.', 'src/projekte.html'],
+                        ['project-lues', 'LÜS', 'Projekt', 'Lernstands-Überprüfungs-Software.', 'https://github.com/Datenflix007/L-S/tree/main'],
+                        ['tool-datastructurelab', 'DatastructureLab', 'Tool', 'Interaktives Labor zum Erstellen, Visualisieren und Ausprobieren zentraler Datenstrukturen.', 'src/modules/AlgoDatCourse/DatastructureLab.html'],
+                        ['tool-algodat-kurs', 'AlgoDat-Kurs', 'Tool', 'Interaktiver Kurs zu Algorithmen, Datenstrukturen, Laufzeitanalyse und Sortierverfahren.', 'src/modules/AlgoDatCourse/index.html'],
+                        ['tool-ti-trainer', 'TI-Trainer', 'Tool', 'Interaktive Lernumgebung zu Automaten, Algorithmen und Datenstrukturen.', 'src/modules/titrainer/index.html'],
+                        ['tool-algorithmplanner', 'AlgorithmPlanner', 'Tool', 'Visueller Baukasten zum Modellieren von Programmabläufen, Struktogrammen, Flussdiagrammen und UML.', 'src/modules/AlgorithmPlanner/index.html'],
+                        ['tool-hologramm-history', 'Hologramm-History', 'Tool', 'Webanwendung für Fragen an historische Persönlichkeiten.', 'https://github.com/Datenflix007/holo-history'],
+                        ['tool-markdown-generator', 'Markdown-Generator', 'Tool', 'Webanwendung zum Erzeugen von Markdown-Dateien.', 'src/modules/markdownGenerator/index.html'],
+                        ['tool-manuskript-maker', 'Manuskript-Maker', 'Tool', 'Tool zum Erstellen und Bearbeiten von Manuskripten.', 'src/modules/manuscriptMaker/index.html'],
+                        ['tool-meme-maker', 'Meme-Maker', 'Tool', 'Tool zum Erstellen von Memes.', 'src/modules/memeMaker/index.html'],
+                        ['tool-mysql-trainee-ground', 'MySQL-Trainee-Ground', 'Tool', 'Docker-Umgebung zum Lernen und Vertiefen von SQL-Kenntnissen.', 'https://github.com/Datenflix007/MySQL_TraineeGround'],
+                        ['tool-mywebhub', 'MyWebHub', 'Tool', 'Startseite für den Webbrowser mit lokal gespeicherten Daten.', 'src/projekte.html'],
+                        ['tool-ocr-extractor', 'OCR-Extractor', 'Tool', 'Werkzeug zur Texterkennung und Dokumentenauswertung.', 'https://github.com/Datenflix007/OCR-Extractor'],
+                        ['tool-qr-generator', 'QR-Generator', 'Tool', 'Webanwendung zum Generieren angepasster QR-Codes.', 'src/modules/qrgenerator/index.html'],
+                        ['tool-scrum-4-school', 'Scrum 4 School', 'Tool', 'Webanwendung zum strukturierten Arbeiten im Schulkontext.', 'src/modules/scrum4school/index.html'],
+                        ['tool-school-notebook', 'School-Notebook', 'Tool', 'Webanwendung mit IDE und Konsole für eine Python-nachempfundene Sprache.', 'src/modules/SchoolNotebook/index.html'],
+                        ['tool-zotero-docker-github', 'Zotero x Docker x Github', 'Tool', 'Setup zur Synchronisation von Zotero über selbst gehosteten WebDAV.', 'https://github.com/Datenflix007/zotero-webdav-GithubViaDocker'],
+                        ['tool-tivisualizer', 'TIVisualizer', 'Tool', 'Webanwendung zur Visualisierung der Von-Neumann-Architektur.', 'src/modules/tivisualiser/index.html'],
+                        ['tool-automatalab', 'AutomataLab', 'Tool', 'Werkzeug zum Konstruieren, Simulieren und Transformieren endlicher Automaten, Kellerautomaten und Turingmaschinen.', 'src/modules/AutomataLab/index.html'],
+                        ['automata-course', 'Automaten & Berechenbarkeit', 'Automatentheorie', 'Kursseite zu Automatenmodellen, Sprachklassen und Berechenbarkeit.', 'src/modules/titrainer/automaten.html'],
+                        ['automata-vorwort', 'Vorwort: Zwei Ordnungen', 'Automatentheorie', 'Einordnung von Chomsky-Hierarchie und Berechenbarkeit als zwei Perspektiven.', 'src/modules/titrainer/automaten.html#vorwort'],
+                        ['automata-chomsky', '1. Chomsky-Hierarchie', 'Automatentheorie', 'Sprachklassen von regulär über kontextfrei und kontextsensitiv bis rekursiv aufzählbar.', 'src/modules/titrainer/automaten.html#chomsky'],
+                        ['automata-berechenbarkeit', '2. Berechenbarkeit (REC/RE)', 'Automatentheorie', 'Unterscheidung zwischen entscheidbaren und semi-entscheidbaren Sprachen.', 'src/modules/titrainer/automaten.html#berechenbarkeit'],
+                        ['automata-dfa', '3. DFA', 'Automatentheorie', 'Deterministische endliche Automaten und reguläre Sprachen.', 'src/modules/titrainer/automaten.html#dfa'],
+                        ['automata-nfa', '4. NFA', 'Automatentheorie', 'Nichtdeterministische endliche Automaten und Potenzmengenkonstruktion.', 'src/modules/titrainer/automaten.html#nfa'],
+                        ['automata-pda', '5. PDA', 'Automatentheorie', 'Kellerautomaten als Automatenmodell mit Stack.', 'src/modules/titrainer/automaten.html#pda'],
+                        ['automata-tm', '6. Turingmaschine', 'Automatentheorie', 'Turingmaschinen als Standardmodell der Berechenbarkeit.', 'src/modules/titrainer/automaten.html#tm'],
+                        ['automata-beweise', 'Beweise', 'Automatentheorie', 'Beweisskizzen im Automatenkurs, unter anderem NFA zu DFA und Pumping Lemma.', 'src/modules/titrainer/automaten.html#beweise'],
+                        ['automata-wortlaut', 'Wortlaut-Sammlung', 'Automatentheorie', 'Sammlung der Definitionen, Beispiele, Lemmata und Sätze aus dem Automatenkurs.', 'src/modules/titrainer/rote-boxen.html'],
+                        ['reference-poster-wenn-zeit', 'Wenn Zeit Leben rettet', 'Publikation', 'Wissenschaftliches Poster und Poster Viewer zur Digitalisierung in der präklinischen Notfallmedizin.', 'src/modules/WennZeitÜberLebenEntscheidet/poster-viewer.html'],
                         ['publication-jenacraft', 'JenaCraft', 'Publikation', 'Publikation eines Lehrkonzeptes: Die Stadt der Zukunft.', 'src/Referenzen.html#jenacraft'],
                         ['publication-gothacraft', 'GothaCraft', 'Publikation', 'Publikation eines Lehrkonzeptes: Die Stadt der Zukunft.', 'src/Referenzen.html#gothacraft'],
-                        ['publication-minecraft-heritage', 'Minecraft in der Lehre', 'Publikation', 'Lehrkonzepte und Publikationen zu Minecraft, Stadtgeschichte und kulturellem Erbe.', 'src/Referenzen.html#lehrkonzepte']
+                        ['paper-lindenring', 'Am Rand der heutigen Wahrnehmung, im Zentrum des spätmittelalterlichen Konflikts', 'Publikation', 'Paper/Artikel zum Naumburger Lindenring als Schauplatz spätmittelalterlicher innerstädtischer Teilung.', 'src/Referenzen.html#paper-lindenring'],
+                        ['paper-commitment-cultural-heritage', 'Commitment to protecting cultural heritage and the environment with student-led Minecraft courses', 'Publikation', 'ADHO-Paper zu studentisch geleiteten Minecraft-Kursen für Kinder und Jugendliche.', 'src/Referenzen.html#paper-commitment-cultural-heritage'],
+                        ['paper-urban-history-minecraft-chatgpt', 'Urban history projects by university students for school pupils', 'Publikation', 'UHDL-Paper zur Nutzung von Minecraft und ChatGPT in einem humanities teaching and learning laboratory.', 'src/Referenzen.html#paper-urban-history-minecraft-chatgpt']
                     ].forEach(([id, title, kind, summary, path]) => {
-                        if (nodes.some((node) => node.id === id || node.path === path)) return;
+                        if (nodes.some((node) => node.id === id)) return;
                         const node = { id, path, title, kind, summary, source: 'manual' };
                         nodes.push(node);
                         nodeMap.set(path, node);
@@ -920,11 +1067,7 @@
 
                     relevantFiles.forEach((entry) => {
                         if (nodeMap.has(entry.path)) return;
-                        const node = createNode(entry.path, inferTitle(entry.path), inferKind(entry.path));
-                        const parentPath = entry.path.split('/').slice(0, -1).join('/');
-                        if (parentPath && nodeMap.has(parentPath)) {
-                            addEdge(node.id, nodeMap.get(parentPath).id, 0.8);
-                        }
+                        createNode(entry.path, inferTitle(entry.path), inferKind(entry.path));
                     });
 
                     const contentFiles = relevantFiles;
@@ -941,49 +1084,31 @@
                         }
                     }));
 
-                    nodes.forEach((node) => {
-                        if (!node.text) return;
-                        const links = extractLocalLinks(node.text);
-                        links.forEach((link) => {
-                            const resolved = resolveRelativePath(node.path, link);
-                            if (!resolved) return;
-                            const targetNode = nodeMap.get(resolved) || nodeMap.get(`src/modules/AlgoDatCourse/infopedia.html#${resolved}`);
-                            if (targetNode) {
-                                addEdge(node.id, targetNode.id, 1.4);
-                            }
-                        });
-                    });
-
                     infopediaEntries.forEach((entry) => {
                         entry.related.forEach((relatedId) => {
                             const target = nodes.find((node) => node.id === `infopedia-${relatedId}`);
                             if (target) addEdge(entry.id, target.id, 1.4);
                         });
-                        entry.links.forEach((link) => {
-                            if (!link || /^(https?:|mailto:|tel:|javascript:|#)/i.test(link)) return;
-                            const target = nodeMap.get(link.replace(/^\.\//, ''));
-                            if (target) addEdge(entry.id, target.id, 1.2);
-                        });
                     });
 
-                    const byFolder = new Map();
-                    nodes.filter((node) => node.path && !node.path.startsWith('src/modules/AlgoDatCourse/infopedia.html#')).forEach((node) => {
-                        const folder = node.path.split('/').slice(0, -1).join('/');
-                        if (!folder) return;
-                        const list = byFolder.get(folder) || [];
-                        list.push(node);
-                        byFolder.set(folder, list);
-                    });
-                    byFolder.forEach((group) => {
-                        for (let i = 0; i < group.length - 1; i += 1) {
-                            addEdge(group[i].id, group[i + 1].id, 0.6);
-                        }
-                    });
-
-                    const referencesNode = nodeMap.get('src/Referenzen.html');
-                    ['publication-jenacraft', 'publication-gothacraft', 'publication-minecraft-heritage'].forEach((id) => {
-                        if (referencesNode) addEdge(id, referencesNode.id, 1.5);
-                    });
+                    addEdge('automata-course', 'automata-vorwort', 1.2);
+                    addEdge('automata-course', 'automata-chomsky', 1.2);
+                    addEdge('automata-course', 'automata-berechenbarkeit', 1.2);
+                    addEdge('automata-course', 'automata-dfa', 1.2);
+                    addEdge('automata-course', 'automata-nfa', 1.2);
+                    addEdge('automata-course', 'automata-pda', 1.2);
+                    addEdge('automata-course', 'automata-tm', 1.2);
+                    addEdge('automata-course', 'automata-beweise', 1.2);
+                    addEdge('automata-course', 'automata-wortlaut', 1.2);
+                    addEdge('automata-dfa', 'automata-nfa', 1.0);
+                    addEdge('automata-nfa', 'automata-beweise', 1.0);
+                    addEdge('automata-chomsky', 'automata-dfa', 1.0);
+                    addEdge('automata-chomsky', 'automata-pda', 1.0);
+                    addEdge('automata-chomsky', 'automata-tm', 1.0);
+                    addEdge('automata-berechenbarkeit', 'automata-tm', 1.0);
+                    addEdge('publication-jenacraft', 'publication-gothacraft', 1.2);
+                    addEdge('publication-jenacraft', 'paper-commitment-cultural-heritage', 1.1);
+                    addEdge('publication-jenacraft', 'paper-urban-history-minecraft-chatgpt', 1.1);
 
                     status.textContent = `${nodes.length} Inhalte geladen · aktualisiert aus dem aktuellen Repository-Stand`;
                     selectedId = nodes[0]?.id || null;
