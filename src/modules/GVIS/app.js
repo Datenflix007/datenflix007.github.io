@@ -1216,7 +1216,8 @@ async function analyzeImageFile(event) {
         const image = await loadImage(url);
         setStatus("Bild wird lokal analysiert ...");
         let hints = analyzeImagePixels(image, gps, file.name);
-        const textHints = await analyzeImageText(url, file.name);
+        const imageSignature = imageComparisonSignature(image);
+        const textHints = await analyzeImageText(url, file.name, imageSignature);
         hints = dedupeImageHints([...hints, ...textHints]);
         state.imageHints = hints;
         renderImageSignals(hints, gps);
@@ -1243,7 +1244,7 @@ function loadImage(url) {
     });
 }
 
-async function analyzeImageText(imageUrl, fileName) {
+async function analyzeImageText(imageUrl, fileName, imageSignature) {
     const hints = [];
     const candidates = imageTextCandidates(fileName, "filename", .76);
     if (window.Tesseract?.recognize) {
@@ -1258,7 +1259,7 @@ async function analyzeImageText(imageUrl, fileName) {
             if (!$("#imageTextInput").value.trim()) $("#imageTextInput").value = terms.join(", ");
         }
     }
-    hints.push(...await resolveImagePlaceHints(candidates));
+    hints.push(...await resolveImagePlaceHints(candidates, { imageSignature, allowAutoFocus: state.searchCenterReady }));
     return hints;
 }
 
@@ -1270,7 +1271,7 @@ async function resolveManualImageText() {
     }
     setStatus("Ortskandidaten werden weltweit gesucht ...");
     const candidates = imageTextCandidates(raw, "manual", .96);
-    const hints = await resolveImagePlaceHints(candidates);
+    const hints = await resolveImagePlaceHints(candidates, { allowGlobal: true, allowAutoFocus: true });
     if (!hints.length) {
         setStatus("Kein globaler Ortskandidat gefunden. Text praezisieren, z. B. Landmarke + Stadt/Land.");
         return;
@@ -1344,38 +1345,83 @@ function isUsefulPlaceCandidate(term) {
     return true;
 }
 
-async function resolveImagePlaceHints(candidates) {
+async function resolveImagePlaceHints(candidates, options = {}) {
     const hints = [];
     const seen = new Set();
     for (const candidate of candidates.slice(0, 5)) {
         const key = normalize(candidate.term);
         if (seen.has(key)) continue;
         seen.add(key);
-        const place = await geocodeGlobalTerm(candidate.term);
-        if (!place) continue;
-        const confidence = candidate.source === "manual" ? .96 : candidate.source === "ocr" ? .9 : .78;
-        hints.push(imageHint(
-            `Ortskandidat: ${place.name}`,
-            candidate.term,
-            "poi",
-            confidence,
-            [],
-            { lat: place.lat, lon: place.lon, zoom: place.zoom, label: place.label },
-        ));
+        const place = await geocodeCandidateTerm(candidate, options);
+        if (place) {
+            const confidence = place.contextual ? Math.max(.9, candidate.confidence) : candidate.source === "manual" ? .96 : .72;
+            hints.push(imageHint(
+                `${place.contextual ? "lokaler Ortskandidat" : "Ortskandidat"}: ${place.name}`,
+                candidate.term,
+                "poi",
+                confidence,
+                [],
+                {
+                    lat: place.lat,
+                    lon: place.lon,
+                    zoom: place.zoom,
+                    label: place.label,
+                    autofocus: Boolean(options.allowAutoFocus && (place.contextual || candidate.source === "manual")),
+                },
+            ));
+        }
+        if (options.imageSignature && (candidate.source === "manual" || candidate.source === "ocr")) {
+            const reference = await commonsReferenceMatch(candidate.term, options.imageSignature);
+            if (reference) {
+                hints.push(imageHint(
+                    `Online-Bildreferenz: ${reference.title}`,
+                    `${candidate.term}, ${reference.title}`,
+                    "poi",
+                    reference.confidence,
+                    [],
+                ));
+            }
+        }
     }
     return hints;
+}
+
+async function geocodeCandidateTerm(candidate, options = {}) {
+    if (state.searchCenterReady) {
+        const local = await geocodeLocalTerm(candidate.term);
+        if (local) return { ...local, contextual: true };
+    }
+    if (options.allowGlobal || candidate.source === "manual") {
+        const global = await geocodeGlobalTerm(candidate.term);
+        if (global) return { ...global, contextual: false };
+    }
+    return null;
+}
+
+async function geocodeLocalTerm(term) {
+    const maxDistance = imageContextRadius();
+    return await geocodePhotonTerm(term, { center: state.center, maxDistance, limit: 6 })
+        || await geocodeNominatimTerm(term, { bbox: bboxAround(state.center, maxDistance), bounded: true, maxDistance });
+}
+
+function imageContextRadius() {
+    return Math.max(3500, Math.min(30000, radius() * 12));
 }
 
 async function geocodeGlobalTerm(term) {
     return await geocodePhotonTerm(term) || await geocodeNominatimTerm(term);
 }
 
-async function geocodePhotonTerm(term) {
+async function geocodePhotonTerm(term, options = {}) {
     try {
-        const params = new URLSearchParams({ q: term, limit: "1" });
+        const params = new URLSearchParams({ q: term, limit: String(options.limit || 1) });
+        if (options.center) {
+            params.set("lat", String(options.center[0]));
+            params.set("lon", String(options.center[1]));
+        }
         const response = await fetchWithTimeout(`https://photon.komoot.io/api/?${params}`, { headers: { "Accept": "application/json" } }, 7000);
         const data = await response.json();
-        const feature = data.features?.[0];
+        const feature = bestGeocoderFeature(data.features || [], term, options);
         const coordinates = feature?.geometry?.coordinates;
         if (!coordinates) return null;
         const props = feature.properties || {};
@@ -1392,18 +1438,22 @@ async function geocodePhotonTerm(term) {
     }
 }
 
-async function geocodeNominatimTerm(term) {
+async function geocodeNominatimTerm(term, options = {}) {
     try {
         const params = new URLSearchParams({
             format: "geojson",
             q: term,
-            limit: "1",
+            limit: String(options.limit || 6),
             addressdetails: "0",
             extratags: "1",
         });
+        if (options.bounded && options.bbox) {
+            params.set("bounded", "1");
+            params.set("viewbox", `${options.bbox.west},${options.bbox.north},${options.bbox.east},${options.bbox.south}`);
+        }
         const response = await fetchWithTimeout(`https://nominatim.openstreetmap.org/search?${params}`, { headers: { "Accept": "application/geo+json" } }, 7000);
         const data = await response.json();
-        const feature = data.features?.[0];
+        const feature = bestGeocoderFeature(data.features || [], term, options);
         const coordinates = feature?.geometry?.coordinates;
         if (!coordinates) return null;
         const props = feature.properties || {};
@@ -1419,12 +1469,122 @@ async function geocodeNominatimTerm(term) {
     }
 }
 
+function bestGeocoderFeature(features, term, options = {}) {
+    const normalizedTerm = normalize(term);
+    const scored = features
+        .map((feature) => {
+            const coordinates = feature.geometry?.coordinates;
+            if (!coordinates || coordinates.length < 2) return null;
+            const props = feature.properties || {};
+            const lat = Number(coordinates[1]);
+            const lon = Number(coordinates[0]);
+            const distance = options.center ? distanceMeters(options.center[0], options.center[1], lat, lon) : 0;
+            if (options.maxDistance && distance > options.maxDistance) return null;
+            const text = normalize(`${props.name || ""} ${props.display_name || ""} ${props.city || ""} ${props.country || ""} ${props.osm_key || ""} ${props.osm_value || ""} ${props.class || ""} ${props.type || ""}`);
+            const exactName = normalize(props.name || "") === normalizedTerm ? .45 : 0;
+            const contains = text.includes(normalizedTerm) ? .24 : 0;
+            const landmark = /tourism|historic|amenity|building|shop|place|highway/.test(text) ? .12 : 0;
+            const distanceScore = options.center ? Math.max(0, 1 - distance / Math.max(options.maxDistance || 1, 1)) * .28 : 0;
+            return { feature, score: exactName + contains + landmark + distanceScore };
+        })
+        .filter(Boolean)
+        .sort((a, b) => b.score - a.score);
+    return scored[0]?.feature || null;
+}
+
 function geocodeZoom(key, value) {
     const text = normalize(`${key} ${value}`);
     if (/tourism|amenity|shop|historic|building|attraction|viewpoint|tower/.test(text)) return 17;
     if (/highway|street|road|pedestrian/.test(text)) return 16;
     if (/city|town|village|municipality|place/.test(text)) return 12;
     return 14;
+}
+
+async function commonsReferenceMatch(term, uploadedSignature) {
+    const references = await searchCommonsImages(term);
+    let best = null;
+    for (const reference of references.slice(0, 4)) {
+        const image = await loadCorsImage(reference.thumbUrl).catch(() => null);
+        if (!image) continue;
+        const signature = imageComparisonSignature(image);
+        const similarity = signatureSimilarity(uploadedSignature, signature);
+        if (!best || similarity > best.similarity) best = { ...reference, similarity };
+    }
+    if (!best || best.similarity < .58) return null;
+    return {
+        ...best,
+        confidence: clamp(.48 + best.similarity * .42),
+    };
+}
+
+async function searchCommonsImages(term) {
+    try {
+        const params = new URLSearchParams({
+            action: "query",
+            generator: "search",
+            gsrsearch: term,
+            gsrnamespace: "6",
+            gsrlimit: "5",
+            prop: "imageinfo",
+            iiprop: "url",
+            iiurlwidth: "260",
+            format: "json",
+            origin: "*",
+        });
+        const response = await fetchWithTimeout(`https://commons.wikimedia.org/w/api.php?${params}`, { headers: { "Accept": "application/json" } }, 8000);
+        const data = await response.json();
+        return Object.values(data.query?.pages || {})
+            .map((page) => ({
+                title: String(page.title || "").replace(/^File:/, "").replace(/\.[a-z0-9]+$/i, ""),
+                thumbUrl: page.imageinfo?.[0]?.thumburl || page.imageinfo?.[0]?.url,
+            }))
+            .filter((item) => item.thumbUrl);
+    } catch {
+        return [];
+    }
+}
+
+function loadCorsImage(url) {
+    return new Promise((resolve, reject) => {
+        const image = new Image();
+        image.crossOrigin = "anonymous";
+        image.onload = () => resolve(image);
+        image.onerror = () => reject(new Error("Referenzbild konnte nicht geladen werden"));
+        image.src = url;
+    });
+}
+
+function imageComparisonSignature(image) {
+    const canvas = document.createElement("canvas");
+    const maxSide = 96;
+    const scale = Math.min(1, maxSide / Math.max(image.naturalWidth || image.width, image.naturalHeight || image.height));
+    canvas.width = Math.max(1, Math.round((image.naturalWidth || image.width) * scale));
+    canvas.height = Math.max(1, Math.round((image.naturalHeight || image.height) * scale));
+    const ctx = canvas.getContext("2d", { willReadFrequently: true });
+    ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+    const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+    const stats = regionStats(pixels, canvas.width, canvas.height, 0, 0, 1, 1);
+    const edges = edgeProfile(pixels, canvas.width, canvas.height, 0, 0, 1, 1);
+    return {
+        green: stats.green,
+        blue: stats.blue,
+        gray: stats.gray,
+        warm: stats.warm,
+        dark: stats.dark,
+        bright: stats.bright,
+        luma: stats.luma,
+        edge: edges.density,
+        vertical: edges.vertical,
+        aspect: canvas.height / Math.max(canvas.width, 1),
+    };
+}
+
+function signatureSimilarity(a, b) {
+    if (!a || !b) return 0;
+    const keys = ["green", "blue", "gray", "warm", "dark", "bright", "luma", "edge", "vertical"];
+    const distance = keys.reduce((sum, key) => sum + Math.abs((a[key] || 0) - (b[key] || 0)), 0) / keys.length;
+    const aspectDistance = Math.min(.35, Math.abs((a.aspect || 1) - (b.aspect || 1)) / 3);
+    return clamp(1 - distance * 1.35 - aspectDistance);
 }
 
 function promiseTimeout(promise, ms) {
@@ -1437,7 +1597,7 @@ function promiseTimeout(promise, ms) {
 
 function focusBestImageLocation(hints) {
     const locationHint = hints
-        .filter((hint) => hint.location && hint.confidence >= .88)
+        .filter((hint) => hint.location && hint.location.autofocus !== false && hint.confidence >= .9)
         .sort((a, b) => b.confidence - a.confidence)[0];
     if (!locationHint) return false;
     focusImageLocation(locationHint.location, `Bildhinweis: ${locationHint.label}`);
