@@ -66,6 +66,35 @@
             </section>
 
             <section class="panel">
+                <div class="panel-head">
+                    <h2>Entitaeten</h2>
+                    <button id="clearEntitiesBtn" class="icon-btn" type="button" title="Auswahl leeren">x</button>
+                </div>
+                <label for="entitySearch">Baumart, Hausart, POI, Kueche oder Landschaft</label>
+                <input id="entitySearch" type="search" placeholder="z. B. Eiche, Fachwerk, Pizza, Spielplatz" />
+                <div class="custom-entity-row">
+                    <input id="customKeyInput" type="text" placeholder="OSM-Key" />
+                    <input id="customValueInput" type="text" placeholder="Wert/Regex" />
+                    <button id="addCustomEntityBtn" class="btn compact" type="button">Add</button>
+                </div>
+                <div id="selectedEntities" class="selected-entities"></div>
+                <div id="entityCatalog" class="entity-catalog" aria-label="Entitaeten-Auswahl"></div>
+            </section>
+
+            <section class="panel">
+                <div class="panel-head">
+                    <h2>Bildanalyse</h2>
+                    <button id="applyImageHintsBtn" class="icon-btn" type="button" title="Bildhinweise in Query uebernehmen">+</button>
+                </div>
+                <label class="file-drop image-drop" for="imageInput">
+                    <input id="imageInput" type="file" accept="image/*" />
+                    <span>Bild hochladen</span>
+                </label>
+                <img id="imagePreview" class="image-preview" alt="Bildvorschau" hidden />
+                <div id="imageSignals" class="signal-list"></div>
+            </section>
+
+            <section class="panel">
                 <h2>Datenquellen</h2>
                 <div class="check-list">
                     <label><input type="checkbox" class="source-check" value="building" checked /> Gebaeude und Haeuser</label>
@@ -121,6 +150,15 @@
                     </div>
                 </div>
                 <div id="factorList" class="factor-list"></div>
+            </section>
+
+            <section class="panel">
+                <h2>Reviews</h2>
+                <label class="file-drop" for="reviewInput">
+                    <input id="reviewInput" type="file" accept=".csv,.json,.geojson" />
+                    <span>Bewertungen importieren</span>
+                </label>
+                <div id="reviewSummary" class="review-summary">CSV/JSON: name, source, rating, count, url, lat, lon</div>
             </section>
 
             <section class="panel result-panel">

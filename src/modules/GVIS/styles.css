@@ -248,6 +248,130 @@ input[type="range"] {
     display: none;
 }
 
+.selected-entities {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    min-height: 12px;
+    margin: 10px 0;
+}
+
+.custom-entity-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.entity-catalog {
+    display: grid;
+    gap: 10px;
+    max-height: 280px;
+    overflow: auto;
+    padding-right: 2px;
+}
+
+.entity-group {
+    display: grid;
+    gap: 6px;
+}
+
+.entity-group-title {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.entity-chip {
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #ffffff;
+    color: var(--ink);
+    padding: 7px 9px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.entity-chip.active,
+.selected-chip {
+    color: #064e3b;
+    border-color: #86efac;
+    background: #dcfce7;
+}
+
+.selected-chip {
+    border-radius: 999px;
+    padding: 5px 8px;
+    font-size: 12px;
+    font-weight: 900;
+}
+
+.image-preview {
+    width: 100%;
+    max-height: 160px;
+    object-fit: cover;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    margin-top: 10px;
+}
+
+.signal-list {
+    display: grid;
+    gap: 7px;
+    margin-top: 10px;
+}
+
+.signal {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    border: 1px solid #dbeafe;
+    border-radius: 8px;
+    background: #eff6ff;
+    color: #1e3a8a;
+    padding: 8px;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.review-summary {
+    margin-top: 10px;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.review-stack {
+    display: grid;
+    gap: 5px;
+    margin-top: 8px;
+}
+
+.review-row,
+.external-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.review-pill,
+.external-link {
+    border-radius: 999px;
+    background: #f1f5f9;
+    color: #334155;
+    padding: 4px 7px;
+    font-size: 12px;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.external-link {
+    background: #ecfeff;
+    color: #155e75;
+}
+
 .map-area {
     position: relative;
     min-width: 0;

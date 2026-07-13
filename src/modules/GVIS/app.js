@@ -2,8 +2,12 @@ const state = {
     map: null,
     markerLayer: null,
     searchCircle: null,
+    imageMarker: null,
     center: [50.9271, 11.5892],
     importedFeatures: [],
+    reviewRecords: [],
+    selectedEntities: new Set(),
+    imageHints: [],
     results: [],
     loading: false,
 };
@@ -37,6 +41,36 @@ const sourceQueries = {
     water: 'node["waterway"](around:RADIUS,LAT,LON);way["waterway"](around:RADIUS,LAT,LON);way["natural"="water"](around:RADIUS,LAT,LON);way["bridge"](around:RADIUS,LAT,LON);',
 };
 
+const entityCatalog = [
+    entity("oak", "Eiche", "Baumarten", "vegetation", ["eiche", "oak", "quercus"], 'node["natural"="tree"]["species"~"Quercus|quercus|oak|Oak|Eiche|eiche"](around:RADIUS,LAT,LON);node["natural"="tree"]["genus"~"Quercus|quercus"](around:RADIUS,LAT,LON);', [["species", "quercus", "oak", "eiche"], ["genus", "quercus"]]),
+    entity("beech", "Buche", "Baumarten", "vegetation", ["buche", "beech", "fagus"], 'node["natural"="tree"]["species"~"Fagus|fagus|beech|Beech|Buche|buche"](around:RADIUS,LAT,LON);node["natural"="tree"]["genus"~"Fagus|fagus"](around:RADIUS,LAT,LON);', [["species", "fagus", "beech", "buche"], ["genus", "fagus"]]),
+    entity("birch", "Birke", "Baumarten", "vegetation", ["birke", "birch", "betula"], 'node["natural"="tree"]["species"~"Betula|betula|birch|Birch|Birke|birke"](around:RADIUS,LAT,LON);node["natural"="tree"]["genus"~"Betula|betula"](around:RADIUS,LAT,LON);', [["species", "betula", "birch", "birke"], ["genus", "betula"]]),
+    entity("pine", "Kiefer", "Baumarten", "vegetation", ["kiefer", "pine", "pinus"], 'node["natural"="tree"]["species"~"Pinus|pinus|pine|Pine|Kiefer|kiefer"](around:RADIUS,LAT,LON);node["natural"="tree"]["genus"~"Pinus|pinus"](around:RADIUS,LAT,LON);', [["species", "pinus", "pine", "kiefer"], ["genus", "pinus"]]),
+    entity("spruce", "Fichte", "Baumarten", "vegetation", ["fichte", "spruce", "picea"], 'node["natural"="tree"]["species"~"Picea|picea|spruce|Spruce|Fichte|fichte"](around:RADIUS,LAT,LON);node["natural"="tree"]["genus"~"Picea|picea"](around:RADIUS,LAT,LON);', [["species", "picea", "spruce", "fichte"], ["genus", "picea"]]),
+    entity("maple", "Ahorn", "Baumarten", "vegetation", ["ahorn", "maple", "acer"], 'node["natural"="tree"]["species"~"Acer|acer|maple|Maple|Ahorn|ahorn"](around:RADIUS,LAT,LON);node["natural"="tree"]["genus"~"Acer|acer"](around:RADIUS,LAT,LON);', [["species", "acer", "maple", "ahorn"], ["genus", "acer"]]),
+    entity("lime", "Linde", "Baumarten", "vegetation", ["linde", "lime", "tilia"], 'node["natural"="tree"]["species"~"Tilia|tilia|lime|Lime|Linde|linde"](around:RADIUS,LAT,LON);node["natural"="tree"]["genus"~"Tilia|tilia"](around:RADIUS,LAT,LON);', [["species", "tilia", "lime", "linde"], ["genus", "tilia"]]),
+    entity("detached", "Einfamilienhaus", "Hausarten", "building", ["einfamilienhaus", "detached", "house"], 'way["building"~"detached|house|semidetached_house"](around:RADIUS,LAT,LON);', [["building", "detached", "house", "semidetached_house"]]),
+    entity("apartments", "Mehrfamilienhaus", "Hausarten", "building", ["mehrfamilienhaus", "apartments", "residential"], 'way["building"~"apartments|residential"](around:RADIUS,LAT,LON);', [["building", "apartments", "residential"]]),
+    entity("terrace", "Reihenhaus", "Hausarten", "building", ["reihenhaus", "terrace"], 'way["building"~"terrace|house"](around:RADIUS,LAT,LON);', [["building", "terrace"]]),
+    entity("half_timbered", "Fachwerk", "Hausarten", "building", ["fachwerk", "half timbered", "timber"], 'way["building"]["building:architecture"~"half-timbered|half_timbered|fachwerk|timber"](around:RADIUS,LAT,LON);way["building"]["facade:material"~"timber|wood"](around:RADIUS,LAT,LON);', [["building:architecture", "half-timbered", "fachwerk", "timber"], ["facade:material", "timber", "wood"]]),
+    entity("flat_roof", "Flachdach", "Hausarten", "building", ["flachdach", "flat roof"], 'way["roof:shape"="flat"](around:RADIUS,LAT,LON);', [["roof:shape", "flat"]]),
+    entity("gabled_roof", "Satteldach", "Hausarten", "building", ["satteldach", "gabled roof"], 'way["roof:shape"~"gabled|half-hipped"](around:RADIUS,LAT,LON);', [["roof:shape", "gabled", "half-hipped"]]),
+    entity("restaurant", "Restaurant", "POIs", "poi", ["restaurant", "essen"], 'node["amenity"="restaurant"](around:RADIUS,LAT,LON);way["amenity"="restaurant"](around:RADIUS,LAT,LON);', [["amenity", "restaurant"]]),
+    entity("cafe", "Cafe", "POIs", "poi", ["cafe", "kaffee"], 'node["amenity"="cafe"](around:RADIUS,LAT,LON);way["amenity"="cafe"](around:RADIUS,LAT,LON);', [["amenity", "cafe"]]),
+    entity("playground", "Spielplatz", "POIs", "poi", ["spielplatz", "playground"], 'node["leisure"="playground"](around:RADIUS,LAT,LON);way["leisure"="playground"](around:RADIUS,LAT,LON);', [["leisure", "playground"]]),
+    entity("school", "Schule", "POIs", "poi", ["schule", "school"], 'node["amenity"="school"](around:RADIUS,LAT,LON);way["amenity"="school"](around:RADIUS,LAT,LON);', [["amenity", "school"]]),
+    entity("viewpoint", "Aussichtspunkt", "POIs", "poi", ["aussicht", "viewpoint"], 'node["tourism"="viewpoint"](around:RADIUS,LAT,LON);way["tourism"="viewpoint"](around:RADIUS,LAT,LON);', [["tourism", "viewpoint"]]),
+    entity("supermarket", "Supermarkt", "POIs", "poi", ["supermarkt", "supermarket"], 'node["shop"="supermarket"](around:RADIUS,LAT,LON);way["shop"="supermarket"](around:RADIUS,LAT,LON);', [["shop", "supermarket"]]),
+    entity("pizza", "Pizza", "Kueche", "poi", ["pizza", "italian"], 'node["amenity"~"restaurant|fast_food"]["cuisine"~"pizza|italian"](around:RADIUS,LAT,LON);way["amenity"~"restaurant|fast_food"]["cuisine"~"pizza|italian"](around:RADIUS,LAT,LON);', [["cuisine", "pizza", "italian"]]),
+    entity("kebab", "Kebab", "Kueche", "poi", ["kebab", "doener", "doner"], 'node["amenity"~"restaurant|fast_food"]["cuisine"~"kebab|doner|turkish"](around:RADIUS,LAT,LON);way["amenity"~"restaurant|fast_food"]["cuisine"~"kebab|doner|turkish"](around:RADIUS,LAT,LON);', [["cuisine", "kebab", "doner", "turkish"]]),
+    entity("sushi", "Sushi", "Kueche", "poi", ["sushi", "japanese"], 'node["amenity"~"restaurant|fast_food"]["cuisine"~"sushi|japanese"](around:RADIUS,LAT,LON);way["amenity"~"restaurant|fast_food"]["cuisine"~"sushi|japanese"](around:RADIUS,LAT,LON);', [["cuisine", "sushi", "japanese"]]),
+    entity("forest", "Wald", "Landschaft", "vegetation", ["wald", "forest", "wood"], 'way["landuse"="forest"](around:RADIUS,LAT,LON);way["natural"="wood"](around:RADIUS,LAT,LON);relation["landuse"="forest"](around:RADIUS,LAT,LON);', [["landuse", "forest"], ["natural", "wood"]]),
+    entity("meadow", "Wiese", "Landschaft", "vegetation", ["wiese", "meadow", "grass"], 'way["landuse"~"meadow|grass|recreation_ground"](around:RADIUS,LAT,LON);way["natural"="grassland"](around:RADIUS,LAT,LON);', [["landuse", "meadow", "grass", "recreation_ground"], ["natural", "grassland"]]),
+    entity("river", "Wasserlauf", "Landschaft", "water", ["wasser", "fluss", "bach", "river", "stream"], 'way["waterway"~"river|stream|canal"](around:RADIUS,LAT,LON);node["waterway"~"river|stream|canal"](around:RADIUS,LAT,LON);', [["waterway", "river", "stream", "canal"]]),
+    entity("bridge", "Bruecke", "Landschaft", "transport", ["bruecke", "bridge"], 'way["bridge"](around:RADIUS,LAT,LON);node["bridge"](around:RADIUS,LAT,LON);', [["bridge", "yes"]]),
+    entity("bus_stop", "Bushaltestelle", "Verkehr", "transport", ["bus", "haltestelle", "bus_stop"], 'node["highway"="bus_stop"](around:RADIUS,LAT,LON);node["public_transport"="platform"](around:RADIUS,LAT,LON);', [["highway", "bus_stop"], ["public_transport", "platform"]]),
+];
+
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => Array.from(document.querySelectorAll(selector));
 
@@ -49,6 +83,8 @@ function init() {
     }).addTo(state.map);
     state.markerLayer = L.layerGroup().addTo(state.map);
     drawSearchCircle();
+    renderEntityCatalog();
+    renderSelectedEntities();
     bindUi();
     window.addEventListener("resize", () => state.map.invalidateSize());
     setTimeout(() => state.map.invalidateSize(), 250);
@@ -61,6 +97,12 @@ function bindUi() {
     $("#locateBtn").addEventListener("click", locateUser);
     $("#radiusSelect").addEventListener("change", drawSearchCircle);
     $("#fileInput").addEventListener("change", importFile);
+    $("#imageInput").addEventListener("change", analyzeImageFile);
+    $("#reviewInput").addEventListener("change", importReviewFile);
+    $("#entitySearch").addEventListener("input", renderEntityCatalog);
+    $("#clearEntitiesBtn").addEventListener("click", clearEntitySelection);
+    $("#addCustomEntityBtn").addEventListener("click", addCustomEntity);
+    $("#applyImageHintsBtn").addEventListener("click", applyImageHintsToQuery);
     $("#exportBtn").addEventListener("click", exportGeoJson);
     ["poiWeight", "contextWeight", "densityWeight"].forEach((id) => {
         const input = $(`#${id}`);
@@ -80,6 +122,129 @@ function bindUi() {
 
 function selectedSources() {
     return $$(".source-check:checked").map((input) => input.value);
+}
+
+function entity(id, label, category, group, terms, query, matchers) {
+    return {
+        id,
+        label,
+        category,
+        group,
+        terms,
+        query,
+        matchers: matchers.map(([key, ...values]) => ({ key, values })),
+    };
+}
+
+function selectedEntityObjects() {
+    return entityCatalog.filter((item) => state.selectedEntities.has(item.id));
+}
+
+function renderEntityCatalog() {
+    const catalog = $("#entityCatalog");
+    if (!catalog) return;
+    const filter = normalize($("#entitySearch")?.value || "");
+    const visible = entityCatalog.filter((item) => {
+        const haystack = normalize([item.label, item.category, item.group, ...item.terms].join(" "));
+        return !filter || haystack.includes(filter);
+    });
+    catalog.innerHTML = "";
+    const groups = [...new Set(visible.map((item) => item.category))];
+    groups.forEach((group) => {
+        const wrapper = document.createElement("div");
+        wrapper.className = "entity-group";
+        const title = document.createElement("div");
+        title.className = "entity-group-title";
+        title.textContent = group;
+        wrapper.appendChild(title);
+        visible.filter((item) => item.category === group).forEach((item) => {
+            const button = document.createElement("button");
+            button.type = "button";
+            button.className = `entity-chip${state.selectedEntities.has(item.id) ? " active" : ""}`;
+            button.textContent = item.label;
+            button.addEventListener("click", () => toggleEntity(item.id));
+            wrapper.appendChild(button);
+        });
+        catalog.appendChild(wrapper);
+    });
+}
+
+function renderSelectedEntities() {
+    const box = $("#selectedEntities");
+    if (!box) return;
+    box.innerHTML = "";
+    selectedEntityObjects().forEach((item) => {
+        const chip = document.createElement("button");
+        chip.type = "button";
+        chip.className = "selected-chip";
+        chip.textContent = item.label;
+        chip.title = "Entitaet entfernen";
+        chip.addEventListener("click", () => toggleEntity(item.id));
+        box.appendChild(chip);
+    });
+}
+
+function toggleEntity(id) {
+    if (state.selectedEntities.has(id)) {
+        state.selectedEntities.delete(id);
+    } else {
+        state.selectedEntities.add(id);
+    }
+    syncEntityQueryText();
+    renderEntityCatalog();
+    renderSelectedEntities();
+}
+
+function clearEntitySelection() {
+    state.selectedEntities.clear();
+    syncEntityQueryText();
+    renderEntityCatalog();
+    renderSelectedEntities();
+}
+
+function addCustomEntity() {
+    const keyInput = $("#customKeyInput");
+    const valueInput = $("#customValueInput");
+    const key = keyInput.value.trim();
+    const value = valueInput.value.trim();
+    if (!key) {
+        setStatus("OSM-Key fehlt.");
+        return;
+    }
+    const id = `custom-${Date.now()}`;
+    const label = value ? `${key}=${value}` : key;
+    const keyText = overpassString(key);
+    const valueText = overpassString(value);
+    const query = value
+        ? `node["${keyText}"~"${valueText}"](around:RADIUS,LAT,LON);way["${keyText}"~"${valueText}"](around:RADIUS,LAT,LON);relation["${keyText}"~"${valueText}"](around:RADIUS,LAT,LON);`
+        : `node["${keyText}"](around:RADIUS,LAT,LON);way["${keyText}"](around:RADIUS,LAT,LON);relation["${keyText}"](around:RADIUS,LAT,LON);`;
+    entityCatalog.push(entity(id, label, "Eigene", inferGroupFromKey(key), [key, value, label].filter(Boolean), query, [[key, value]]));
+    state.selectedEntities.add(id);
+    keyInput.value = "";
+    valueInput.value = "";
+    syncEntityQueryText();
+    renderEntityCatalog();
+    renderSelectedEntities();
+    setStatus(`Eigene Entitaet ${label} hinzugefuegt.`);
+}
+
+function overpassString(value) {
+    return String(value).replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+}
+
+function inferGroupFromKey(key) {
+    if (["building", "roof:shape", "building:architecture", "facade:material"].includes(key)) return "building";
+    if (["natural", "landuse", "leisure", "species", "genus", "taxon"].includes(key)) return "vegetation";
+    if (["water", "waterway", "bridge"].includes(key)) return "water";
+    if (["highway", "railway", "public_transport"].includes(key)) return "transport";
+    return "poi";
+}
+
+function syncEntityQueryText() {
+    const input = $("#queryInput");
+    const selectedLabels = selectedEntityObjects().map((item) => item.label);
+    const base = input.value.replace(/\n?Entitaeten:.*$/s, "").trim();
+    input.value = selectedLabels.length ? `${base}${base ? "\n" : ""}Entitaeten: ${selectedLabels.join(", ")}` : base;
 }
 
 function setStatus(message) {
@@ -148,14 +313,14 @@ function locateUser() {
 async function runAnalysis() {
     if (state.loading) return;
     const sources = selectedSources();
-    if (!sources.length && !state.importedFeatures.length) {
-        setStatus("Mindestens eine Datenquelle aktivieren oder Datei importieren.");
+    if (!sources.length && !state.importedFeatures.length && !state.selectedEntities.size) {
+        setStatus("Mindestens eine Datenquelle, Entitaet oder Datei auswaehlen.");
         return;
     }
     setLoading(true);
     setStatus("OSM-Daten werden begrenzt ueber Overpass geladen ...");
     try {
-        const osmFeatures = sources.length ? await fetchOverpass(sources) : [];
+        const osmFeatures = sources.length || state.selectedEntities.size ? await fetchOverpass(sources) : [];
         const allFeatures = [...osmFeatures, ...state.importedFeatures];
         if (!allFeatures.length) {
             renderResults([], parseQuery($("#queryInput").value, sources));
@@ -178,7 +343,9 @@ async function runAnalysis() {
 
 async function fetchOverpass(sources) {
     const queryRadius = Math.min(radius(), 2500);
-    const rawLimit = Math.max(120, Math.min(550, Math.ceil(Number($("#limitSelect").value) * 2.4 / Math.max(sources.length, 1))));
+    const selectedEntities = selectedEntityObjects();
+    const requestCount = Math.max(sources.length + selectedEntities.length, 1);
+    const rawLimit = Math.max(80, Math.min(420, Math.ceil(Number($("#limitSelect").value) * 2.4 / requestCount)));
     const features = [];
     const failures = [];
 
@@ -191,6 +358,16 @@ async function fetchOverpass(sources) {
             features.push(...sourceFeatures);
         } catch (error) {
             failures.push(`${sourceLabel(source)}: ${error.message}`);
+        }
+    }
+
+    for (const item of selectedEntities) {
+        setStatus(`Lade Entitaet ${item.label} von OSM ...`);
+        try {
+            const entityFeatures = await fetchOverpassSource(item.query, queryRadius, rawLimit);
+            features.push(...entityFeatures);
+        } catch (error) {
+            failures.push(`${item.label}: ${error.message}`);
         }
     }
 
@@ -304,11 +481,19 @@ function readableType(tags) {
 function parseQuery(raw, fallbackSources) {
     const text = normalize(raw);
     const active = new Set(fallbackSources);
+    const entities = selectedEntityObjects();
+    const entityTerms = entities.flatMap((item) => [item.label, ...item.terms]).map(normalize);
     const terms = text.split(/[^a-z0-9äöüß]+/i).filter((term) => term.length > 2);
     Object.entries(queryLexicon).forEach(([group, words]) => {
         if (words.some((word) => text.includes(normalize(word)))) active.add(group);
     });
-    return { raw: text, terms, groups: Array.from(active) };
+    entities.forEach((item) => active.add(item.group));
+    return {
+        raw: text,
+        terms: Array.from(new Set([...terms, ...entityTerms])).filter((term) => term.length > 2),
+        groups: Array.from(active),
+        entities,
+    };
 }
 
 function scoreFeatures(features, query) {
@@ -318,20 +503,26 @@ function scoreFeatures(features, query) {
         const tagText = normalize(`${feature.name} ${Object.entries(feature.tags).map(([key, value]) => `${key} ${value}`).join(" ")}`);
         const groupHits = query.groups.filter((group) => matchesGroup(feature.tags, group));
         const termHits = query.terms.filter((term) => tagText.includes(term));
+        const entityHits = query.entities.filter((item) => matchesEntityFeature(feature.tags, item));
         const distanceScore = Math.max(0, 1 - distanceMeters(state.center[0], state.center[1], feature.lat, feature.lon) / radius());
         const localDensity = density.get(feature.id) || 0;
-        const poiScore = clamp((termHits.length / Math.max(query.terms.length, 1)) * .65 + (groupHits.length / Math.max(query.groups.length, 1)) * .35);
+        const entityScore = query.entities.length ? entityHits.length / query.entities.length : 0;
+        const poiScore = clamp((termHits.length / Math.max(query.terms.length, 1)) * .45 + (groupHits.length / Math.max(query.groups.length, 1)) * .25 + entityScore * .55);
         const contextScore = clamp(distanceScore * .5 + groupHits.length * .14 + relationBonus(feature.tags, query.groups));
         const densityScore = clamp(localDensity / 12);
-        const score = Math.round(100 * clamp(poiScore * weights.poi + contextScore * weights.context + densityScore * weights.density));
+        const reviews = findReviewsForFeature(feature);
+        const reviewScore = reviewConfidence(reviews);
+        const score = Math.round(100 * clamp(poiScore * weights.poi + contextScore * weights.context + densityScore * weights.density + reviewScore * .06));
         return {
             ...feature,
+            reviews,
             score,
             factors: {
                 query: Math.round(poiScore * 100),
                 context: Math.round(contextScore * 100),
                 density: Math.round(densityScore * 100),
-                hits: [...termHits, ...groupHits].slice(0, 8),
+                reviews: Math.round(reviewScore * 100),
+                hits: [...entityHits.map((item) => item.label), ...termHits, ...groupHits].slice(0, 8),
             },
         };
     });
@@ -348,6 +539,14 @@ function normalizedWeights() {
 function matchesGroup(tags, group) {
     const keys = tagGroups[group] || [];
     return keys.some((key) => Object.prototype.hasOwnProperty.call(tags, key));
+}
+
+function matchesEntityFeature(tags, item) {
+    return item.matchers.some((matcher) => {
+        const value = normalize(tags[matcher.key]);
+        const expectedValues = matcher.values.flatMap((expected) => String(expected).split("|")).filter(Boolean);
+        return value && (!expectedValues.length || expectedValues.some((expected) => value.includes(normalize(expected))));
+    });
 }
 
 function relationBonus(tags, groups) {
@@ -399,6 +598,8 @@ function renderFactors(results, query) {
         ["Query-Tags", `${avg("query")}%`],
         ["Umgebung", `${avg("context")}%`],
         ["Dichte", `${avg("density")}%`],
+        ["Reviews", state.reviewRecords.length ? `${state.reviewRecords.length} geladen` : "keine"],
+        ["Entitaeten", selectedEntityObjects().map((item) => item.label).join(", ") || "keine"],
         ["Aktive Gruppen", query.groups.join(", ") || "keine"],
     ].forEach(([name, value]) => {
         const row = document.createElement("div");
@@ -426,6 +627,8 @@ function popupHtml(result) {
     return `<p class="popup-title">${escapeHtml(result.name)}</p>
         <strong>${result.score}% Wahrscheinlichkeit</strong>
         <div>Query ${result.factors.query}% · Umgebung ${result.factors.context}% · Dichte ${result.factors.density}%</div>
+        ${reviewsHtml(result)}
+        ${externalLinksHtml(result)}
         <p class="popup-tags">${escapeHtml(tags)}</p>`;
 }
 
@@ -434,7 +637,8 @@ function resultListItem(result, index, marker) {
     const button = template.querySelector(".result-item");
     template.querySelector(".rank").textContent = index + 1;
     template.querySelector("strong").textContent = result.name;
-    template.querySelector("small").textContent = `${result.source} · ${result.factors.hits.join(", ") || readableType(result.tags) || "Kontexttreffer"}`;
+    const reviewText = result.reviews?.length ? `rating ${averageRating(result.reviews).toFixed(1)} aus ${result.reviews.length} Quellen` : "";
+    template.querySelector("small").textContent = [result.source, result.factors.hits.join(", ") || readableType(result.tags) || "Kontexttreffer", reviewText].filter(Boolean).join(" · ");
     template.querySelector(".probability").textContent = `${result.score}%`;
     button.addEventListener("click", () => {
         state.map.setView([result.lat, result.lon], 17);
@@ -445,12 +649,397 @@ function resultListItem(result, index, marker) {
 
 function clearMap() {
     state.markerLayer.clearLayers();
+    if (state.imageMarker) {
+        state.imageMarker.remove();
+        state.imageMarker = null;
+    }
     state.results = [];
     $("#resultList").innerHTML = "";
     $("#resultCount").textContent = "0";
     $("#bestScore").textContent = "0%";
     $("#factorList").innerHTML = "";
     setStatus("Karte geleert.");
+}
+
+async function analyzeImageFile(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const buffer = await file.arrayBuffer();
+    const url = URL.createObjectURL(file);
+    const preview = $("#imagePreview");
+    preview.src = url;
+    preview.hidden = false;
+    try {
+        const gps = extractGpsFromExif(buffer);
+        const image = await loadImage(url);
+        const hints = analyzeImagePixels(image, gps, file.name);
+        state.imageHints = hints;
+        renderImageSignals(hints, gps);
+        if (gps) {
+            state.center = [gps.lat, gps.lon];
+            state.map.setView(state.center, 16);
+            if (state.imageMarker) state.imageMarker.remove();
+            state.imageMarker = L.marker(state.center).addTo(state.map).bindPopup("Fotostandort aus EXIF").openPopup();
+            drawSearchCircle();
+            setStatus("Bild-GPS gefunden. Suchraum wurde auf das Foto gesetzt.");
+        } else {
+            setStatus(`${hints.length} Bildhinweise erkannt. Mit + in die Query uebernehmen.`);
+        }
+    } catch (error) {
+        setStatus(`Bildanalyse fehlgeschlagen: ${error.message}`);
+    }
+}
+
+function loadImage(url) {
+    return new Promise((resolve, reject) => {
+        const image = new Image();
+        image.onload = () => resolve(image);
+        image.onerror = () => reject(new Error("Bild konnte nicht geladen werden"));
+        image.src = url;
+    });
+}
+
+function analyzeImagePixels(image, gps, fileName) {
+    const canvas = document.createElement("canvas");
+    const maxSide = 180;
+    const scale = Math.min(1, maxSide / Math.max(image.naturalWidth, image.naturalHeight));
+    canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+    canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+    const ctx = canvas.getContext("2d", { willReadFrequently: true });
+    ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+    const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+    const total = pixels.length / 4;
+    const counts = { green: 0, blue: 0, gray: 0, warm: 0, dark: 0 };
+    for (let i = 0; i < pixels.length; i += 4) {
+        const r = pixels[i];
+        const g = pixels[i + 1];
+        const b = pixels[i + 2];
+        const max = Math.max(r, g, b);
+        const min = Math.min(r, g, b);
+        if (g > r * 1.12 && g > b * 1.08) counts.green += 1;
+        if (b > r * 1.1 && b > g * 1.02) counts.blue += 1;
+        if (max - min < 28 && max > 70) counts.gray += 1;
+        if (r > g * 1.08 && g > b * 1.08) counts.warm += 1;
+        if (max < 58) counts.dark += 1;
+    }
+    const ratio = (key) => counts[key] / Math.max(total, 1);
+    const hints = [];
+    if (gps) hints.push(imageHint("GPS-Koordinaten", "exakte Fotokoordinaten", "transport", .95, []));
+    if (ratio("green") > .22) hints.push(imageHint("viel Gruen", "Wald, Park, Wiese, Baeume", "vegetation", ratio("green"), ["forest", "meadow"]));
+    if (ratio("blue") > .18) hints.push(imageHint("blaues Wasser/Himmel", "Wasser, Fluss, Bruecke, Ufer", "water", ratio("blue"), ["river", "bridge"]));
+    if (ratio("gray") > .28) hints.push(imageHint("graue Flaechen", "Strasse, Wege, Gebaeude, Haltestellen", "transport", ratio("gray"), ["bus_stop"]));
+    if (ratio("warm") > .16) hints.push(imageHint("warme Fassaden/Daecher", "Satteldach, Wohngebiet, Fachwerk", "building", ratio("warm"), ["gabled_roof", "half_timbered", "detached"]));
+    if (ratio("dark") > .2 && ratio("green") > .14) hints.push(imageHint("dunkle Vegetation", "Waldnaehe, dichter Bewuchs", "vegetation", ratio("dark"), ["forest"]));
+    const nameText = normalize(fileName);
+    entityCatalog.forEach((item) => {
+        if ([item.label, ...item.terms].some((term) => nameText.includes(normalize(term)))) {
+            hints.push(imageHint(`Dateiname: ${item.label}`, item.label, item.group, .8, [item.id]));
+        }
+    });
+    return hints;
+}
+
+function imageHint(label, query, group, confidence, entityIds) {
+    return { label, query, group, confidence: clamp(confidence), entityIds };
+}
+
+function renderImageSignals(hints, gps) {
+    const box = $("#imageSignals");
+    box.innerHTML = "";
+    if (!hints.length) {
+        const empty = document.createElement("div");
+        empty.className = "signal";
+        empty.innerHTML = "<span>keine stabilen Hinweise</span><strong>0%</strong>";
+        box.appendChild(empty);
+        return;
+    }
+    hints.forEach((hint) => {
+        const row = document.createElement("div");
+        row.className = "signal";
+        row.innerHTML = `<span>${escapeHtml(hint.label)}</span><strong>${Math.round(hint.confidence * 100)}%</strong>`;
+        box.appendChild(row);
+    });
+    if (gps) {
+        const row = document.createElement("div");
+        row.className = "signal";
+        row.innerHTML = `<span>${gps.lat.toFixed(5)}, ${gps.lon.toFixed(5)}</span><strong>GPS</strong>`;
+        box.appendChild(row);
+    }
+}
+
+function applyImageHintsToQuery() {
+    if (!state.imageHints.length) {
+        setStatus("Noch keine Bildhinweise vorhanden.");
+        return;
+    }
+    const queryText = state.imageHints.map((hint) => hint.query).filter(Boolean).join(", ");
+    const input = $("#queryInput");
+    input.value = appendUniqueText(input.value, queryText);
+    state.imageHints.flatMap((hint) => hint.entityIds).forEach((id) => state.selectedEntities.add(id));
+    syncEntityQueryText();
+    renderEntityCatalog();
+    renderSelectedEntities();
+    setStatus("Bildhinweise wurden in Query und Entitaeten uebernommen.");
+}
+
+function appendUniqueText(current, addition) {
+    if (!addition) return current;
+    const normalizedCurrent = normalize(current);
+    const parts = addition.split(",").map((part) => part.trim()).filter(Boolean);
+    const missing = parts.filter((part) => !normalizedCurrent.includes(normalize(part)));
+    return missing.length ? `${current.trim()}${current.trim() ? ", " : ""}${missing.join(", ")}` : current;
+}
+
+function extractGpsFromExif(buffer) {
+    try {
+        const view = new DataView(buffer);
+        if (view.byteLength < 12 || view.getUint16(0, false) !== 0xffd8) return null;
+        let offset = 2;
+        while (offset + 4 < view.byteLength) {
+            if (view.getUint8(offset) !== 0xff) return null;
+            const marker = view.getUint8(offset + 1);
+            const size = view.getUint16(offset + 2, false);
+            if (marker === 0xe1 && readAscii(view, offset + 4, 6) === "Exif\0\0") {
+                const tiffOffset = offset + 10;
+                const endian = view.getUint16(tiffOffset, false);
+                const little = endian === 0x4949;
+                if (!little && endian !== 0x4d4d) return null;
+                const firstIfdOffset = tiffOffset + view.getUint32(tiffOffset + 4, little);
+                const ifd0 = readIfdEntries(view, tiffOffset, firstIfdOffset, little);
+                const gpsPointer = ifd0.get(0x8825);
+                if (!gpsPointer?.value) return null;
+                const gpsIfd = readIfdEntries(view, tiffOffset, tiffOffset + gpsPointer.value, little);
+                const lat = gpsCoordinate(view, gpsIfd.get(0x0002), asciiTag(view, gpsIfd.get(0x0001)), little);
+                const lon = gpsCoordinate(view, gpsIfd.get(0x0004), asciiTag(view, gpsIfd.get(0x0003)), little);
+                return Number.isFinite(lat) && Number.isFinite(lon) ? { lat, lon } : null;
+            }
+            offset += 2 + size;
+        }
+    } catch {
+        return null;
+    }
+    return null;
+}
+
+function readIfdEntries(view, tiffOffset, ifdOffset, little) {
+    const entries = new Map();
+    const count = view.getUint16(ifdOffset, little);
+    for (let i = 0; i < count; i += 1) {
+        const entryOffset = ifdOffset + 2 + i * 12;
+        const tag = view.getUint16(entryOffset, little);
+        const type = view.getUint16(entryOffset + 2, little);
+        const entryCount = view.getUint32(entryOffset + 4, little);
+        const valueOffset = view.getUint32(entryOffset + 8, little);
+        const bytes = typeByteSize(type) * entryCount;
+        entries.set(tag, {
+            type,
+            count: entryCount,
+            value: type === 4 && entryCount === 1 ? valueOffset : null,
+            dataOffset: bytes <= 4 ? entryOffset + 8 : tiffOffset + valueOffset,
+        });
+    }
+    return entries;
+}
+
+function typeByteSize(type) {
+    return { 1: 1, 2: 1, 3: 2, 4: 4, 5: 8 }[type] || 1;
+}
+
+function asciiTag(view, entry) {
+    if (!entry) return "";
+    return readAscii(view, entry.dataOffset, entry.count).replace(/\0/g, "");
+}
+
+function gpsCoordinate(view, entry, ref, little) {
+    if (!entry || entry.type !== 5 || entry.count < 3) return null;
+    const parts = [];
+    for (let i = 0; i < 3; i += 1) {
+        const offset = entry.dataOffset + i * 8;
+        const numerator = view.getUint32(offset, little);
+        const denominator = view.getUint32(offset + 4, little) || 1;
+        parts.push(numerator / denominator);
+    }
+    const value = parts[0] + parts[1] / 60 + parts[2] / 3600;
+    return ref === "S" || ref === "W" ? -value : value;
+}
+
+function readAscii(view, offset, length) {
+    let output = "";
+    for (let i = 0; i < length && offset + i < view.byteLength; i += 1) {
+        output += String.fromCharCode(view.getUint8(offset + i));
+    }
+    return output;
+}
+
+async function importReviewFile(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const text = await file.text();
+    try {
+        const reviews = file.name.toLowerCase().endsWith(".csv") ? parseReviewCsv(text) : parseReviewJson(JSON.parse(text));
+        state.reviewRecords = reviews;
+        renderReviewSummary();
+        setStatus(`${reviews.length} Review-Datensaetze geladen.`);
+        if (state.results.length) {
+            const query = parseQuery($("#queryInput").value, selectedSources());
+            state.results = scoreFeatures(state.results, query).sort((a, b) => b.score - a.score);
+            renderResults(state.results, query);
+        }
+    } catch (error) {
+        setStatus(`Review-Import fehlgeschlagen: ${error.message}`);
+    }
+}
+
+function parseReviewJson(data) {
+    const rows = Array.isArray(data) ? data : data.features || [];
+    return rows.map((row, index) => {
+        const props = row.properties || row;
+        const coords = row.geometry?.type === "Point" ? row.geometry.coordinates : null;
+        return normalizeReviewRecord({
+            name: props.name || props.title,
+            source: props.source || props.platform || "Review",
+            rating: props.rating || props.stars || props.score,
+            count: props.count || props.reviews || props.review_count,
+            url: props.url || props.link,
+            text: props.text || props.review,
+            lat: props.lat || props.latitude || coords?.[1],
+            lon: props.lon || props.lng || props.longitude || coords?.[0],
+        }, index);
+    }).filter(Boolean);
+}
+
+function parseReviewCsv(text) {
+    const rows = parseCsvRows(text);
+    const header = rows.shift()?.map((cell) => normalize(cell)) || [];
+    return rows.map((row, index) => {
+        const get = (...names) => {
+            const target = names.map(normalize);
+            const found = header.findIndex((item) => target.includes(item));
+            return found >= 0 ? row[found] : "";
+        };
+        return normalizeReviewRecord({
+            name: get("name", "title", "restaurant"),
+            source: get("source", "platform", "map"),
+            rating: get("rating", "stars", "score"),
+            count: get("count", "reviews", "review_count"),
+            url: get("url", "link"),
+            text: get("text", "review"),
+            lat: get("lat", "latitude"),
+            lon: get("lon", "lng", "longitude"),
+        }, index);
+    }).filter(Boolean);
+}
+
+function normalizeReviewRecord(raw, index) {
+    const rating = Number(String(raw.rating || "").replace(",", "."));
+    const lat = Number(String(raw.lat || "").replace(",", "."));
+    const lon = Number(String(raw.lon || "").replace(",", "."));
+    if (!raw.name && (!Number.isFinite(lat) || !Number.isFinite(lon))) return null;
+    return {
+        id: `review-${index}`,
+        name: raw.name || `Review ${index + 1}`,
+        source: raw.source || "Review",
+        rating: Number.isFinite(rating) ? rating : null,
+        count: Number(raw.count) || null,
+        url: raw.url || "",
+        text: raw.text || "",
+        lat: Number.isFinite(lat) ? lat : null,
+        lon: Number.isFinite(lon) ? lon : null,
+    };
+}
+
+function parseCsvRows(text) {
+    const rows = [];
+    let row = [];
+    let cell = "";
+    let quoted = false;
+    const delimiter = guessCsvDelimiter(text);
+    for (let i = 0; i < text.length; i += 1) {
+        const char = text[i];
+        const next = text[i + 1];
+        if (char === '"' && quoted && next === '"') {
+            cell += '"';
+            i += 1;
+        } else if (char === '"') {
+            quoted = !quoted;
+        } else if (char === delimiter && !quoted) {
+            row.push(cell.trim());
+            cell = "";
+        } else if ((char === "\n" || char === "\r") && !quoted) {
+            if (char === "\r" && next === "\n") i += 1;
+            row.push(cell.trim());
+            if (row.some(Boolean)) rows.push(row);
+            row = [];
+            cell = "";
+        } else {
+            cell += char;
+        }
+    }
+    row.push(cell.trim());
+    if (row.some(Boolean)) rows.push(row);
+    return rows;
+}
+
+function guessCsvDelimiter(text) {
+    const firstLine = text.split(/\r?\n/, 1)[0] || "";
+    const semicolons = (firstLine.match(/;/g) || []).length;
+    const commas = (firstLine.match(/,/g) || []).length;
+    return semicolons > commas ? ";" : ",";
+}
+
+function renderReviewSummary() {
+    const box = $("#reviewSummary");
+    const sources = [...new Set(state.reviewRecords.map((review) => review.source))];
+    box.textContent = `${state.reviewRecords.length} Review-Datensaetze${sources.length ? ` aus ${sources.join(", ")}` : ""}`;
+}
+
+function findReviewsForFeature(feature) {
+    const featureName = normalize(feature.name);
+    return state.reviewRecords.filter((review) => {
+        const reviewName = normalize(review.name);
+        const nameMatch = featureName && reviewName && (featureName === reviewName || featureName.includes(reviewName) || reviewName.includes(featureName));
+        const geoMatch = Number.isFinite(review.lat) && Number.isFinite(review.lon) && distanceMeters(feature.lat, feature.lon, review.lat, review.lon) <= 90;
+        return nameMatch || geoMatch;
+    });
+}
+
+function reviewConfidence(reviews) {
+    if (!reviews.length) return 0;
+    return clamp((averageRating(reviews) || 0) / 5);
+}
+
+function averageRating(reviews) {
+    const values = reviews.map((review) => review.rating).filter((rating) => Number.isFinite(rating));
+    return values.length ? values.reduce((sum, rating) => sum + rating, 0) / values.length : 0;
+}
+
+function reviewsHtml(result) {
+    if (!result.reviews?.length) return "";
+    const rows = result.reviews.slice(0, 4).map((review) => {
+        const rating = Number.isFinite(review.rating) ? `${review.rating.toFixed(1)}/5` : "ohne Rating";
+        const count = review.count ? ` (${review.count})` : "";
+        const label = `${review.source}: ${rating}${count}`;
+        return review.url
+            ? `<a class="review-pill" href="${escapeHtml(review.url)}" target="_blank" rel="noopener">${escapeHtml(label)}</a>`
+            : `<span class="review-pill">${escapeHtml(label)}</span>`;
+    }).join("");
+    return `<div class="review-stack"><div class="review-row">${rows}</div></div>`;
+}
+
+function externalLinksHtml(result) {
+    if (!isFoodPlace(result)) return "";
+    const q = encodeURIComponent(`${result.name} ${state.center[0].toFixed(4)},${state.center[1].toFixed(4)}`);
+    const lat = encodeURIComponent(result.lat);
+    const lon = encodeURIComponent(result.lon);
+    return `<div class="external-links">
+        <a class="external-link" href="https://www.google.com/maps/search/?api=1&query=${q}" target="_blank" rel="noopener">Google Maps</a>
+        <a class="external-link" href="https://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}#map=18/${lat}/${lon}" target="_blank" rel="noopener">OSM</a>
+        <a class="external-link" href="https://www.tripadvisor.com/Search?q=${q}" target="_blank" rel="noopener">Tripadvisor</a>
+    </div>`;
+}
+
+function isFoodPlace(result) {
+    return ["restaurant", "cafe", "fast_food", "bar", "pub"].includes(result.tags.amenity) || Boolean(result.tags.cuisine);
 }
 
 async function importFile(event) {
