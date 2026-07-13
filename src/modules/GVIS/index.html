@@ -29,7 +29,7 @@
                 </div>
                 <label for="placeInput">Ort oder Koordinaten</label>
                 <div class="input-row">
-                    <input id="placeInput" type="search" value="Jena" placeholder="z. B. Jena, 50.9271, 11.5892" />
+                    <input id="placeInput" type="search" placeholder="z. B. Paris, Tokyo, 50.9271, 11.5892" />
                     <button id="searchPlaceBtn" class="btn compact" type="button">Suchen</button>
                 </div>
                 <div class="metric-grid">
@@ -90,6 +90,10 @@
                     <input id="imageInput" type="file" accept="image/*" />
                     <span>Bild hochladen</span>
                 </label>
+                <div class="input-row image-text-row">
+                    <input id="imageTextInput" type="text" placeholder="optional: Schrift, Ort oder Landmarke aus dem Bild" />
+                    <button id="resolveImageTextBtn" class="btn compact" type="button">Finden</button>
+                </div>
                 <img id="imagePreview" class="image-preview" alt="Bildvorschau" hidden />
                 <div id="imageSignals" class="signal-list"></div>
             </section>
@@ -125,7 +129,7 @@
         <main class="map-area">
             <div class="toolbar">
                 <div class="status-card">
-                    <span id="statusText">Bereit. Query formulieren und Analyse starten.</span>
+                    <span id="statusText">Bereit. Suchraum setzen oder Bild mit GPS/Text hochladen.</span>
                 </div>
                 <div class="legend" aria-label="Legende">
                     <span><i class="dot high"></i> hoch</span>
@@ -191,6 +195,7 @@
         </li>
     </template>
 
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/ol@10.6.1/dist/ol.js"></script>
     <script src="app.js"></script>
 </body>

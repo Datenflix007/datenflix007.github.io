@@ -7,7 +7,8 @@ const state = {
     imageSource: null,
     popupOverlay: null,
     popupElement: null,
-    center: [50.9271, 11.5892],
+    center: [20, 0],
+    searchCenterReady: false,
     importedFeatures: [],
     reviewRecords: [],
     selectedEntities: new Set(),
@@ -237,7 +238,7 @@ const $$ = (selector) => Array.from(document.querySelectorAll(selector));
 function init() {
     state.view = new ol.View({
         center: ol.proj.fromLonLat([state.center[1], state.center[0]]),
-        zoom: 14,
+        zoom: state.searchCenterReady ? 14 : 2,
         maxZoom: 20,
     });
     state.baseLayer = new ol.layer.Tile({
@@ -347,6 +348,7 @@ function bindUi() {
     $("#radiusSelect").addEventListener("change", drawSearchCircle);
     $("#fileInput").addEventListener("change", importFile);
     $("#imageInput").addEventListener("change", analyzeImageFile);
+    $("#resolveImageTextBtn").addEventListener("click", resolveManualImageText);
     $("#reviewInput").addEventListener("change", importReviewFile);
     $("#entitySearch").addEventListener("input", renderEntityCatalog);
     $("#clearEntitiesBtn").addEventListener("click", clearEntitySelection);
@@ -367,6 +369,9 @@ function bindUi() {
     });
     $("#placeInput").addEventListener("keydown", (event) => {
         if (event.key === "Enter") searchPlace();
+    });
+    $("#imageTextInput").addEventListener("keydown", (event) => {
+        if (event.key === "Enter") resolveManualImageText();
     });
 }
 
@@ -546,9 +551,18 @@ function setMapView(center, zoom) {
 function drawSearchCircle() {
     if (!state.searchSource) return;
     state.searchSource.clear();
+    if (!state.searchCenterReady) return;
     const center = ol.proj.fromLonLat([state.center[1], state.center[0]]);
     const feature = new ol.Feature(new ol.geom.Circle(center, radius()));
     state.searchSource.addFeature(feature);
+}
+
+function setSearchCenter(center, zoom, status) {
+    state.center = center;
+    state.searchCenterReady = true;
+    setMapView(state.center, zoom);
+    drawSearchCircle();
+    if (status) setStatus(status);
 }
 
 async function searchPlace() {
@@ -556,10 +570,7 @@ async function searchPlace() {
     if (!raw) return;
     const coordinateMatch = raw.match(/^\s*(-?\d+(?:\.\d+)?)\s*[,;]\s*(-?\d+(?:\.\d+)?)\s*$/);
     if (coordinateMatch) {
-        state.center = [Number(coordinateMatch[1]), Number(coordinateMatch[2])];
-        setMapView(state.center, 14);
-        drawSearchCircle();
-        setStatus("Koordinaten gesetzt.");
+        setSearchCenter([Number(coordinateMatch[1]), Number(coordinateMatch[2])], 14, "Koordinaten gesetzt.");
         return;
     }
     setStatus("Ort wird gesucht ...");
@@ -571,10 +582,7 @@ async function searchPlace() {
             setStatus("Ort nicht gefunden.");
             return;
         }
-        state.center = [Number(places[0].lat), Number(places[0].lon)];
-        setMapView(state.center, 14);
-        drawSearchCircle();
-        setStatus(`Suchraum gesetzt: ${places[0].display_name}`);
+        setSearchCenter([Number(places[0].lat), Number(places[0].lon)], 14, `Suchraum gesetzt: ${places[0].display_name}`);
     } catch (error) {
         setStatus(`Ortssuche fehlgeschlagen: ${error.message}`);
     }
@@ -587,10 +595,7 @@ function locateUser() {
     }
     setStatus("Standort wird abgefragt ...");
     navigator.geolocation.getCurrentPosition((position) => {
-        state.center = [position.coords.latitude, position.coords.longitude];
-        setMapView(state.center, 15);
-        drawSearchCircle();
-        setStatus("Suchraum auf aktuellen Standort gesetzt.");
+        setSearchCenter([position.coords.latitude, position.coords.longitude], 15, "Suchraum auf aktuellen Standort gesetzt.");
     }, () => setStatus("Standort konnte nicht ermittelt werden."));
 }
 
@@ -599,6 +604,10 @@ async function runAnalysis() {
     const sources = selectedSources();
     if (!sources.length && !state.importedFeatures.length && !state.selectedEntities.size) {
         setStatus("Mindestens eine Datenquelle, Entitaet oder Datei auswaehlen.");
+        return;
+    }
+    if (!state.searchCenterReady && (sources.length || state.selectedEntities.size)) {
+        setStatus("Erst Suchraum setzen: Ort/Koordinaten suchen, EXIF-GPS nutzen oder einen Orts-/Landmarkentext aus dem Bild finden.");
         return;
     }
     setLoading(true);
@@ -1205,7 +1214,10 @@ async function analyzeImageFile(event) {
     try {
         const gps = extractGpsFromExif(buffer);
         const image = await loadImage(url);
-        const hints = analyzeImagePixels(image, gps, file.name);
+        setStatus("Bild wird lokal analysiert ...");
+        let hints = analyzeImagePixels(image, gps, file.name);
+        const textHints = await analyzeImageText(url, file.name);
+        hints = dedupeImageHints([...hints, ...textHints]);
         state.imageHints = hints;
         renderImageSignals(hints, gps);
         if (gps) {
@@ -1231,6 +1243,198 @@ function loadImage(url) {
     });
 }
 
+async function analyzeImageText(imageUrl, fileName) {
+    const hints = [];
+    const candidates = imageTextCandidates(fileName, "filename", .76);
+    if (window.Tesseract?.recognize) {
+        setStatus("Bildtext wird per OCR gesucht ...");
+        const result = await promiseTimeout(window.Tesseract.recognize(imageUrl, "eng"), 14000).catch(() => null);
+        const text = result?.data?.text || "";
+        const ocrCandidates = imageTextCandidates(text, "ocr", .9);
+        candidates.push(...ocrCandidates);
+        if (ocrCandidates.length) {
+            const terms = ocrCandidates.map((candidate) => candidate.term).slice(0, 3);
+            hints.push(imageHint(`Text im Bild: ${terms.join(", ")}`, terms.join(", "), "poi", .7, []));
+            if (!$("#imageTextInput").value.trim()) $("#imageTextInput").value = terms.join(", ");
+        }
+    }
+    hints.push(...await resolveImagePlaceHints(candidates));
+    return hints;
+}
+
+async function resolveManualImageText() {
+    const raw = $("#imageTextInput").value.trim();
+    if (!raw) {
+        setStatus("Erst einen Orts-, Landmarken- oder Schrift-Hinweis eingeben.");
+        return;
+    }
+    setStatus("Ortskandidaten werden weltweit gesucht ...");
+    const candidates = imageTextCandidates(raw, "manual", .96);
+    const hints = await resolveImagePlaceHints(candidates);
+    if (!hints.length) {
+        setStatus("Kein globaler Ortskandidat gefunden. Text praezisieren, z. B. Landmarke + Stadt/Land.");
+        return;
+    }
+    state.imageHints = dedupeImageHints([...state.imageHints, ...hints]);
+    renderImageSignals(state.imageHints, null);
+    focusBestImageLocation(state.imageHints);
+    setStatus(`${hints.length} globale Ortskandidaten gefunden.`);
+}
+
+function imageTextCandidates(text, source, confidence) {
+    const raw = source === "filename" ? fileNameToText(text) : text;
+    const lines = raw
+        .split(/[\r\n,;|]+/)
+        .map((line) => cleanImageTextCandidate(line))
+        .filter(Boolean);
+    const phrase = cleanImageTextCandidate(raw);
+    if (phrase) lines.push(phrase);
+    const seen = new Set();
+    return lines
+        .flatMap((line) => splitCandidatePhrases(line))
+        .map((term) => ({ term, source, confidence }))
+        .filter((candidate) => {
+            const key = normalize(candidate.term);
+            if (seen.has(key) || !isUsefulPlaceCandidate(candidate.term)) return false;
+            seen.add(key);
+            return true;
+        })
+        .slice(0, 6);
+}
+
+function fileNameToText(fileName) {
+    return String(fileName || "")
+        .replace(/\.[a-z0-9]{2,5}$/i, "")
+        .replace(/[_-]+/g, " ")
+        .replace(/\b(img|dsc|dcim|photo|bild|screenshot|whatsapp|signal|telegram)\b/gi, " ")
+        .replace(/\b\d{4}[- ]?\d{2}[- ]?\d{2}\b/g, " ")
+        .replace(/\b\d{6,}\b/g, " ");
+}
+
+function cleanImageTextCandidate(value) {
+    return String(value || "")
+        .replace(/[^\p{L}\p{N}\s.'&-]/gu, " ")
+        .replace(/\s+/g, " ")
+        .trim()
+        .slice(0, 72);
+}
+
+function splitCandidatePhrases(line) {
+    const words = line.split(/\s+/).filter(Boolean);
+    if (words.length <= 4) return [line];
+    const chunks = [];
+    for (let i = 0; i < words.length - 1; i += 1) {
+        chunks.push(words.slice(i, Math.min(words.length, i + 4)).join(" "));
+    }
+    return chunks;
+}
+
+function isUsefulPlaceCandidate(term) {
+    const value = normalize(term);
+    if (value.length < 4 || value.length > 48) return false;
+    if (!/[a-z]/.test(value)) return false;
+    if (/^\d/.test(value)) return false;
+    const generic = new Set([
+        "street", "strasse", "straße", "road", "avenue", "platz", "place", "restaurant", "cafe", "bar", "hotel",
+        "shop", "open", "closed", "stop", "exit", "entry", "parking", "pizza", "menu", "wc", "toilet", "welcome",
+        "photo", "image", "screenshot", "whatsapp", "telegram", "unknown", "gvis",
+    ]);
+    if (generic.has(value)) return false;
+    if (value.split(/\s+/).every((word) => generic.has(word))) return false;
+    return true;
+}
+
+async function resolveImagePlaceHints(candidates) {
+    const hints = [];
+    const seen = new Set();
+    for (const candidate of candidates.slice(0, 5)) {
+        const key = normalize(candidate.term);
+        if (seen.has(key)) continue;
+        seen.add(key);
+        const place = await geocodeGlobalTerm(candidate.term);
+        if (!place) continue;
+        const confidence = candidate.source === "manual" ? .96 : candidate.source === "ocr" ? .9 : .78;
+        hints.push(imageHint(
+            `Ortskandidat: ${place.name}`,
+            candidate.term,
+            "poi",
+            confidence,
+            [],
+            { lat: place.lat, lon: place.lon, zoom: place.zoom, label: place.label },
+        ));
+    }
+    return hints;
+}
+
+async function geocodeGlobalTerm(term) {
+    return await geocodePhotonTerm(term) || await geocodeNominatimTerm(term);
+}
+
+async function geocodePhotonTerm(term) {
+    try {
+        const params = new URLSearchParams({ q: term, limit: "1" });
+        const response = await fetchWithTimeout(`https://photon.komoot.io/api/?${params}`, { headers: { "Accept": "application/json" } }, 7000);
+        const data = await response.json();
+        const feature = data.features?.[0];
+        const coordinates = feature?.geometry?.coordinates;
+        if (!coordinates) return null;
+        const props = feature.properties || {};
+        const name = [props.name, props.city, props.country].filter(Boolean).join(", ");
+        return {
+            name: props.name || term,
+            label: name || term,
+            lat: Number(coordinates[1]),
+            lon: Number(coordinates[0]),
+            zoom: geocodeZoom(props.osm_key, props.osm_value),
+        };
+    } catch {
+        return null;
+    }
+}
+
+async function geocodeNominatimTerm(term) {
+    try {
+        const params = new URLSearchParams({
+            format: "geojson",
+            q: term,
+            limit: "1",
+            addressdetails: "0",
+            extratags: "1",
+        });
+        const response = await fetchWithTimeout(`https://nominatim.openstreetmap.org/search?${params}`, { headers: { "Accept": "application/geo+json" } }, 7000);
+        const data = await response.json();
+        const feature = data.features?.[0];
+        const coordinates = feature?.geometry?.coordinates;
+        if (!coordinates) return null;
+        const props = feature.properties || {};
+        return {
+            name: props.name || term,
+            label: props.display_name || props.name || term,
+            lat: Number(coordinates[1]),
+            lon: Number(coordinates[0]),
+            zoom: geocodeZoom(props.class, props.type),
+        };
+    } catch {
+        return null;
+    }
+}
+
+function geocodeZoom(key, value) {
+    const text = normalize(`${key} ${value}`);
+    if (/tourism|amenity|shop|historic|building|attraction|viewpoint|tower/.test(text)) return 17;
+    if (/highway|street|road|pedestrian/.test(text)) return 16;
+    if (/city|town|village|municipality|place/.test(text)) return 12;
+    return 14;
+}
+
+function promiseTimeout(promise, ms) {
+    let timer;
+    const timeout = new Promise((_, reject) => {
+        timer = setTimeout(() => reject(new Error("timeout")), ms);
+    });
+    return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
+}
+
 function focusBestImageLocation(hints) {
     const locationHint = hints
         .filter((hint) => hint.location && hint.confidence >= .88)
@@ -1242,8 +1446,7 @@ function focusBestImageLocation(hints) {
 
 function focusImageLocation(location, label) {
     if (!location) return;
-    state.center = [location.lat, location.lon];
-    setMapView(state.center, location.zoom || 16);
+    setSearchCenter([location.lat, location.lon], location.zoom || 16);
     state.imageSource.clear();
     const imageFeature = new ol.Feature({
         geometry: new ol.geom.Point(ol.proj.fromLonLat([location.lon, location.lat])),
@@ -1360,7 +1563,6 @@ function towerCandidateScore(pixels, width, height, left, right) {
 function visualLandmarkHints(scene, fileName) {
     const hints = [];
     const name = normalize(fileName);
-    const fileJentower = /jentower|jen tower|jena tower|intershop|uniturm|unithochhaus/.test(name);
     const fileAlley = /gasse|wagnergasse|johannisgasse|jenergasse|kopfstein|cobble|paving/.test(name);
     const tower = scene.towerCandidate;
     const genericTowerConfidence = clamp(
@@ -1369,24 +1571,11 @@ function visualLandmarkHints(scene, fileName) {
         + scene.towerStripes * .10
         + (scene.aspect > 1.05 ? .04 : 0),
     );
-    const jentowerConfidence = fileJentower ? .92 : clamp(
-        tower.score * .54
-        + tower.stripes * .28
-        + tower.core.gray * .16
-        + tower.backgroundOpen * .12
-        + Math.max(0, tower.edges.vertical - .52) * .28
-        - tower.core.green * .18
-        - Math.max(0, tower.core.warm - .42) * .16,
-    );
-    const likelyStripedTower = fileJentower || (
-        jentowerConfidence > .78
-        && tower.stripes > .20
-        && tower.core.gray > .16
-        && tower.edges.density > .12
-        && tower.edges.vertical > .50
-        && tower.backgroundOpen > .10
-        && tower.core.green < .20
-        && tower.core.warm < .50
+    const stripedHighriseConfidence = clamp(
+        genericTowerConfidence * .58
+        + tower.stripes * .30
+        + tower.core.gray * .12
+        + tower.backgroundOpen * .08,
     );
     const sideFacadeScore = clamp(
         (scene.leftSide.warm + scene.leftSide.gray + scene.leftSide.dark * .32
@@ -1409,18 +1598,21 @@ function visualLandmarkHints(scene, fileName) {
         + scene.bottom.warm * .32
         + scene.bottomEdges.density * .18,
     );
-    const jentowerLocation = { lat: 50.92925, lon: 11.58455, zoom: 16, label: "Jentower / Jena Zentrum" };
-    const alleyLocation = { lat: 50.9290, lon: 11.5842, zoom: 17, label: "Jena-Altstadt nahe Jentower" };
-    const strongJentowerLocation = fileJentower || jentowerConfidence > .88;
+    const urbanStreetConfidence = clamp(sideFacadeScore * .34 + groundTextureScore * .24 + scene.bottom.gray * .18 + scene.sideEdges.density * .20);
+    const waterfrontConfidence = clamp(scene.lowerCenter.blue * .48 + scene.bottom.blue * .42 + scene.centerSky.blue * .12 + scene.lowerCenter.bright * .08);
+    const greenPlaceConfidence = clamp(scene.bottom.green * .32 + scene.leftSide.green * .22 + scene.rightSide.green * .22 + scene.lowerCenter.green * .20);
+    const mediterraneanConfidence = clamp(scene.leftSide.warm * .25 + scene.rightSide.warm * .25 + scene.bottom.bright * .10 + scene.centerSky.bright * .12 - scene.bottom.green * .12);
 
-    if (likelyStripedTower) {
-        hints.push(imageHint("Jentower / Streifenturm", "Jentower, JenTower, Jena Tower, Intershop Tower", "building", Math.max(.80, jentowerConfidence), ["jentower"], strongJentowerLocation ? jentowerLocation : null));
+    if (stripedHighriseConfidence > .62 && tower.core.green < .24) {
+        hints.push(imageHint("gestreiftes Hochhaus/Turm", "Hochhaus, Turm, Glasfassade, gestreifte Fassade, markantes Gebaeude", "building", stripedHighriseConfidence, ["tower_building", "viewpoint"]));
     } else if (genericTowerConfidence > .54 && tower.core.green < .28) {
         hints.push(imageHint("Hochhaus/Turm-Silhouette", "Hochhaus, Turm, markantes Gebaeude, Aussichtspunkt", "building", genericTowerConfidence, ["tower_building", "viewpoint"]));
     }
+    if (urbanStreetConfidence > .50) {
+        hints.push(imageHint("urbane Strassenszene", "Stadtzentrum, Strasse, Gebaeude, POIs, Haltestellen", "transport", urbanStreetConfidence, ["road_reference", "traffic_signal", "bus_stop"]));
+    }
     if (alleyConfidence > .48 && (fileAlley || groundTextureScore > .20 || sideFacadeScore > .22)) {
-        const location = strongJentowerLocation ? alleyLocation : null;
-        hints.push(imageHint("Altstadtgasse / enge Gasse", "Gasse, Altstadtgasse, schmale Strasse, Jena Altstadt", "transport", alleyConfidence, ["alley"], location));
+        hints.push(imageHint("Altstadtgasse / enge Gasse", "Gasse, Altstadtgasse, schmale Strasse, Altstadt", "transport", alleyConfidence, ["alley"]));
     }
     if (cobblestoneConfidence > .46) {
         hints.push(imageHint("Kopfsteinpflaster", "Kopfsteinpflaster, Pflastersteine, cobblestone, paving stones", "transport", cobblestoneConfidence, ["cobblestone"]));
@@ -1428,8 +1620,17 @@ function visualLandmarkHints(scene, fileName) {
     if (outdoorSeatingConfidence > .42) {
         hints.push(imageHint("Aussengastronomie", "Aussengastronomie, Strassencafe, Restaurant, Cafe, outdoor seating", "poi", outdoorSeatingConfidence, ["outdoor_seating", "restaurant", "cafe"]));
     }
-    if (likelyStripedTower && alleyConfidence > .48) {
-        hints.push(imageHint("Jena-Altstadt mit Jentower-Sicht", "Jentower, Altstadtgasse, Kopfsteinpflaster, Aussengastronomie", "building", clamp((jentowerConfidence + alleyConfidence) / 2 + .08), ["jentower", "alley", "cobblestone", "outdoor_seating"], strongJentowerLocation ? alleyLocation : null));
+    if (waterfrontConfidence > .34) {
+        hints.push(imageHint("Wasser- oder Kuestennaehe", "Wasser, Fluss, See, Kueste, Bruecke, Ufer", "water", waterfrontConfidence, ["river", "bridge"]));
+    }
+    if (greenPlaceConfidence > .30) {
+        hints.push(imageHint("starker Gruenanteil", "Park, Wald, Wiese, Baumreihen, Gruenflaechen", "vegetation", greenPlaceConfidence, ["forest", "meadow"]));
+    }
+    if (mediterraneanConfidence > .46 && sideFacadeScore > .18) {
+        hints.push(imageHint("helle warme Fassaden", "Altstadt, warme Fassaden, Satteldach, historische Gebaeude", "building", mediterraneanConfidence, ["gabled_roof", "historic", "half_timbered"]));
+    }
+    if (stripedHighriseConfidence > .62 && alleyConfidence > .48) {
+        hints.push(imageHint("Stadtgasse mit markantem Turm", "Altstadtgasse, Hochhaus, Turm, Kopfsteinpflaster, Aussengastronomie", "building", clamp((stripedHighriseConfidence + alleyConfidence) / 2 + .08), ["tower_building", "alley", "cobblestone", "outdoor_seating"]));
     }
     return hints;
 }
