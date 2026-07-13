@@ -5,6 +5,7 @@ const state = {
     center: [50.9271, 11.5892],
     importedFeatures: [],
     results: [],
+    loading: false,
 };
 
 const overpassEndpoints = [
@@ -29,10 +30,10 @@ const tagGroups = {
 };
 
 const sourceQueries = {
-    building: 'way["building"](around:RADIUS,LAT,LON);relation["building"](around:RADIUS,LAT,LON);',
-    vegetation: 'node["natural"](around:RADIUS,LAT,LON);way["natural"](around:RADIUS,LAT,LON);relation["natural"](around:RADIUS,LAT,LON);way["landuse"~"forest|grass|meadow|orchard|vineyard|recreation_ground"](around:RADIUS,LAT,LON);way["leisure"~"park|garden|nature_reserve|playground"](around:RADIUS,LAT,LON);',
+    building: 'way["building"~"yes|house|detached|semidetached_house|terrace|apartments|residential|school|church|commercial|retail"](around:RADIUS,LAT,LON);',
+    vegetation: 'way["natural"~"wood|tree_row|scrub|heath|grassland"](around:RADIUS,LAT,LON);relation["natural"~"wood|scrub|heath|grassland"](around:RADIUS,LAT,LON);way["landuse"~"forest|grass|meadow|orchard|vineyard|recreation_ground"](around:RADIUS,LAT,LON);way["leisure"~"park|garden|nature_reserve|playground"](around:RADIUS,LAT,LON);',
     poi: 'node["amenity"](around:RADIUS,LAT,LON);node["shop"](around:RADIUS,LAT,LON);node["tourism"](around:RADIUS,LAT,LON);node["historic"](around:RADIUS,LAT,LON);way["amenity"](around:RADIUS,LAT,LON);way["shop"](around:RADIUS,LAT,LON);way["tourism"](around:RADIUS,LAT,LON);',
-    transport: 'node["highway"~"bus_stop|crossing|traffic_signals"](around:RADIUS,LAT,LON);node["public_transport"](around:RADIUS,LAT,LON);way["highway"](around:RADIUS,LAT,LON);node["railway"](around:RADIUS,LAT,LON);way["railway"](around:RADIUS,LAT,LON);',
+    transport: 'node["highway"~"bus_stop|crossing|traffic_signals"](around:RADIUS,LAT,LON);node["public_transport"](around:RADIUS,LAT,LON);node["railway"~"station|halt|tram_stop"](around:RADIUS,LAT,LON);way["highway"~"primary|secondary|tertiary|residential|footway|cycleway|path"](around:RADIUS,LAT,LON);',
     water: 'node["waterway"](around:RADIUS,LAT,LON);way["waterway"](around:RADIUS,LAT,LON);way["natural"="water"](around:RADIUS,LAT,LON);way["bridge"](around:RADIUS,LAT,LON);',
 };
 
@@ -49,6 +50,8 @@ function init() {
     state.markerLayer = L.layerGroup().addTo(state.map);
     drawSearchCircle();
     bindUi();
+    window.addEventListener("resize", () => state.map.invalidateSize());
+    setTimeout(() => state.map.invalidateSize(), 250);
 }
 
 function bindUi() {
@@ -143,15 +146,22 @@ function locateUser() {
 }
 
 async function runAnalysis() {
+    if (state.loading) return;
     const sources = selectedSources();
     if (!sources.length && !state.importedFeatures.length) {
         setStatus("Mindestens eine Datenquelle aktivieren oder Datei importieren.");
         return;
     }
-    setStatus("OSM-Daten werden ueber Overpass geladen ...");
+    setLoading(true);
+    setStatus("OSM-Daten werden begrenzt ueber Overpass geladen ...");
     try {
         const osmFeatures = sources.length ? await fetchOverpass(sources) : [];
         const allFeatures = [...osmFeatures, ...state.importedFeatures];
+        if (!allFeatures.length) {
+            renderResults([], parseQuery($("#queryInput").value, sources));
+            setStatus("Keine passenden Daten im Suchraum gefunden. Radius, Ort oder Datenquellen anpassen.");
+            return;
+        }
         const query = parseQuery($("#queryInput").value, sources);
         const scored = scoreFeatures(allFeatures, query)
             .sort((a, b) => b.score - a.score)
@@ -161,30 +171,113 @@ async function runAnalysis() {
         setStatus(`${scored.length} Punkte bewertet. Hoehere Werte bedeuten bessere Uebereinstimmung mit Query und Umgebung.`);
     } catch (error) {
         setStatus(`Analyse fehlgeschlagen: ${error.message}`);
+    } finally {
+        setLoading(false);
     }
 }
 
 async function fetchOverpass(sources) {
-    const queryParts = sources.map((source) => sourceQueries[source]).filter(Boolean).join("");
-    const query = `[out:json][timeout:30];(${queryParts});out center 5000;`
-        .replaceAll("RADIUS", String(radius()))
+    const queryRadius = Math.min(radius(), 2500);
+    const rawLimit = Math.max(120, Math.min(550, Math.ceil(Number($("#limitSelect").value) * 2.4 / Math.max(sources.length, 1))));
+    const features = [];
+    const failures = [];
+
+    for (const source of sources) {
+        const queryPart = sourceQueries[source];
+        if (!queryPart) continue;
+        setStatus(`Lade ${sourceLabel(source)} von OSM ...`);
+        try {
+            const sourceFeatures = await fetchOverpassSource(queryPart, queryRadius, rawLimit);
+            features.push(...sourceFeatures);
+        } catch (error) {
+            failures.push(`${sourceLabel(source)}: ${error.message}`);
+        }
+    }
+
+    if (!features.length && failures.length) {
+        throw new Error(failures.join(" | "));
+    }
+    if (failures.length) {
+        setStatus(`Teilergebnis geladen. Nicht erreichbar: ${failures.map((failure) => failure.split(":")[0]).join(", ")}.`);
+    }
+    return dedupeFeatures(features);
+}
+
+async function fetchOverpassSource(queryPart, queryRadius, rawLimit) {
+    const query = `[out:json][timeout:10];(${queryPart});out center qt ${rawLimit};`
+        .replaceAll("RADIUS", String(queryRadius))
         .replaceAll("LAT", String(state.center[0]))
         .replaceAll("LON", String(state.center[1]));
     let lastError = null;
     for (const endpoint of overpassEndpoints) {
         try {
-            const response = await fetch(endpoint, {
-                method: "POST",
-                body: new URLSearchParams({ data: query }),
-            });
-            if (!response.ok) throw new Error(`${endpoint} HTTP ${response.status}`);
-            const data = await response.json();
+            const data = await requestOverpass(endpoint, query);
             return data.elements.map(osmElementToFeature).filter(Boolean);
         } catch (error) {
             lastError = error;
         }
     }
     throw lastError || new Error("Keine Overpass-Antwort erhalten");
+}
+
+async function requestOverpass(endpoint, query) {
+    const getUrl = `${endpoint}?data=${encodeURIComponent(query)}`;
+    const response = await fetchWithTimeout(getUrl, {
+        method: "GET",
+        headers: { "Accept": "application/json" },
+    }, 7000);
+    return await parseOverpassResponse(response);
+}
+
+async function parseOverpassResponse(response) {
+    const text = await response.text();
+    if (!response.ok) {
+        const clean = text.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+        throw new Error(`HTTP ${response.status}${clean ? ` ${clean.slice(0, 120)}` : ""}`);
+    }
+    try {
+        return JSON.parse(text);
+    } catch {
+        throw new Error("Overpass lieferte kein JSON");
+    }
+}
+
+async function fetchWithTimeout(url, options, timeoutMs) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+        return await fetch(url, { ...options, signal: controller.signal });
+    } catch (error) {
+        if (error.name === "AbortError") throw new Error(`Overpass-Timeout nach ${Math.round(timeoutMs / 1000)} Sekunden`);
+        throw error;
+    } finally {
+        clearTimeout(timeout);
+    }
+}
+
+function setLoading(isLoading) {
+    state.loading = isLoading;
+    $("#runBtn").disabled = isLoading;
+    $("#runBtn").textContent = isLoading ? "Laedt ..." : "Analyse starten";
+}
+
+function sourceLabel(source) {
+    return {
+        building: "Gebaeude",
+        vegetation: "Vegetation",
+        poi: "POIs",
+        transport: "Verkehr",
+        water: "Wasser",
+    }[source] || source;
+}
+
+function dedupeFeatures(features) {
+    const seen = new Set();
+    return features.filter((feature) => {
+        if (seen.has(feature.id)) return false;
+        seen.add(feature.id);
+        return true;
+    });
 }
 
 function osmElementToFeature(element) {
