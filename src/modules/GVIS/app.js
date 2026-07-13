@@ -96,6 +96,66 @@ const focusedQueryRules = [
     focusRule("forest", "Wald", ["wald", "baeume", "bäume", "vegetation", "park", "wiese"], 'way["landuse"~"forest|meadow|grass|recreation_ground"](around:RADIUS,LAT,LON);way["natural"~"wood|grassland|tree_row|scrub"](around:RADIUS,LAT,LON);way["leisure"~"park|garden"](around:RADIUS,LAT,LON);'),
     focusRule("residential", "Wohngebiet", ["wohngebiet", "haeuser", "häuser", "einfamilienhaus", "siedlung"], 'way["landuse"="residential"](around:RADIUS,LAT,LON);way["building"~"house|detached|semidetached_house|terrace|apartments|residential"](around:RADIUS,LAT,LON);'),
     focusRule("viewpoint", "Aussichtspunkt", ["aussicht", "aussichtspunkt", "viewpoint"], 'node["tourism"="viewpoint"](around:RADIUS,LAT,LON);way["tourism"="viewpoint"](around:RADIUS,LAT,LON);'),
+    focusRule("tower_building", "Hochhaus/Turm", ["hochhaus", "turm", "skyscraper", "tower", "markantes gebaeude", "markantes gebäude"], 'node["building"~"tower|office|commercial"](around:RADIUS,LAT,LON);way["building"~"tower|office|commercial"](around:RADIUS,LAT,LON);node["man_made"~"tower|mast"](around:RADIUS,LAT,LON);way["man_made"~"tower|mast"](around:RADIUS,LAT,LON);'),
+    focusRule("jentower", "Jentower", ["jentower", "jen tower", "jena tower", "intershop tower", "uniturm", "unithochhaus", "streifenturm"], 'node["name"~"JenTower|Jentower|Jena Tower|Intershop Tower|Universitaetshochhaus|Universitätshochhaus"](around:RADIUS,LAT,LON);way["name"~"JenTower|Jentower|Jena Tower|Intershop Tower|Universitaetshochhaus|Universitätshochhaus"](around:RADIUS,LAT,LON);relation["name"~"JenTower|Jentower|Jena Tower|Intershop Tower|Universitaetshochhaus|Universitätshochhaus"](around:RADIUS,LAT,LON);'),
+    focusRule("alley", "Altstadtgasse", ["gasse", "altstadtgasse", "enge gasse", "schmale gasse", "cobblestone alley", "old town alley"], 'way["highway"~"pedestrian|living_street|service|footway"]["name"~"Gasse|gasse|Wagnergasse|Johannisgasse|Jenergasse"](around:RADIUS,LAT,LON);way["highway"~"pedestrian|living_street|service|footway"]["surface"~"sett|cobblestone|paving_stones"](around:RADIUS,LAT,LON);node["amenity"~"restaurant|cafe"]["outdoor_seating"~"yes|seasonal"](around:RADIUS,LAT,LON);way["amenity"~"restaurant|cafe"]["outdoor_seating"~"yes|seasonal"](around:RADIUS,LAT,LON);'),
+    focusRule("cobblestone", "Kopfsteinpflaster", ["kopfsteinpflaster", "pflastersteine", "pflastergasse", "cobblestone", "sett", "paving stones"], 'way["surface"~"sett|cobblestone|paving_stones"](around:RADIUS,LAT,LON);way["smoothness"~"bad|intermediate"]["surface"~"paving_stones|sett"](around:RADIUS,LAT,LON);'),
+    focusRule("outdoor_seating", "Aussengastronomie", ["aussengastronomie", "aussenbereich", "outdoor seating", "tische draussen", "strassencafe", "street cafe"], 'node["amenity"~"restaurant|cafe|bar|pub"]["outdoor_seating"~"yes|seasonal"](around:RADIUS,LAT,LON);way["amenity"~"restaurant|cafe|bar|pub"]["outdoor_seating"~"yes|seasonal"](around:RADIUS,LAT,LON);'),
+    focusRule("church_tower", "Kirchturm", ["kirchturm", "church tower", "kirche turm", "stadtkirche"], 'node["amenity"="place_of_worship"](around:RADIUS,LAT,LON);way["amenity"="place_of_worship"](around:RADIUS,LAT,LON);way["building"~"church|cathedral|chapel"](around:RADIUS,LAT,LON);'),
+    focusRule("power_pole", "Strommast", ["strommast", "strommasten", "stromleitung", "power pole", "utility pole", "hochspannung"], 'node["power"~"pole|tower"](around:RADIUS,LAT,LON);way["power"="line"](around:RADIUS,LAT,LON);'),
+    focusRule("street_lamp", "Straßenlaterne", ["laterne", "strassenlaterne", "straßenlaterne", "street lamp"], 'node["highway"="street_lamp"](around:RADIUS,LAT,LON);node["amenity"="street_lamp"](around:RADIUS,LAT,LON);'),
+    focusRule("road_marking", "Straßenmarkierung", ["strassenbemalung", "straßenbemalung", "strassenmarkierung", "straßenmarkierung", "road marking", "zebrastreifen", "spurpfeil"], 'node["road_marking"](around:RADIUS,LAT,LON);way["road_marking"](around:RADIUS,LAT,LON);node["highway"="crossing"](around:RADIUS,LAT,LON);way["turn:lanes"](around:RADIUS,LAT,LON);way["cycleway"="lane"](around:RADIUS,LAT,LON);'),
+    focusRule("traffic_sign", "Verkehrsschild", ["schild", "verkehrsschild", "strassenschild", "straßenschild", "traffic sign"], 'node["traffic_sign"](around:RADIUS,LAT,LON);way["traffic_sign"](around:RADIUS,LAT,LON);way["traffic_sign:forward"](around:RADIUS,LAT,LON);way["traffic_sign:backward"](around:RADIUS,LAT,LON);'),
+    focusRule("stop_sign", "Stoppschild", ["stoppschild", "stop schild", "stop sign"], 'node["highway"="stop"](around:RADIUS,LAT,LON);node["traffic_sign"~"stop|STOP|206|R1-1"](around:RADIUS,LAT,LON);'),
+    focusRule("speed_limit", "Tempolimit", ["tempolimit", "geschwindigkeitsschild", "speed limit", "maxspeed"], 'node["traffic_sign"~"274|speed|Speed|maxspeed|R2"](around:RADIUS,LAT,LON);way["maxspeed"](around:RADIUS,LAT,LON);'),
+    focusRule("country_signs_de", "Deutsche Schilder", ["deutsches schild", "deutsche schilder", "de sign", "german sign"], 'node["traffic_sign"~"DE:"](around:RADIUS,LAT,LON);way["traffic_sign"~"DE:"](around:RADIUS,LAT,LON);way["traffic_sign:forward"~"DE:"](around:RADIUS,LAT,LON);way["traffic_sign:backward"~"DE:"](around:RADIUS,LAT,LON);'),
+    focusRule("country_signs_us", "US-Schilder", ["us schild", "usa schild", "american sign", "us sign"], 'node["traffic_sign"~"US:"](around:RADIUS,LAT,LON);way["traffic_sign"~"US:"](around:RADIUS,LAT,LON);way["traffic_sign:forward"~"US:"](around:RADIUS,LAT,LON);way["traffic_sign:backward"~"US:"](around:RADIUS,LAT,LON);'),
+];
+
+const countrySignDefinitions = [
+    ["DE", "Deutschland", ["deutsch", "german", "de"]],
+    ["AT", "Oesterreich", ["oesterreich", "österreich", "austrian", "at"]],
+    ["CH", "Schweiz", ["schweiz", "swiss", "ch"]],
+    ["FR", "Frankreich", ["frankreich", "french", "fr"]],
+    ["IT", "Italien", ["italien", "italian", "it"]],
+    ["ES", "Spanien", ["spanien", "spanish", "es"]],
+    ["PT", "Portugal", ["portugal", "portuguese", "pt"]],
+    ["NL", "Niederlande", ["niederlande", "holland", "dutch", "nl"]],
+    ["BE", "Belgien", ["belgien", "belgian", "be"]],
+    ["PL", "Polen", ["polen", "polish", "pl"]],
+    ["CZ", "Tschechien", ["tschechien", "czech", "cz"]],
+    ["SK", "Slowakei", ["slowakei", "slovak", "sk"]],
+    ["HU", "Ungarn", ["ungarn", "hungarian", "hu"]],
+    ["RO", "Rumaenien", ["rumaenien", "rumänien", "romanian", "ro"]],
+    ["BG", "Bulgarien", ["bulgarien", "bulgarian", "bg"]],
+    ["HR", "Kroatien", ["kroatien", "croatian", "hr"]],
+    ["SI", "Slowenien", ["slowenien", "slovenian", "si"]],
+    ["DK", "Daenemark", ["daenemark", "dänemark", "danish", "dk"]],
+    ["SE", "Schweden", ["schweden", "swedish", "se"]],
+    ["NO", "Norwegen", ["norwegen", "norwegian", "no"]],
+    ["FI", "Finnland", ["finnland", "finnish", "fi"]],
+    ["EE", "Estland", ["estland", "estonian", "ee"]],
+    ["LV", "Lettland", ["lettland", "latvian", "lv"]],
+    ["LT", "Litauen", ["litauen", "lithuanian", "lt"]],
+    ["GB", "Grossbritannien", ["grossbritannien", "großbritannien", "uk", "british", "gb"]],
+    ["IE", "Irland", ["irland", "irish", "ie"]],
+    ["US", "USA", ["usa", "us", "american"]],
+    ["CA", "Kanada", ["kanada", "canada", "canadian", "ca"]],
+    ["MX", "Mexiko", ["mexiko", "mexico", "mexican", "mx"]],
+    ["BR", "Brasilien", ["brasilien", "brazil", "brazilian", "br"]],
+    ["AR", "Argentinien", ["argentinien", "argentina", "argentinian", "ar"]],
+    ["CL", "Chile", ["chile", "chilean", "cl"]],
+    ["AU", "Australien", ["australien", "australia", "australian", "au"]],
+    ["NZ", "Neuseeland", ["neuseeland", "new zealand", "nz"]],
+    ["JP", "Japan", ["japan", "japanese", "jp"]],
+    ["KR", "Korea", ["korea", "korean", "kr"]],
+    ["TH", "Thailand", ["thailand", "thai", "th"]],
+    ["ID", "Indonesien", ["indonesien", "indonesia", "indonesian", "id"]],
+    ["MY", "Malaysia", ["malaysia", "malaysian", "my"]],
+    ["ZA", "Suedafrika", ["suedafrika", "südafrika", "south africa", "za"]],
+    ["TR", "Tuerkei", ["tuerkei", "türkei", "turkey", "turkish", "tr"]],
+    ["GR", "Griechenland", ["griechenland", "greece", "greek", "gr"]],
+    ["UA", "Ukraine", ["ukraine", "ukrainian", "ua"]],
 ];
 
 const entityCatalog = [
@@ -117,6 +177,9 @@ const entityCatalog = [
     entity("playground", "Spielplatz", "POIs", "poi", ["spielplatz", "playground"], 'node["leisure"="playground"](around:RADIUS,LAT,LON);way["leisure"="playground"](around:RADIUS,LAT,LON);', [["leisure", "playground"]]),
     entity("school", "Schule", "POIs", "poi", ["schule", "school"], 'node["amenity"="school"](around:RADIUS,LAT,LON);way["amenity"="school"](around:RADIUS,LAT,LON);', [["amenity", "school"]]),
     entity("viewpoint", "Aussichtspunkt", "POIs", "poi", ["aussicht", "viewpoint"], 'node["tourism"="viewpoint"](around:RADIUS,LAT,LON);way["tourism"="viewpoint"](around:RADIUS,LAT,LON);', [["tourism", "viewpoint"]]),
+    entity("tower_building", "Hochhaus/Turm", "Landmarks", "building", ["hochhaus", "turm", "skyscraper", "tower", "markantes gebaeude"], 'node["building"~"tower|office|commercial"](around:RADIUS,LAT,LON);way["building"~"tower|office|commercial"](around:RADIUS,LAT,LON);node["man_made"~"tower|mast"](around:RADIUS,LAT,LON);way["man_made"~"tower|mast"](around:RADIUS,LAT,LON);', [["building", "tower", "office", "commercial"], ["man_made", "tower", "mast"], ["height", ""]]),
+    entity("jentower", "Jentower", "Landmarks", "building", ["jentower", "jen tower", "jena tower", "intershop tower", "uniturm", "unithochhaus", "streifenturm"], 'node["name"~"JenTower|Jentower|Jena Tower|Intershop Tower|Universitaetshochhaus|Universitätshochhaus"](around:RADIUS,LAT,LON);way["name"~"JenTower|Jentower|Jena Tower|Intershop Tower|Universitaetshochhaus|Universitätshochhaus"](around:RADIUS,LAT,LON);relation["name"~"JenTower|Jentower|Jena Tower|Intershop Tower|Universitaetshochhaus|Universitätshochhaus"](around:RADIUS,LAT,LON);', [["name", "jentower", "jen tower", "jena tower", "intershop tower", "universitaetshochhaus", "universitätshochhaus"], ["building", "tower", "office"]]),
+    entity("church_tower", "Kirchturm", "Landmarks", "building", ["kirchturm", "church tower", "stadtkirche", "kirche", "turm"], 'node["amenity"="place_of_worship"](around:RADIUS,LAT,LON);way["amenity"="place_of_worship"](around:RADIUS,LAT,LON);way["building"~"church|cathedral|chapel"](around:RADIUS,LAT,LON);', [["building", "church", "cathedral", "chapel"], ["amenity", "place_of_worship"]]),
     entity("supermarket", "Supermarkt", "POIs", "poi", ["supermarkt", "supermarket"], 'node["shop"="supermarket"](around:RADIUS,LAT,LON);way["shop"="supermarket"](around:RADIUS,LAT,LON);', [["shop", "supermarket"]]),
     entity("pizza", "Pizza", "Kueche", "poi", ["pizza", "italian"], 'node["amenity"~"restaurant|fast_food"]["cuisine"~"pizza|italian"](around:RADIUS,LAT,LON);way["amenity"~"restaurant|fast_food"]["cuisine"~"pizza|italian"](around:RADIUS,LAT,LON);', [["cuisine", "pizza", "italian"]]),
     entity("kebab", "Kebab", "Kueche", "poi", ["kebab", "doener", "doner"], 'node["amenity"~"restaurant|fast_food"]["cuisine"~"kebab|doner|turkish"](around:RADIUS,LAT,LON);way["amenity"~"restaurant|fast_food"]["cuisine"~"kebab|doner|turkish"](around:RADIUS,LAT,LON);', [["cuisine", "kebab", "doner", "turkish"]]),
@@ -126,6 +189,46 @@ const entityCatalog = [
     entity("river", "Wasserlauf", "Landschaft", "water", ["wasser", "fluss", "bach", "river", "stream"], 'way["waterway"~"river|stream|canal"](around:RADIUS,LAT,LON);node["waterway"~"river|stream|canal"](around:RADIUS,LAT,LON);', [["waterway", "river", "stream", "canal"]]),
     entity("bridge", "Bruecke", "Landschaft", "transport", ["bruecke", "bridge"], 'way["bridge"](around:RADIUS,LAT,LON);node["bridge"](around:RADIUS,LAT,LON);', [["bridge", "yes"]]),
     entity("bus_stop", "Bushaltestelle", "Verkehr", "transport", ["bus", "haltestelle", "bus_stop"], 'node["highway"="bus_stop"](around:RADIUS,LAT,LON);node["public_transport"="platform"](around:RADIUS,LAT,LON);', [["highway", "bus_stop"], ["public_transport", "platform"]]),
+    entity("power_pole", "Strommast", "Energie", "transport", ["strommast", "strommasten", "power pole", "utility pole"], 'node["power"~"pole|tower"](around:RADIUS,LAT,LON);', [["power", "pole", "tower"]]),
+    entity("power_line", "Stromleitung", "Energie", "transport", ["stromleitung", "hochspannung", "power line"], 'way["power"~"line|minor_line"](around:RADIUS,LAT,LON);', [["power", "line", "minor_line"]]),
+    entity("substation", "Umspannwerk", "Energie", "transport", ["umspannwerk", "substation", "transformator"], 'node["power"~"substation|transformer"](around:RADIUS,LAT,LON);way["power"~"substation|transformer"](around:RADIUS,LAT,LON);', [["power", "substation", "transformer"]]),
+    entity("wind_turbine", "Windrad", "Energie", "transport", ["windrad", "wind turbine"], 'node["power"="generator"]["generator:source"="wind"](around:RADIUS,LAT,LON);way["power"="generator"]["generator:source"="wind"](around:RADIUS,LAT,LON);', [["power", "generator"], ["generator:source", "wind"]]),
+    entity("solar", "Solaranlage", "Energie", "transport", ["solar", "solaranlage", "photovoltaik"], 'node["power"="generator"]["generator:source"="solar"](around:RADIUS,LAT,LON);way["power"="generator"]["generator:source"="solar"](around:RADIUS,LAT,LON);', [["power", "generator"], ["generator:source", "solar"]]),
+    entity("telecom_mast", "Funkmast", "Infrastruktur", "transport", ["funkmast", "sendemast", "telecom mast"], 'node["man_made"~"mast|tower"]["communication:mobile_phone"](around:RADIUS,LAT,LON);node["man_made"~"mast|tower"]["tower:type"~"communication|telecommunication"](around:RADIUS,LAT,LON);', [["man_made", "mast", "tower"], ["tower:type", "communication", "telecommunication"]]),
+    entity("street_lamp", "Strassenlaterne", "Infrastruktur", "transport", ["laterne", "strassenlaterne", "street lamp"], 'node["highway"="street_lamp"](around:RADIUS,LAT,LON);node["amenity"="street_lamp"](around:RADIUS,LAT,LON);', [["highway", "street_lamp"], ["amenity", "street_lamp"]]),
+    entity("camera", "Ueberwachungskamera", "Infrastruktur", "poi", ["kamera", "ueberwachung", "surveillance"], 'node["man_made"="surveillance"](around:RADIUS,LAT,LON);node["surveillance"](around:RADIUS,LAT,LON);', [["man_made", "surveillance"], ["surveillance", "yes", "camera"]]),
+    entity("fire_hydrant", "Hydrant", "Infrastruktur", "poi", ["hydrant", "feuerwehrhydrant"], 'node["emergency"="fire_hydrant"](around:RADIUS,LAT,LON);', [["emergency", "fire_hydrant"]]),
+    entity("post_box", "Briefkasten", "Stadtmoebel", "poi", ["briefkasten", "postbox", "post box"], 'node["amenity"="post_box"](around:RADIUS,LAT,LON);', [["amenity", "post_box"]]),
+    entity("bench", "Bank", "Stadtmoebel", "poi", ["bank", "sitzbank", "bench"], 'node["amenity"="bench"](around:RADIUS,LAT,LON);', [["amenity", "bench"]]),
+    entity("waste_basket", "Muelleimer", "Stadtmoebel", "poi", ["muelleimer", "mülleimer", "waste basket"], 'node["amenity"="waste_basket"](around:RADIUS,LAT,LON);', [["amenity", "waste_basket"]]),
+    entity("bollard", "Poller", "Stadtmoebel", "transport", ["poller", "bollard"], 'node["barrier"="bollard"](around:RADIUS,LAT,LON);way["barrier"="bollard"](around:RADIUS,LAT,LON);', [["barrier", "bollard"]]),
+    entity("street_cabinet", "Verteilerkasten", "Stadtmoebel", "transport", ["verteilerkasten", "street cabinet", "stromkasten"], 'node["man_made"="street_cabinet"](around:RADIUS,LAT,LON);node["street_cabinet"](around:RADIUS,LAT,LON);', [["man_made", "street_cabinet"], ["street_cabinet", "power", "telecom", "traffic_control"]]),
+    entity("traffic_sign", "Verkehrsschild", "Schilder", "transport", ["verkehrsschild", "schild", "traffic sign"], 'node["traffic_sign"](around:RADIUS,LAT,LON);way["traffic_sign"](around:RADIUS,LAT,LON);way["traffic_sign:forward"](around:RADIUS,LAT,LON);way["traffic_sign:backward"](around:RADIUS,LAT,LON);', [["traffic_sign", ""], ["traffic_sign:forward", ""], ["traffic_sign:backward", ""]]),
+    entity("stop_sign", "Stoppschild", "Schilder", "transport", ["stoppschild", "stop sign"], 'node["highway"="stop"](around:RADIUS,LAT,LON);node["traffic_sign"~"stop|STOP|206|R1-1"](around:RADIUS,LAT,LON);', [["highway", "stop"], ["traffic_sign", "stop", "206", "R1-1"]]),
+    entity("give_way", "Vorfahrt gewaehrten", "Schilder", "transport", ["vorfahrt gewaehren", "yield", "give way"], 'node["highway"="give_way"](around:RADIUS,LAT,LON);node["traffic_sign"~"give_way|yield|205|R1-2"](around:RADIUS,LAT,LON);', [["highway", "give_way"], ["traffic_sign", "give_way", "yield", "205", "R1-2"]]),
+    entity("speed_limit", "Tempolimit", "Schilder", "transport", ["tempolimit", "maxspeed", "speed limit"], 'node["traffic_sign"~"274|speed|Speed|maxspeed|R2"](around:RADIUS,LAT,LON);way["maxspeed"](around:RADIUS,LAT,LON);', [["traffic_sign", "274", "speed", "R2"], ["maxspeed", ""]]),
+    entity("city_limit_sign", "Ortsschild", "Schilder", "transport", ["ortsschild", "city limit"], 'node["traffic_sign"~"city_limit|310|311"](around:RADIUS,LAT,LON);way["traffic_sign"~"city_limit|310|311"](around:RADIUS,LAT,LON);', [["traffic_sign", "city_limit", "310", "311"]]),
+    entity("no_entry", "Einfahrt verboten", "Schilder", "transport", ["einfahrt verboten", "no entry"], 'node["traffic_sign"~"no_entry|267|R5-1"](around:RADIUS,LAT,LON);way["oneway"="yes"](around:RADIUS,LAT,LON);', [["traffic_sign", "no_entry", "267", "R5-1"], ["oneway", "yes"]]),
+    entity("roundabout", "Kreisverkehr", "Schilder", "transport", ["kreisverkehr", "roundabout"], 'node["traffic_sign"~"roundabout|215"](around:RADIUS,LAT,LON);way["junction"="roundabout"](around:RADIUS,LAT,LON);', [["traffic_sign", "roundabout", "215"], ["junction", "roundabout"]]),
+    entity("pedestrian_crossing_sign", "Fussgaengerueberweg-Schild", "Schilder", "transport", ["fussgaengerueberweg", "fußgängerüberweg", "pedestrian crossing sign"], 'node["traffic_sign"~"350|pedestrian|crossing"](around:RADIUS,LAT,LON);node["highway"="crossing"](around:RADIUS,LAT,LON);', [["traffic_sign", "350", "pedestrian", "crossing"], ["highway", "crossing"]]),
+    entity("rail_crossing_sign", "Bahnuebergang", "Schilder", "transport", ["bahnuebergang", "railway crossing"], 'node["railway"="level_crossing"](around:RADIUS,LAT,LON);node["traffic_sign"~"railway|level_crossing|201"](around:RADIUS,LAT,LON);', [["railway", "level_crossing"], ["traffic_sign", "railway", "level_crossing", "201"]]),
+    entity("road_marking", "Strassenmarkierung", "Strassenmarkierung", "transport", ["strassenmarkierung", "straßenmarkierung", "road marking"], 'node["road_marking"](around:RADIUS,LAT,LON);way["road_marking"](around:RADIUS,LAT,LON);', [["road_marking", ""]]),
+    entity("zebra_crossing", "Zebrastreifen", "Strassenmarkierung", "transport", ["zebrastreifen", "zebra crossing"], 'node["highway"="crossing"]["crossing:markings"~"zebra|lines|ladder"](around:RADIUS,LAT,LON);node["highway"="crossing"]["crossing"~"zebra|marked"](around:RADIUS,LAT,LON);', [["highway", "crossing"], ["crossing:markings", "zebra", "lines", "ladder"], ["crossing", "zebra", "marked"]]),
+    entity("stop_line", "Haltelinie", "Strassenmarkierung", "transport", ["haltelinie", "stop line"], 'node["road_marking"~"stop_line|stop"](around:RADIUS,LAT,LON);way["road_marking"~"stop_line|stop"](around:RADIUS,LAT,LON);node["highway"="stop"](around:RADIUS,LAT,LON);', [["road_marking", "stop_line", "stop"], ["highway", "stop"]]),
+    entity("lane_arrows", "Spurpfeile", "Strassenmarkierung", "transport", ["spurpfeile", "lane arrows", "turn lanes"], 'way["turn:lanes"](around:RADIUS,LAT,LON);way["turn:lanes:forward"](around:RADIUS,LAT,LON);way["turn:lanes:backward"](around:RADIUS,LAT,LON);', [["turn:lanes", ""], ["turn:lanes:forward", ""], ["turn:lanes:backward", ""]]),
+    entity("cycle_lane", "Radfahrstreifen", "Strassenmarkierung", "transport", ["radfahrstreifen", "bike lane", "cycle lane"], 'way["cycleway"="lane"](around:RADIUS,LAT,LON);way["cycleway:left"="lane"](around:RADIUS,LAT,LON);way["cycleway:right"="lane"](around:RADIUS,LAT,LON);', [["cycleway", "lane"], ["cycleway:left", "lane"], ["cycleway:right", "lane"]]),
+    entity("bus_lane", "Busspur", "Strassenmarkierung", "transport", ["busspur", "bus lane"], 'way["bus:lanes"](around:RADIUS,LAT,LON);way["busway"](around:RADIUS,LAT,LON);way["psv:lanes"](around:RADIUS,LAT,LON);', [["bus:lanes", ""], ["busway", ""], ["psv:lanes", ""]]),
+    entity("traffic_calming", "Verkehrsberuhigung", "Strasse", "transport", ["verkehrsberuhigung", "speed bump", "traffic calming"], 'node["traffic_calming"](around:RADIUS,LAT,LON);way["traffic_calming"](around:RADIUS,LAT,LON);', [["traffic_calming", ""]]),
+    entity("speed_camera", "Blitzer", "Strasse", "transport", ["blitzer", "speed camera"], 'node["highway"="speed_camera"](around:RADIUS,LAT,LON);node["enforcement"="maxspeed"](around:RADIUS,LAT,LON);', [["highway", "speed_camera"], ["enforcement", "maxspeed"]]),
+    entity("traffic_signal", "Ampel", "Strasse", "transport", ["ampel", "traffic signal"], 'node["highway"="traffic_signals"](around:RADIUS,LAT,LON);', [["highway", "traffic_signals"]]),
+    entity("milestone", "Kilometerstein", "GeoGuessr-Hinweise", "transport", ["kilometerstein", "milestone"], 'node["highway"="milestone"](around:RADIUS,LAT,LON);node["historic"="milestone"](around:RADIUS,LAT,LON);', [["highway", "milestone"], ["historic", "milestone"]]),
+    entity("guidepost", "Wegweiser", "GeoGuessr-Hinweise", "transport", ["wegweiser", "guidepost", "signpost"], 'node["information"="guidepost"](around:RADIUS,LAT,LON);node["tourism"="information"]["information"="guidepost"](around:RADIUS,LAT,LON);', [["information", "guidepost"], ["tourism", "information"]]),
+    entity("road_reference", "Strassennummer", "GeoGuessr-Hinweise", "transport", ["strassennummer", "road ref", "route number"], 'way["ref"](around:RADIUS,LAT,LON);relation["route"="road"]["ref"](around:RADIUS,LAT,LON);', [["ref", ""], ["route", "road"]]),
+    entity("surface_unpaved", "Unbefestigte Strasse", "GeoGuessr-Hinweise", "transport", ["schotter", "unpaved", "gravel road"], 'way["surface"~"unpaved|gravel|dirt|ground|compacted"](around:RADIUS,LAT,LON);', [["surface", "unpaved", "gravel", "dirt", "ground", "compacted"]]),
+    entity("alley", "Altstadtgasse", "GeoGuessr-Hinweise", "transport", ["gasse", "altstadtgasse", "enge gasse", "schmale gasse", "old town alley"], 'way["highway"~"pedestrian|living_street|service|footway"]["name"~"Gasse|gasse|Wagnergasse|Johannisgasse|Jenergasse"](around:RADIUS,LAT,LON);way["highway"~"pedestrian|living_street|service|footway"]["surface"~"sett|cobblestone|paving_stones"](around:RADIUS,LAT,LON);', [["highway", "pedestrian", "living_street", "service", "footway"], ["name", "gasse", "wagnergasse", "johannisgasse", "jenergasse"]]),
+    entity("cobblestone", "Kopfsteinpflaster", "GeoGuessr-Hinweise", "transport", ["kopfsteinpflaster", "pflastersteine", "cobblestone", "sett", "paving stones"], 'way["surface"~"sett|cobblestone|paving_stones"](around:RADIUS,LAT,LON);', [["surface", "sett", "cobblestone", "paving_stones"]]),
+    entity("outdoor_seating", "Aussengastronomie", "GeoGuessr-Hinweise", "poi", ["aussengastronomie", "outdoor seating", "strassencafe", "street cafe", "tische draussen"], 'node["amenity"~"restaurant|cafe|bar|pub"]["outdoor_seating"~"yes|seasonal"](around:RADIUS,LAT,LON);way["amenity"~"restaurant|cafe|bar|pub"]["outdoor_seating"~"yes|seasonal"](around:RADIUS,LAT,LON);', [["outdoor_seating", "yes", "seasonal"], ["amenity", "restaurant", "cafe", "bar", "pub"]]),
+    ...countrySignEntities(),
 ];
 
 const $ = (selector) => document.querySelector(selector);
@@ -289,6 +392,27 @@ function entity(id, label, category, group, terms, query, matchers) {
 
 function focusRule(id, label, terms, query) {
     return { id, label, terms, query };
+}
+
+function countrySignEntities() {
+    return countrySignDefinitions.map(([code, label, terms]) => {
+        return entity(`traffic_sign_${code.toLowerCase()}`, `${label}-Schilder`, "Schilder nach Laendern", "transport", [...terms, `${code}:`, "traffic sign", "verkehrsschild"], countrySignQuery(code), [
+            ["traffic_sign", `${code}:`],
+            ["traffic_sign:forward", `${code}:`],
+            ["traffic_sign:backward", `${code}:`],
+        ]);
+    });
+}
+
+function countrySignQuery(code) {
+    return `node["traffic_sign"~"${code}:"](around:RADIUS,LAT,LON);way["traffic_sign"~"${code}:"](around:RADIUS,LAT,LON);way["traffic_sign:forward"~"${code}:"](around:RADIUS,LAT,LON);way["traffic_sign:backward"~"${code}:"](around:RADIUS,LAT,LON);`;
+}
+
+function focusedCountrySignPlans(query) {
+    if (!query.raw.includes("schild") && !query.raw.includes("sign")) return [];
+    return countrySignDefinitions
+        .filter(([code, , terms]) => query.raw.includes(normalize(code)) || terms.some((term) => query.raw.includes(normalize(term))))
+        .map(([code, label]) => ({ id: `country-sign-${code}`, label: `${label}-Schilder`, query: countrySignQuery(code) }));
 }
 
 function selectedEntityObjects() {
@@ -576,6 +700,7 @@ function buildOverpassPlans(sources, query) {
             plans.push({ id: `focus-${rule.id}`, label: rule.label, query: rule.query });
         }
     });
+    plans.push(...focusedCountrySignPlans(query));
     if (!plans.length) {
         sources.forEach((source) => {
             const queryPart = sourceQueries[source];
@@ -709,6 +834,21 @@ function nominatimTermsForPlan(plan) {
         supermarket: ["supermarket"],
         bus_stop: ["bus stop"],
         viewpoint: ["viewpoint"],
+        tower_building: ["tower", "high-rise building", "skyscraper"],
+        jentower: ["Jentower", "JenTower Jena", "Intershop Tower"],
+        alley: ["Gasse", "pedestrian street", "old town alley"],
+        cobblestone: ["cobblestone street", "paving stones"],
+        outdoor_seating: ["outdoor seating cafe", "restaurant terrace"],
+        church_tower: ["church tower", "Stadtkirche"],
+        power_pole: ["power pole", "utility pole"],
+        street_lamp: ["street lamp"],
+        traffic_signal: ["traffic lights"],
+        speed_camera: ["speed camera"],
+        telecom_mast: ["communication mast", "telecommunication tower"],
+        fire_hydrant: ["fire hydrant"],
+        post_box: ["post box"],
+        bench: ["bench"],
+        guidepost: ["guidepost"],
     };
     if (byId[id]) return byId[id];
     if (/restaurant/i.test(plan.label)) return ["restaurant"];
@@ -716,6 +856,17 @@ function nominatimTermsForPlan(plan) {
     if (/kirche/i.test(plan.label)) return ["church"];
     if (/parkplatz/i.test(plan.label)) return ["parking"];
     if (/histor/i.test(plan.label)) return ["historic"];
+    if (/jentower|jen tower|intershop/i.test(plan.label)) return ["Jentower"];
+    if (/hochhaus|turm|tower/i.test(plan.label)) return ["tower", "high-rise building"];
+    if (/gasse|kopfstein|pflaster/i.test(plan.label)) return ["Gasse", "cobblestone street"];
+    if (/aussengastronomie|outdoor/i.test(plan.label)) return ["outdoor seating cafe"];
+    if (/kirchturm|stadtkirche/i.test(plan.label)) return ["church tower"];
+    if (/strommast|stromleitung|umspannwerk/i.test(plan.label)) return ["power pole"];
+    if (/laterne/i.test(plan.label)) return ["street lamp"];
+    if (/ampel/i.test(plan.label)) return ["traffic lights"];
+    if (/blitzer/i.test(plan.label)) return ["speed camera"];
+    if (/zebrastreifen|fussgaenger|fußgänger/i.test(plan.label)) return ["crossing"];
+    if (/funkmast/i.test(plan.label)) return ["communication mast"];
     return [];
 }
 
@@ -1058,17 +1209,11 @@ async function analyzeImageFile(event) {
         state.imageHints = hints;
         renderImageSignals(hints, gps);
         if (gps) {
-            state.center = [gps.lat, gps.lon];
-            setMapView(state.center, 16);
-            state.imageSource.clear();
-            const imageFeature = new ol.Feature({
-                geometry: new ol.geom.Point(ol.proj.fromLonLat([gps.lon, gps.lat])),
-                popupHtml: "<strong>Fotostandort aus EXIF</strong>",
-            });
-            state.imageSource.addFeature(imageFeature);
-            openFeaturePopup(imageFeature, imageFeature.get("popupHtml"));
-            drawSearchCircle();
+            focusImageLocation({ lat: gps.lat, lon: gps.lon, zoom: 16 }, "Fotostandort aus EXIF");
             setStatus("Bild-GPS gefunden. Suchraum wurde auf das Foto gesetzt.");
+        } else if (focusBestImageLocation(hints)) {
+            const locationHint = hints.find((hint) => hint.location);
+            setStatus(`${hints.length} Bildhinweise erkannt. Suchraum wurde auf ${locationHint.location.label || locationHint.label} gesetzt.`);
         } else {
             setStatus(`${hints.length} Bildhinweise erkannt. Mit + in die Query uebernehmen.`);
         }
@@ -1084,6 +1229,29 @@ function loadImage(url) {
         image.onerror = () => reject(new Error("Bild konnte nicht geladen werden"));
         image.src = url;
     });
+}
+
+function focusBestImageLocation(hints) {
+    const locationHint = hints
+        .filter((hint) => hint.location && hint.confidence >= .88)
+        .sort((a, b) => b.confidence - a.confidence)[0];
+    if (!locationHint) return false;
+    focusImageLocation(locationHint.location, `Bildhinweis: ${locationHint.label}`);
+    return true;
+}
+
+function focusImageLocation(location, label) {
+    if (!location) return;
+    state.center = [location.lat, location.lon];
+    setMapView(state.center, location.zoom || 16);
+    state.imageSource.clear();
+    const imageFeature = new ol.Feature({
+        geometry: new ol.geom.Point(ol.proj.fromLonLat([location.lon, location.lat])),
+        popupHtml: `<strong>${escapeHtml(label)}</strong>${location.label ? `<br>${escapeHtml(location.label)}` : ""}`,
+    });
+    state.imageSource.addFeature(imageFeature);
+    openFeaturePopup(imageFeature, imageFeature.get("popupHtml"));
+    drawSearchCircle();
 }
 
 function analyzeImagePixels(image, gps, fileName) {
@@ -1111,6 +1279,8 @@ function analyzeImagePixels(image, gps, fileName) {
     }
     const ratio = (key) => counts[key] / Math.max(total, 1);
     const hints = [];
+    const scene = imageSceneMetrics(pixels, canvas.width, canvas.height);
+    hints.push(...visualLandmarkHints(scene, fileName));
     if (gps) hints.push(imageHint("GPS-Koordinaten", "exakte Fotokoordinaten", "transport", .95, []));
     if (ratio("green") > .22) hints.push(imageHint("viel Gruen", "Wald, Park, Wiese, Baeume", "vegetation", ratio("green"), ["forest", "meadow"]));
     if (ratio("blue") > .18) hints.push(imageHint("blaues Wasser/Himmel", "Wasser, Fluss, Bruecke, Ufer", "water", ratio("blue"), ["river", "bridge"]));
@@ -1123,11 +1293,258 @@ function analyzeImagePixels(image, gps, fileName) {
             hints.push(imageHint(`Dateiname: ${item.label}`, item.label, item.group, .8, [item.id]));
         }
     });
+    return dedupeImageHints(hints);
+}
+
+function imageSceneMetrics(pixels, width, height) {
+    const towerBand = regionStats(pixels, width, height, .34, .06, .72, .66);
+    const upperCenter = regionStats(pixels, width, height, .24, .04, .78, .52);
+    const centerSky = regionStats(pixels, width, height, .32, .02, .68, .32);
+    const lowerCenter = regionStats(pixels, width, height, .25, .52, .75, .95);
+    const bottom = regionStats(pixels, width, height, .05, .62, .95, .98);
+    const leftSide = regionStats(pixels, width, height, .00, .12, .30, .86);
+    const rightSide = regionStats(pixels, width, height, .70, .12, 1.00, .86);
+    const towerCandidate = bestTowerCandidate(pixels, width, height);
+    return {
+        aspect: height / Math.max(width, 1),
+        towerBand,
+        towerCandidate,
+        upperCenter,
+        centerSky,
+        lowerCenter,
+        bottom,
+        leftSide,
+        rightSide,
+        towerStripes: horizontalStripeScore(pixels, width, height, .36, .08, .70, .62),
+        towerEdges: edgeProfile(pixels, width, height, .34, .06, .72, .66),
+        bottomEdges: edgeProfile(pixels, width, height, .05, .62, .95, .98),
+        sideEdges: edgeProfile(pixels, width, height, .00, .16, 1.00, .86),
+    };
+}
+
+function bestTowerCandidate(pixels, width, height) {
+    const windows = [
+        [.28, .48],
+        [.34, .54],
+        [.40, .60],
+        [.46, .66],
+        [.52, .72],
+        [.34, .66],
+        [.42, .74],
+    ];
+    return windows
+        .map(([left, right]) => towerCandidateScore(pixels, width, height, left, right))
+        .sort((a, b) => b.score - a.score)[0];
+}
+
+function towerCandidateScore(pixels, width, height, left, right) {
+    const core = regionStats(pixels, width, height, left, .08, right, .64);
+    const leftBack = regionStats(pixels, width, height, Math.max(0, left - .18), .05, left, .58);
+    const rightBack = regionStats(pixels, width, height, right, .05, Math.min(1, right + .18), .58);
+    const stripes = horizontalStripeScore(pixels, width, height, left, .10, right, .60);
+    const edges = edgeProfile(pixels, width, height, left, .08, right, .64);
+    const backgroundOpen = clamp((leftBack.bright + leftBack.blue + rightBack.bright + rightBack.blue) / 2);
+    const facadePenalty = clamp(core.green * .45 + Math.max(0, core.warm - .38) * .32 + Math.max(0, core.dark - .26) * .20);
+    const bodyScore = clamp(core.gray * .34 + stripes * .32 + edges.density * .22 + Math.max(0, edges.vertical - .48) * .28 + backgroundOpen * .16);
+    return {
+        left,
+        right,
+        core,
+        stripes,
+        edges,
+        backgroundOpen,
+        score: clamp(bodyScore - facadePenalty),
+    };
+}
+
+function visualLandmarkHints(scene, fileName) {
+    const hints = [];
+    const name = normalize(fileName);
+    const fileJentower = /jentower|jen tower|jena tower|intershop|uniturm|unithochhaus/.test(name);
+    const fileAlley = /gasse|wagnergasse|johannisgasse|jenergasse|kopfstein|cobble|paving/.test(name);
+    const tower = scene.towerCandidate;
+    const genericTowerConfidence = clamp(
+        tower.score * .76
+        + scene.towerBand.gray * .10
+        + scene.towerStripes * .10
+        + (scene.aspect > 1.05 ? .04 : 0),
+    );
+    const jentowerConfidence = fileJentower ? .92 : clamp(
+        tower.score * .54
+        + tower.stripes * .28
+        + tower.core.gray * .16
+        + tower.backgroundOpen * .12
+        + Math.max(0, tower.edges.vertical - .52) * .28
+        - tower.core.green * .18
+        - Math.max(0, tower.core.warm - .42) * .16,
+    );
+    const likelyStripedTower = fileJentower || (
+        jentowerConfidence > .78
+        && tower.stripes > .20
+        && tower.core.gray > .16
+        && tower.edges.density > .12
+        && tower.edges.vertical > .50
+        && tower.backgroundOpen > .10
+        && tower.core.green < .20
+        && tower.core.warm < .50
+    );
+    const sideFacadeScore = clamp(
+        (scene.leftSide.warm + scene.leftSide.gray + scene.leftSide.dark * .32
+        + scene.rightSide.warm + scene.rightSide.gray + scene.rightSide.dark * .32) / 1.7,
+    );
+    const skyCorridorScore = clamp(scene.centerSky.bright * .45 + scene.centerSky.blue * .34 + scene.centerSky.gray * .12);
+    const groundTextureScore = clamp(scene.bottomEdges.density * .72 + scene.bottomEdges.strength * 1.8 + scene.bottom.gray * .18);
+    const alleyConfidence = clamp(
+        (fileAlley ? .42 : .08)
+        + sideFacadeScore * .34
+        + skyCorridorScore * .24
+        + groundTextureScore * .44
+        + scene.sideEdges.vertical * .12
+        + (scene.aspect > 1.08 ? .07 : 0),
+    );
+    const cobblestoneConfidence = clamp((fileAlley ? .32 : .04) + groundTextureScore * .74 + scene.bottom.gray * .18 + scene.bottom.warm * .12);
+    const outdoorSeatingConfidence = clamp(
+        (alleyConfidence > .48 ? .18 : 0)
+        + scene.lowerCenter.warm * .48
+        + scene.bottom.warm * .32
+        + scene.bottomEdges.density * .18,
+    );
+    const jentowerLocation = { lat: 50.92925, lon: 11.58455, zoom: 16, label: "Jentower / Jena Zentrum" };
+    const alleyLocation = { lat: 50.9290, lon: 11.5842, zoom: 17, label: "Jena-Altstadt nahe Jentower" };
+    const strongJentowerLocation = fileJentower || jentowerConfidence > .88;
+
+    if (likelyStripedTower) {
+        hints.push(imageHint("Jentower / Streifenturm", "Jentower, JenTower, Jena Tower, Intershop Tower", "building", Math.max(.80, jentowerConfidence), ["jentower"], strongJentowerLocation ? jentowerLocation : null));
+    } else if (genericTowerConfidence > .54 && tower.core.green < .28) {
+        hints.push(imageHint("Hochhaus/Turm-Silhouette", "Hochhaus, Turm, markantes Gebaeude, Aussichtspunkt", "building", genericTowerConfidence, ["tower_building", "viewpoint"]));
+    }
+    if (alleyConfidence > .48 && (fileAlley || groundTextureScore > .20 || sideFacadeScore > .22)) {
+        const location = strongJentowerLocation ? alleyLocation : null;
+        hints.push(imageHint("Altstadtgasse / enge Gasse", "Gasse, Altstadtgasse, schmale Strasse, Jena Altstadt", "transport", alleyConfidence, ["alley"], location));
+    }
+    if (cobblestoneConfidence > .46) {
+        hints.push(imageHint("Kopfsteinpflaster", "Kopfsteinpflaster, Pflastersteine, cobblestone, paving stones", "transport", cobblestoneConfidence, ["cobblestone"]));
+    }
+    if (outdoorSeatingConfidence > .42) {
+        hints.push(imageHint("Aussengastronomie", "Aussengastronomie, Strassencafe, Restaurant, Cafe, outdoor seating", "poi", outdoorSeatingConfidence, ["outdoor_seating", "restaurant", "cafe"]));
+    }
+    if (likelyStripedTower && alleyConfidence > .48) {
+        hints.push(imageHint("Jena-Altstadt mit Jentower-Sicht", "Jentower, Altstadtgasse, Kopfsteinpflaster, Aussengastronomie", "building", clamp((jentowerConfidence + alleyConfidence) / 2 + .08), ["jentower", "alley", "cobblestone", "outdoor_seating"], strongJentowerLocation ? alleyLocation : null));
+    }
     return hints;
 }
 
-function imageHint(label, query, group, confidence, entityIds) {
-    return { label, query, group, confidence: clamp(confidence), entityIds };
+function regionStats(pixels, width, height, left, top, right, bottom) {
+    const x0 = Math.max(0, Math.floor(width * left));
+    const y0 = Math.max(0, Math.floor(height * top));
+    const x1 = Math.min(width, Math.ceil(width * right));
+    const y1 = Math.min(height, Math.ceil(height * bottom));
+    const totals = { count: 0, green: 0, blue: 0, gray: 0, warm: 0, dark: 0, bright: 0, luma: 0 };
+    for (let y = y0; y < y1; y += 1) {
+        for (let x = x0; x < x1; x += 1) {
+            const index = (y * width + x) * 4;
+            const r = pixels[index];
+            const g = pixels[index + 1];
+            const b = pixels[index + 2];
+            const max = Math.max(r, g, b);
+            const min = Math.min(r, g, b);
+            const lum = pixelLuma(r, g, b);
+            totals.count += 1;
+            totals.luma += lum;
+            if (g > r * 1.12 && g > b * 1.08) totals.green += 1;
+            if (b > r * 1.1 && b > g * 1.02) totals.blue += 1;
+            if (max - min < 32 && max > 62) totals.gray += 1;
+            if (r > g * 1.04 && g > b * 1.02) totals.warm += 1;
+            if (max < 58) totals.dark += 1;
+            if (max > 185 && lum > 148) totals.bright += 1;
+        }
+    }
+    const count = Math.max(totals.count, 1);
+    return {
+        green: totals.green / count,
+        blue: totals.blue / count,
+        gray: totals.gray / count,
+        warm: totals.warm / count,
+        dark: totals.dark / count,
+        bright: totals.bright / count,
+        luma: totals.luma / count / 255,
+    };
+}
+
+function edgeProfile(pixels, width, height, left, top, right, bottom) {
+    const x0 = Math.max(1, Math.floor(width * left));
+    const y0 = Math.max(1, Math.floor(height * top));
+    const x1 = Math.min(width - 1, Math.ceil(width * right));
+    const y1 = Math.min(height - 1, Math.ceil(height * bottom));
+    let count = 0;
+    let strong = 0;
+    let dxTotal = 0;
+    let dyTotal = 0;
+    for (let y = y0; y < y1; y += 2) {
+        for (let x = x0; x < x1; x += 2) {
+            const dx = Math.abs(lumaAt(pixels, width, x + 1, y) - lumaAt(pixels, width, x - 1, y));
+            const dy = Math.abs(lumaAt(pixels, width, x, y + 1) - lumaAt(pixels, width, x, y - 1));
+            dxTotal += dx;
+            dyTotal += dy;
+            if (dx + dy > 42) strong += 1;
+            count += 1;
+        }
+    }
+    const total = Math.max(dxTotal + dyTotal, 1);
+    return {
+        density: strong / Math.max(count, 1),
+        vertical: dxTotal / total,
+        horizontal: dyTotal / total,
+        strength: total / Math.max(count * 510, 1),
+    };
+}
+
+function horizontalStripeScore(pixels, width, height, left, top, right, bottom) {
+    const x0 = Math.max(0, Math.floor(width * left));
+    const y0 = Math.max(0, Math.floor(height * top));
+    const x1 = Math.min(width, Math.ceil(width * right));
+    const y1 = Math.min(height, Math.ceil(height * bottom));
+    const rows = [];
+    for (let y = y0; y < y1; y += 2) {
+        let sum = 0;
+        let count = 0;
+        for (let x = x0; x < x1; x += 2) {
+            sum += lumaAt(pixels, width, x, y);
+            count += 1;
+        }
+        rows.push(sum / Math.max(count, 1));
+    }
+    if (rows.length < 4) return 0;
+    const diffs = rows.slice(1).map((value, index) => Math.abs(value - rows[index]));
+    const avgDiff = diffs.reduce((sum, value) => sum + value, 0) / Math.max(diffs.length, 1) / 255;
+    const sharpRows = diffs.filter((value) => value > 10).length / Math.max(diffs.length, 1);
+    return clamp((avgDiff - .01) * 7 + sharpRows * .34);
+}
+
+function lumaAt(pixels, width, x, y) {
+    const index = (y * width + x) * 4;
+    return pixelLuma(pixels[index], pixels[index + 1], pixels[index + 2]);
+}
+
+function pixelLuma(r, g, b) {
+    return r * .2126 + g * .7152 + b * .0722;
+}
+
+function dedupeImageHints(hints) {
+    const seen = new Set();
+    return hints
+        .filter((hint) => {
+            const key = `${hint.label}:${hint.query}`;
+            if (seen.has(key)) return false;
+            seen.add(key);
+            return true;
+        })
+        .sort((a, b) => b.confidence - a.confidence)
+        .slice(0, 12);
+}
+
+function imageHint(label, query, group, confidence, entityIds = [], location = null) {
+    return { label, query, group, confidence: clamp(confidence), entityIds, location };
 }
 
 function renderImageSignals(hints, gps) {
@@ -1166,6 +1583,7 @@ function applyImageHintsToQuery() {
     syncEntityQueryText();
     renderEntityCatalog();
     renderSelectedEntities();
+    focusBestImageLocation(state.imageHints);
     setStatus("Bildhinweise wurden in Query und Entitaeten uebernommen.");
 }
 
