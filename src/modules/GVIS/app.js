@@ -75,19 +75,57 @@ const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => Array.from(document.querySelectorAll(selector));
 
 function init() {
-    state.map = L.map("map", { zoomControl: false }).setView(state.center, 14);
+    state.map = L.map("map", {
+        zoomControl: false,
+        scrollWheelZoom: false,
+        wheelDebounceTime: 80,
+        trackResize: true,
+        preferCanvas: true,
+    }).setView(state.center, 14);
     L.control.zoom({ position: "bottomright" }).addTo(state.map);
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        maxZoom: 19,
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-    }).addTo(state.map);
+    const basemaps = createBasemaps();
+    basemaps["Carto Light"].addTo(state.map);
+    L.control.layers(basemaps, null, { position: "bottomright", collapsed: true }).addTo(state.map);
     state.markerLayer = L.layerGroup().addTo(state.map);
     drawSearchCircle();
     renderEntityCatalog();
     renderSelectedEntities();
     bindUi();
     window.addEventListener("resize", () => state.map.invalidateSize());
-    setTimeout(() => state.map.invalidateSize(), 250);
+    if ("ResizeObserver" in window) {
+        new ResizeObserver(() => state.map.invalidateSize()).observe($("#map"));
+    }
+    [0, 120, 350, 800].forEach((delay) => setTimeout(() => state.map.invalidateSize(), delay));
+}
+
+function createBasemaps() {
+    const common = {
+        maxZoom: 20,
+        keepBuffer: 6,
+        updateWhenIdle: false,
+        updateWhenZooming: false,
+    };
+    return {
+        "Carto Light": L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
+            ...common,
+            subdomains: "abcd",
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        }),
+        "Carto Voyager": L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
+            ...common,
+            subdomains: "abcd",
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        }),
+        "Esri Satellit": L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
+            ...common,
+            attribution: "Tiles &copy; Esri",
+        }),
+        "OSM Standard": L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            ...common,
+            maxZoom: 19,
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        }),
+    };
 }
 
 function bindUi() {
