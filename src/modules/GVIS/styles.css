@@ -306,6 +306,22 @@ input[type="range"] {
     text-align: left;
     font-size: 12px;
     font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.entity-chip[data-count]::after {
+    content: attr(data-count);
+    min-width: 22px;
+    border-radius: 999px;
+    background: #e2e8f0;
+    color: #475569;
+    padding: 2px 6px;
+    text-align: center;
+    font-size: 11px;
+    font-weight: 900;
 }
 
 .entity-chip.active,

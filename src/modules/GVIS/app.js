@@ -12,6 +12,8 @@ const state = {
     importedFeatures: [],
     reviewRecords: [],
     selectedEntities: new Set(),
+    dynamicEntities: [],
+    measuredFeaturePool: [],
     imageHints: [],
     results: [],
     loading: false,
@@ -420,15 +422,19 @@ function focusedCountrySignPlans(query) {
         .map(([code, label]) => ({ id: `country-sign-${code}`, label: `${label}-Schilder`, query: countrySignQuery(code) }));
 }
 
+function allEntityObjects() {
+    return [...entityCatalog, ...state.dynamicEntities];
+}
+
 function selectedEntityObjects() {
-    return entityCatalog.filter((item) => state.selectedEntities.has(item.id));
+    return allEntityObjects().filter((item) => state.selectedEntities.has(item.id));
 }
 
 function renderEntityCatalog() {
     const catalog = $("#entityCatalog");
     if (!catalog) return;
     const filter = normalize($("#entitySearch")?.value || "");
-    const visible = entityCatalog.filter((item) => {
+    const visible = allEntityObjects().filter((item) => {
         const haystack = normalize([item.label, item.category, item.group, ...item.terms].join(" "));
         return !filter || haystack.includes(filter);
     });
@@ -446,6 +452,10 @@ function renderEntityCatalog() {
             button.type = "button";
             button.className = `entity-chip${state.selectedEntities.has(item.id) ? " active" : ""}`;
             button.textContent = item.label;
+            if (item.dynamic) {
+                button.title = `${item.count || 1} gemessene Treffer`;
+                if (item.count) button.dataset.count = String(item.count);
+            }
             button.addEventListener("click", () => toggleEntity(item.id));
             wrapper.appendChild(button);
         });
@@ -512,6 +522,185 @@ function addCustomEntity() {
     setStatus(`Eigene Entitaet ${label} hinzugefuegt.`);
 }
 
+function refreshDynamicEntities(features = [], options = {}) {
+    const pool = [...state.measuredFeaturePool, ...features].filter(Boolean);
+    state.measuredFeaturePool = dedupeMeasuredFeatures(pool).slice(0, 900);
+    const previousSelected = new Set(state.selectedEntities);
+    state.dynamicEntities = buildDynamicEntities(state.measuredFeaturePool);
+    previousSelected.forEach((id) => {
+        if (!allEntityObjects().some((item) => item.id === id)) state.selectedEntities.delete(id);
+    });
+    renderEntityCatalog();
+    renderSelectedEntities();
+    if (options.status && state.dynamicEntities.length) {
+        setStatus(`${state.dynamicEntities.length} dynamische Entitaeten aus messbaren Daten gelesen.`);
+    }
+}
+
+function dedupeMeasuredFeatures(features) {
+    const seen = new Set();
+    return features.filter((feature) => {
+        if (!feature) return false;
+        const key = feature.id || `${feature.source || "feature"}:${feature.lat}:${feature.lon}:${feature.name || ""}`;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+    });
+}
+
+function buildDynamicEntities(features) {
+    const buckets = new Map();
+    features.forEach((feature) => dynamicEntityMeasurements(feature).forEach((measurement) => {
+        const key = dynamicEntityKey(measurement.key, measurement.value);
+        const current = buckets.get(key) || {
+            ...measurement,
+            count: 0,
+            examples: new Set(),
+        };
+        current.count += 1;
+        if (feature.name) current.examples.add(feature.name);
+        buckets.set(key, current);
+    }));
+    return Array.from(buckets.values())
+        .filter((item) => item.count >= item.minCount && !baseEntityCoversMeasurement(item.key, item.value))
+        .sort((a, b) => dynamicEntityPriority(b) - dynamicEntityPriority(a))
+        .slice(0, 80)
+        .map(dynamicMeasurementToEntity);
+}
+
+function baseEntityCoversMeasurement(key, value) {
+    const expected = normalize(value);
+    return entityCatalog.some((item) => item.matchers.some((matcher) => {
+        if (matcher.key !== key) return false;
+        return matcher.values.filter(Boolean).some((candidate) => expected.includes(normalize(candidate)) || normalize(candidate).includes(expected));
+    }));
+}
+
+function dynamicEntityMeasurements(feature) {
+    const tags = feature.tags || {};
+    const measurements = [];
+    measurableTagRules().forEach((rule) => {
+        const raw = tags[rule.key];
+        if (!raw) return;
+        String(raw).split(";").map((part) => part.trim()).filter(Boolean).forEach((value) => {
+            if (!isUsefulDynamicValue(rule.key, value)) return;
+            measurements.push({
+                key: rule.key,
+                value,
+                label: dynamicEntityLabel(rule, value),
+                category: rule.category,
+                group: rule.group,
+                minCount: rule.minCount || 1,
+                weight: rule.weight || 1,
+            });
+        });
+    });
+    if (tags.name && (tags.wikidata || tags.wikipedia || tags.tourism || tags.historic || tags.memorial || tags.artwork_type)) {
+        measurements.push({
+            key: "name",
+            value: tags.name,
+            label: `Name: ${tags.name}`,
+            category: "Gemessen: Landmarken",
+            group: "poi",
+            minCount: 1,
+            weight: 5,
+        });
+    }
+    return measurements;
+}
+
+function measurableTagRules() {
+    return [
+        { key: "tourism", category: "Gemessen: Sehenswuerdigkeiten", group: "poi", weight: 5 },
+        { key: "historic", category: "Gemessen: Historisch", group: "poi", weight: 5 },
+        { key: "memorial", category: "Gemessen: Historisch", group: "poi", weight: 4 },
+        { key: "artwork_type", category: "Gemessen: Kunst", group: "poi", weight: 4 },
+        { key: "amenity", category: "Gemessen: POIs", group: "poi", minCount: 2, weight: 3 },
+        { key: "shop", category: "Gemessen: Shops", group: "poi", minCount: 2, weight: 3 },
+        { key: "cuisine", category: "Gemessen: Kueche", group: "poi", weight: 3 },
+        { key: "building", category: "Gemessen: Bauform", group: "building", minCount: 2, weight: 2 },
+        { key: "building:architecture", category: "Gemessen: Bauform", group: "building", weight: 4 },
+        { key: "roof:shape", category: "Gemessen: Dachform", group: "building", weight: 3 },
+        { key: "facade:material", category: "Gemessen: Fassade", group: "building", weight: 3 },
+        { key: "material", category: "Gemessen: Material", group: "building", minCount: 2, weight: 2 },
+        { key: "natural", category: "Gemessen: Landschaft", group: "vegetation", weight: 3 },
+        { key: "landuse", category: "Gemessen: Landschaft", group: "vegetation", minCount: 2, weight: 2 },
+        { key: "leisure", category: "Gemessen: Freizeit", group: "vegetation", weight: 3 },
+        { key: "species", category: "Gemessen: Baumarten", group: "vegetation", weight: 5 },
+        { key: "genus", category: "Gemessen: Baumarten", group: "vegetation", weight: 4 },
+        { key: "highway", category: "Gemessen: Verkehr", group: "transport", minCount: 2, weight: 2 },
+        { key: "surface", category: "Gemessen: Oberflaeche", group: "transport", minCount: 2, weight: 3 },
+        { key: "traffic_sign", category: "Gemessen: Schilder", group: "transport", weight: 4 },
+        { key: "traffic_sign:forward", category: "Gemessen: Schilder", group: "transport", weight: 4 },
+        { key: "traffic_sign:backward", category: "Gemessen: Schilder", group: "transport", weight: 4 },
+        { key: "road_marking", category: "Gemessen: Strassenmarkierung", group: "transport", weight: 4 },
+        { key: "power", category: "Gemessen: Infrastruktur", group: "transport", weight: 3 },
+        { key: "man_made", category: "Gemessen: Infrastruktur", group: "transport", weight: 3 },
+        { key: "waterway", category: "Gemessen: Wasser", group: "water", weight: 3 },
+        { key: "water", category: "Gemessen: Wasser", group: "water", weight: 3 },
+        { key: "wikidata", category: "Gemessen: Landmarken", group: "poi", weight: 5 },
+        { key: "wikipedia", category: "Gemessen: Landmarken", group: "poi", weight: 5 },
+    ];
+}
+
+function isUsefulDynamicValue(key, value) {
+    const text = normalize(value);
+    if (!text || text === "yes" || text === "no" || text === "unknown") return false;
+    if (text.length > 80) return false;
+    if (["building", "landuse", "highway", "amenity", "shop", "tourism", "historic"].includes(key) && text === "yes") return false;
+    return true;
+}
+
+function dynamicEntityLabel(rule, value) {
+    const label = readableDynamicValue(rule.key, value);
+    return label.includes("=") ? label : `${readableDynamicKey(rule.key)}: ${label}`;
+}
+
+function readableDynamicKey(key) {
+    return ({
+        "building:architecture": "Architektur",
+        "roof:shape": "Dach",
+        "facade:material": "Fassade",
+        "traffic_sign:forward": "Schild vorwaerts",
+        "traffic_sign:backward": "Schild rueckwaerts",
+        artwork_type: "Kunst",
+        man_made: "Infrastruktur",
+        wikidata: "Wikidata",
+        wikipedia: "Wikipedia",
+    }[key] || key);
+}
+
+function readableDynamicValue(key, value) {
+    const raw = String(value || "");
+    if (key === "wikidata" || key === "wikipedia") return raw;
+    return raw
+        .replace(/_/g, " ")
+        .replace(/\b\w/g, (char) => char.toUpperCase())
+        .slice(0, 64);
+}
+
+function dynamicEntityPriority(item) {
+    return item.weight * 10 + item.count + (item.key === "name" ? 20 : 0);
+}
+
+function dynamicMeasurementToEntity(item) {
+    const keyText = overpassString(item.key);
+    const valueText = overpassString(item.value);
+    const id = dynamicEntityKey(item.key, item.value);
+    const query = item.key === "name"
+        ? `node["name"~"${valueText}"](around:RADIUS,LAT,LON);way["name"~"${valueText}"](around:RADIUS,LAT,LON);relation["name"~"${valueText}"](around:RADIUS,LAT,LON);`
+        : `node["${keyText}"~"${valueText}"](around:RADIUS,LAT,LON);way["${keyText}"~"${valueText}"](around:RADIUS,LAT,LON);relation["${keyText}"~"${valueText}"](around:RADIUS,LAT,LON);`;
+    return {
+        ...entity(id, `${item.label} (${item.count})`, item.category, item.group, [item.key, item.value, item.label, ...Array.from(item.examples).slice(0, 3)], query, [[item.key, item.value]]),
+        dynamic: true,
+        count: item.count,
+    };
+}
+
+function dynamicEntityKey(key, value) {
+    return `dyn-${normalize(`${key}-${value}`).replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 80)}`;
+}
+
 function overpassString(value) {
     return String(value).replace(/\\/g, "\\\\").replace(/"/g, '\\"');
 }
@@ -560,6 +749,13 @@ function drawSearchCircle() {
 function setSearchCenter(center, zoom, status) {
     state.center = center;
     state.searchCenterReady = true;
+    state.measuredFeaturePool = [...state.importedFeatures];
+    state.dynamicEntities = buildDynamicEntities(state.measuredFeaturePool);
+    state.selectedEntities.forEach((id) => {
+        if (!allEntityObjects().some((item) => item.id === id)) state.selectedEntities.delete(id);
+    });
+    renderEntityCatalog();
+    renderSelectedEntities();
     setMapView(state.center, zoom);
     drawSearchCircle();
     if (status) setStatus(status);
@@ -616,6 +812,7 @@ async function runAnalysis() {
     try {
         const osmFeatures = sources.length || state.selectedEntities.size ? await fetchOverpass(sources, query) : [];
         const allFeatures = [...osmFeatures, ...state.importedFeatures];
+        refreshDynamicEntities(allFeatures);
         if (!allFeatures.length) {
             renderResults([], query);
             setStatus("Keine passenden Daten im Suchraum gefunden. Radius, Ort oder Datenquellen anpassen.");
@@ -1217,8 +1414,9 @@ async function analyzeImageFile(event) {
         setStatus("Bild wird lokal analysiert ...");
         let hints = analyzeImagePixels(image, gps, file.name);
         const imageSignature = imageComparisonSignature(image);
+        const landmarkHints = state.searchCenterReady ? await matchNearbyLandmarkImages(imageSignature) : [];
         const textHints = await analyzeImageText(url, file.name, imageSignature);
-        hints = dedupeImageHints([...hints, ...textHints]);
+        hints = dedupeImageHints([...landmarkHints, ...hints, ...textHints]);
         state.imageHints = hints;
         renderImageSignals(hints, gps);
         if (gps) {
@@ -1261,6 +1459,297 @@ async function analyzeImageText(imageUrl, fileName, imageSignature) {
     }
     hints.push(...await resolveImagePlaceHints(candidates, { imageSignature, allowAutoFocus: state.searchCenterReady }));
     return hints;
+}
+
+async function matchNearbyLandmarkImages(uploadedSignature) {
+    if (!state.searchCenterReady || !uploadedSignature) return [];
+    setStatus("Sehenswuerdigkeiten im Suchraum werden mit Online-Bildern verglichen ...");
+    const candidates = await fetchNearbyLandmarkCandidates();
+    const wikiCandidates = await fetchWikipediaGeosearchCandidates();
+    const geoCandidates = await fetchCommonsGeosearchImageCandidates();
+    const allCandidates = sortLandmarkImageCandidates(dedupeLandmarkCandidates([...candidates, ...wikiCandidates, ...geoCandidates]));
+    refreshDynamicEntities(allCandidates);
+    if (!allCandidates.length) return [];
+    const matches = [];
+    for (const [index, candidate] of allCandidates.slice(0, 36).entries()) {
+        if (index && index % 6 === 0) setStatus(`Bildabgleich: ${index}/${Math.min(allCandidates.length, 36)} Kandidaten ...`);
+        const references = await landmarkImageReferences(candidate);
+        for (const reference of references.slice(0, 4)) {
+            const image = await loadCorsImage(reference.thumbUrl).catch(() => null);
+            if (!image) continue;
+            const referenceSignature = safeImageComparisonSignature(image);
+            if (!referenceSignature) continue;
+            const similarity = signatureSimilarity(uploadedSignature, referenceSignature);
+            matches.push({ candidate, reference, similarity });
+        }
+    }
+    return matches
+        .sort((a, b) => b.similarity - a.similarity)
+        .filter((match, index, list) => match.similarity >= .60 && list.findIndex((item) => item.candidate.id === match.candidate.id) === index)
+        .slice(0, 5)
+        .map((match) => nearbyLandmarkMatchHint(match));
+}
+
+function dedupeLandmarkCandidates(candidates) {
+    const seen = new Set();
+    return candidates.filter((candidate) => {
+        const key = normalize(`${candidate.name}:${candidate.tags?.wikidata || candidate.tags?.wikipedia || ""}`);
+        if (!key || seen.has(key)) return false;
+        seen.add(key);
+        return true;
+    });
+}
+
+function sortLandmarkImageCandidates(candidates) {
+    return candidates.sort((a, b) => imageCandidatePriority(b) - imageCandidatePriority(a));
+}
+
+function imageCandidatePriority(candidate) {
+    const tags = candidate.tags || {};
+    const distance = distanceMeters(state.center[0], state.center[1], candidate.lat, candidate.lon);
+    return (
+        (candidate.imageReferences?.length ? 12 : 0)
+        + (tags.image ? 9 : 0)
+        + (tags.wikimedia_commons ? 8 : 0)
+        + (tags.wikidata ? 7 : 0)
+        + (tags.wikipedia ? 6 : 0)
+        + landmarkCandidateWeight(tags)
+        + Math.max(0, 4 - distance / 1200)
+    );
+}
+
+async function fetchNearbyLandmarkCandidates() {
+    const queryRadius = Math.max(900, Math.min(6000, radius() * 4));
+    const plans = [{ id: "image-landmarks", label: "Sehenswuerdigkeiten im Suchraum", query: nearbyLandmarkQuery() }];
+    try {
+        const features = await fetchOverpassPlans(plans, queryRadius, 140, 10000);
+        return dedupeFeatures(features)
+            .filter((feature) => feature.name && landmarkCandidateWeight(feature.tags) > 0)
+            .sort((a, b) => landmarkCandidateWeight(b.tags) - landmarkCandidateWeight(a.tags))
+            .slice(0, 60);
+    } catch {
+        return [];
+    }
+}
+
+async function fetchCommonsGeosearchImageCandidates() {
+    const queryRadius = Math.max(900, Math.min(10000, radius() * 5));
+    try {
+        const params = new URLSearchParams({
+            action: "query",
+            list: "geosearch",
+            gscoord: `${state.center[0]}|${state.center[1]}`,
+            gsradius: String(queryRadius),
+            gslimit: "24",
+            gsnamespace: "6",
+            format: "json",
+            origin: "*",
+        });
+        const response = await fetchWithTimeout(`https://commons.wikimedia.org/w/api.php?${params}`, { headers: { "Accept": "application/json" } }, 8000);
+        const data = await response.json();
+        const rows = data.query?.geosearch || [];
+        if (!rows.length) return [];
+        const imageInfo = await commonsImageInfoByPageIds(rows.map((row) => row.pageid));
+        return rows
+            .map((row) => {
+                const ref = imageInfo.get(String(row.pageid));
+                if (!ref) return null;
+                return {
+                    id: `commons-geo-${row.pageid}`,
+                    source: "Commons Geosearch",
+                    lat: Number(row.lat),
+                    lon: Number(row.lon),
+                    name: ref.title,
+                    tags: { image: ref.title, wikimedia_commons: `File:${ref.title}` },
+                    imageReferences: [ref],
+                };
+            })
+            .filter(Boolean);
+    } catch {
+        return [];
+    }
+}
+
+async function fetchWikipediaGeosearchCandidates() {
+    if (!state.searchCenterReady) return [];
+    const langs = ["de", "en"];
+    const results = [];
+    for (const lang of langs) {
+        results.push(...await fetchWikipediaGeosearchForLang(lang));
+    }
+    const seen = new Set();
+    return results.filter((candidate) => {
+        const key = normalize(candidate.name);
+        if (!key || seen.has(key)) return false;
+        seen.add(key);
+        return true;
+    }).slice(0, 36);
+}
+
+async function fetchWikipediaGeosearchForLang(lang) {
+    const queryRadius = Math.max(900, Math.min(10000, radius() * 5));
+    try {
+        const params = new URLSearchParams({
+            action: "query",
+            list: "geosearch",
+            gscoord: `${state.center[0]}|${state.center[1]}`,
+            gsradius: String(queryRadius),
+            gslimit: "24",
+            format: "json",
+            origin: "*",
+        });
+        const response = await fetchWithTimeout(`https://${lang}.wikipedia.org/w/api.php?${params}`, { headers: { "Accept": "application/json" } }, 8000);
+        const data = await response.json();
+        const rows = data.query?.geosearch || [];
+        if (!rows.length) return [];
+        const pageInfo = await wikipediaPageInfoByPageIds(lang, rows.map((row) => row.pageid));
+        return rows
+            .map((row) => {
+                const info = pageInfo.get(String(row.pageid));
+                const references = info?.thumbUrl ? [{ title: info.title, thumbUrl: info.thumbUrl, source: `${lang}.wikipedia` }] : [];
+                return {
+                    id: `wikipedia-${lang}-${row.pageid}`,
+                    source: `${lang}.wikipedia geosearch`,
+                    lat: Number(row.lat),
+                    lon: Number(row.lon),
+                    name: info?.title || row.title,
+                    tags: { wikipedia: `${lang}:${row.title}`, wikidata: info?.wikidata || "" },
+                    imageReferences: references,
+                };
+            });
+    } catch {
+        return [];
+    }
+}
+
+async function wikipediaPageInfoByPageIds(lang, pageIds) {
+    if (!pageIds.length) return new Map();
+    try {
+        const params = new URLSearchParams({
+            action: "query",
+            pageids: pageIds.slice(0, 50).join("|"),
+            prop: "pageimages|pageprops",
+            pithumbsize: "320",
+            format: "json",
+            origin: "*",
+        });
+        const response = await fetchWithTimeout(`https://${lang}.wikipedia.org/w/api.php?${params}`, { headers: { "Accept": "application/json" } }, 8000);
+        const data = await response.json();
+        const map = new Map();
+        Object.values(data.query?.pages || {}).forEach((page) => {
+            map.set(String(page.pageid), {
+                title: page.title,
+                thumbUrl: page.thumbnail?.source || "",
+                wikidata: page.pageprops?.wikibase_item || "",
+            });
+        });
+        return map;
+    } catch {
+        return new Map();
+    }
+}
+
+async function commonsImageInfoByPageIds(pageIds) {
+    if (!pageIds.length) return new Map();
+    try {
+        const params = new URLSearchParams({
+            action: "query",
+            pageids: pageIds.slice(0, 50).join("|"),
+            prop: "imageinfo",
+            iiprop: "url",
+            iiurlwidth: "320",
+            format: "json",
+            origin: "*",
+        });
+        const response = await fetchWithTimeout(`https://commons.wikimedia.org/w/api.php?${params}`, { headers: { "Accept": "application/json" } }, 8000);
+        const data = await response.json();
+        const map = new Map();
+        Object.values(data.query?.pages || {}).forEach((page) => {
+            const thumbUrl = page.imageinfo?.[0]?.thumburl || page.imageinfo?.[0]?.url;
+            if (!thumbUrl) return;
+            map.set(String(page.pageid), {
+                title: String(page.title || "").replace(/^File:/, "").replace(/\.[a-z0-9]+$/i, ""),
+                thumbUrl,
+                source: "Commons geosearch",
+            });
+        });
+        return map;
+    } catch {
+        return new Map();
+    }
+}
+
+function nearbyLandmarkQuery() {
+    const selectors = [
+        '["tourism"~"attraction|viewpoint|museum|gallery|artwork|information"]',
+        '["historic"~"monument|memorial|castle|ruins|archaeological_site|wayside_cross|building"]',
+        '["amenity"="place_of_worship"]',
+        '["building"~"church|cathedral|chapel|tower|public|civic|university"]',
+        '["man_made"~"tower|obelisk|statue|water_tower"]',
+        '["memorial"]',
+        '["artwork_type"]',
+        '["wikidata"]',
+        '["wikipedia"]',
+        '["wikimedia_commons"]',
+        '["image"]',
+    ];
+    return selectors.flatMap((selector) => [
+        `node${selector}(around:RADIUS,LAT,LON);`,
+        `way${selector}(around:RADIUS,LAT,LON);`,
+        `relation${selector}(around:RADIUS,LAT,LON);`,
+    ]).join("");
+}
+
+function landmarkCandidateWeight(tags) {
+    let score = 0;
+    if (tags.wikidata || tags.wikipedia || tags.wikimedia_commons || tags.image) score += 6;
+    if (tags.tourism) score += 4;
+    if (tags.historic) score += 4;
+    if (tags.memorial || tags.artwork_type) score += 3;
+    if (tags.man_made) score += 2;
+    if (tags.amenity === "place_of_worship") score += 2;
+    if (tags.name) score += 1;
+    return score;
+}
+
+async function landmarkImageReferences(candidate) {
+    const refs = [];
+    const tags = candidate.tags || {};
+    refs.push(...(candidate.imageReferences || []));
+    refs.push(...await directImageReferences(tags.image));
+    refs.push(...await commonsTagReferences(tags.wikimedia_commons));
+    if (tags.wikidata) refs.push(...await wikidataImageReferences(tags.wikidata));
+    if (tags.wikipedia) refs.push(...await wikipediaImageReferences(tags.wikipedia));
+    if (candidate.name) {
+        const context = localPlaceContextText();
+        refs.push(...await searchCommonsImages(`${candidate.name} ${context}`.trim()));
+        if (!refs.length) refs.push(...await searchCommonsImages(candidate.name));
+    }
+    return dedupeImageReferences(refs).slice(0, 8);
+}
+
+function nearbyLandmarkMatchHint(match) {
+    const confidence = clamp(.28 + match.similarity * .72);
+    const name = match.candidate.name || match.reference.title;
+    return imageHint(
+        `Bildmatch im Suchraum: ${name}`,
+        `${name}, ${match.reference.title}`,
+        "poi",
+        confidence,
+        [],
+        {
+            lat: match.candidate.lat,
+            lon: match.candidate.lon,
+            zoom: 17,
+            label: `${name} · Referenz: ${match.reference.title}`,
+            autofocus: confidence >= .9,
+        },
+    );
+}
+
+function localPlaceContextText() {
+    const raw = $("#placeInput")?.value?.trim() || "";
+    return raw && !/^-?\d/.test(raw) ? raw : "";
 }
 
 async function resolveManualImageText() {
@@ -1506,7 +1995,8 @@ async function commonsReferenceMatch(term, uploadedSignature) {
     for (const reference of references.slice(0, 4)) {
         const image = await loadCorsImage(reference.thumbUrl).catch(() => null);
         if (!image) continue;
-        const signature = imageComparisonSignature(image);
+        const signature = safeImageComparisonSignature(image);
+        if (!signature) continue;
         const similarity = signatureSimilarity(uploadedSignature, signature);
         if (!best || similarity > best.similarity) best = { ...reference, similarity };
     }
@@ -1515,6 +2005,156 @@ async function commonsReferenceMatch(term, uploadedSignature) {
         ...best,
         confidence: clamp(.48 + best.similarity * .42),
     };
+}
+
+async function directImageReferences(value) {
+    if (!value) return [];
+    const raw = String(value).trim();
+    if (/^https?:\/\//i.test(raw)) return [{ title: raw.split("/").pop() || "Direktbild", thumbUrl: raw, source: "OSM image" }];
+    return await commonsTagReferences(raw);
+}
+
+async function commonsTagReferences(value) {
+    if (!value) return [];
+    const raw = String(value).trim().replace(/^https?:\/\/commons\.wikimedia\.org\/wiki\//i, "");
+    if (/^category:/i.test(raw)) return await commonsCategoryImages(raw);
+    return await commonsFileImages(raw);
+}
+
+async function wikidataImageReferences(qid) {
+    const id = String(qid || "").trim();
+    if (!/^Q\d+$/i.test(id)) return [];
+    try {
+        const response = await fetchWithTimeout(`https://www.wikidata.org/wiki/Special:EntityData/${encodeURIComponent(id)}.json`, { headers: { "Accept": "application/json" } }, 8000);
+        const data = await response.json();
+        const entity = data.entities?.[id.toUpperCase()];
+        const claims = entity?.claims || {};
+        const images = (claims.P18 || [])
+            .map((claim) => claim.mainsnak?.datavalue?.value)
+            .filter(Boolean);
+        const categories = (claims.P373 || [])
+            .map((claim) => claim.mainsnak?.datavalue?.value)
+            .filter(Boolean);
+        const refs = [];
+        for (const image of images.slice(0, 3)) refs.push(...await commonsFileImages(image));
+        for (const category of categories.slice(0, 2)) refs.push(...await commonsCategoryImages(`Category:${category}`));
+        return refs;
+    } catch {
+        return [];
+    }
+}
+
+async function wikipediaImageReferences(tag) {
+    const parsed = parseWikipediaTag(tag);
+    if (!parsed) return [];
+    try {
+        const params = new URLSearchParams({
+            action: "query",
+            titles: parsed.title,
+            prop: "pageimages|pageprops",
+            pithumbsize: "320",
+            format: "json",
+            origin: "*",
+        });
+        const response = await fetchWithTimeout(`https://${parsed.lang}.wikipedia.org/w/api.php?${params}`, { headers: { "Accept": "application/json" } }, 8000);
+        const data = await response.json();
+        const page = Object.values(data.query?.pages || {})[0];
+        const refs = [];
+        if (page?.thumbnail?.source) refs.push({ title: page.title || parsed.title, thumbUrl: page.thumbnail.source, source: "Wikipedia" });
+        const qid = page?.pageprops?.wikibase_item;
+        if (qid) refs.push(...await wikidataImageReferences(qid));
+        return refs;
+    } catch {
+        return [];
+    }
+}
+
+function parseWikipediaTag(value) {
+    const raw = String(value || "").trim();
+    const match = raw.match(/^([a-z-]+):(.+)$/i);
+    if (!match) return null;
+    return { lang: match[1].toLowerCase(), title: match[2].replace(/_/g, " ") };
+}
+
+async function commonsFileImages(value) {
+    const title = normalizeCommonsFileTitle(value);
+    if (!title) return [];
+    try {
+        const params = new URLSearchParams({
+            action: "query",
+            titles: title,
+            prop: "imageinfo",
+            iiprop: "url",
+            iiurlwidth: "320",
+            format: "json",
+            origin: "*",
+        });
+        const response = await fetchWithTimeout(`https://commons.wikimedia.org/w/api.php?${params}`, { headers: { "Accept": "application/json" } }, 8000);
+        const data = await response.json();
+        return Object.values(data.query?.pages || {})
+            .map((page) => ({
+                title: String(page.title || title).replace(/^File:/, "").replace(/\.[a-z0-9]+$/i, ""),
+                thumbUrl: page.imageinfo?.[0]?.thumburl || page.imageinfo?.[0]?.url,
+                source: "Commons",
+            }))
+            .filter((item) => item.thumbUrl);
+    } catch {
+        return [];
+    }
+}
+
+async function commonsCategoryImages(value) {
+    const title = normalizeCommonsCategoryTitle(value);
+    if (!title) return [];
+    try {
+        const params = new URLSearchParams({
+            action: "query",
+            generator: "categorymembers",
+            gcmtitle: title,
+            gcmnamespace: "6",
+            gcmlimit: "6",
+            prop: "imageinfo",
+            iiprop: "url",
+            iiurlwidth: "320",
+            format: "json",
+            origin: "*",
+        });
+        const response = await fetchWithTimeout(`https://commons.wikimedia.org/w/api.php?${params}`, { headers: { "Accept": "application/json" } }, 8000);
+        const data = await response.json();
+        return Object.values(data.query?.pages || {})
+            .map((page) => ({
+                title: String(page.title || "").replace(/^File:/, "").replace(/\.[a-z0-9]+$/i, ""),
+                thumbUrl: page.imageinfo?.[0]?.thumburl || page.imageinfo?.[0]?.url,
+                source: "Commons category",
+            }))
+            .filter((item) => item.thumbUrl);
+    } catch {
+        return [];
+    }
+}
+
+function normalizeCommonsFileTitle(value) {
+    if (!value) return "";
+    const decoded = decodeURIComponent(String(value).trim()).replace(/_/g, " ");
+    if (/^file:/i.test(decoded)) return decoded.replace(/^file:/i, "File:");
+    if (/^category:/i.test(decoded)) return "";
+    return `File:${decoded}`;
+}
+
+function normalizeCommonsCategoryTitle(value) {
+    if (!value) return "";
+    const decoded = decodeURIComponent(String(value).trim()).replace(/_/g, " ");
+    return /^category:/i.test(decoded) ? decoded.replace(/^category:/i, "Category:") : `Category:${decoded}`;
+}
+
+function dedupeImageReferences(refs) {
+    const seen = new Set();
+    return refs.filter((ref) => {
+        const key = ref.thumbUrl || ref.title;
+        if (!key || seen.has(key)) return false;
+        seen.add(key);
+        return true;
+    });
 }
 
 async function searchCommonsImages(term) {
@@ -1576,15 +2216,77 @@ function imageComparisonSignature(image) {
         edge: edges.density,
         vertical: edges.vertical,
         aspect: canvas.height / Math.max(canvas.width, 1),
+        hash: perceptualHash(image),
+        regions: regionGridSignature(pixels, canvas.width, canvas.height),
     };
+}
+
+function safeImageComparisonSignature(image) {
+    try {
+        return imageComparisonSignature(image);
+    } catch {
+        return null;
+    }
 }
 
 function signatureSimilarity(a, b) {
     if (!a || !b) return 0;
     const keys = ["green", "blue", "gray", "warm", "dark", "bright", "luma", "edge", "vertical"];
     const distance = keys.reduce((sum, key) => sum + Math.abs((a[key] || 0) - (b[key] || 0)), 0) / keys.length;
-    const aspectDistance = Math.min(.35, Math.abs((a.aspect || 1) - (b.aspect || 1)) / 3);
-    return clamp(1 - distance * 1.35 - aspectDistance);
+    const globalSimilarity = clamp(1 - distance * 1.35);
+    const aspectSimilarity = clamp(1 - Math.min(.45, Math.abs((a.aspect || 1) - (b.aspect || 1)) / 2));
+    const hashSimilarity = binaryHashSimilarity(a.hash, b.hash);
+    const regionSimilarity = vectorSimilarity(a.regions, b.regions);
+    return clamp(globalSimilarity * .22 + hashSimilarity * .30 + regionSimilarity * .38 + aspectSimilarity * .10);
+}
+
+function perceptualHash(image) {
+    const canvas = document.createElement("canvas");
+    canvas.width = 9;
+    canvas.height = 8;
+    const ctx = canvas.getContext("2d", { willReadFrequently: true });
+    ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+    const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+    const bits = [];
+    for (let y = 0; y < 8; y += 1) {
+        for (let x = 0; x < 8; x += 1) {
+            bits.push(lumaAt(pixels, canvas.width, x, y) > lumaAt(pixels, canvas.width, x + 1, y) ? 1 : 0);
+        }
+    }
+    return bits;
+}
+
+function regionGridSignature(pixels, width, height) {
+    const vector = [];
+    const cols = 4;
+    const rows = 4;
+    for (let y = 0; y < rows; y += 1) {
+        for (let x = 0; x < cols; x += 1) {
+            const stats = regionStats(pixels, width, height, x / cols, y / rows, (x + 1) / cols, (y + 1) / rows);
+            vector.push(stats.luma, stats.green, stats.blue, stats.gray, stats.warm);
+        }
+    }
+    return vector;
+}
+
+function binaryHashSimilarity(a, b) {
+    if (!a?.length || !b?.length) return .5;
+    const length = Math.min(a.length, b.length);
+    let same = 0;
+    for (let i = 0; i < length; i += 1) {
+        if (a[i] === b[i]) same += 1;
+    }
+    return same / length;
+}
+
+function vectorSimilarity(a, b) {
+    if (!a?.length || !b?.length) return .5;
+    const length = Math.min(a.length, b.length);
+    let distance = 0;
+    for (let i = 0; i < length; i += 1) {
+        distance += Math.abs((a[i] || 0) - (b[i] || 0));
+    }
+    return clamp(1 - distance / length * 1.45);
 }
 
 function promiseTimeout(promise, ms) {
@@ -2215,6 +2917,7 @@ async function importFile(event) {
     try {
         const features = file.name.toLowerCase().endsWith(".csv") ? parseCsv(text) : parseGeoJson(JSON.parse(text));
         state.importedFeatures = features;
+        refreshDynamicEntities(features);
         setStatus(`${features.length} importierte Punkte aus ${file.name} geladen.`);
     } catch (error) {
         setStatus(`Import fehlgeschlagen: ${error.message}`);
