@@ -1,8 +1,12 @@
 const state = {
     map: null,
-    markerLayer: null,
-    searchCircle: null,
-    imageMarker: null,
+    view: null,
+    baseLayer: null,
+    searchSource: null,
+    resultSource: null,
+    imageSource: null,
+    popupOverlay: null,
+    popupElement: null,
     center: [50.9271, 11.5892],
     importedFeatures: [],
     reviewRecords: [],
@@ -12,9 +16,46 @@ const state = {
     loading: false,
 };
 
+const basemapConfigs = {
+    voyager: {
+        urls: [
+        "https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png",
+        "https://b.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png",
+        "https://c.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png",
+        "https://d.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png",
+        ],
+        attribution: '&copy; OpenStreetMap &copy; CARTO',
+    },
+    light: {
+        urls: [
+        "https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png",
+        "https://b.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png",
+        "https://c.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png",
+        "https://d.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png",
+        ],
+        attribution: '&copy; OpenStreetMap &copy; CARTO',
+    },
+    dark: {
+        urls: [
+        "https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png",
+        "https://b.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png",
+        "https://c.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png",
+        "https://d.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png",
+        ],
+        attribution: '&copy; OpenStreetMap &copy; CARTO',
+    },
+    satellite: {
+        urls: [
+        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+        ],
+        attribution: "Tiles &copy; Esri",
+    },
+};
+
 const overpassEndpoints = [
-    "https://overpass-api.de/api/interpreter",
     "https://overpass.kumi.systems/api/interpreter",
+    "https://overpass-api.de/api/interpreter",
+    "https://overpass.osm.ch/api/interpreter",
 ];
 
 const queryLexicon = {
@@ -40,6 +81,22 @@ const sourceQueries = {
     transport: 'node["highway"~"bus_stop|crossing|traffic_signals"](around:RADIUS,LAT,LON);node["public_transport"](around:RADIUS,LAT,LON);node["railway"~"station|halt|tram_stop"](around:RADIUS,LAT,LON);way["highway"~"primary|secondary|tertiary|residential|footway|cycleway|path"](around:RADIUS,LAT,LON);',
     water: 'node["waterway"](around:RADIUS,LAT,LON);way["waterway"](around:RADIUS,LAT,LON);way["natural"="water"](around:RADIUS,LAT,LON);way["bridge"](around:RADIUS,LAT,LON);',
 };
+
+const focusedQueryRules = [
+    focusRule("restaurant", "Restaurant", ["restaurant", "essen", "speiselokal"], 'node["amenity"="restaurant"](around:RADIUS,LAT,LON);way["amenity"="restaurant"](around:RADIUS,LAT,LON);'),
+    focusRule("cafe", "Cafe", ["cafe", "kaffee"], 'node["amenity"="cafe"](around:RADIUS,LAT,LON);way["amenity"="cafe"](around:RADIUS,LAT,LON);'),
+    focusRule("church", "Kirche", ["kirche", "gotteshaus", "kapelle", "church"], 'node["amenity"="place_of_worship"](around:RADIUS,LAT,LON);way["amenity"="place_of_worship"](around:RADIUS,LAT,LON);way["building"="church"](around:RADIUS,LAT,LON);'),
+    focusRule("parking", "Parkplatz", ["parkplatz", "parking"], 'node["amenity"="parking"](around:RADIUS,LAT,LON);way["amenity"="parking"](around:RADIUS,LAT,LON);'),
+    focusRule("historic", "Historisch", ["historisch", "historische", "denkmal", "monument", "historic"], 'node["historic"](around:RADIUS,LAT,LON);way["historic"](around:RADIUS,LAT,LON);'),
+    focusRule("school", "Schule", ["schule", "school"], 'node["amenity"="school"](around:RADIUS,LAT,LON);way["amenity"="school"](around:RADIUS,LAT,LON);'),
+    focusRule("playground", "Spielplatz", ["spielplatz", "playground"], 'node["leisure"="playground"](around:RADIUS,LAT,LON);way["leisure"="playground"](around:RADIUS,LAT,LON);'),
+    focusRule("supermarket", "Supermarkt", ["supermarkt", "laden", "shop"], 'node["shop"="supermarket"](around:RADIUS,LAT,LON);way["shop"="supermarket"](around:RADIUS,LAT,LON);node["shop"](around:RADIUS,LAT,LON);'),
+    focusRule("bus_stop", "Bushaltestelle", ["bus", "bushaltestelle", "haltestelle"], 'node["highway"="bus_stop"](around:RADIUS,LAT,LON);node["public_transport"="platform"](around:RADIUS,LAT,LON);'),
+    focusRule("water", "Wasser", ["wasser", "fluss", "bach", "ufer", "bruecke", "brücke"], 'way["waterway"~"river|stream|canal"](around:RADIUS,LAT,LON);node["waterway"~"river|stream|canal"](around:RADIUS,LAT,LON);way["natural"="water"](around:RADIUS,LAT,LON);way["bridge"](around:RADIUS,LAT,LON);'),
+    focusRule("forest", "Wald", ["wald", "baeume", "bäume", "vegetation", "park", "wiese"], 'way["landuse"~"forest|meadow|grass|recreation_ground"](around:RADIUS,LAT,LON);way["natural"~"wood|grassland|tree_row|scrub"](around:RADIUS,LAT,LON);way["leisure"~"park|garden"](around:RADIUS,LAT,LON);'),
+    focusRule("residential", "Wohngebiet", ["wohngebiet", "haeuser", "häuser", "einfamilienhaus", "siedlung"], 'way["landuse"="residential"](around:RADIUS,LAT,LON);way["building"~"house|detached|semidetached_house|terrace|apartments|residential"](around:RADIUS,LAT,LON);'),
+    focusRule("viewpoint", "Aussichtspunkt", ["aussicht", "aussichtspunkt", "viewpoint"], 'node["tourism"="viewpoint"](around:RADIUS,LAT,LON);way["tourism"="viewpoint"](around:RADIUS,LAT,LON);'),
+];
 
 const entityCatalog = [
     entity("oak", "Eiche", "Baumarten", "vegetation", ["eiche", "oak", "quercus"], 'node["natural"="tree"]["species"~"Quercus|quercus|oak|Oak|Eiche|eiche"](around:RADIUS,LAT,LON);node["natural"="tree"]["genus"~"Quercus|quercus"](around:RADIUS,LAT,LON);', [["species", "quercus", "oak", "eiche"], ["genus", "quercus"]]),
@@ -75,57 +132,108 @@ const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => Array.from(document.querySelectorAll(selector));
 
 function init() {
-    state.map = L.map("map", {
-        zoomControl: false,
-        scrollWheelZoom: false,
-        wheelDebounceTime: 80,
-        trackResize: true,
-        preferCanvas: true,
-    }).setView(state.center, 14);
-    L.control.zoom({ position: "bottomright" }).addTo(state.map);
-    const basemaps = createBasemaps();
-    basemaps["Carto Light"].addTo(state.map);
-    L.control.layers(basemaps, null, { position: "bottomright", collapsed: true }).addTo(state.map);
-    state.markerLayer = L.layerGroup().addTo(state.map);
+    state.view = new ol.View({
+        center: ol.proj.fromLonLat([state.center[1], state.center[0]]),
+        zoom: 14,
+        maxZoom: 20,
+    });
+    state.baseLayer = new ol.layer.Tile({
+        source: createTileSource("voyager"),
+        preload: 2,
+    });
+    state.searchSource = new ol.source.Vector();
+    state.resultSource = new ol.source.Vector();
+    state.imageSource = new ol.source.Vector();
+    state.popupElement = createPopupElement();
+    state.popupOverlay = new ol.Overlay({
+        element: state.popupElement,
+        positioning: "bottom-center",
+        stopEvent: true,
+        offset: [0, -18],
+    });
+    state.map = new ol.Map({
+        target: "map",
+        layers: [
+            state.baseLayer,
+            new ol.layer.Vector({ source: state.searchSource, style: searchRadiusStyle() }),
+            new ol.layer.Vector({ source: state.resultSource, style: resultFeatureStyle }),
+            new ol.layer.Vector({ source: state.imageSource, style: imageFeatureStyle() }),
+        ],
+        overlays: [state.popupOverlay],
+        controls: ol.control.defaults.defaults({ zoom: false, rotate: false }).extend([
+            new ol.control.Zoom({ className: "ol-zoom gvis-zoom" }),
+        ]),
+        interactions: ol.interaction.defaults.defaults({ mouseWheelZoom: false, altShiftDragRotate: false, pinchRotate: false }),
+        view: state.view,
+    });
+    state.map.on("singleclick", handleMapClick);
     drawSearchCircle();
     renderEntityCatalog();
     renderSelectedEntities();
     bindUi();
-    window.addEventListener("resize", () => state.map.invalidateSize());
+    window.addEventListener("resize", () => state.map.updateSize());
     if ("ResizeObserver" in window) {
-        new ResizeObserver(() => state.map.invalidateSize()).observe($("#map"));
+        new ResizeObserver(() => state.map.updateSize()).observe($("#map"));
     }
-    [0, 120, 350, 800].forEach((delay) => setTimeout(() => state.map.invalidateSize(), delay));
+    [0, 120, 350, 800].forEach((delay) => setTimeout(() => state.map.updateSize(), delay));
 }
 
-function createBasemaps() {
-    const common = {
+function createTileSource(key) {
+    const config = basemapConfigs[key] || basemapConfigs.voyager;
+    return new ol.source.XYZ({
+        urls: config.urls,
+        attributions: config.attribution,
         maxZoom: 20,
-        keepBuffer: 6,
-        updateWhenIdle: false,
-        updateWhenZooming: false,
-    };
-    return {
-        "Carto Light": L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
-            ...common,
-            subdomains: "abcd",
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        transition: 0,
+    });
+}
+
+function createPopupElement() {
+    const popup = document.createElement("div");
+    popup.className = "gvis-popup";
+    popup.hidden = true;
+    return popup;
+}
+
+function searchRadiusStyle() {
+    return new ol.style.Style({
+        fill: new ol.style.Fill({ color: "rgba(96, 165, 250, 0.12)" }),
+        stroke: new ol.style.Stroke({ color: "#2563eb", width: 2 }),
+    });
+}
+
+function resultFeatureStyle(feature) {
+    const result = feature.get("result");
+    const score = result?.score || 0;
+    const size = Math.max(7, Math.round(7 + score / 8));
+    const color = score >= 70 ? "#16a34a" : score >= 42 ? "#f59e0b" : "#e11d48";
+    return new ol.style.Style({
+        image: new ol.style.Circle({
+            radius: size,
+            fill: new ol.style.Fill({ color }),
+            stroke: new ol.style.Stroke({ color: "#ffffff", width: 2 }),
         }),
-        "Carto Voyager": L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
-            ...common,
-            subdomains: "abcd",
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+    });
+}
+
+function imageFeatureStyle() {
+    return new ol.style.Style({
+        image: new ol.style.Circle({
+            radius: 9,
+            fill: new ol.style.Fill({ color: "#2563eb" }),
+            stroke: new ol.style.Stroke({ color: "#ffffff", width: 3 }),
         }),
-        "Esri Satellit": L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
-            ...common,
-            attribution: "Tiles &copy; Esri",
-        }),
-        "OSM Standard": L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-            ...common,
-            maxZoom: 19,
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-        }),
-    };
+    });
+}
+
+function handleMapClick(event) {
+    const feature = state.map.forEachFeatureAtPixel(event.pixel, (candidate) => candidate);
+    if (!feature) {
+        hidePopup();
+        return;
+    }
+    const html = feature.get("popupHtml");
+    if (html) openFeaturePopup(feature, html);
 }
 
 function bindUi() {
@@ -141,6 +249,7 @@ function bindUi() {
     $("#clearEntitiesBtn").addEventListener("click", clearEntitySelection);
     $("#addCustomEntityBtn").addEventListener("click", addCustomEntity);
     $("#applyImageHintsBtn").addEventListener("click", applyImageHintsToQuery);
+    $("#basemapSelect").addEventListener("change", switchBasemap);
     $("#exportBtn").addEventListener("click", exportGeoJson);
     ["poiWeight", "contextWeight", "densityWeight"].forEach((id) => {
         const input = $(`#${id}`);
@@ -158,6 +267,10 @@ function bindUi() {
     });
 }
 
+function switchBasemap(event) {
+    state.baseLayer.setSource(createTileSource(event.target.value));
+}
+
 function selectedSources() {
     return $$(".source-check:checked").map((input) => input.value);
 }
@@ -172,6 +285,10 @@ function entity(id, label, category, group, terms, query, matchers) {
         query,
         matchers: matchers.map(([key, ...values]) => ({ key, values })),
     };
+}
+
+function focusRule(id, label, terms, query) {
+    return { id, label, terms, query };
 }
 
 function selectedEntityObjects() {
@@ -293,16 +410,21 @@ function radius() {
     return Number($("#radiusSelect").value);
 }
 
+function setMapView(center, zoom) {
+    if (!state.view) return;
+    state.view.animate({
+        center: ol.proj.fromLonLat([center[1], center[0]]),
+        zoom,
+        duration: 450,
+    });
+}
+
 function drawSearchCircle() {
-    if (!state.map) return;
-    if (state.searchCircle) state.searchCircle.remove();
-    state.searchCircle = L.circle(state.center, {
-        radius: radius(),
-        color: "#2563eb",
-        weight: 2,
-        fillColor: "#60a5fa",
-        fillOpacity: .08,
-    }).addTo(state.map);
+    if (!state.searchSource) return;
+    state.searchSource.clear();
+    const center = ol.proj.fromLonLat([state.center[1], state.center[0]]);
+    const feature = new ol.Feature(new ol.geom.Circle(center, radius()));
+    state.searchSource.addFeature(feature);
 }
 
 async function searchPlace() {
@@ -311,7 +433,7 @@ async function searchPlace() {
     const coordinateMatch = raw.match(/^\s*(-?\d+(?:\.\d+)?)\s*[,;]\s*(-?\d+(?:\.\d+)?)\s*$/);
     if (coordinateMatch) {
         state.center = [Number(coordinateMatch[1]), Number(coordinateMatch[2])];
-        state.map.setView(state.center, 14);
+        setMapView(state.center, 14);
         drawSearchCircle();
         setStatus("Koordinaten gesetzt.");
         return;
@@ -326,7 +448,7 @@ async function searchPlace() {
             return;
         }
         state.center = [Number(places[0].lat), Number(places[0].lon)];
-        state.map.setView(state.center, 14);
+        setMapView(state.center, 14);
         drawSearchCircle();
         setStatus(`Suchraum gesetzt: ${places[0].display_name}`);
     } catch (error) {
@@ -342,7 +464,7 @@ function locateUser() {
     setStatus("Standort wird abgefragt ...");
     navigator.geolocation.getCurrentPosition((position) => {
         state.center = [position.coords.latitude, position.coords.longitude];
-        state.map.setView(state.center, 15);
+        setMapView(state.center, 15);
         drawSearchCircle();
         setStatus("Suchraum auf aktuellen Standort gesetzt.");
     }, () => setStatus("Standort konnte nicht ermittelt werden."));
@@ -356,16 +478,16 @@ async function runAnalysis() {
         return;
     }
     setLoading(true);
-    setStatus("OSM-Daten werden begrenzt ueber Overpass geladen ...");
+    const query = parseQuery($("#queryInput").value, sources);
+    setStatus("OSM-Daten werden gezielt ueber Overpass geladen ...");
     try {
-        const osmFeatures = sources.length || state.selectedEntities.size ? await fetchOverpass(sources) : [];
+        const osmFeatures = sources.length || state.selectedEntities.size ? await fetchOverpass(sources, query) : [];
         const allFeatures = [...osmFeatures, ...state.importedFeatures];
         if (!allFeatures.length) {
-            renderResults([], parseQuery($("#queryInput").value, sources));
+            renderResults([], query);
             setStatus("Keine passenden Daten im Suchraum gefunden. Radius, Ort oder Datenquellen anpassen.");
             return;
         }
-        const query = parseQuery($("#queryInput").value, sources);
         const scored = scoreFeatures(allFeatures, query)
             .sort((a, b) => b.score - a.score)
             .slice(0, Number($("#limitSelect").value));
@@ -379,69 +501,266 @@ async function runAnalysis() {
     }
 }
 
-async function fetchOverpass(sources) {
-    const queryRadius = Math.min(radius(), 2500);
-    const selectedEntities = selectedEntityObjects();
-    const requestCount = Math.max(sources.length + selectedEntities.length, 1);
-    const rawLimit = Math.max(80, Math.min(420, Math.ceil(Number($("#limitSelect").value) * 2.4 / requestCount)));
-    const features = [];
-    const failures = [];
-
-    for (const source of sources) {
-        const queryPart = sourceQueries[source];
-        if (!queryPart) continue;
-        setStatus(`Lade ${sourceLabel(source)} von OSM ...`);
-        try {
-            const sourceFeatures = await fetchOverpassSource(queryPart, queryRadius, rawLimit);
-            features.push(...sourceFeatures);
-        } catch (error) {
-            failures.push(`${sourceLabel(source)}: ${error.message}`);
+async function fetchOverpass(sources, query) {
+    const queryRadius = Math.min(radius(), hasFocusedQuery(query) ? 1800 : 1100);
+    const plans = buildOverpassPlans(sources, query);
+    if (!plans.length) return [];
+    const rawLimit = Math.max(160, Math.min(900, Number($("#limitSelect").value) * (plans.length <= 3 ? 8 : 5)));
+    const labels = plans.map((plan) => plan.label).slice(0, 5).join(", ");
+    setStatus(`Lade fokussierte OSM-Abfrage: ${labels}${plans.length > 5 ? " ..." : ""}`);
+    try {
+        const primary = await fetchOverpassPlans(plans, queryRadius, rawLimit, 14000);
+        if (primary.length) return primary;
+        const emptyFallback = await fetchPhotonFallback(plans, queryRadius, rawLimit);
+        if (emptyFallback.length) {
+            setStatus("Overpass lieferte keine Treffer. Fallback ueber Photon geladen.");
+            return emptyFallback;
         }
-    }
-
-    for (const item of selectedEntities) {
-        setStatus(`Lade Entitaet ${item.label} von OSM ...`);
-        try {
-            const entityFeatures = await fetchOverpassSource(item.query, queryRadius, rawLimit);
-            features.push(...entityFeatures);
-        } catch (error) {
-            failures.push(`${item.label}: ${error.message}`);
+        return [];
+    } catch (combinedError) {
+        const fastFallback = await fetchPhotonFallback(plans, queryRadius, rawLimit);
+        if (fastFallback.length) {
+            setStatus("Overpass war langsam. Fallback ueber Photon geladen.");
+            return fastFallback;
         }
+        setStatus("Sammelabfrage langsam. Versuche kleine Fallback-Abfragen ...");
+        const features = [];
+        const failures = [];
+        for (const plan of plans.slice(0, 6)) {
+            try {
+                const part = await fetchOverpassPlans([plan], queryRadius, Math.max(80, Math.floor(rawLimit / 3)), 7000);
+                features.push(...part);
+                if (features.length >= rawLimit) break;
+            } catch (error) {
+                failures.push(`${plan.label}: ${error.message}`);
+            }
+        }
+        if (!features.length) {
+            const fallback = await fetchPhotonFallback(plans, queryRadius, rawLimit);
+            if (fallback.length) {
+                setStatus("Overpass war langsam. Fallback ueber Photon geladen.");
+                return fallback;
+            }
+            const nominatimFallback = await fetchNominatimFallback(plans, queryRadius, rawLimit);
+            if (nominatimFallback.length) {
+                setStatus("Overpass war langsam. Fallback ueber Nominatim geladen.");
+                return nominatimFallback;
+            }
+            throw new Error(`Overpass antwortet nicht schnell genug. ${failures[0] || combinedError.message}`);
+        }
+        if (failures.length) setStatus(`Teilergebnis geladen. Langsam: ${failures.map((failure) => failure.split(":")[0]).join(", ")}.`);
+        return dedupeFeatures(features);
     }
-
-    if (!features.length && failures.length) {
-        throw new Error(failures.join(" | "));
-    }
-    if (failures.length) {
-        setStatus(`Teilergebnis geladen. Nicht erreichbar: ${failures.map((failure) => failure.split(":")[0]).join(", ")}.`);
-    }
-    return dedupeFeatures(features);
 }
 
-async function fetchOverpassSource(queryPart, queryRadius, rawLimit) {
-    const query = `[out:json][timeout:10];(${queryPart});out center qt ${rawLimit};`
+async function fetchOverpassPlans(plans, queryRadius, rawLimit, timeoutMs) {
+    const queryParts = plans.map((plan) => plan.query).join("");
+    const query = `[out:json][timeout:${Math.ceil(timeoutMs / 1000)}];(${queryParts});out center qt ${rawLimit};`
         .replaceAll("RADIUS", String(queryRadius))
         .replaceAll("LAT", String(state.center[0]))
         .replaceAll("LON", String(state.center[1]));
-    let lastError = null;
-    for (const endpoint of overpassEndpoints) {
-        try {
-            const data = await requestOverpass(endpoint, query);
-            return data.elements.map(osmElementToFeature).filter(Boolean);
-        } catch (error) {
-            lastError = error;
-        }
+    try {
+        const data = await Promise.any(overpassEndpoints.map((endpoint) => requestOverpass(endpoint, query, timeoutMs)));
+        return dedupeFeatures(data.elements.map(osmElementToFeature).filter(Boolean));
+    } catch (error) {
+        const reason = error.errors?.[0]?.message || error.message;
+        throw new Error(reason || "Keine Overpass-Antwort erhalten");
     }
-    throw lastError || new Error("Keine Overpass-Antwort erhalten");
 }
 
-async function requestOverpass(endpoint, query) {
-    const getUrl = `${endpoint}?data=${encodeURIComponent(query)}`;
-    const response = await fetchWithTimeout(getUrl, {
-        method: "GET",
-        headers: { "Accept": "application/json" },
-    }, 7000);
+function buildOverpassPlans(sources, query) {
+    const plans = [];
+    selectedEntityObjects().forEach((item) => plans.push({ id: `entity-${item.id}`, label: item.label, query: item.query }));
+    focusedQueryRules.forEach((rule) => {
+        if (rule.terms.some((term) => query.raw.includes(normalize(term)))) {
+            plans.push({ id: `focus-${rule.id}`, label: rule.label, query: rule.query });
+        }
+    });
+    if (!plans.length) {
+        sources.forEach((source) => {
+            const queryPart = sourceQueries[source];
+            if (queryPart) plans.push({ id: `source-${source}`, label: sourceLabel(source), query: queryPart });
+        });
+    }
+    return dedupePlans(plans);
+}
+
+function hasFocusedQuery(query) {
+    return Boolean(state.selectedEntities.size) || focusedQueryRules.some((rule) => rule.terms.some((term) => query.raw.includes(normalize(term))));
+}
+
+function dedupePlans(plans) {
+    const seen = new Set();
+    return plans.filter((plan) => {
+        const key = plan.query;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+    });
+}
+
+async function requestOverpass(endpoint, query, timeoutMs) {
+    const body = new URLSearchParams({ data: query });
+    const response = await fetchWithTimeout(endpoint, {
+        method: "POST",
+        headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+        },
+        body,
+    }, timeoutMs);
     return await parseOverpassResponse(response);
+}
+
+async function fetchPhotonFallback(plans, queryRadius, rawLimit) {
+    const terms = dedupeText(plans.flatMap(nominatimTermsForPlan)).slice(0, 5);
+    if (!terms.length) return [];
+    const features = [];
+    for (const term of terms) {
+        setStatus(`Fallback-Suche: ${term} ...`);
+        const params = new URLSearchParams({
+            q: term,
+            lat: String(state.center[0]),
+            lon: String(state.center[1]),
+            limit: String(Math.max(8, Math.min(35, Math.ceil(rawLimit / Math.max(terms.length, 1))))),
+        });
+        try {
+            const response = await fetchWithTimeout(`https://photon.komoot.io/api/?${params}`, {
+                method: "GET",
+                headers: { "Accept": "application/geo+json" },
+            }, 9000);
+            if (!response.ok) continue;
+            const data = await response.json();
+            features.push(...(data.features || []).map((feature, index) => photonFeatureToFeature(feature, term, index)).filter((feature) => {
+                return feature && distanceMeters(state.center[0], state.center[1], feature.lat, feature.lon) <= queryRadius * 1.35;
+            }));
+        } catch {
+            // Keep trying the remaining terms; this is only a resilience fallback.
+        }
+    }
+    return dedupeFeatures(features).slice(0, rawLimit);
+}
+
+function photonFeatureToFeature(feature, term, index) {
+    const coordinates = feature.geometry?.coordinates;
+    if (!coordinates || coordinates.length < 2) return null;
+    const props = feature.properties || {};
+    const tags = {
+        name: props.name || term,
+        class: props.osm_key,
+        type: props.osm_value,
+        search: term,
+        city: props.city,
+        street: props.street,
+        country: props.country,
+    };
+    if (props.osm_key && props.osm_value) tags[props.osm_key] = props.osm_value;
+    return {
+        id: `photon-${term}-${props.osm_type || "x"}-${props.osm_id || index}`,
+        source: "Photon",
+        lat: Number(coordinates[1]),
+        lon: Number(coordinates[0]),
+        name: props.name || `${term} ${index + 1}`,
+        tags,
+    };
+}
+
+async function fetchNominatimFallback(plans, queryRadius, rawLimit) {
+    const terms = dedupeText(plans.flatMap(nominatimTermsForPlan)).slice(0, 5);
+    if (!terms.length) return [];
+    const bbox = bboxAround(state.center, queryRadius);
+    const features = [];
+    for (const term of terms) {
+        setStatus(`Fallback-Suche: ${term} ...`);
+        const params = new URLSearchParams({
+            format: "geojson",
+            q: term,
+            limit: String(Math.max(8, Math.min(30, Math.ceil(rawLimit / Math.max(terms.length, 1))))),
+            bounded: "1",
+            viewbox: `${bbox.west},${bbox.north},${bbox.east},${bbox.south}`,
+            addressdetails: "0",
+            extratags: "1",
+            namedetails: "1",
+        });
+        try {
+            const response = await fetchWithTimeout(`https://nominatim.openstreetmap.org/search?${params}`, {
+                method: "GET",
+                headers: { "Accept": "application/geo+json" },
+            }, 9000);
+            const data = await response.json();
+            features.push(...(data.features || []).map((feature, index) => nominatimFeatureToFeature(feature, term, index)).filter(Boolean));
+        } catch {
+            // Keep trying the remaining terms; this is only a resilience fallback.
+        }
+    }
+    return dedupeFeatures(features).slice(0, rawLimit);
+}
+
+function nominatimTermsForPlan(plan) {
+    const id = plan.id.replace(/^entity-|^focus-/, "");
+    const byId = {
+        restaurant: ["restaurant"],
+        cafe: ["cafe"],
+        church: ["church", "place of worship"],
+        parking: ["parking"],
+        historic: ["historic", "monument"],
+        school: ["school"],
+        playground: ["playground"],
+        supermarket: ["supermarket"],
+        bus_stop: ["bus stop"],
+        viewpoint: ["viewpoint"],
+    };
+    if (byId[id]) return byId[id];
+    if (/restaurant/i.test(plan.label)) return ["restaurant"];
+    if (/cafe/i.test(plan.label)) return ["cafe"];
+    if (/kirche/i.test(plan.label)) return ["church"];
+    if (/parkplatz/i.test(plan.label)) return ["parking"];
+    if (/histor/i.test(plan.label)) return ["historic"];
+    return [];
+}
+
+function nominatimFeatureToFeature(feature, term, index) {
+    const coordinates = feature.geometry?.coordinates;
+    if (!coordinates || coordinates.length < 2) return null;
+    const props = feature.properties || {};
+    const tags = {
+        name: props.name || props.display_name || term,
+        class: props.class,
+        type: props.type,
+        search: term,
+        ...(props.extratags || {}),
+    };
+    if (props.class && props.type) tags[props.class] = props.type;
+    return {
+        id: `nominatim-${term}-${props.osm_type || "x"}-${props.osm_id || index}`,
+        source: "Nominatim",
+        lat: Number(coordinates[1]),
+        lon: Number(coordinates[0]),
+        name: props.name || props.display_name || `${term} ${index + 1}`,
+        tags,
+    };
+}
+
+function bboxAround(center, meters) {
+    const [lat, lon] = center;
+    const latDelta = meters / 111320;
+    const lonDelta = meters / (111320 * Math.max(Math.cos(lat * Math.PI / 180), .2));
+    return {
+        west: lon - lonDelta,
+        south: lat - latDelta,
+        east: lon + lonDelta,
+        north: lat + latDelta,
+    };
+}
+
+function dedupeText(values) {
+    const seen = new Set();
+    return values.filter((value) => {
+        const key = normalize(value);
+        if (!key || seen.has(key)) return false;
+        seen.add(key);
+        return true;
+    });
 }
 
 async function parseOverpassResponse(response) {
@@ -611,7 +930,7 @@ function buildDensityIndex(features) {
 }
 
 function renderResults(results, query) {
-    state.markerLayer.clearLayers();
+    clearResultMarkers();
     const list = $("#resultList");
     list.innerHTML = "";
     $("#resultCount").textContent = results.length;
@@ -619,13 +938,28 @@ function renderResults(results, query) {
     renderFactors(results, query);
     const bounds = [];
     results.forEach((result, index) => {
-        const marker = createMarker(result).addTo(state.markerLayer);
-        marker.bindPopup(popupHtml(result));
+        const marker = createMarker(result);
+        state.resultSource.addFeature(marker);
         bounds.push([result.lat, result.lon]);
         const item = resultListItem(result, index, marker);
         list.appendChild(item);
     });
-    if (bounds.length) state.map.fitBounds(bounds, { maxZoom: 16, padding: [40, 40] });
+    if (bounds.length) fitResultBounds(bounds);
+}
+
+function clearResultMarkers() {
+    state.resultSource.clear();
+    hidePopup();
+}
+
+function fitResultBounds(points) {
+    if (!points.length) return;
+    const extent = ol.extent.boundingExtent(points.map(([lat, lon]) => ol.proj.fromLonLat([lon, lat])));
+    state.view.fit(extent, {
+        padding: [90, 90, 90, 90],
+        maxZoom: 16,
+        duration: 550,
+    });
 }
 
 function renderFactors(results, query) {
@@ -648,16 +982,12 @@ function renderFactors(results, query) {
 }
 
 function createMarker(result) {
-    const size = Math.max(12, Math.round(14 + result.score / 4));
-    const color = result.score >= 70 ? "#16a34a" : result.score >= 42 ? "#f59e0b" : "#e11d48";
-    return L.circleMarker([result.lat, result.lon], {
-        radius: size / 2,
-        color: "#ffffff",
-        weight: 2,
-        fillColor: color,
-        fillOpacity: .82,
-        className: "probability-marker",
+    const feature = new ol.Feature({
+        geometry: new ol.geom.Point(ol.proj.fromLonLat([result.lon, result.lat])),
+        result,
+        popupHtml: popupHtml(result),
     });
+    return feature;
 }
 
 function popupHtml(result) {
@@ -679,18 +1009,32 @@ function resultListItem(result, index, marker) {
     template.querySelector("small").textContent = [result.source, result.factors.hits.join(", ") || readableType(result.tags) || "Kontexttreffer", reviewText].filter(Boolean).join(" · ");
     template.querySelector(".probability").textContent = `${result.score}%`;
     button.addEventListener("click", () => {
-        state.map.setView([result.lat, result.lon], 17);
-        marker.openPopup();
+        setMapView([result.lat, result.lon], 17);
+        openMarkerPopup(marker);
     });
     return template;
 }
 
+function openMarkerPopup(marker) {
+    openFeaturePopup(marker, marker.get("popupHtml"));
+}
+
+function openFeaturePopup(feature, html) {
+    if (!html) return;
+    state.popupElement.hidden = false;
+    state.popupElement.innerHTML = html;
+    state.popupOverlay.setPosition(feature.getGeometry().getCoordinates());
+}
+
+function hidePopup() {
+    if (!state.popupElement) return;
+    state.popupElement.hidden = true;
+    state.popupOverlay?.setPosition(undefined);
+}
+
 function clearMap() {
-    state.markerLayer.clearLayers();
-    if (state.imageMarker) {
-        state.imageMarker.remove();
-        state.imageMarker = null;
-    }
+    clearResultMarkers();
+    state.imageSource.clear();
     state.results = [];
     $("#resultList").innerHTML = "";
     $("#resultCount").textContent = "0";
@@ -715,9 +1059,14 @@ async function analyzeImageFile(event) {
         renderImageSignals(hints, gps);
         if (gps) {
             state.center = [gps.lat, gps.lon];
-            state.map.setView(state.center, 16);
-            if (state.imageMarker) state.imageMarker.remove();
-            state.imageMarker = L.marker(state.center).addTo(state.map).bindPopup("Fotostandort aus EXIF").openPopup();
+            setMapView(state.center, 16);
+            state.imageSource.clear();
+            const imageFeature = new ol.Feature({
+                geometry: new ol.geom.Point(ol.proj.fromLonLat([gps.lon, gps.lat])),
+                popupHtml: "<strong>Fotostandort aus EXIF</strong>",
+            });
+            state.imageSource.addFeature(imageFeature);
+            openFeaturePopup(imageFeature, imageFeature.get("popupHtml"));
             drawSearchCircle();
             setStatus("Bild-GPS gefunden. Suchraum wurde auf das Foto gesetzt.");
         } else {

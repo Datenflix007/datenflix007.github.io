@@ -7,7 +7,7 @@
     <title>GVIS - Geo Visual Intelligence Studio</title>
     <meta name="description" content="Statische GIS-Analyse fuer OSM-Daten, GeoGuessr-Hinweise, POIs, Vegetation, Gebaeude und importierte Geo-Daten." />
     <meta name="theme-color" content="#0f172a" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIINfQbQO2AT3T8tv0H4G8nQ6NxE0QZ88tM=" crossorigin="" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@10.6.1/ol.css" />
     <link rel="stylesheet" href="styles.css" />
 </head>
 
@@ -132,6 +132,12 @@
                     <span><i class="dot mid"></i> mittel</span>
                     <span><i class="dot low"></i> niedrig</span>
                 </div>
+                <select id="basemapSelect" class="basemap-select" aria-label="Basiskarte">
+                    <option value="voyager" selected>Carto Voyager</option>
+                    <option value="light">Carto Light</option>
+                    <option value="dark">Carto Dark</option>
+                    <option value="satellite">Esri Satellit</option>
+                </select>
             </div>
             <div id="map"></div>
             <div class="map-scroll-note">Karte per Ziehen bewegen, Zoom ueber +/-. Die Seitenleisten scrollen separat.</div>
@@ -185,7 +191,7 @@
         </li>
     </template>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="https://cdn.jsdelivr.net/npm/ol@10.6.1/dist/ol.js"></script>
     <script src="app.js"></script>
 </body>
 
