@@ -4,3 +4,6 @@ _WS_2022*
 .env
 .dev.vars
 node_modules/
+.claude/
+.vscode/
+.codex/
