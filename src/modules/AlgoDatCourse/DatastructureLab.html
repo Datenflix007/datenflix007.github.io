@@ -385,7 +385,7 @@ main{flex:1;position:relative;overflow:hidden}
       <button onclick="cmdTopologicalSort()">Topological Sort</button>
       <button onclick="cmdPrim()">Prim</button>
       <button onclick="cmdKruskal()">Kruskal</button>
-      <button onclick="cmdDijkstra()">Dijkstra</button>
+      <button onclick="cmdDijkstraSelect()">Dijkstra</button>
     </div>
   </div>
 
@@ -1275,6 +1275,34 @@ class BinomialHeap {
     return null;
   }
 
+  _findNodeByValue(value) {
+    const go = (n, parent=null) => {
+      if (!n) return null;
+      if (String(n.value) === String(value)) return { node:n, parent };
+      for (const c of n.children) { const r = go(c, n); if (r) return r; }
+      return null;
+    };
+    for (const r of this.roots) { const f = go(r, null); if (f) return f; }
+    return null;
+  }
+
+  decreaseKeyByValue(value, newKey) {
+    const found = this._findNodeByValue(value);
+    if (!found || this._better(found.node.key, newKey)) return false;
+    let x = found.node;
+    x.key = newKey;
+    _log(`Decrease-Key(${value}): key <- ${newKey}`);
+    let parent = this._findNodeByValue(x.value)?.parent || null;
+    while (parent && this._better(x.key, parent.key)) {
+      _log(`Heap-Ordnung reparieren: tausche (${x.value}, ${x.key}) mit Parent (${parent.value}, ${parent.key})`);
+      [x.key, parent.key] = [parent.key, x.key];
+      [x.value, parent.value] = [parent.value, x.value];
+      x = parent;
+      parent = this._findNodeByValue(x.value)?.parent || null;
+    }
+    return true;
+  }
+
   delete(key) {
     const all = this._allNodes();
     const idx = all.findIndex(n => n.key === key);
@@ -1508,6 +1536,34 @@ class FibHeap {
     };
     for (const r of this._listArr(this.min)) { const f = go(r); if (f) return f; }
     return null;
+  }
+
+  _findNodeByValue(value) {
+    if (!this.min) return null;
+    const go = n => {
+      if (String(n.value) === String(value)) return n;
+      if (n.child) for (const c of this._listArr(n.child)) { const r = go(c); if (r) return r; }
+      return null;
+    };
+    for (const r of this._listArr(this.min)) { const f = go(r); if (f) return f; }
+    return null;
+  }
+
+  decreaseKeyByValue(value, newKey) {
+    const n = this._findNodeByValue(value);
+    if (!n || this._better(n.key, newKey)) return false;
+    const oldKey = n.key;
+    n.key = newKey;
+    const p = n.parent;
+    _log(`Decrease-Key(${value}): ${oldKey} -> ${newKey}`);
+    if (p && this._better(n.key, p.key)) {
+      _log(`Heap-Eigenschaft verletzt: <b>${newKey}</b> ${this._cmpSign()} Elter <b>${p.key}</b> -> Schnitt von <b>${value}</b>`);
+      this._cut(n, p); this._cascadingCut(p);
+    } else {
+      _log(`Heap-Eigenschaft OK fuer <b>${value}</b> -> kein Schnitt`);
+    }
+    if (this.min && this._better(n.key, this.min.key)) { _log(`Neues ${this._topLabel()}: <b>${n.key}</b>`); this.min = n; }
+    return true;
   }
 
   search(key)             { const n = this._findNode(key); return n ? n.value : null; }
@@ -1803,6 +1859,7 @@ class GraphStructure {
     this.vertices = new Map();
     this.edges = [];
     this.lastAlgorithm = null;
+    this.lastAux = null;
   }
   insert(key, value='') { return this.addVertex(key, value); }
   addVertex(key, value='') {
@@ -1819,12 +1876,14 @@ class GraphStructure {
     const edge = { u, v, w:Number(w) || 1 };
     this.edges.push(edge);
     this.lastAlgorithm = null;
+    this.lastAux = null;
     _log(`AddEdge(${u}, ${v}, w=${edge.w})`);
     return edge;
   }
   setDirected(flag) {
     this.directed = !!flag;
     this.lastAlgorithm = null;
+    this.lastAux = null;
     _log(`Graph ist jetzt ${this.directed ? 'gerichtet' : 'ungerichtet'}`);
   }
   delete(key) {
@@ -1886,6 +1945,57 @@ class GraphStructure {
     }
     const treeEdges = [...prev.entries()].map(([v,u]) => ({ u, v }));
     this.lastAlgorithm = { type:'dijkstra', source, vertices:[...done], edges:treeEdges, dist:Object.fromEntries(dist) };
+    this.lastAux = null;
+    return { dist, prev };
+  }
+  _newPriorityQueue(kind) {
+    return kind === 'fibonacci' ? new FibHeap() : new BinomialHeap();
+  }
+  _heapKindLabel(kind) {
+    return kind === 'fibonacci' ? 'Fibonacci-Heap' : 'Binomialheap';
+  }
+  dijkstraWithHeap(source, kind='fibonacci') {
+    if (!this.vertices.has(source)) return null;
+    const pq = this._newPriorityQueue(kind);
+    const label = this._heapKindLabel(kind);
+    const dist = new Map(this.vertexKeys().map(k => [k, Infinity]));
+    const prev = new Map();
+    const done = new Set();
+    const ops = [];
+    dist.set(source, 0);
+    _log(`Dijkstra mit ${label}: Initialize-Single-Source, d[${source}] = 0`);
+    for (const v of this.vertexKeys()) {
+      pq.insert(dist.get(v), String(v));
+      ops.push(`Insert(${v}, key=${dist.get(v) === Infinity ? 'inf' : dist.get(v)})`);
+    }
+    while (!pq.isEmpty()) {
+      const min = pq.extractMin();
+      if (!min || min.key === Infinity) break;
+      const u = Number(min.value);
+      if (done.has(u)) continue;
+      done.add(u);
+      ops.push(`Extract-Min -> ${u} (d=${min.key})`);
+      _log(`Extract-Min(${label}): Vertex ${u} mit d=${min.key}`);
+      for (const { to:v, w, edge } of this.neighbors(u)) {
+        if (done.has(v)) continue;
+        const alt = dist.get(u) + w;
+        if (alt < dist.get(v)) {
+          dist.set(v, alt); prev.set(v, u);
+          _log(`Relax(${u}, ${v}): d[${v}] <- ${alt}; Decrease-Key(${v}) im ${label}`);
+          pq.decreaseKeyByValue(String(v), alt);
+          ops.push(`Decrease-Key(${v}, ${alt})`);
+          edge._alg = true;
+        }
+      }
+    }
+    const treeEdges = [...prev.entries()].map(([v,u]) => ({ u, v }));
+    this.lastAlgorithm = { type:'dijkstra', source, vertices:[...done], edges:treeEdges, dist:Object.fromEntries(dist) };
+    this.lastAux = { type:label, mode:'Dijkstra Priority Queue', rows:this.vertexKeys().map(v => ({
+      item:v,
+      key:dist.get(v) === Infinity ? 'inf' : dist.get(v),
+      parent:prev.has(v) ? prev.get(v) : '-',
+      done:done.has(v) ? 'S' : 'Q'
+    })), ops };
     return { dist, prev };
   }
   prim(source=this.vertexKeys()[0]) {
@@ -1904,6 +2014,55 @@ class GraphStructure {
       _log(`waehle leichteste Schnittkante (${best.u}, ${best.v}) mit w=${best.w}`);
     }
     this.lastAlgorithm = { type:'prim', source, vertices:[...inTree], edges:mst };
+    this.lastAux = null;
+    return mst;
+  }
+  primWithHeap(source=this.vertexKeys()[0], kind='fibonacci') {
+    if (!this.vertices.has(source)) return null;
+    const pq = this._newPriorityQueue(kind);
+    const label = this._heapKindLabel(kind);
+    const key = new Map(this.vertexKeys().map(k => [k, Infinity]));
+    const parent = new Map();
+    const inTree = new Set();
+    const mst = [];
+    const ops = [];
+    key.set(source, 0);
+    _log(`Prim mit ${label}: Start bei ${source}; alle Keys initialisieren`);
+    for (const v of this.vertexKeys()) {
+      pq.insert(key.get(v), String(v));
+      ops.push(`Insert(${v}, key=${key.get(v) === Infinity ? 'inf' : key.get(v)})`);
+    }
+    while (!pq.isEmpty()) {
+      const min = pq.extractMin();
+      if (!min || min.key === Infinity) break;
+      const u = Number(min.value);
+      if (inTree.has(u)) continue;
+      inTree.add(u);
+      ops.push(`Extract-Min -> ${u} (key=${min.key})`);
+      _log(`Extract-Min(${label}): Vertex ${u} mit key=${min.key}`);
+      if (parent.has(u)) {
+        const p = parent.get(u);
+        const edge = this.edges.find(e => (e.u === p && e.v === u) || (e.u === u && e.v === p));
+        mst.push({ u:p, v:u, w:key.get(u) });
+        if (edge) edge._alg = true;
+        _log(`nehme Kante (${p}, ${u}) mit w=${key.get(u)} in MST auf`);
+      }
+      for (const { to:v, w } of this.neighbors(u, { undirected:true })) {
+        if (!inTree.has(v) && w < key.get(v)) {
+          key.set(v, w); parent.set(v, u);
+          _log(`Update fuer ${v}: parent=${u}, key=${w}; Decrease-Key im ${label}`);
+          pq.decreaseKeyByValue(String(v), w);
+          ops.push(`Decrease-Key(${v}, ${w})`);
+        }
+      }
+    }
+    this.lastAlgorithm = { type:'prim', source, vertices:[...inTree], edges:mst };
+    this.lastAux = { type:label, mode:'Prim Priority Queue', rows:this.vertexKeys().map(v => ({
+      item:v,
+      key:key.get(v) === Infinity ? 'inf' : key.get(v),
+      parent:parent.has(v) ? parent.get(v) : '-',
+      done:inTree.has(v) ? 'MST' : 'Q'
+    })), ops };
     return mst;
   }
   kruskal() {
@@ -1912,13 +2071,15 @@ class GraphStructure {
     const sorted = [...this.edges].sort((a,b)=>a.w-b.w || a.u-b.u || a.v-b.v);
     const mst = [];
     _log('Kruskal: sortiere Kanten nach Gewicht und initialisiere Make-Set fuer alle Knoten');
+    const auxRows = [];
     for (const e of sorted) {
       const ru = uf.findSet(e.u), rv = uf.findSet(e.v);
       _log(`pruefe (${e.u}, ${e.v}) w=${e.w}: FindSet=${ru}/${rv}`);
-      if (ru !== rv) { mst.push(e); uf.union(e.u, e.v); _log(`nehme Kante (${e.u}, ${e.v}) in MST auf`); }
-      else _log(`verwerfe (${e.u}, ${e.v}) wegen Zyklus`);
+      if (ru !== rv) { mst.push(e); uf.union(e.u, e.v); _log(`nehme Kante (${e.u}, ${e.v}) in MST auf`); auxRows.push({ item:`${e.u}-${e.v}`, key:e.w, parent:'Union', done:'MST' }); }
+      else { _log(`verwerfe (${e.u}, ${e.v}) wegen Zyklus`); auxRows.push({ item:`${e.u}-${e.v}`, key:e.w, parent:'FindSet gleich', done:'Zyklus' }); }
     }
     this.lastAlgorithm = { type:'kruskal', vertices:this.vertexKeys(), edges:mst };
+    this.lastAux = { type:'UnionFind', mode:'Kruskal Disjoint Sets', rows:[...uf.items.values()].map(x => ({ item:x.key, key:`rank ${x.rank}`, parent:x.parent, done:'set' })), ops:auxRows.map(r => `${r.done}: (${r.item}) w=${r.key}`) };
     return mst;
   }
   toJSON() {
@@ -2433,33 +2594,39 @@ PSEUDOCODE.Graph = {
       'Dijkstra(G, s):',
       '  Initialize-Single-Source(G, s)',
       '  S = empty set',
-      '  Q = V[G]',
+      '  Q = Build-Min-Priority-Queue(V[G])',
       '  while Q nicht leer:',
       '    u = Extract-Min(Q)',
       '    S = S union {u}',
       '    for v in Adj[u]:',
       '      Relax(u, v, w)',
+      '      if d[v] kleiner wurde: Decrease-Key(Q, v)',
     ],
     lineMap: [
-      { re:/Initialize-Single-Source/, lines:[1,2,3] },
+      { re:/Initialize-Single-Source|Insert/, lines:[1,2,3] },
       { re:/Extract-Min/, lines:[4,5,6] },
       { re:/Relax/, lines:[7,8] },
+      { re:/Decrease-Key/, lines:[9] },
     ]
   },
   prim: {
     title: 'Prim',
     code: [
       'Prim(G, r):',
-      '  S = {r}',
+      '  Q = Build-Min-Priority-Queue(V[G])',
       '  T = empty set',
-      '  while S != V:',
-      '    waehle leichteste Schnittkante (u, v)',
-      '    T = T union {(u, v)}',
-      '    S = S union {v}',
+      '  while Q nicht leer:',
+      '    u = Extract-Min(Q)',
+      '    T = T union {(parent[u], u)}',
+      '    for v in Adj[u]:',
+      '      if w(u,v) < key[v]: parent[v]=u',
+      '      Decrease-Key(Q, v)',
     ],
     lineMap: [
-      { re:/Start/, lines:[1,2] },
-      { re:/Schnittkante/, lines:[3,4,5,6] },
+      { re:/Start|Insert/, lines:[1,2] },
+      { re:/Extract-Min/, lines:[3,4,5] },
+      { re:/Update|Decrease-Key/, lines:[6,7,8] },
+      { re:/nehme Kante/, lines:[5] },
     ]
   },
   kruskal: {
@@ -2679,12 +2846,20 @@ function _graphMemoryHTML() {
     const dist = structure.lastAlgorithm?.dist?.[k];
     return `<tr><td>Adj[${k}]</td><td>${_escH(adj)}</td><td>${dist == null ? '' : dist}</td></tr>`;
   }).join('');
+  const aux = structure.lastAux;
+  const auxHTML = aux ? `
+    <div class="memory-section"><h4>${_escH(aux.mode)} - ${_escH(aux.type)}</h4><table class="memory-table">
+      <thead><tr><th>item</th><th>key</th><th>parent</th><th>state</th></tr></thead>
+      <tbody>${(aux.rows || []).map(r => `<tr><td>${_escH(String(r.item))}</td><td>${_escH(String(r.key))}</td><td>${_escH(String(r.parent))}</td><td>${_escH(String(r.done))}</td></tr>`).join('')}</tbody></table>
+      <div class="memory-array">${(aux.ops || []).slice(-12).map((op, i) => `<div class="mem-cell"><span class="mem-idx">op[${i}]</span><span class="mem-val">${_escH(op)}</span></div>`).join('')}</div>
+    </div>` : '';
   return `
     <div class="memory-section"><h4>Vertex-Array V</h4><div class="memory-array">${_arrayCells(cells, 'V')}</div></div>
     <div class="memory-section"><h4>Edge-Array</h4><table class="memory-table">
       <thead><tr><th>addr</th><th>u</th><th>v</th><th>w</th></tr></thead><tbody>${edgeRows}</tbody></table></div>
     <div class="memory-section"><h4>Adjazenzlisten</h4><table class="memory-table">
-      <thead><tr><th>slot</th><th>neighbors</th><th>d</th></tr></thead><tbody>${adjRows}</tbody></table></div>`;
+      <thead><tr><th>slot</th><th>neighbors</th><th>d</th></tr></thead><tbody>${adjRows}</tbody></table></div>
+    ${auxHTML}`;
 }
 
 function _refreshMemoryViewer() {
@@ -4251,9 +4426,13 @@ function buildOpsMenu() {
     ['❌  Delete Vertex', cmdDelete],
     null,
     ['Topological Sort', cmdTopologicalSort],
-    ['Prim',             cmdPrim],
+    ['Prim (Auswahl)',   cmdPrim],
+    ['Prim + Fibonacci', cmdPrimFib],
+    ['Prim + Binomial',  cmdPrimBinomial],
     ['Kruskal',          cmdKruskal],
-    ['Dijkstra',         cmdDijkstra],
+    ['Dijkstra (Auswahl)', cmdDijkstraSelect],
+    ['Dijkstra + Fibonacci', cmdDijkstraFib],
+    ['Dijkstra + Binomial',  cmdDijkstraBinomial],
   ] : isHash ? [
     ['➕  Insert',      cmdInsert],
     ['➕  Multi Insert', cmdMultiInsert],
@@ -4578,20 +4757,51 @@ function cmdTopologicalSort() {
   setStatus(r.hasCycle ? `⚠ Zyklus erkannt; Teilordnung: ${r.order.join(', ')}` : `Topological Sort: <b>${r.order.join(', ')}</b>`);
 }
 
-function cmdPrim() {
+function _askGraphStartAndHeap(title, cb) {
+  showDialog(title, `
+    <div class="dialog-field"><label>Startknoten</label><input type="number" id="_gstart" step="1"></div>
+    <div class="dialog-field"><label>Hilfsstruktur</label><select id="_gheap">
+      <option value="fibonacci">Fibonacci-Heap</option>
+      <option value="binomial">Binomialheap</option>
+    </select></div>`, () => {
+    const s = parseInt(document.getElementById('_gstart').value);
+    const heapKind = document.getElementById('_gheap').value;
+    if (!Number.isNaN(s)) cb(s, heapKind);
+  });
+  setTimeout(()=>document.getElementById('_gstart')?.focus(),50);
+}
+
+function _runPrimWithHeap(kind, presetStart=null) {
   if (!_needGraph('prim')) return;
-  askKey('Prim Startknoten', s => {
-    _startLog(`${structType} - Prim(${s})`, 'prim');
-    const mst = structure.prim(s);
+  const run = s => {
+    openMemoryPanel();
+    _startLog(`${structType} - Prim(${s}) mit ${structure._heapKindLabel(kind)}`, 'prim');
+    const mst = structure.primWithHeap(s, kind);
     _endLog();
     _highlightGraphResult(mst);
     const weight = (mst || []).reduce((sum,e)=>sum+e.w,0);
     setStatus(mst ? `Prim MST Gewicht: <b>${weight}</b>` : 'Startknoten fehlt');
-  });
+  };
+  if (presetStart == null) askKey(`Prim Startknoten (${structure._heapKindLabel(kind)})`, run);
+  else run(presetStart);
+}
+
+function cmdPrim() {
+  if (!_needGraph('prim')) return;
+  _askGraphStartAndHeap('Prim: Hilfsstruktur waehlen', (s, kind) => _runPrimWithHeap(kind, s));
+}
+
+function cmdPrimFib() {
+  _runPrimWithHeap('fibonacci');
+}
+
+function cmdPrimBinomial() {
+  _runPrimWithHeap('binomial');
 }
 
 function cmdKruskal() {
   if (!_needGraph('kruskal')) return;
+  openMemoryPanel();
   _startLog(`${structType} - Kruskal`, 'kruskal');
   const mst = structure.kruskal();
   _endLog();
@@ -4603,14 +4813,44 @@ function cmdKruskal() {
 function cmdDijkstra() {
   if (!_needGraph('dijkstra')) return;
   askKey('Dijkstra Startknoten', s => {
-    _startLog(`${structType} - Dijkstra(${s})`, 'dijkstra');
-    const r = structure.dijkstra(s);
+    openMemoryPanel();
+    _startLog(`${structType} - Dijkstra(${s}) mit ${structure._heapKindLabel('fibonacci')}`, 'dijkstra');
+    const r = structure.dijkstraWithHeap(s, 'fibonacci');
     _endLog();
     _highlightGraphResult(r);
     if (!r) { setStatus('Startknoten fehlt'); return; }
     const dist = [...r.dist.entries()].map(([k,d]) => `${k}:${d === Infinity ? '∞' : d}`).join('  ');
     setStatus(`Dijkstra d[]: <b>${dist}</b>`);
   });
+}
+
+function cmdDijkstraSelect() {
+  if (!_needGraph('dijkstra')) return;
+  _askGraphStartAndHeap('Dijkstra: Hilfsstruktur waehlen', (s, kind) => _runDijkstraWithHeap(kind, s));
+}
+
+function _runDijkstraWithHeap(kind, presetStart=null) {
+  if (!_needGraph('dijkstra')) return;
+  const run = s => {
+    openMemoryPanel();
+    _startLog(`${structType} - Dijkstra(${s}) mit ${structure._heapKindLabel(kind)}`, 'dijkstra');
+    const r = structure.dijkstraWithHeap(s, kind);
+    _endLog();
+    _highlightGraphResult(r);
+    if (!r) { setStatus('Startknoten fehlt'); return; }
+    const dist = [...r.dist.entries()].map(([k,d]) => `${k}:${d === Infinity ? 'inf' : d}`).join('  ');
+    setStatus(`Dijkstra d[]: <b>${dist}</b>`);
+  };
+  if (presetStart == null) askKey(`Dijkstra Startknoten (${structure._heapKindLabel(kind)})`, run);
+  else run(presetStart);
+}
+
+function cmdDijkstraFib() {
+  _runDijkstraWithHeap('fibonacci');
+}
+
+function cmdDijkstraBinomial() {
+  _runDijkstraWithHeap('binomial');
 }
 
 function cmdInsert() {
