@@ -7,6 +7,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/png" href="media/favicon.png">
     <title>Felix Staacke</title>
     <meta name="description" content="Moderne persönliche Website mit Referenzen, Projekten und Kontakt.">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -303,26 +304,57 @@
             const btnNext = document.getElementById('catNext');
             if (track) {
                 const cards = Array.from(track.querySelectorAll('.cat-card'));
-                const count = cards.length;
                 let current = 0;
+                let snapPoints = [];
+                let dots = [];
 
-                const dots = cards.map((_, i) => {
-                    const btn = document.createElement('button');
-                    btn.className = 'dot' + (i === 0 ? ' active' : '');
-                    btn.setAttribute('aria-label', `Karte ${i + 1}`);
-                    btn.addEventListener('click', () => goTo(i));
-                    dotsEl.appendChild(btn);
-                    return btn;
-                });
+                function maxScroll() {
+                    return Math.max(0, track.scrollWidth - track.clientWidth);
+                }
 
-                function goTo(idx) {
-                    current = (idx + count) % count;
-                    const card = cards[current];
-                    track.scrollTo({ left: card.offsetLeft - track.offsetLeft - 4, behavior: 'smooth' });
+                function clamp(value, min, max) {
+                    return Math.min(max, Math.max(min, value));
+                }
+
+                function buildSnapPoints() {
+                    const max = maxScroll();
+                    snapPoints = cards.map((card) => clamp(
+                        card.offsetLeft + card.offsetWidth / 2 - track.clientWidth / 2,
+                        0,
+                        max
+                    ));
+                    snapPoints = snapPoints.filter((point, index, list) => index === 0 || Math.abs(point - list[index - 1]) > 8);
+                    if (!snapPoints.length) snapPoints = [0];
+
+                    dotsEl.innerHTML = '';
+                    dots = snapPoints.map((_, i) => {
+                        const btn = document.createElement('button');
+                        btn.className = 'dot' + (i === current ? ' active' : '');
+                        btn.setAttribute('aria-label', `Ansicht ${i + 1}`);
+                        btn.addEventListener('click', () => goTo(i));
+                        dotsEl.appendChild(btn);
+                        return btn;
+                    });
+
+                    current = clamp(current, 0, snapPoints.length - 1);
+                    btnPrev.hidden = snapPoints.length < 2;
+                    btnNext.hidden = snapPoints.length < 2;
+                    dotsEl.hidden = snapPoints.length < 2;
+                    updateDots();
+                }
+
+                function updateDots() {
                     dots.forEach((d, i) => d.classList.toggle('active', i === current));
                 }
 
+                function goTo(idx) {
+                    current = (idx + snapPoints.length) % snapPoints.length;
+                    track.scrollTo({ left: snapPoints[current], behavior: 'smooth' });
+                    updateDots();
+                }
+
                 function startAuto() { return setInterval(() => goTo(current + 1), 4500); }
+                buildSnapPoints();
                 let autoTimer = startAuto();
                 track.addEventListener('mouseenter', () => clearInterval(autoTimer));
                 track.addEventListener('touchstart', () => clearInterval(autoTimer), { passive: true });
@@ -336,13 +368,21 @@
                     clearTimeout(scrollTimer);
                     scrollTimer = setTimeout(() => {
                         let closest = 0, minDist = Infinity;
-                        cards.forEach((card, i) => {
-                            const dist = Math.abs(card.offsetLeft - track.offsetLeft - track.scrollLeft);
+                        snapPoints.forEach((point, i) => {
+                            const dist = Math.abs(point - track.scrollLeft);
                             if (dist < minDist) { minDist = dist; closest = i; }
                         });
                         current = closest;
-                        dots.forEach((d, i) => d.classList.toggle('active', i === current));
+                        updateDots();
                     }, 80);
+                });
+
+                window.addEventListener('resize', () => {
+                    const oldProgress = snapPoints.length > 1 ? current / (snapPoints.length - 1) : 0;
+                    buildSnapPoints();
+                    current = Math.round(oldProgress * (snapPoints.length - 1));
+                    track.scrollTo({ left: snapPoints[current] || 0 });
+                    updateDots();
                 });
             }
 
