@@ -1,4 +1,4 @@
-# Felix Staacke - Benutzerhandbuch zur persoenlichen GitHub Page
+# Benutzerhandbuch
 
 Dieses Repository enthaelt die persoenliche GitHub Page von **Felix Staacke**. Die Website ist unter dem Namen `datenflix007.github.io` organisiert und gehoert zu Felix Staacke. Sie dient als persoenliche Webpraesenz, Projektarchiv, Tool-Sammlung, Guide-Bibliothek und Dokumentation verschiedener Studien-, Lehr- und Bastelprojekte.
 
