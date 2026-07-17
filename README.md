@@ -256,30 +256,246 @@ Screenshot:
 
 ![DatastructureLab](media/readme/modules/datastructurelab.png)
 
+Weitere Live-Screenshots:
+
+![DatastructureLab Desktop-Ansicht](media/readme/modules/datastructurelab-desktop.png)
+
+![DatastructureLab kompaktere Ansicht](media/readme/modules/datastructurelab-compact.png)
+
+![DatastructureLab Vollseitenansicht](media/readme/modules/datastructurelab-fullpage.png)
+
 ### Zweck
 
-DatastructureLab ist ein interaktives Labor fuer Datenstrukturen. Es macht abstrakte Strukturen sichtbar und zeigt, wie Operationen Speicherbilder, Knoten, Tabellen oder Graphen veraendern.
+DatastructureLab ist ein interaktives Labor fuer Datenstrukturen und Algorithmen. Es ist nicht nur eine Demo-Seite, sondern ein Arbeitswerkzeug: Man waehlt eine Struktur aus, gibt Daten ein, fuehrt Operationen aus und beobachtet, wie sich Darstellung, Speicherbild, Hilfsstrukturen und Ergebnis veraendern.
+
+Das Lab hilft besonders dann, wenn eine Datenstruktur zwar formal verstanden wurde, aber noch nicht klar ist, was eine Operation konkret veraendert. Statt nur Definitionen wie "Heap-Eigenschaft", "Hash-Kollision" oder "Pfadkompression" zu lesen, kann man Beispiele erzeugen und Schritt fuer Schritt untersuchen.
+
+### Grundidee der Arbeit mit dem Lab
+
+Man sollte mit dem DatastructureLab wie mit einem Experimentierkasten arbeiten:
+
+1. Eine Datenstruktur oder einen Algorithmus auswaehlen.
+2. Einen kleinen, ueberschaubaren Datensatz eingeben.
+3. Eine einzelne Operation ausfuehren.
+4. Erst beobachten, dann erklaeren.
+5. Das Beispiel leicht veraendern.
+6. Wieder beobachten.
+7. Danach erst groessere Beispiele testen.
+
+Gute Beispiele sind am Anfang klein. Fuer einen Heap reichen 5 bis 8 Zahlen. Fuer Hashing reichen 6 bis 10 Schluessel. Fuer Graphalgorithmen reichen 4 bis 6 Knoten. Zu grosse Beispiele sehen beeindruckend aus, verdecken aber oft die eigentliche Idee.
 
 ### Bedienung
 
-1. Labor oeffnen.
-2. Datenstruktur oder Algorithmus waehlen.
-3. Werte eingeben oder Beispielstruktur laden.
-4. Operation ausfuehren, zum Beispiel Einfuegen, Loeschen, Suchen, Heapify, Union, Find oder Graphalgorithmus.
-5. Visualisierung beobachten.
-6. Zusatzinformationen, Speicherbild oder Operationslog lesen.
+1. **Labor oeffnen:** `src/modules/AlgoDatCourse/DatastructureLab.html` im Browser starten.
+2. **Struktur auswaehlen:** Im Auswahlbereich die gewuenschte Datenstruktur oder den Algorithmus waehlen.
+3. **Daten eingeben:** Werte, Knoten, Kanten oder Schluessel eintragen. Wenn Beispielbuttons vorhanden sind, zuerst ein Beispiel laden.
+4. **Operation waehlen:** Eine Operation wie Insert, Delete, Search, Heapify, Union, Find, Dijkstra, Prim oder Kruskal ausfuehren.
+5. **Visualisierung lesen:** Nicht sofort weiterklicken, sondern die Veraenderung der Struktur betrachten.
+6. **Speicherbild betrachten:** Wenn ein Array-, Tabellen- oder Memory-Viewer angezeigt wird, dort pruefen, wie die abstrakte Struktur intern abgelegt ist.
+7. **Hilfsstrukturen beachten:** Bei Graphalgorithmen zum Beispiel Priority Queue, Union-Find oder Distanzwerte beobachten.
+8. **Operationslog lesen:** Falls ein Log oder Statusbereich angezeigt wird, diesen mit der Visualisierung vergleichen.
+9. **Hypothese testen:** Vor der naechsten Operation ueberlegen, was passieren muesste, und erst danach klicken.
+10. **Beispiel dokumentieren:** Fuer Lernzwecke die Eingabe, Operation und Beobachtung notieren.
+
+### Empfohlener Lernworkflow
+
+Ein sinnvoller Ablauf fuer eine Lerneinheit sieht so aus:
+
+1. **Theorie im AlgoDat-Kurs lesen.**
+   Beispiel: erst den Abschnitt zu Heaps, Hashing oder Graphalgorithmen lesen.
+2. **Begriff in InfoPedia nachschlagen.**
+   Dort Definition, Operationen und Beweisidee wiederholen.
+3. **Im DatastructureLab ein kleines Beispiel bauen.**
+   Nicht direkt mit komplizierten Daten beginnen.
+4. **Operationen einzeln ausfuehren.**
+   Immer nur eine Operation betrachten.
+5. **Ergebnis mit der Theorie vergleichen.**
+   Stimmt die Heap-Eigenschaft? Wurde der richtige Slot beim Hashing gefunden? Ist die MST-Kante plausibel?
+6. **Grenzfall testen.**
+   Zum Beispiel doppelte Werte, leere Struktur, Kollisionen, unverbundene Graphen oder gleiche Kantengewichte.
+7. **In eigenen Worten erklaeren.**
+   Wenn man das Ergebnis ohne Hilfe erklaeren kann, ist der Algorithmus meist wirklich verstanden.
 
 ### Typische Workflows
 
-- Heap erstellen und Extract-/Insert-Operationen nachvollziehen.
-- Hash-Tabelle mit Kollisionen untersuchen.
-- Union-Find mit Pfadkompression beobachten.
-- Graphalgorithmus ausfuehren und Hilfsstrukturen betrachten.
-- Baumoperationen Schritt fuer Schritt nachvollziehen.
+#### 1. Heap verstehen
+
+Ziel: Verstehen, warum ein Heap als Array gespeichert werden kann und wie Insert oder Extract das Array veraendern.
+
+Vorgehen:
+
+1. Heap-Struktur auswaehlen.
+2. Werte wie `7, 3, 10, 1, 5, 8` eingeben.
+3. Build-Heap oder Insert-Schritte ausfuehren.
+4. Im Baum schauen, welcher Wert Eltern- oder Kindknoten ist.
+5. Im Speicherbild pruefen, an welcher Array-Position derselbe Wert steht.
+6. Extract-Min oder Extract-Max ausfuehren.
+7. Beobachten, welcher Wert an die Wurzel wandert und welche Tauschoperationen passieren.
+
+Worauf achten:
+
+- Ein Heap ist kein sortiertes Array.
+- Nur die Heap-Eigenschaft ist garantiert.
+- Die Wurzel ist besonders wichtig, weil dort Minimum oder Maximum liegt.
+- Die Array-Indizes erklaeren die Eltern-Kind-Beziehungen.
+
+#### 2. Hashing und Kollisionen untersuchen
+
+Ziel: Verstehen, warum Hashfunktionen Kollisionen erzeugen koennen und wie die Tabelle damit umgeht.
+
+Vorgehen:
+
+1. Hash-Tabelle auswaehlen.
+2. Tabellengroesse klein halten, zum Beispiel 7 oder 11.
+3. Mehrere Schluessel einfuegen.
+4. Gezielt Werte waehlen, die auf denselben Slot fallen.
+5. Search fuer vorhandene und nicht vorhandene Schluessel testen.
+6. Delete ausfuehren, wenn die Struktur es anbietet.
+7. Beobachten, ob Verkettung, offene Adressierung oder Markierungen verwendet werden.
+
+Worauf achten:
+
+- Eine gute Hashfunktion verteilt Schluessel moeglichst gleichmaessig.
+- Kollisionen sind normal, kein Fehler.
+- Bei offener Adressierung ist die Suchfolge wichtig.
+- Bei Delete darf die spaetere Suche nicht kaputtgehen.
+
+#### 3. Union-Find beobachten
+
+Ziel: Verstehen, wie Mengen zusammengelegt werden und warum Pfadkompression spaeter schneller macht.
+
+Vorgehen:
+
+1. Union-Find bzw. Disjoint Set auswaehlen.
+2. Einzelne Elemente anlegen.
+3. Mehrere Union-Operationen ausfuehren, zum Beispiel `union(1,2)`, `union(2,3)`, `union(4,5)`.
+4. Find auf verschiedenen Elementen ausfuehren.
+5. Vor und nach Find pruefen, ob sich Elternzeiger veraendern.
+6. Wenn Rank oder Size angezeigt wird, diese Werte beobachten.
+
+Worauf achten:
+
+- Union-Find speichert Mengen nicht als Listen, sondern als Wald von Elternzeigern.
+- `find(x)` liefert den Repraesentanten der Menge.
+- Pfadkompression veraendert die Struktur, obwohl nur gesucht wird.
+- Union by Rank oder Size verhindert unnoetig tiefe Baeume.
+
+#### 4. Dijkstra nachvollziehen
+
+Ziel: Verstehen, wie kuerzeste Wege mit nichtnegativen Kantengewichten gefunden werden.
+
+Vorgehen:
+
+1. Graphbereich oeffnen.
+2. Kleinen gewichteten Graphen mit 4 bis 6 Knoten anlegen.
+3. Startknoten waehlen.
+4. Dijkstra ausfuehren.
+5. Distanzwerte beobachten.
+6. Priority Queue oder Heap als Hilfsstruktur beachten, wenn sie angezeigt wird.
+7. Pruefen, welcher Knoten als naechstes fest gewaehlt wird.
+8. Relaxationen nachvollziehen.
+
+Worauf achten:
+
+- Dijkstra funktioniert nur korrekt mit nichtnegativen Kantengewichten.
+- Ein Knoten wird fest, wenn seine aktuell kleinste Distanz sicher ist.
+- Relaxation bedeutet: Ein gefundener Weg zu einem Nachbarn wird verbessert.
+- Die Priority Queue bestimmt, welcher Knoten als naechstes verarbeitet wird.
+
+#### 5. Prim und Kruskal vergleichen
+
+Ziel: Verstehen, dass beide Algorithmen minimale Spannbaeume finden, aber unterschiedlich arbeiten.
+
+Vorgehen Prim:
+
+1. Gewichteten ungerichteten Graphen anlegen.
+2. Startknoten waehlen.
+3. Prim ausfuehren.
+4. Beobachten, wie der Baum von einem Startpunkt aus waechst.
+5. Priority Queue oder Kandidatenkanten betrachten.
+
+Vorgehen Kruskal:
+
+1. Denselben Graphen verwenden.
+2. Kruskal ausfuehren.
+3. Beobachten, wie Kanten nach Gewicht betrachtet werden.
+4. Union-Find-Hilfsstruktur beachten.
+5. Pruefen, welche Kanten wegen Zyklusbildung abgelehnt werden.
+
+Worauf achten:
+
+- Prim waechst von einem Startknoten aus.
+- Kruskal sortiert Kanten global nach Gewicht.
+- Kruskal braucht Union-Find, um Zyklen effizient zu erkennen.
+- Beide sollen am Ende einen minimalen Spannbaum liefern, aber nicht zwingend dieselbe Kantenreihenfolge.
+
+#### 6. Baumoperationen Schritt fuer Schritt nachvollziehen
+
+Ziel: Verstehen, wie Suchbaeume, balancierte Baeume oder Traversierungen arbeiten.
+
+Vorgehen:
+
+1. Baumstruktur auswaehlen.
+2. Werte in einer bewusst unguenstigen Reihenfolge einfuegen, zum Beispiel sortiert oder fast sortiert.
+3. Insert ausfuehren und Baumform beobachten.
+4. Search fuer vorhandene und fehlende Werte testen.
+5. Delete ausfuehren, wenn verfuegbar.
+6. Bei balancierten Baeumen Rotationen oder Farb-/Balanceinformationen beachten.
+
+Worauf achten:
+
+- Suchbaeume leben von ihrer Ordnungseigenschaft.
+- Unbalancierte Baeume koennen degenerieren.
+- Rotationen veraendern die Form, aber nicht die Inorder-Reihenfolge.
+- Traversierungen zeigen, welche Reihenfolge der Baum implizit speichert.
+
+### Aufgabenideen fuer das Arbeiten mit dem Lab
+
+Diese Aufgaben eignen sich fuer Selbststudium oder Unterricht:
+
+- Baue einen Heap aus 8 Zahlen und notiere nach jedem Insert das Array.
+- Erzeuge in einer Hash-Tabelle mindestens drei Kollisionen und erklaere, wie sie aufgeloest werden.
+- Fuehre `find` in Union-Find vor und nach Pfadkompression aus und vergleiche die Elternzeiger.
+- Erstelle einen Graphen, bei dem Dijkstra mehrere Distanzwerte verbessert, bevor ein Knoten fest wird.
+- Vergleiche Prim und Kruskal auf demselben Graphen.
+- Suche ein Beispiel, bei dem zwei unterschiedliche minimale Spannbaeume moeglich sind.
+- Erzeuge einen Suchbaum mit sortierter Eingabe und erklaere, warum das unguenstig ist.
+- Erstelle einen Screenshot vor und nach einer Operation und beschrifte die Veraenderung.
+
+### Typische Fehler beim Arbeiten
+
+| Problem | Ursache | Loesung |
+| --- | --- | --- |
+| Die Visualisierung wirkt chaotisch | Beispiel ist zu gross | Mit weniger Werten starten |
+| Erwartetes Ergebnis stimmt nicht | Operation oder Struktur verwechselt | Erst pruefen, ob Min-Heap, Max-Heap, BST, Hashing usw. gewaehlt ist |
+| Graphalgorithmus liefert kein sinnvolles Ergebnis | Graph ist gerichtet/ungerichtet oder gewichtet/ungewichtet falsch modelliert | Kanten und Gewichte kontrollieren |
+| Dijkstra verhaelt sich unerwartet | Negative Kantengewichte oder falscher Startknoten | Nur nichtnegative Gewichte verwenden und Startknoten pruefen |
+| Hash-Suche bricht scheinbar zu frueh ab | Delete-/Open-Addressing-Regel nicht beachtet | Markierungen und Suchfolge anschauen |
+| Union-Find sieht nach `find` anders aus | Pfadkompression veraendert Elternzeiger | Das ist Absicht und Teil der Optimierung |
+
+### Wie man Ergebnisse dokumentiert
+
+Fuer Lern- oder Abgabezwecke sollte man nicht nur schreiben "Ich habe Dijkstra ausgefuehrt". Besser ist:
+
+1. Eingabedaten nennen.
+2. Gewaehlte Struktur nennen.
+3. Operation nennen.
+4. Beobachtung beschreiben.
+5. Ergebnis mit Theorie verbinden.
+
+Beispiel:
+
+```text
+Struktur: Union-Find
+Eingabe: Elemente 1 bis 6
+Operationen: union(1,2), union(2,3), find(3)
+Beobachtung: Nach find(3) zeigt 3 direkter auf den Repraesentanten.
+Erklaerung: Das ist Pfadkompression. Sie beschleunigt spaetere find-Aufrufe.
+```
 
 ### Hinweise
 
-Das Modul ist besonders nuetzlich, wenn man eine Datenstruktur nicht nur als Definition, sondern als veraenderbares Objekt verstehen will.
+Das Modul ist besonders nuetzlich, wenn man eine Datenstruktur nicht nur als Definition, sondern als veraenderbares Objekt verstehen will. Der wichtigste Tipp lautet: nicht zu schnell klicken. Nach jeder Operation sollte man kurz erklaeren koennen, warum die neue Darstellung korrekt ist. Wenn das nicht gelingt, ist genau diese Stelle der richtige Lernpunkt.
 
 ---
 
@@ -386,6 +602,40 @@ GVIS ist ein statisches GIS-Werkzeug fuer OSM-, GeoJSON- und CSV-Daten. Es kann 
 - OpenStreetMap-Daten fuer Unterricht oder Projekte auswerten.
 - Hinweise fuer GeoGuessr-aehnliche Analysen sammeln.
 - POIs oder Flaechen vergleichen.
+
+---
+
+## Regie Wall
+
+Pfad:
+
+```text
+src/modules/regie/index(1).html
+```
+
+### Zweck
+
+Die Regie Wall ist eine browserbasierte Kontrollwand fuer mehrere Quellen. Sie kann Websites, Login-Seiten, YouTube-Videos, HLS-Streams und lokale IPv4-/LAN-Dienste in Monitor-Kacheln anordnen. Das Modul ist besonders fuer Vorfuehrungen, Regiesituationen, Stream-Setups oder lokale Kontrollanzeigen gedacht.
+
+### Bedienung
+
+1. Regie Wall oeffnen.
+2. Anzahl der Monitore waehlen.
+3. Preset auswaehlen, zum Beispiel Grid oder Program + Preview.
+4. Im Menue Quellen eintragen oder Sender/Streams auswaehlen.
+5. Kacheln verschieben, skalieren und bei Bedarf in den Vollbildmodus wechseln.
+6. Audio mit Mute, Solo und Lautstaerke-Reglern kontrollieren.
+
+### Hinweise
+
+Lokale HTTP-Quellen wie `http://192.168.x.x` funktionieren im Browser nur dann sauber im Frame, wenn die Regie Wall nicht aus einem HTTPS-Kontext geladen wird. Fuer echte LAN-Quellen ist deshalb lokales Oeffnen per `file://` oder ein lokaler HTTP-Server sinnvoll.
+
+### Typische Nutzung
+
+- Mehrere Streams oder Webseiten parallel ueberwachen.
+- Program- und Preview-Ansichten fuer Vorfuehrungen aufbauen.
+- Lokale Geraete, Kameras oder Webinterfaces in einer Wand sammeln.
+- Soundboard und Audio-Steuerung fuer einfache Regiesituationen nutzen.
 
 ---
 
@@ -761,6 +1011,7 @@ Der Installer Guide erklaert, wie eigene Java- oder Python-Projekte installierba
 
 ### Weitere Guides
 
+- `src/guides/programm-exe-erstellen.html`: Programm.exe-Dateien aus Python-, Java-, C#-, Node.js-, Go- und Rust-Projekten bauen.
 - `src/guides/pake.html`: Webseiten als Desktop-Apps verpacken.
 - `src/guides/redis-caching.html`: Redis-Caching verstehen und einsetzen.
 - `src/guides/just.html`: Projektbefehle mit `just` automatisieren.
