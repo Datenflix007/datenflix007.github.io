@@ -628,7 +628,19 @@ Die Regie Wall ist eine browserbasierte Kontrollwand fuer mehrere Quellen. Sie k
 
 ### Hinweise
 
-Lokale HTTP-Quellen wie `http://192.168.x.x` funktionieren im Browser nur dann sauber im Frame, wenn die Regie Wall nicht aus einem HTTPS-Kontext geladen wird. Fuer echte LAN-Quellen ist deshalb lokales Oeffnen per `file://` oder ein lokaler HTTP-Server sinnvoll.
+Lokale HTTP-Quellen wie `http://192.168.x.x` funktionieren im Browser nur dann sauber im Frame, wenn die Regie Wall nicht aus einem HTTPS-Kontext geladen wird. Fuer echte LAN-Quellen gibt es deshalb den Local-Mode:
+
+```text
+src\modules\regie\start-local-regie-wall.bat
+```
+
+Das Script startet einen lokalen HTTP-Server im Repository-Root und oeffnet:
+
+```text
+http://127.0.0.1:8765/src/modules/regie/index(1).html
+```
+
+Wenn die Regie Wall bereits ueber GitHub Pages offen ist, kann der Button `Lokale Regie mit Setup oeffnen` das aktuelle Setup an diese lokale URL uebergeben. Danach koennen lokale IPv4-/LAN-Webseiten als normale Frames geladen werden, sofern die Zielseite selbst Frames erlaubt.
 
 ### Typische Nutzung
 

@@ -121,11 +121,11 @@
 
       <details class="section">
         <summary>Lokale Dienste</summary>
-        <p>Fuer echte LAN-IPv4-HTTP-Frames muss die Regie Wall lokal per <code>file://</code> oder <code>http://localhost</code> laufen. Auf GitHub Pages blockiert der Browser lokale <code>http://192.168.x.x</code>-Frames als Mixed Content.</p>
+        <p>Turnaround fuer lokale IPv4-Webseiten: Starte die Wall lokal per HTTP. Dann werden <code>http://127.x.x.x</code>, <code>http://192.168.x.x</code>, <code>http://10.x.x.x</code> und <code>http://172.16-31.x.x</code> als normale Frames geladen.</p>
         <div class="local-tools">
           <div id="localModeState" class="local-state">Lokaler Modus wird geprueft...</div>
-          <button id="copyLocalServerBtn" class="mini">Lokalen Startbefehl kopieren</button>
-          <button id="openLocalWallBtn" class="mini">Regie Wall lokal oeffnen</button>
+          <button id="copyLocalServerBtn" class="mini">Startscript kopieren</button>
+          <button id="openLocalWallBtn" class="mini">Lokale Regie mit Setup oeffnen</button>
         </div>
       </details>
     </div>
@@ -139,11 +139,11 @@
         <p>Wähle als Typ <code>Login-Website</code>. Dann wird der Frame ohne Sandbox geladen. Formulare, Cookies und Login-Popups haben dadurch die besten Chancen.</p>
         <p>Grenze: Wenn die Zielseite selbst <code>X-Frame-Options</code>, <code>frame-ancestors</code>, blockierte Third-Party-Cookies oder eine Weiterleitung aus dem Frame nutzt, kann die Regie Wall das nicht erzwingen. Nutze dann <code>Login</code>/<code>Öffnen</code>, melde dich im normalen Tab an und lade danach den Frame neu.</p>
         <h3>IPv4-/LAN-Dienste</h3>
-        <p>Lokale HTTP-Geräte wie <code>http://192.168.0.50:8080</code> können nur dann im Frame erscheinen, wenn die Regie Wall nicht selbst aus einem HTTPS-Kontext geladen wurde. Browser blockieren sonst Mixed Content; das kann JavaScript nicht abschalten.</p>
+        <p>Lokale HTTP-Geräte wie <code>http://192.168.0.50:8080</code> koennen im Frame erscheinen, wenn die Regie Wall selbst lokal per HTTP laeuft. Aus GitHub Pages heraus blockiert der Browser HTTP-Frames als Mixed Content; der Local-Mode ist der funktionierende Turnaround.</p>
         <ul>
-          <li>Empfohlen: Diese HTML-Datei direkt lokal öffnen (<code>file://</code>) oder im LAN per HTTP hosten.</li>
-          <li>Beispiel im Ordner der Datei: <code>python -m http.server 8000</code>, danach <code>http://localhost:8000/index(1).html</code> öffnen.</li>
-          <li>Alternativ: dem lokalen Gerät HTTPS geben oder einen Reverse Proxy verwenden.</li>
+          <li>Empfohlen: <code>src\modules\regie\start-local-regie-wall.bat</code> starten. Das Script hostet das Repository lokal und oeffnet die Wall auf Port 8765.</li>
+          <li>Wenn du von GitHub Pages kommst: erst das Script starten, dann <code>Lokale Regie mit Setup oeffnen</code> klicken. Die aktuelle Quellenliste wird per URL uebernommen.</li>
+          <li>Grenze: Wenn die Zielseite selbst <code>X-Frame-Options</code> oder <code>frame-ancestors</code> setzt, muss sie im eigenen Tab laufen; das kann keine Wall ueberschreiben.</li>
         </ul>
         <h3>Tonsteuerung</h3>
         <p>Mute/Solo/Volume funktionieren bei YouTube und HLS. Bei fremden Website-iFrames ist Tonsteuerung aus Sicherheitsgründen nicht zuverlässig möglich.</p>
@@ -159,6 +159,9 @@
     const DEFAULT_COUNT = 4;
     const DEFAULT_PRESET = "grid";
     const DEFAULT_VERSION = "2026-07-regie-streams";
+    const LOCAL_SERVER_PORT = 8765;
+    const LOCAL_WALL_PATH = "/src/modules/regie/index(1).html";
+    const LOCAL_START_SCRIPT = "src\\modules\\regie\\start-local-regie-wall.bat";
     const NAUMBURG_WATCH_URL = "https://www.youtube.com/watch?v=IixXpcGrTzo";
     const NAUMBURG_SEARCH_URL = "https://www.youtube.com/results?search_query=livecam+naumburg";
     const PINNED_SOURCE = { title:"Naumburg Marktplatz Live", type:"youtube", url:NAUMBURG_WATCH_URL, fallbackUrl:NAUMBURG_WATCH_URL, volume:70, muted:false, pinned:true };
@@ -255,7 +258,15 @@
     function profileDefault(profile=activeProfile){const preset=PROFILE_PRESETS[profile]||PROFILE_PRESETS.standard;return {count:preset.count||DEFAULT_COUNT,sources:clonePreset(preset.sources),soloIndex:-1,muteAllSnapshot:null,positions:null};}
     function profileLayout(profile=activeProfile){const preset=PROFILE_PRESETS[profile]||PROFILE_PRESETS.standard;return localStorage.getItem(scopedKey("preset"))||preset.layout||DEFAULT_PRESET;}
     function loadState(){const base=profileDefault();return {count:Number(localStorage.getItem(scopedKey("count")))||base.count,sources:JSON.parse(localStorage.getItem(scopedKey("sources"))||"null")||base.sources,soloIndex:Number(localStorage.getItem(scopedKey("soloIndex"))??-1),muteAllSnapshot:JSON.parse(localStorage.getItem(scopedKey("muteAllSnapshot"))||"null"),positions:JSON.parse(localStorage.getItem(scopedKey("positions"))||"null")};}
-    let state = loadState();
+    function encodePayload(value){try{const json=JSON.stringify(value);const bytes=new TextEncoder().encode(json);let binary="";bytes.forEach(byte=>binary+=String.fromCharCode(byte));return btoa(binary);}catch(e){return"";}}
+    function decodePayload(value){try{const binary=atob(value);const bytes=Uint8Array.from(binary,c=>c.charCodeAt(0));return JSON.parse(new TextDecoder().decode(bytes));}catch(e){return null;}}
+    function importStateFromUrl(){const raw=new URLSearchParams(location.search).get("regieState");if(!raw)return null;const payload=decodePayload(raw);if(!payload||typeof payload!=="object")return null;if(payload.activeProfile&&PROFILE_PRESETS[payload.activeProfile])activeProfile=payload.activeProfile;if(payload.preset)localStorage.setItem(scopedKey("preset"),String(payload.preset));const imported=payload.state;if(!imported||!Array.isArray(imported.sources))return null;const count=Math.max(1,Math.min(8,Number(imported.count)||imported.sources.length||DEFAULT_COUNT));return{count,sources:imported.sources.slice(0,8),soloIndex:Number.isFinite(Number(imported.soloIndex))?Number(imported.soloIndex):-1,muteAllSnapshot:imported.muteAllSnapshot||null,positions:Array.isArray(imported.positions)?imported.positions:null};}
+    function persistImportedState(imported){if(!imported)return false;localStorage.setItem(STORAGE_PREFIX+"activeProfile",activeProfile);localStorage.setItem(scopedKey("count"),imported.count);localStorage.setItem(scopedKey("sources"),JSON.stringify(imported.sources));localStorage.setItem(scopedKey("soloIndex"),String(imported.soloIndex));localStorage.setItem(scopedKey("muteAllSnapshot"),JSON.stringify(imported.muteAllSnapshot));if(imported.positions)localStorage.setItem(scopedKey("positions"),JSON.stringify(imported.positions));else localStorage.removeItem(scopedKey("positions"));return true;}
+    function cleanImportUrl(){if(!new URLSearchParams(location.search).has("regieState"))return;try{const url=new URL(location.href);url.searchParams.delete("regieState");history.replaceState(null,"",url.pathname+(url.search||"")+url.hash);}catch(e){}}
+    const importedState = importStateFromUrl();
+    let state = importedState || loadState();
+    const importedLocalState = persistImportedState(importedState);
+    if(importedLocalState)cleanImportUrl();
     function hlsReplacementFor(source,index){const hay=`${source?.title||""} ${source?.url||""}`;if(/IixXpcGrTzo|Naumburg|Marktplatz/i.test(hay))return{...source,title:source?.title||"Naumburg Marktplatz Live",type:"youtube",url:NAUMBURG_WATCH_URL,fallbackUrl:source?.fallbackUrl||NAUMBURG_WATCH_URL};if(/LuKwFajn37U|DW News/i.test(hay))return clonePreset(HLS_SOURCES.dw);if(/HvZt-nh9sGg|FRANCE 24/i.test(hay))return clonePreset(index===0?HLS_SOURCES.welt:HLS_SOURCES.tagesschau);if(/pykpO5kQJ98|Euronews/i.test(hay))return clonePreset(index===0?HLS_SOURCES.welt:HLS_SOURCES.phoenix);return source;}
     function migrateBlockedSources(){state.sources=state.sources.map((s,i)=>hlsReplacementFor(s,i));localStorage.setItem(scopedKey("version"),DEFAULT_VERSION);}
     migrateBlockedSources();
@@ -268,7 +279,14 @@
     function normalizeUrl(value){const u=(value||"").trim();if(!u)return"";if(/^(https?:|file:|\/|\.\/|\.\.\/)/i.test(u))return u;if(/^(localhost|127\.|10\.|192\.168\.|172\.(1[6-9]|2\d|3[0-1])\.)/i.test(u))return"http://"+u;if(/^(\d{1,3}\.){3}\d{1,3}(:\d+)?(\/|$)/.test(u))return"http://"+u;return"https://"+u;}
     function parseUrl(value){try{return new URL(normalizeUrl(value));}catch(e){return null;}}
     function isPrivateIPv4Host(host){if(!host)return false;if(host==="localhost")return true;if(/^127\./.test(host))return true;if(/^10\./.test(host))return true;if(/^192\.168\./.test(host))return true;if(/^172\.(1[6-9]|2\d|3[0-1])\./.test(host))return true;return false;}
-    function isMixedContentBlocked(urlValue){const u=parseUrl(urlValue);if(!u)return false;return location.protocol==="https:"&&u.protocol==="http:";}function isLocalHttpUrl(urlValue){const u=parseUrl(urlValue);return Boolean(u&&u.protocol==="http:"&&isPrivateIPv4Host(u.hostname));}function isLocalMode(){return location.protocol==="file:"||location.hostname==="localhost"||location.hostname==="127.0.0.1"||location.protocol==="http:";}function localRunCommand(){return`cd /d pfad\\zur\\regie && python -m http.server 8000`;}function localWallUrl(){return"http://localhost:8000/index(1).html";}
+    function isMixedContentBlocked(urlValue){const u=parseUrl(urlValue);if(!u)return false;return location.protocol==="https:"&&u.protocol==="http:";}
+    function isLocalHttpUrl(urlValue){const u=parseUrl(urlValue);return Boolean(u&&u.protocol==="http:"&&isPrivateIPv4Host(u.hostname));}
+    function isLocalMode(){return location.protocol==="file:"||location.hostname==="localhost"||location.hostname==="127.0.0.1"||location.protocol==="http:";}
+    function localRunCommand(){return LOCAL_START_SCRIPT;}
+    function manualLocalRunCommand(){return`python -m http.server ${LOCAL_SERVER_PORT} --bind 127.0.0.1`;}
+    function localStatePayload(){return{activeProfile,preset:presetSelect?.value||profileLayout(),state:clonePreset(state)};}
+    function localPlainWallUrl(){return`http://127.0.0.1:${LOCAL_SERVER_PORT}${LOCAL_WALL_PATH}`;}
+    function localWallUrl(includeState=true){const url=new URL(localPlainWallUrl());const payload=includeState?encodePayload(localStatePayload()):"";if(payload)url.searchParams.set("regieState",payload);return url.toString();}
     function detectType(source){const declared=source.type||"auto";if(declared!=="auto")return declared;const u=(source.url||"").trim().toLowerCase();if(!u)return"iframe";if(u.includes("youtube.com")||u.includes("youtu.be")||/^[a-zA-Z0-9_-]{11}$/.test(source.url.trim()))return"youtube";if(u.includes(".m3u8")||u.includes("m3u8"))return"hls";if((source.title||"").toLowerCase().includes("edpweb")||u.includes("edpweb"))return"edpweb";const parsed=parseUrl(source.url);if(parsed&&isPrivateIPv4Host(parsed.hostname))return"local";return"iframe";}
     function youtubeId(input){const s=(input||"").trim();if(/^[a-zA-Z0-9_-]{11}$/.test(s))return s;try{const u=new URL(normalizeUrl(s));if(u.hostname.includes("youtu.be"))return u.pathname.slice(1).split("/")[0];if(u.searchParams.get("v"))return u.searchParams.get("v");const m=u.pathname.match(/\/embed\/([a-zA-Z0-9_-]{11})/);if(m)return m[1];}catch(e){}return s;}
     function setQuickStatus(text){if(quickStatusEl)quickStatusEl.textContent=text;}
@@ -290,8 +308,71 @@
     document.getElementById("menuBtn").onclick=openMenu; document.getElementById("closeMenu").onclick=closeMenu; scrim.onclick=closeMenu; document.getElementById("helpBtn").onclick=()=>helpModal.classList.add("open"); document.getElementById("closeHelp").onclick=()=>helpModal.classList.remove("open"); helpModal.addEventListener("click",e=>{if(e.target===helpModal)helpModal.classList.remove("open")});
     function createPane(i){const s=state.sources[i]||{title:`SOURCE ${i+1}`,type:"auto",url:"",volume:70,muted:true};const actualType=detectType(s);const pane=document.createElement("article");pane.className="pane";pane.dataset.index=i;pane.innerHTML=`<div class="head"><div class="num">${i+1}</div><div class="monitor-title">${esc(s.title||`SOURCE ${i+1}`)} · ${actualType.toUpperCase()}</div><button class="audio-chip solo ${state.soloIndex===i?"on":""}" title="Nur diesen Stream hören">SOLO</button><button class="audio-chip mute ${isEffectivelyMuted(i)?"muted":""}" title="Stream stumm schalten">MUTE</button><button class="icon login" title="Login im eigenen Tab">🔐</button><button class="icon reload" title="Neu laden">↻</button><button class="icon open" title="Im neuen Tab öffnen">↗</button></div><div class="frame"></div><div class="resize"></div>`;renderInsideFrame(pane.querySelector(".frame"),s,i);pane.querySelector(".reload").onclick=e=>{e.stopPropagation();renderInsideFrame(pane.querySelector(".frame"),state.sources[i],i);};pane.querySelector(".open").onclick=e=>{e.stopPropagation();openSourceUrl(i,false);};pane.querySelector(".login").onclick=e=>{e.stopPropagation();openSourceUrl(i,true);};pane.querySelector(".mute").onclick=e=>{e.stopPropagation();toggleMute(i);};pane.querySelector(".solo").onclick=e=>{e.stopPropagation();toggleSolo(i);};pane.addEventListener("pointerdown",()=>setActive(pane));enableDrag(pane);enableResize(pane);return pane;}
     function openSourceUrl(index,loginMode=false){const s=state.sources[index];const u=normalizeUrl(s?.url);if(!u)return;const name=loginMode?`login_${index}`:"_blank";window.open(u,name,"noopener");}
-    function renderInsideFrame(frame,s,index){frame.innerHTML="";ytPlayers.delete(index);videoPlayers.delete(index);const type=detectType(s);const u=normalizeUrl(s.url);if(!u){frame.innerHTML=`<div class="placeholder"><div><strong>NO SIGNAL</strong>Source im Menü setzen</div></div>`;return;}if((type==="local"||type==="iframe"||type==="login"||type==="edpweb")&&isMixedContentBlocked(u)){const parsed=parseUrl(u);const isLan=parsed&&isPrivateIPv4Host(parsed.hostname);frame.innerHTML=`<div class="note"><div><strong>Lokales HTTP durch HTTPS blockiert</strong>Der Browser blockiert <code>${esc(u)}</code> hier, weil die Regie Wall über HTTPS läuft. ${isLan?"Fuer lokale IPv4-/LAN-Dienste muss diese Regie Wall lokal laufen.":""}<br><br><strong>So klappt es wirklich:</strong><br>1. Im Ordner dieser Datei <code>python -m http.server 8000</code> starten.<br>2. Danach <code>${localWallUrl()}</code> oeffnen.<br>3. Dann kann dieser Monitor <code>${esc(u)}</code> direkt im Fenster laden.<div class="note-actions"><button onclick="window.open('${esc(u)}','_blank','noopener')">Gerät im Tab öffnen</button><button onclick="copyLocalCommand()">Startbefehl kopieren</button><button onclick="openLocalWall()">Lokale Regie oeffnen</button><button onclick="showLocalAdvice()">Hilfe</button></div></div></div>`;return;}if(type==="youtube"){renderYouTubeFrame(frame,s,index,u);return;}if(type==="hls"){const video=document.createElement("video");video.controls=true;video.autoplay=true;video.muted=isEffectivelyMuted(index);video.volume=getEffectiveVolume(index);video.playsInline=true;frame.appendChild(video);videoPlayers.set(index,video);const note=document.createElement("div");note.className="note";note.innerHTML="<div><strong>Lade HLS…</strong>Falls nichts kommt: .m3u8-URL, CORS und Rechte prüfen.</div>";frame.appendChild(note);if(video.canPlayType("application/vnd.apple.mpegurl")){video.src=u;video.addEventListener("loadedmetadata",()=>note.remove());video.play().catch(()=>{});}else if(window.Hls&&Hls.isSupported()){const hls=new Hls({lowLatencyMode:true});hls.loadSource(u);hls.attachMedia(video);hls.on(Hls.Events.MANIFEST_PARSED,()=>{note.remove();applyAudioToIndex(index);video.play().catch(()=>{});});hls.on(Hls.Events.ERROR,(event,data)=>{if(data.fatal)note.innerHTML="<div><strong>HLS lädt nicht.</strong>Prüfe Stream-URL, CORS oder ob die URL noch aktuell ist.</div>";});}else{note.innerHTML="<div><strong>HLS nicht unterstützt.</strong>Dieser Browser kann den Stream hier nicht abspielen.</div>";}return;}const iframe=document.createElement("iframe");iframe.src=u;iframe.referrerPolicy="strict-origin-when-cross-origin";iframe.allow="fullscreen; autoplay; clipboard-read; clipboard-write; encrypted-media; picture-in-picture; web-share";frame.appendChild(iframe);const note=document.createElement("div");note.className="note";note.style.display="none";note.innerHTML=`<div><strong>Login oder Embed blockiert?</strong>Falls die Seite im Frame nicht lädt: im normalen Tab anmelden bzw. Zertifikat/IP bestätigen, danach hier neu laden.<br><div class="note-actions"><button onclick="window.open('${esc(u)}','login_${index}','noopener')">Login im Tab</button><button onclick="window.open('${esc(u)}','_blank','noopener')">Öffnen</button></div></div>`;frame.appendChild(note);let loaded=false;iframe.addEventListener("load",()=>loaded=true);setTimeout(()=>{if(!loaded)note.style.display="grid";},3200);}
-    function showLocalAdvice(){helpModal.classList.add("open");}function copyLocalCommand(){const cmd=localRunCommand();if(navigator.clipboard)navigator.clipboard.writeText(cmd).catch(()=>{});alert("Befehl kopiert/anzeigen: "+cmd+"\nIm Ordner der HTML-Datei ausfuehren und dann "+localWallUrl()+" oeffnen.");}function openLocalWall(){window.open(localWallUrl(),"_blank","noopener");}function updateLocalModeUi(){const el=document.getElementById("localModeState");if(!el)return;el.innerHTML=isLocalMode()?"<strong>Lokaler Modus aktiv.</strong><br>Lokale IPv4-HTTP-Quellen koennen im Monitor geladen werden, sofern die Zielseite Frames erlaubt.":"<strong>GitHub-Pages-/HTTPS-Modus.</strong><br>Lokale IPv4-HTTP-Quellen werden im Frame blockiert. Starte die Regie Wall lokal und oeffne sie ueber localhost.";document.getElementById("copyLocalServerBtn")?.addEventListener("click",copyLocalCommand);document.getElementById("openLocalWallBtn")?.addEventListener("click",openLocalWall);}function initYouTubePlayer(index,holderId=null,videoId=null){if(!(window.YT&&window.YT.Player)){ensureYouTubeApi();return;}const holder=holderId?document.getElementById(holderId):document.querySelector(`[data-yt-index="${index}"]`);if(!holder)return;const id=videoId||holder.dataset.videoId;if(!id)return;const previous=ytPlayers.get(index);if(previous&&typeof previous.destroy==="function"){try{previous.destroy();}catch(e){}}const player=new YT.Player(holder.id,{videoId:id,width:"100%",height:"100%",playerVars:{autoplay:1,mute:1,controls:1,enablejsapi:1,hl:"de",playsinline:1,rel:0,origin:youtubeOrigin(),widget_referrer:youtubeWidgetReferrer()},events:{onReady:event=>{ytPlayers.set(index,event.target);applyAudioToIndex(index);try{event.target.mute();event.target.playVideo();}catch(e){}setQuickStatus(`YouTube API bereit: ${state.sources[index]?.title||id}`);},onError:event=>{setQuickStatus(`YouTube API Fehler ${event.data}. Extern oeffnen oder Embed neu versuchen.`);}}});}
+    function renderInsideFrame(frame,s,index){
+      frame.innerHTML="";
+      ytPlayers.delete(index);
+      videoPlayers.delete(index);
+      const type=detectType(s);
+      const u=normalizeUrl(s.url);
+      if(!u){
+        frame.innerHTML=`<div class="placeholder"><div><strong>NO SIGNAL</strong>Source im Menue setzen</div></div>`;
+        return;
+      }
+      if((type==="local"||type==="iframe"||type==="login"||type==="edpweb")&&isMixedContentBlocked(u)){
+        const parsed=parseUrl(u);
+        const isLan=parsed&&isPrivateIPv4Host(parsed.hostname);
+        frame.innerHTML=`<div class="note"><div><strong>Local Mode noetig</strong>Der Browser blockiert <code>${esc(u)}</code>, weil diese Wall gerade ueber HTTPS laeuft. ${isLan?"Fuer lokale IPv4-/LAN-Webseiten ist der lokale HTTP-Modus der funktionierende Turnaround.":"Diese HTTP-Seite braucht ebenfalls den lokalen HTTP-Modus."}<br><br><strong>So funktioniert es:</strong><br>1. Im Repository <code>${LOCAL_START_SCRIPT}</code> starten.<br>2. Danach <code>${localPlainWallUrl()}</code> oeffnen oder hier den Setup-Button nutzen.<br>3. Diese Kachel laedt <code>${esc(u)}</code> dann direkt im lokalen HTTP-Kontext.<div class="note-actions"><button onclick="openLocalWall()">Lokale Regie mit Setup</button><button onclick="copyLocalCommand()">Startscript kopieren</button><button onclick="window.open('${esc(u)}','_blank','noopener')">Ziel im Tab</button><button onclick="showLocalAdvice()">Hilfe</button></div></div></div>`;
+        return;
+      }
+      if(type==="youtube"){renderYouTubeFrame(frame,s,index,u);return;}
+      if(type==="hls"){
+        const video=document.createElement("video");
+        video.controls=true;
+        video.autoplay=true;
+        video.muted=isEffectivelyMuted(index);
+        video.volume=getEffectiveVolume(index);
+        video.playsInline=true;
+        frame.appendChild(video);
+        videoPlayers.set(index,video);
+        const note=document.createElement("div");
+        note.className="note";
+        note.innerHTML="<div><strong>Lade HLS...</strong>Falls nichts kommt: .m3u8-URL, CORS und Rechte pruefen.</div>";
+        frame.appendChild(note);
+        if(video.canPlayType("application/vnd.apple.mpegurl")){
+          video.src=u;
+          video.addEventListener("loadedmetadata",()=>note.remove());
+          video.play().catch(()=>{});
+        }else if(window.Hls&&Hls.isSupported()){
+          const hls=new Hls({lowLatencyMode:true});
+          hls.loadSource(u);
+          hls.attachMedia(video);
+          hls.on(Hls.Events.MANIFEST_PARSED,()=>{note.remove();applyAudioToIndex(index);video.play().catch(()=>{});});
+          hls.on(Hls.Events.ERROR,(event,data)=>{if(data.fatal)note.innerHTML="<div><strong>HLS laedt nicht.</strong>Pruefe Stream-URL, CORS oder ob die URL noch aktuell ist.</div>";});
+        }else{
+          note.innerHTML="<div><strong>HLS nicht unterstuetzt.</strong>Dieser Browser kann den Stream hier nicht abspielen.</div>";
+        }
+        return;
+      }
+      const iframe=document.createElement("iframe");
+      iframe.src=u;
+      iframe.referrerPolicy="strict-origin-when-cross-origin";
+      iframe.allow="fullscreen; autoplay; clipboard-read; clipboard-write; encrypted-media; picture-in-picture; web-share";
+      frame.appendChild(iframe);
+      const note=document.createElement("div");
+      note.className="note";
+      note.style.display="none";
+      note.innerHTML=`<div><strong>Login oder Embed blockiert?</strong>Falls die Seite im Frame nicht laedt: im normalen Tab anmelden bzw. Zertifikat/IP bestaetigen, danach hier neu laden.<br><div class="note-actions"><button onclick="window.open('${esc(u)}','login_${index}','noopener')">Login im Tab</button><button onclick="window.open('${esc(u)}','_blank','noopener')">Oeffnen</button></div></div>`;
+      frame.appendChild(note);
+      let loaded=false;
+      iframe.addEventListener("load",()=>loaded=true);
+      const shouldShowSlowLoadNote=!(type==="local"||isLocalHttpUrl(u));
+      setTimeout(()=>{if(!loaded&&shouldShowSlowLoadNote)note.style.display="grid";},3200);
+    }
+    function showLocalAdvice(){helpModal.classList.add("open");}
+    function copyLocalCommand(){const cmd=localRunCommand();const url=localWallUrl(true);const text=`${cmd}\n${url}`;if(navigator.clipboard)navigator.clipboard.writeText(text).catch(()=>{});alert("Startscript und lokale Setup-URL kopiert.\n\n1. Im Repository ausfuehren oder doppelklicken: "+cmd+"\n2. Danach die lokale Regie mit Setup oeffnen.\n\nLokale Basis-URL: "+localPlainWallUrl());}
+    function openLocalWall(){window.open(localWallUrl(true),"_blank","noopener");}
+    function updateLocalModeUi(){const el=document.getElementById("localModeState");if(!el)return;const imported=importedLocalState?"<br><strong>Setup uebernommen.</strong> Quellen, Layout und Positionen kamen aus der GitHub-Pages-Wall.":"";el.innerHTML=isLocalMode()?`<strong>Lokaler Modus aktiv.</strong><br>Lokale IPv4-HTTP-Quellen koennen im Monitor geladen werden, sofern die Zielseite Frames erlaubt.${imported}<br><code>${localPlainWallUrl()}</code>`:`<strong>GitHub-Pages-/HTTPS-Modus.</strong><br>Lokale IPv4-HTTP-Frames werden hier blockiert. Starte <code>${LOCAL_START_SCRIPT}</code> und klicke danach <strong>Lokale Regie mit Setup oeffnen</strong>.`;document.getElementById("copyLocalServerBtn")?.addEventListener("click",copyLocalCommand);document.getElementById("openLocalWallBtn")?.addEventListener("click",openLocalWall);}
+    function initYouTubePlayer(index,holderId=null,videoId=null){if(!(window.YT&&window.YT.Player)){ensureYouTubeApi();return;}const holder=holderId?document.getElementById(holderId):document.querySelector(`[data-yt-index="${index}"]`);if(!holder)return;const id=videoId||holder.dataset.videoId;if(!id)return;const previous=ytPlayers.get(index);if(previous&&typeof previous.destroy==="function"){try{previous.destroy();}catch(e){}}const player=new YT.Player(holder.id,{videoId:id,width:"100%",height:"100%",playerVars:{autoplay:1,mute:1,controls:1,enablejsapi:1,hl:"de",playsinline:1,rel:0,origin:youtubeOrigin(),widget_referrer:youtubeWidgetReferrer()},events:{onReady:event=>{ytPlayers.set(index,event.target);applyAudioToIndex(index);try{event.target.mute();event.target.playVideo();}catch(e){}setQuickStatus(`YouTube API bereit: ${state.sources[index]?.title||id}`);},onError:event=>{setQuickStatus(`YouTube API Fehler ${event.data}. Extern oeffnen oder Embed neu versuchen.`);}}});}
     function getEffectiveVolume(index){const s=state.sources[index];return Math.max(0,Math.min(1,Number((s?.volume??70))/100))} function isEffectivelyMuted(index){const s=state.sources[index];if(!s)return true;if(state.soloIndex>=0&&state.soloIndex!==index)return true;return Boolean(s.muted)}
     function applyAudioToIndex(index){const muted=isEffectivelyMuted(index),volumePercent=Math.round(getEffectiveVolume(index)*100);const video=videoPlayers.get(index);if(video){video.volume=volumePercent/100;video.muted=muted}const yt=ytPlayers.get(index);if(yt&&typeof yt.setVolume==="function"){try{yt.setVolume(volumePercent);muted?yt.mute():yt.unMute()}catch(e){}}const pane=wall.querySelector(`.pane[data-index="${index}"]`);if(pane){const muteBtn=pane.querySelector(".mute"),soloBtn=pane.querySelector(".solo");if(muteBtn)muteBtn.classList.toggle("muted",muted);if(soloBtn)soloBtn.classList.toggle("on",state.soloIndex===index)}}
     function updateMuteAllButton(){muteAllBtn.textContent=state.muteAllSnapshot?"Unmute":"Alle stumm";muteAllBtn.classList.toggle("blue",Boolean(state.muteAllSnapshot));muteAllBtn.classList.toggle("red",!state.muteAllSnapshot)}
