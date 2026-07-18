@@ -50,7 +50,7 @@
     .drawer-head{height:46px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;border-bottom:1px solid var(--line);background:var(--panel)}.drawer-head strong{font-size:13px;letter-spacing:.04em;text-transform:uppercase}
     .drawer-body{overflow:auto;padding:12px}.section{border:1px solid var(--line);border-radius:10px;background:var(--panel);margin-bottom:12px;overflow:hidden}
     .section h2{margin:0;padding:10px 10px 6px;font-size:13px}.section p{margin:0;padding:0 10px 10px;color:var(--muted);font-size:12px;line-height:1.35}
-    .quick-actions{display:grid;gap:8px;padding:0 10px 10px}.quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}.quick-grid .mini{height:34px}.quick-grid .wide{grid-column:1/-1}.quick-note{border:1px solid var(--line);border-radius:8px;background:#07090d;color:#cbd5e1;font-size:12px;line-height:1.35;padding:8px}
+    .quick-actions{display:grid;gap:8px;padding:0 10px 10px}.quick-target{display:grid;grid-template-columns:1fr;gap:7px}.quick-target.choosing{grid-template-columns:minmax(0,1fr) minmax(128px,.9fr)}.quick-target .mini,.quick-target .select{height:34px}.quick-target .select{width:100%;max-width:none;min-width:0}.quick-target:not(.choosing) .select{display:none}.quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}.quick-grid .mini{height:34px}.quick-grid .wide{grid-column:1/-1}.quick-note{border:1px solid var(--line);border-radius:8px;background:#07090d;color:#cbd5e1;font-size:12px;line-height:1.35;padding:8px}
     .settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 10px 10px}.settings-grid label{display:grid;gap:5px;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.04em}.settings-grid .wide{grid-column:1/-1}
     .device-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 10px 10px}.device-actions .wide{grid-column:1/-1}.mini.primary{border-color:#1d4ed8;background:#0f1d31}
     .section summary{cursor:pointer;list-style:none;margin:0;padding:10px 10px 6px;font-size:13px;font-weight:700}.section summary::-webkit-details-marker{display:none}.section summary::after{content:"+";float:right;color:var(--muted)}.section[open] summary::after{content:"-"}
@@ -117,10 +117,13 @@
         <h2>Schnellstart</h2>
         <p>Wichtige Aktionen ohne lange Quellenliste: Naumburg-Livestream frisch von YouTube holen oder robuste HLS-Nachrichten laden.</p>
         <div class="quick-actions">
+          <div class="quick-target">
+            <button id="quickNaumburg" class="mini">Webcam Naumburg suchen</button>
+            <select id="quickNaumburgTarget" class="select" aria-label="Zielfenster fuer Webcam Naumburg"></select>
+          </div>
           <div class="quick-grid">
-            <button id="quickNaumburg" class="mini">Naumburg Live finden</button>
             <button id="quickRefreshEmbed" class="mini">Embed aktualisieren</button>
-            <button id="quickNewsHls" class="mini wide">News Übersicht</button>
+            <button id="quickNewsHls" class="mini">News Übersicht</button>
           </div>
           <div id="quickStatus" class="quick-note">Bereit.</div>
         </div>
@@ -280,7 +283,7 @@
     const bootDeviceView = readDeviceView();
     let activeProfile = bootDeviceView?.activeProfile || DEFAULT_PROFILE;
     if(!PROFILE_PRESETS[activeProfile]) activeProfile = DEFAULT_PROFILE;
-    const wall = document.getElementById("wall"), drawer = document.getElementById("drawer"), scrim = document.getElementById("scrim"), sourcesEl = document.getElementById("sources"), countSelect = document.getElementById("countSelect"), presetSelect = document.getElementById("presetSelect"), profileSelect = document.getElementById("profileSelect"), helpModal = document.getElementById("helpModal"), muteAllBtn = document.getElementById("muteAllBtn"), quickStatusEl = document.getElementById("quickStatus");
+    const wall = document.getElementById("wall"), drawer = document.getElementById("drawer"), scrim = document.getElementById("scrim"), sourcesEl = document.getElementById("sources"), countSelect = document.getElementById("countSelect"), presetSelect = document.getElementById("presetSelect"), profileSelect = document.getElementById("profileSelect"), quickNaumburgTarget = document.getElementById("quickNaumburgTarget"), helpModal = document.getElementById("helpModal"), muteAllBtn = document.getElementById("muteAllBtn"), quickStatusEl = document.getElementById("quickStatus");
     function scopedKey(name){return STORAGE_PREFIX+"profile."+activeProfile+"."+name;}
     function profileDefault(profile=activeProfile){const preset=PROFILE_PRESETS[profile]||PROFILE_PRESETS.standard;return {count:preset.count||DEFAULT_COUNT,sources:clonePreset(preset.sources),soloIndex:-1,muteAllSnapshot:null,positions:null};}
     function profileLayout(profile=activeProfile){const preset=PROFILE_PRESETS[profile]||PROFILE_PRESETS.standard;return localStorage.getItem(scopedKey("preset"))||preset.layout||DEFAULT_PRESET;}
@@ -339,7 +342,13 @@
     function shouldRefreshYouTubeEmbed(source){if(!source||detectType(source)!=="youtube")return false;if(!source.embedUrl)return true;const refreshedAt=Date.parse(source.refreshedAt||"");return !Number.isFinite(refreshedAt)||(Date.now()-refreshedAt)>6*60*60*1000;}
     function queueYouTubeEmbedRefresh(index,watchUrl){const normalized=watchUrl||NAUMBURG_WATCH_URL;const key=`${index}:${normalized}`;if(embedRefreshes.has(key))return;embedRefreshes.add(key);fetchYouTubeOEmbed(normalized).then(data=>{const current=state.sources[index];if(!current||detectType(current)!=="youtube")return;state.sources[index]={...current,title:current.title||data.title,url:current.url||data.watchUrl,embedUrl:data.embedUrl,fallbackUrl:current.fallbackUrl||data.watchUrl,refreshedAt:new Date().toISOString()};updatePane(index);renderSources();save();setQuickStatus(`Embed aktualisiert: ${state.sources[index].title||data.title}`);}).catch(()=>{}).finally(()=>embedRefreshes.delete(key));}
     function activeIndex(){return activePane?Number(activePane.dataset.index)||0:0;}
-    async function loadYouTubeOEmbedInto(index,watchUrl=NAUMBURG_WATCH_URL){setQuickStatus("YouTube-Embed wird frisch abgefragt...");try{const data=await fetchYouTubeOEmbed(watchUrl);state.sources[index]={title:data.title,type:"youtube",url:data.watchUrl,embedUrl:data.embedUrl,fallbackUrl:data.watchUrl,volume:70,muted:false,refreshedAt:new Date().toISOString()};state.count=Math.max(state.count,index+1);state.muteAllSnapshot=null;updatePane(index);renderSources();save();setQuickStatus(`Geladen: ${data.title}`);return true;}catch(e){setQuickStatus("YouTube konnte nicht automatisch gelesen werden. Suche/Teilen öffnen.");window.open(NAUMBURG_SEARCH_URL,"_blank","noopener");return false;}}
+    function quickTargetLabel(index){const source=state.sources[index]||{};const title=String(source.title||`Monitor ${index+1}`).trim()||`Monitor ${index+1}`;return`[${index+1}] - ${title}`;}
+    function selectedQuickNaumburgIndex(){const value=Number(quickNaumburgTarget?.value);return Number.isInteger(value)&&value>=0&&value<state.count?value:activeIndex();}
+    function updateQuickNaumburgTargets(preferred=null){if(!quickNaumburgTarget)return;const explicit=preferred!==null&&preferred!==undefined;const previous=explicit&&Number.isInteger(Number(preferred))?Number(preferred):Number(quickNaumburgTarget.value);const fallback=Number.isInteger(previous)&&previous>=0&&previous<state.count?previous:activeIndex();quickNaumburgTarget.innerHTML=`<option value="" disabled>Fenster wählen</option>`+Array.from({length:state.count},(_,i)=>`<option value="${i}">${esc(quickTargetLabel(i))}</option>`).join("");quickNaumburgTarget.value=String(Math.min(Math.max(fallback,0),Math.max(0,state.count-1)));}
+    function syncQuickNaumburgTarget(index=activeIndex()){if(quickNaumburgTarget&&index>=0&&index<state.count)quickNaumburgTarget.value=String(index);}
+    function showQuickNaumburgTargets(){if(!quickNaumburgTarget)return;updateQuickNaumburgTargets(activeIndex());quickNaumburgTarget.closest(".quick-target")?.classList.add("choosing");quickNaumburgTarget.value="";setQuickStatus("Zielfenster fuer Webcam Naumburg auswaehlen.");requestAnimationFrame(()=>{quickNaumburgTarget.focus();if(typeof quickNaumburgTarget.showPicker==="function"){try{quickNaumburgTarget.showPicker();}catch(e){}}});}
+    async function loadNaumburgIntoSelectedTarget(){const index=selectedQuickNaumburgIndex();const pane=wall.querySelector(`.pane[data-index="${index}"]`);if(pane)setActive(pane);await loadYouTubeOEmbedInto(index,NAUMBURG_WATCH_URL);}
+    async function loadYouTubeOEmbedInto(index,watchUrl=NAUMBURG_WATCH_URL){setQuickStatus(`YouTube-Embed wird fuer Monitor ${index+1} frisch abgefragt...`);try{const data=await fetchYouTubeOEmbed(watchUrl);state.sources[index]={title:data.title,type:"youtube",url:data.watchUrl,embedUrl:data.embedUrl,fallbackUrl:data.watchUrl,volume:70,muted:false,refreshedAt:new Date().toISOString()};state.count=Math.max(state.count,index+1);state.muteAllSnapshot=null;updatePane(index);renderSources();save();setQuickStatus(`Monitor ${index+1}: ${data.title} geladen.`);return true;}catch(e){setQuickStatus("YouTube konnte nicht automatisch gelesen werden. Suche/Teilen öffnen.");window.open(NAUMBURG_SEARCH_URL,"_blank","noopener");return false;}}
     async function refreshActiveEmbed(){const index=activeIndex();const s=state.sources[index];const url=(s&&detectType(s)==="youtube"&&s.url)?s.url:NAUMBURG_WATCH_URL;await loadYouTubeOEmbedInto(index,url);}
     function youtubeEmbedUrl(input){const id=youtubeId(input);const origin=youtubeOrigin();return`https://www.youtube.com/embed/${encodeURIComponent(id)}?enablejsapi=1&autoplay=1&mute=1&playsinline=1&rel=0&origin=${encodeURIComponent(origin)}`;}
     function youtubeOrigin(){return location.origin&&location.origin!=="null"?location.origin:"https://datenflix007.github.io";}
@@ -429,7 +438,7 @@
     function applyAudioAll(){for(let i=0;i<state.count;i++)applyAudioToIndex(i);updateMuteAllButton();renderSources();save()}
     function toggleMute(index){if(!state.sources[index])return;state.muteAllSnapshot=null;state.sources[index].muted=!state.sources[index].muted;if(state.soloIndex===index&&state.sources[index].muted)state.soloIndex=-1;applyAudioAll()} function toggleSolo(index){state.muteAllSnapshot=null;state.soloIndex=state.soloIndex===index?-1:index;if(state.sources[index])state.sources[index].muted=false;applyAudioAll()}
     function toggleMuteAll(){if(state.muteAllSnapshot){state.sources.forEach((s,i)=>{if(s&&state.muteAllSnapshot[i])s.muted=Boolean(state.muteAllSnapshot[i].muted)});state.soloIndex=typeof state.muteAllSnapshot.soloIndex==="number"?state.muteAllSnapshot.soloIndex:-1;state.muteAllSnapshot=null;}else{state.muteAllSnapshot=state.sources.map(s=>({muted:Boolean(s?.muted)}));state.muteAllSnapshot.soloIndex=state.soloIndex;state.soloIndex=-1;state.sources.forEach(s=>{if(s)s.muted=true});}applyAudioAll();} muteAllBtn.onclick=toggleMuteAll;
-    function setActive(pane){document.querySelectorAll(".pane").forEach(p=>p.classList.remove("active"));activePane=pane;if(pane)pane.classList.add("active")}function capturePositions(){state.positions=[...document.querySelectorAll(".pane")].map(p=>({left:p.style.left,top:p.style.top,width:p.style.width,height:p.style.height}));save();}function applySavedPositions(){if(!Array.isArray(state.positions)||!state.positions.length)return false;const panes=[...document.querySelectorAll(".pane")];panes.forEach((p,i)=>{const pos=state.positions[i];if(pos)Object.assign(p.style,pos)});return true;} function render(){wall.innerHTML="";ytPlayers.clear();videoPlayers.clear();for(let i=0;i<state.count;i++)wall.appendChild(createPane(i));renderSources();profileSelect.value=activeProfile;countSelect.value=String(state.count);if(!applySavedPositions())applyLayout(false);updateMuteAllButton();updateViewStatus();save();}
+    function setActive(pane){document.querySelectorAll(".pane").forEach(p=>p.classList.remove("active"));activePane=pane;if(pane){pane.classList.add("active");syncQuickNaumburgTarget(Number(pane.dataset.index)||0)}}function capturePositions(){state.positions=[...document.querySelectorAll(".pane")].map(p=>({left:p.style.left,top:p.style.top,width:p.style.width,height:p.style.height}));save();}function applySavedPositions(){if(!Array.isArray(state.positions)||!state.positions.length)return false;const panes=[...document.querySelectorAll(".pane")];panes.forEach((p,i)=>{const pos=state.positions[i];if(pos)Object.assign(p.style,pos)});return true;} function render(){wall.innerHTML="";ytPlayers.clear();videoPlayers.clear();for(let i=0;i<state.count;i++)wall.appendChild(createPane(i));renderSources();profileSelect.value=activeProfile;countSelect.value=String(state.count);updateQuickNaumburgTargets();if(!applySavedPositions())applyLayout(false);updateMuteAllButton();updateViewStatus();save();}
     function renderSources(){
       sourcesEl.innerHTML="";
       const datalistId="channelPresetList";
@@ -466,7 +475,7 @@
             <div class="source-actions extra"><button class="mini loginOpen">Login</button><button class="mini clear">Leeren</button></div>
           </details>`;
         const title=row.querySelector(".titleInput"),type=row.querySelector(".typeInput"),url=row.querySelector(".urlInput"),vol=row.querySelector(".volInput"),channel=row.querySelector(".channelInput"),nameEl=row.querySelector(".sourceName"),kindEl=row.querySelector(".sourceKind");
-        title.oninput=()=>{state.sources[i].title=title.value;if(nameEl)nameEl.textContent=title.value||("Monitor "+(i+1));updatePane(i);save()};
+        title.oninput=()=>{state.sources[i].title=title.value;if(nameEl)nameEl.textContent=title.value||("Monitor "+(i+1));updatePane(i);updateQuickNaumburgTargets(i);save()};
         type.onchange=()=>{state.sources[i].type=type.value;if(kindEl)kindEl.textContent=typeLabel(detectType(state.sources[i]));updatePane(i);save()};
         url.oninput=()=>{state.sources[i].url=url.value;save()};
         vol.oninput=()=>{state.sources[i].volume=Number(vol.value);applyAudioToIndex(i);save()};
@@ -480,6 +489,7 @@
         row.querySelector(".clear").onclick=()=>{state.sources[i].url="";url.value="";updatePane(i);save()};
         sourcesEl.appendChild(row);
       }
+      updateQuickNaumburgTargets();
     }
     function applyChannelToSource(index,query){const ch=findChannel(query);if(!ch||!state.sources[index])return;state.sources[index].title=ch.title;state.sources[index].url=ch.url.replace(/^http:\/\//i,"https://");state.sources[index].type=ch.type||detectType(ch);state.sources[index].fallbackUrl=ch.fallbackUrl||"";state.sources[index].fallbackType=ch.fallbackType||"";state.sources[index].muted=false;state.muteAllSnapshot=null;updatePane(index);applyAudioAll();}
     function updatePane(i){const old=wall.querySelector(`.pane[data-index="${i}"]`);if(!old)return;const pos={left:old.style.left,top:old.style.top,width:old.style.width,height:old.style.height};const fresh=createPane(i);Object.assign(fresh.style,pos);old.replaceWith(fresh);}
@@ -497,7 +507,8 @@
     document.getElementById("loadDeviceViewBtn").onclick=loadDeviceView;
     document.getElementById("clearDeviceViewBtn").onclick=clearDeviceView;
     document.getElementById("loadTemplateBtn").onclick=()=>activateProfile(profileSelect.value,true);
-    document.getElementById("quickNaumburg").onclick=()=>loadYouTubeOEmbedInto(activeIndex(),NAUMBURG_WATCH_URL);
+    quickNaumburgTarget.onchange=loadNaumburgIntoSelectedTarget;
+    document.getElementById("quickNaumburg").onclick=()=>{if(!quickNaumburgTarget.closest(".quick-target")?.classList.contains("choosing")||!quickNaumburgTarget.value){showQuickNaumburgTargets();return;}loadNaumburgIntoSelectedTarget();};
     document.getElementById("quickRefreshEmbed").onclick=refreshActiveEmbed;
     document.getElementById("quickNewsHls").onclick=()=>activateProfile("news",true);
     document.getElementById("fullscreenBtn").onclick=async()=>{if(!document.fullscreenElement)await document.documentElement.requestFullscreen();else await document.exitFullscreen()};
