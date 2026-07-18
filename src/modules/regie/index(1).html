@@ -25,7 +25,7 @@
     .title strong{font-size:15px;letter-spacing:.04em}.title small{font-size:11px;color:var(--muted);margin-top:3px}
     .status{height:26px;display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:0 9px;color:var(--muted);font-size:12px;background:#0b0f15;white-space:nowrap}
     .led{width:8px;height:8px;border-radius:999px;background:var(--green);box-shadow:0 0 9px var(--green)}
-    .toolbar{display:flex;gap:8px;align-items:center}.select,.btn{height:36px;padding:0 10px}.btn.blue{border-color:#1d4ed8;background:#0f1d31}.btn.red{border-color:#7f1d1d;background:#241015}.btn.yellow{border-color:#854d0e;background:#251b0b}
+    .toolbar{display:flex;gap:8px;align-items:center}.select,.btn{height:36px;padding:0 10px}.btn{white-space:nowrap}.btn.blue{border-color:#1d4ed8;background:#0f1d31}.btn.red{border-color:#7f1d1d;background:#241015}.btn.yellow{border-color:#854d0e;background:#251b0b}
     .wall{position:absolute;inset:var(--top) 0 0 0;padding:10px;background:linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),#07090d;background-size:36px 36px}
     .pane{position:absolute;min-width:260px;min-height:180px;border:1px solid #334155;border-radius:10px;background:#020617;overflow:hidden;box-shadow:0 10px 26px rgba(0,0,0,.45)}
     .pane.active{outline:2px solid var(--blue);outline-offset:-2px}
@@ -50,36 +50,37 @@
     .drawer-head{height:46px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;border-bottom:1px solid var(--line);background:var(--panel)}.drawer-head strong{font-size:13px;letter-spacing:.04em;text-transform:uppercase}
     .drawer-body{overflow:auto;padding:12px}.section{border:1px solid var(--line);border-radius:10px;background:var(--panel);margin-bottom:12px;overflow:hidden}
     .section h2{margin:0;padding:10px 10px 6px;font-size:13px}.section p{margin:0;padding:0 10px 10px;color:var(--muted);font-size:12px;line-height:1.35}
-    .quick-actions{display:grid;gap:8px;padding:0 10px 10px}.quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}.quick-grid .mini{height:34px}.quick-note{border:1px solid var(--line);border-radius:8px;background:#07090d;color:#cbd5e1;font-size:12px;line-height:1.35;padding:8px}
+    .quick-actions{display:grid;gap:8px;padding:0 10px 10px}.quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}.quick-grid .mini{height:34px}.quick-grid .wide{grid-column:1/-1}.quick-note{border:1px solid var(--line);border-radius:8px;background:#07090d;color:#cbd5e1;font-size:12px;line-height:1.35;padding:8px}
+    .settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 10px 10px}.settings-grid label{display:grid;gap:5px;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.04em}.settings-grid .wide{grid-column:1/-1}
+    .device-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 10px 10px}.device-actions .wide{grid-column:1/-1}.mini.primary{border-color:#1d4ed8;background:#0f1d31}
     .section summary{cursor:pointer;list-style:none;margin:0;padding:10px 10px 6px;font-size:13px;font-weight:700}.section summary::-webkit-details-marker{display:none}.section summary::after{content:"+";float:right;color:var(--muted)}.section[open] summary::after{content:"-"}
     .sources{display:grid;gap:8px;padding:0 10px 10px}.source{border:1px solid var(--line);border-radius:8px;background:#0b0f15;padding:8px;display:grid;gap:7px}
-    .source-label{display:flex;align-items:center;gap:7px;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.04em}.source-label span{color:var(--blue);font-weight:800}
+    .source-top{display:flex;align-items:center;justify-content:space-between;gap:8px}.source-title{display:flex;align-items:center;gap:8px;min-width:0}.source-title span{width:22px;height:20px;border-radius:5px;display:grid;place-items:center;background:#07111f;border:1px solid var(--line);color:var(--blue);font-size:11px;font-weight:800;flex:0 0 auto}.source-title strong{display:block;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px}.source-title small{display:block;margin-top:1px;color:var(--muted);font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px}
     .input,.type-select{width:100%;height:34px;border:1px solid var(--line);border-radius:7px;background:#07090d;color:var(--text);padding:0 9px;outline:none}
-    .input:focus,.type-select:focus{border-color:var(--blue)}.source-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.mini{height:30px;font-size:12px}
+    .input:focus,.type-select:focus{border-color:var(--blue)}.source-fields{display:grid;gap:6px}.source-actions{display:flex;gap:6px;justify-content:flex-end}.source-actions .mini{min-width:66px}.source-actions.extra .mini{flex:1}.mini{height:30px;font-size:12px}
     .audio-row{display:grid;grid-template-columns:54px 1fr 58px 58px;gap:7px;align-items:center;color:var(--muted);font-size:12px}.audio-row input[type=range]{width:100%}
     .channel-row{display:grid;grid-template-columns:1fr 74px;gap:6px}.hint{font-size:11px;color:var(--muted);line-height:1.25}
+    .source-extra{border-top:1px solid rgba(148,163,184,.16);padding-top:2px}.source-extra summary{cursor:pointer;list-style:none;color:var(--muted);font-size:12px;font-weight:700}.source-extra summary::-webkit-details-marker{display:none}.source-extra summary::after{content:"+";float:right}.source-extra[open] summary{margin-bottom:7px;color:var(--text)}.source-extra[open] summary::after{content:"-"}.field-label{display:grid;gap:5px;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.04em}
     .soundboard{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 10px 10px}.pad{height:44px;border:1px solid var(--line);border-radius:8px;background:#0b0f15;color:var(--text);cursor:pointer;font-weight:700}.pad:hover{border-color:#facc15}.pad:active{transform:scale(.98);background:#171f2b}.local-tools{display:grid;gap:8px;padding:0 10px 10px}.local-tools .mini{width:100%}.local-state{border:1px solid var(--line);border-radius:8px;background:#07090d;padding:8px;color:#cbd5e1;font-size:12px;line-height:1.35}
     .scrim{display:none;position:fixed;inset:var(--top) 0 0 0;background:rgba(0,0,0,.28);z-index:15}.scrim.show{display:block}
     .modal{display:none;position:fixed;inset:0;z-index:40;background:rgba(0,0,0,.6);place-items:center;padding:20px}
     .modal.open{display:grid}.modal-card{width:min(820px,96vw);max-height:86vh;overflow:auto;background:#0b0f15;border:1px solid var(--line);border-radius:12px;box-shadow:0 24px 60px rgba(0,0,0,.55)}
     .modal-head{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--line);background:var(--panel)}.modal-body{padding:14px 18px;color:#d8dee9;line-height:1.5}.modal-body h3{margin:16px 0 6px}.modal-body p,.modal-body li{color:#cbd5e1}.modal-body code{background:#111827;border:1px solid #1f2937;padding:2px 5px;border-radius:5px}
     code{color:#cbd5e1;font-size:11px}
-    @media(max-width:980px){.status{display:none}.title small{display:none}.select{max-width:110px}:root{--drawer:min(96vw,400px)}}
+    @media(max-width:980px){.status{display:none}.select{max-width:110px}:root{--drawer:min(96vw,400px)}}
+    @media(max-width:560px){.topbar{gap:7px;padding:8px}.title{min-width:112px}.title small{display:none}.toolbar{gap:6px;margin-left:auto}.toolbar #saveDeviceViewTop,.toolbar #helpBtn{display:none}.btn{padding:0 8px}}
   </style>
 </head>
 
 <body>
   <header class="topbar">
     <button id="menuBtn" class="menu-btn" title="Menü öffnen"><span class="hamburger"><span></span><span></span><span></span></span></button>
-    <div class="title"><strong>REGIE WALL</strong><small>GitHub Pages · EDPweb/Login/Local aware</small></div>
-    <span class="status"><span class="led"></span> LIVE</span><span id="activeStatus" class="status">4 Monitore</span>
+    <div class="title"><strong>REGIE WALL</strong><small>Alles im Blick!</small></div>
+    <span class="status"><span class="led"></span> LIVE</span>
     <div class="toolbar">
-      <select id="profileSelect" class="select"><option value="standard">Standard</option><option value="eld">ELD</option><option value="news">News</option></select>
-      <select id="countSelect" class="select"><option value="2">2 Monitore</option><option value="4" selected>4 Monitore</option><option value="6">6 Monitore</option><option value="8">8 Monitore</option></select>
-      <select id="presetSelect" class="select"><option value="grid">Grid</option><option value="program">Program + Preview</option><option value="wide">Breit oben</option><option value="stack">Kontrollwand</option></select>
+      <button id="saveDeviceViewTop" class="btn">Speichern</button>
       <button id="muteAllBtn" class="btn red">Alle stumm</button>
       <button id="helpBtn" class="btn yellow">Hilfe</button>
-      <button id="resetDefaults" class="btn">Default</button>
       <button id="fullscreenBtn" class="btn">Vollbild</button>
     </div>
   </header>
@@ -91,22 +92,42 @@
     <div class="drawer-head"><strong>Menü</strong><button id="closeMenu" class="icon">×</button></div>
     <div class="drawer-body">
       <section class="section">
+        <h2>Ansicht</h2>
+        <p>ELD bleibt die feste Standardansicht. Geräteansichten werden nur in diesem Browser gespeichert.</p>
+        <div class="settings-grid">
+          <label class="wide">Vorlage
+            <select id="profileSelect" class="select"><option value="standard">Standard</option><option value="news">News Übersicht</option><option value="eld">ELD</option></select>
+          </label>
+          <button id="loadTemplateBtn" class="mini primary wide">Laden</button>
+          <label>Monitore
+            <select id="countSelect" class="select"><option value="2">2 Monitore</option><option value="4" selected>4 Monitore</option><option value="6">6 Monitore</option><option value="8">8 Monitore</option></select>
+          </label>
+          <label>Layout
+            <select id="presetSelect" class="select"><option value="grid">Grid</option><option value="program">Program + Preview</option><option value="wide">Breit oben</option><option value="stack">Kontrollwand</option></select>
+          </label>
+        </div>
+        <div class="device-actions">
+          <button id="saveDeviceViewBtn" class="mini">Geräteansicht speichern</button>
+          <button id="loadDeviceViewBtn" class="mini">Geräteansicht laden</button>
+          <button id="clearDeviceViewBtn" class="mini wide">Geräteansicht löschen</button>
+        </div>
+      </section>
+
+      <section class="section">
         <h2>Schnellstart</h2>
-        <p>Wichtige Setups ohne Quellenliste: Naumburg-Livestream frisch von YouTube holen, robuste HLS-Nachrichten laden oder das ELD-Profil aktivieren.</p>
+        <p>Wichtige Aktionen ohne lange Quellenliste: Naumburg-Livestream frisch von YouTube holen oder robuste HLS-Nachrichten laden.</p>
         <div class="quick-actions">
           <div class="quick-grid">
             <button id="quickNaumburg" class="mini">Naumburg Live finden</button>
             <button id="quickRefreshEmbed" class="mini">Embed aktualisieren</button>
-            <button id="quickNewsHls" class="mini">News HLS</button>
-            <button id="quickEld" class="mini">ELD</button>
+            <button id="quickNewsHls" class="mini wide">News Übersicht</button>
           </div>
           <div id="quickStatus" class="quick-note">Bereit.</div>
         </div>
       </section>
 
       <details class="section">
-        <summary>Quellen feinjustieren</summary>
-        <p>Sender suchen, URLs einfuegen und Typen nur bei Bedarf anpassen.</p>
+        <summary>Quellen bearbeiten</summary>
         <div id="sources" class="sources"></div>
       </details>
 
@@ -161,6 +182,7 @@
     const DEFAULT_COUNT = 4;
     const DEFAULT_PRESET = "grid";
     const DEFAULT_VERSION = "2026-07-regie-streams";
+    const DEFAULT_PROFILE = "eld";
     const LOCAL_SERVER_PORT = 8765;
     const LOCAL_WALL_PATH = "/src/modules/regie/index(1).html";
     const LOCAL_START_SCRIPT = "src\\modules\\regie\\start-local-regie-wall.bat";
@@ -238,7 +260,7 @@
         ]
       },
       news: {
-        label:"News", count:4, layout:"program",
+        label:"News Übersicht", count:4, layout:"program",
         sources:[
           {...HLS_SOURCES.welt, muted:false },
           HLS_SOURCES.tagesschau,
@@ -253,20 +275,26 @@
     };
     function clonePreset(value){return typeof structuredClone==="function"?structuredClone(value):JSON.parse(JSON.stringify(value));}
     const STORAGE_PREFIX = "regie.loginlocal.";
-    let activeProfile = localStorage.getItem(STORAGE_PREFIX+"activeProfile") || "standard";
-    if(!PROFILE_PRESETS[activeProfile]) activeProfile = "standard";
-    const wall = document.getElementById("wall"), drawer = document.getElementById("drawer"), scrim = document.getElementById("scrim"), sourcesEl = document.getElementById("sources"), countSelect = document.getElementById("countSelect"), presetSelect = document.getElementById("presetSelect"), profileSelect = document.getElementById("profileSelect"), activeStatus = document.getElementById("activeStatus"), helpModal = document.getElementById("helpModal"), muteAllBtn = document.getElementById("muteAllBtn"), quickStatusEl = document.getElementById("quickStatus");
+    const DEVICE_VIEW_KEY = STORAGE_PREFIX+"deviceView";
+    function readDeviceView(){try{const value=JSON.parse(localStorage.getItem(DEVICE_VIEW_KEY)||"null");return value&&value.state&&Array.isArray(value.state.sources)?value:null;}catch(e){return null;}}
+    const bootDeviceView = readDeviceView();
+    let activeProfile = bootDeviceView?.activeProfile || DEFAULT_PROFILE;
+    if(!PROFILE_PRESETS[activeProfile]) activeProfile = DEFAULT_PROFILE;
+    const wall = document.getElementById("wall"), drawer = document.getElementById("drawer"), scrim = document.getElementById("scrim"), sourcesEl = document.getElementById("sources"), countSelect = document.getElementById("countSelect"), presetSelect = document.getElementById("presetSelect"), profileSelect = document.getElementById("profileSelect"), helpModal = document.getElementById("helpModal"), muteAllBtn = document.getElementById("muteAllBtn"), quickStatusEl = document.getElementById("quickStatus");
     function scopedKey(name){return STORAGE_PREFIX+"profile."+activeProfile+"."+name;}
     function profileDefault(profile=activeProfile){const preset=PROFILE_PRESETS[profile]||PROFILE_PRESETS.standard;return {count:preset.count||DEFAULT_COUNT,sources:clonePreset(preset.sources),soloIndex:-1,muteAllSnapshot:null,positions:null};}
     function profileLayout(profile=activeProfile){const preset=PROFILE_PRESETS[profile]||PROFILE_PRESETS.standard;return localStorage.getItem(scopedKey("preset"))||preset.layout||DEFAULT_PRESET;}
     function loadState(){const base=profileDefault();return {count:Number(localStorage.getItem(scopedKey("count")))||base.count,sources:JSON.parse(localStorage.getItem(scopedKey("sources"))||"null")||base.sources,soloIndex:Number(localStorage.getItem(scopedKey("soloIndex"))??-1),muteAllSnapshot:JSON.parse(localStorage.getItem(scopedKey("muteAllSnapshot"))||"null"),positions:JSON.parse(localStorage.getItem(scopedKey("positions"))||"null")};}
+    function normalizeStateSnapshot(input){const base=profileDefault();const sources=Array.isArray(input?.sources)?input.sources.slice(0,8):base.sources;return{count:Math.max(1,Math.min(8,Number(input?.count)||sources.length||base.count)),sources,soloIndex:Number.isFinite(Number(input?.soloIndex))?Number(input.soloIndex):-1,muteAllSnapshot:input?.muteAllSnapshot||null,positions:Array.isArray(input?.positions)?input.positions:null};}
     function encodePayload(value){try{const json=JSON.stringify(value);const bytes=new TextEncoder().encode(json);let binary="";bytes.forEach(byte=>binary+=String.fromCharCode(byte));return btoa(binary);}catch(e){return"";}}
     function decodePayload(value){try{const binary=atob(value);const bytes=Uint8Array.from(binary,c=>c.charCodeAt(0));return JSON.parse(new TextDecoder().decode(bytes));}catch(e){return null;}}
     function importStateFromUrl(){const raw=new URLSearchParams(location.search).get("regieState");if(!raw)return null;const payload=decodePayload(raw);if(!payload||typeof payload!=="object")return null;if(payload.activeProfile&&PROFILE_PRESETS[payload.activeProfile])activeProfile=payload.activeProfile;if(payload.preset)localStorage.setItem(scopedKey("preset"),String(payload.preset));const imported=payload.state;if(!imported||!Array.isArray(imported.sources))return null;const count=Math.max(1,Math.min(8,Number(imported.count)||imported.sources.length||DEFAULT_COUNT));return{count,sources:imported.sources.slice(0,8),soloIndex:Number.isFinite(Number(imported.soloIndex))?Number(imported.soloIndex):-1,muteAllSnapshot:imported.muteAllSnapshot||null,positions:Array.isArray(imported.positions)?imported.positions:null};}
     function persistImportedState(imported){if(!imported)return false;localStorage.setItem(STORAGE_PREFIX+"activeProfile",activeProfile);localStorage.setItem(scopedKey("count"),imported.count);localStorage.setItem(scopedKey("sources"),JSON.stringify(imported.sources));localStorage.setItem(scopedKey("soloIndex"),String(imported.soloIndex));localStorage.setItem(scopedKey("muteAllSnapshot"),JSON.stringify(imported.muteAllSnapshot));if(imported.positions)localStorage.setItem(scopedKey("positions"),JSON.stringify(imported.positions));else localStorage.removeItem(scopedKey("positions"));return true;}
     function cleanImportUrl(){if(!new URLSearchParams(location.search).has("regieState"))return;try{const url=new URL(location.href);url.searchParams.delete("regieState");history.replaceState(null,"",url.pathname+(url.search||"")+url.hash);}catch(e){}}
     const importedState = importStateFromUrl();
-    let state = importedState || loadState();
+    let deviceViewActive = Boolean(!importedState && bootDeviceView);
+    if(deviceViewActive&&bootDeviceView.preset)localStorage.setItem(scopedKey("preset"),String(bootDeviceView.preset));
+    let state = importedState || (deviceViewActive?normalizeStateSnapshot(bootDeviceView.state):loadState());
     const importedLocalState = persistImportedState(importedState);
     if(importedLocalState)cleanImportUrl();
     function hlsReplacementFor(source,index){const hay=`${source?.title||""} ${source?.url||""}`;if(/IixXpcGrTzo|Naumburg|Marktplatz/i.test(hay))return{...source,title:source?.title||"Naumburg Marktplatz Live",type:"youtube",url:NAUMBURG_WATCH_URL,fallbackUrl:source?.fallbackUrl||NAUMBURG_WATCH_URL};if(/LuKwFajn37U|DW News/i.test(hay))return clonePreset(HLS_SOURCES.dw);if(/HvZt-nh9sGg|FRANCE 24/i.test(hay))return clonePreset(index===0?HLS_SOURCES.welt:HLS_SOURCES.tagesschau);if(/pykpO5kQJ98|Euronews/i.test(hay))return clonePreset(index===0?HLS_SOURCES.welt:HLS_SOURCES.phoenix);return source;}
@@ -297,6 +325,14 @@
     function detectType(source){const declared=source.type||"auto";if(declared!=="auto")return declared;const u=(source.url||"").trim().toLowerCase();if(!u)return"iframe";if(u.includes("youtube.com")||u.includes("youtu.be")||/^[a-zA-Z0-9_-]{11}$/.test(source.url.trim()))return"youtube";if(u.includes(".m3u8")||u.includes("m3u8"))return"hls";if((source.title||"").toLowerCase().includes("edpweb")||u.includes("edpweb"))return"edpweb";const parsed=parseUrl(source.url);if(parsed&&isPrivateIPv4Host(parsed.hostname))return"local";return"iframe";}
     function youtubeId(input){const s=(input||"").trim();if(/^[a-zA-Z0-9_-]{11}$/.test(s))return s;try{const u=new URL(normalizeUrl(s));if(u.hostname.includes("youtu.be"))return u.pathname.slice(1).split("/")[0];if(u.searchParams.get("v"))return u.searchParams.get("v");const m=u.pathname.match(/\/embed\/([a-zA-Z0-9_-]{11})/);if(m)return m[1];}catch(e){}return s;}
     function setQuickStatus(text){if(quickStatusEl)quickStatusEl.textContent=text;}
+    function layoutLabel(value){return {grid:"Grid",program:"Program + Preview",wide:"Breit oben",stack:"Kontrollwand"}[value]||value||"Layout";}
+    function typeLabel(value){return {auto:"Auto erkennen",iframe:"iFrame / Website",login:"Login-Website",edpweb:"EDPweb",local:"Lokaler IPv4-Dienst",youtube:"YouTube",hls:"HLS / m3u8 Stream"}[value]||value||"Quelle";}
+    function updateViewStatus(){}
+    function currentDeviceSnapshot(){const panes=[...document.querySelectorAll(".pane")];if(panes.length)state.positions=panes.map(p=>({left:p.style.left,top:p.style.top,width:p.style.width,height:p.style.height}));return{activeProfile,preset:presetSelect.value||profileLayout(),savedAt:new Date().toISOString(),state:clonePreset(state)};}
+    function saveDeviceView(){save();const snapshot=currentDeviceSnapshot();localStorage.setItem(DEVICE_VIEW_KEY,JSON.stringify(snapshot));deviceViewActive=true;updateViewStatus();setQuickStatus("Geräteansicht lokal gespeichert. Dieser Browser lädt sie beim nächsten Öffnen automatisch.");}
+    function loadDeviceView(){const snapshot=readDeviceView();if(!snapshot){setQuickStatus("Keine Geräteansicht in diesem Browser gespeichert.");return false;}activeProfile=PROFILE_PRESETS[snapshot.activeProfile]?snapshot.activeProfile:DEFAULT_PROFILE;localStorage.setItem(STORAGE_PREFIX+"activeProfile",activeProfile);if(snapshot.preset)localStorage.setItem(scopedKey("preset"),String(snapshot.preset));state=normalizeStateSnapshot(snapshot.state);presetSelect.value=snapshot.preset||profileLayout();deviceViewActive=true;migrateBlockedSources();render();setQuickStatus("Geräteansicht aus diesem Browser geladen.");return true;}
+    function clearDeviceView(){localStorage.removeItem(DEVICE_VIEW_KEY);loadDrkStandard();setQuickStatus("Geräteansicht gelöscht. Neue Aufrufe starten wieder mit ELD.");}
+    function loadDrkStandard(){activeProfile=DEFAULT_PROFILE;localStorage.setItem(STORAGE_PREFIX+"activeProfile",activeProfile);state=profileDefault(DEFAULT_PROFILE);presetSelect.value=(PROFILE_PRESETS[DEFAULT_PROFILE]||PROFILE_PRESETS.eld).layout||DEFAULT_PRESET;localStorage.setItem(scopedKey("preset"),presetSelect.value);deviceViewActive=false;migrateBlockedSources();render();setQuickStatus("ELD geladen.");}
     function extractIframeSrc(html){const m=String(html||"").match(/\ssrc=["']([^"']+)["']/i);return m?m[1].replace(/&amp;/g,"&"):"";}
     function tuneEmbedUrl(src){try{const u=new URL(src);u.searchParams.set("autoplay","1");u.searchParams.set("mute","1");u.searchParams.set("playsinline","1");u.searchParams.set("rel","0");return u.toString();}catch(e){return src;}}
     async function fetchYouTubeOEmbed(watchUrl){const endpoint=`https://www.youtube.com/oembed?url=${encodeURIComponent(watchUrl)}&format=json&maxwidth=1280`;const res=await fetch(endpoint,{cache:"no-store"});if(!res.ok)throw new Error(`oEmbed ${res.status}`);const data=await res.json();const embedUrl=tuneEmbedUrl(extractIframeSrc(data.html));if(!embedUrl)throw new Error("Kein Embed-Link in oEmbed-Antwort");return{title:data.title||"YouTube Live",author:data.author_name||"",embedUrl,watchUrl};}
@@ -393,16 +429,79 @@
     function applyAudioAll(){for(let i=0;i<state.count;i++)applyAudioToIndex(i);updateMuteAllButton();renderSources();save()}
     function toggleMute(index){if(!state.sources[index])return;state.muteAllSnapshot=null;state.sources[index].muted=!state.sources[index].muted;if(state.soloIndex===index&&state.sources[index].muted)state.soloIndex=-1;applyAudioAll()} function toggleSolo(index){state.muteAllSnapshot=null;state.soloIndex=state.soloIndex===index?-1:index;if(state.sources[index])state.sources[index].muted=false;applyAudioAll()}
     function toggleMuteAll(){if(state.muteAllSnapshot){state.sources.forEach((s,i)=>{if(s&&state.muteAllSnapshot[i])s.muted=Boolean(state.muteAllSnapshot[i].muted)});state.soloIndex=typeof state.muteAllSnapshot.soloIndex==="number"?state.muteAllSnapshot.soloIndex:-1;state.muteAllSnapshot=null;}else{state.muteAllSnapshot=state.sources.map(s=>({muted:Boolean(s?.muted)}));state.muteAllSnapshot.soloIndex=state.soloIndex;state.soloIndex=-1;state.sources.forEach(s=>{if(s)s.muted=true});}applyAudioAll();} muteAllBtn.onclick=toggleMuteAll;
-    function setActive(pane){document.querySelectorAll(".pane").forEach(p=>p.classList.remove("active"));activePane=pane;if(pane)pane.classList.add("active")}function capturePositions(){state.positions=[...document.querySelectorAll(".pane")].map(p=>({left:p.style.left,top:p.style.top,width:p.style.width,height:p.style.height}));save();}function applySavedPositions(){if(!Array.isArray(state.positions)||!state.positions.length)return false;const panes=[...document.querySelectorAll(".pane")];panes.forEach((p,i)=>{const pos=state.positions[i];if(pos)Object.assign(p.style,pos)});return true;} function render(){wall.innerHTML="";ytPlayers.clear();videoPlayers.clear();for(let i=0;i<state.count;i++)wall.appendChild(createPane(i));renderSources();profileSelect.value=activeProfile;countSelect.value=String(state.count);activeStatus.textContent=`${PROFILE_PRESETS[activeProfile]?.label||activeProfile} · ${state.count} Monitore`;if(!applySavedPositions())applyLayout(false);updateMuteAllButton();save();}
-    function renderSources(){sourcesEl.innerHTML="";const datalistId="channelPresetList";const datalist=document.createElement("datalist");datalist.id=datalistId;datalist.innerHTML=CHANNEL_PRESETS.map(ch=>`<option value="${esc(ch.title)}">${esc(ch.url)}</option>`).join("");sourcesEl.appendChild(datalist);for(let i=0;i<state.count;i++){if(!state.sources[i])state.sources[i]={title:`SOURCE ${i+1}`,type:"auto",url:"",volume:70,muted:true};const s=state.sources[i];const row=document.createElement("div");row.className="source";row.innerHTML=`<div class="source-label"><span>${i+1}</span> Monitor · ${detectType(s)}</div><div class="channel-row"><input class="input channelInput" list="${datalistId}" placeholder="Sender suchen, z.B. ARD, ZDF, MDR Thüringen" value=""><button class="mini useChannel">Sender</button></div><div class="hint">Senderauswahl übernimmt Titel, HLS-Link und Typ automatisch.</div><input class="input titleInput" placeholder="Titel" value="${esc(s.title||"")}"><select class="type-select typeInput"><option value="auto"${(s.type||"auto")==="auto"?" selected":""}>Auto erkennen</option><option value="iframe"${s.type==="iframe"?" selected":""}>iFrame / Website</option><option value="login"${s.type==="login"?" selected":""}>Login-Website</option><option value="edpweb"${s.type==="edpweb"?" selected":""}>EDPweb</option><option value="local"${s.type==="local"?" selected":""}>Lokaler IPv4-Dienst</option><option value="youtube"${s.type==="youtube"?" selected":""}>YouTube ID / URL</option><option value="hls"${s.type==="hls"?" selected":""}>HLS / m3u8 Stream</option></select><input class="input urlInput" placeholder="URL, YouTube-ID oder .m3u8" value="${esc(s.url||"")}"><div class="audio-row"><span>Vol</span><input class="volInput" type="range" min="0" max="100" value="${Number(s.volume??70)}"><button class="mini muteBtn">${isEffectivelyMuted(i)?"Unmute":"Mute"}</button><button class="mini soloBtn">${state.soloIndex===i?"Solo aus":"Solo"}</button></div><div class="source-actions"><button class="mini load">Laden</button><button class="mini loginOpen">Login</button><button class="mini open">Öffnen</button><button class="mini clear">Leeren</button></div>`;const title=row.querySelector(".titleInput"),type=row.querySelector(".typeInput"),url=row.querySelector(".urlInput"),vol=row.querySelector(".volInput"),channel=row.querySelector(".channelInput");title.oninput=()=>{state.sources[i].title=title.value;updatePane(i);save()};type.onchange=()=>{state.sources[i].type=type.value;updatePane(i);save()};url.oninput=()=>{state.sources[i].url=url.value;save()};vol.oninput=()=>{state.sources[i].volume=Number(vol.value);applyAudioToIndex(i);save()};channel.onchange=()=>applyChannelToSource(i,channel.value);row.querySelector(".useChannel").onclick=()=>applyChannelToSource(i,channel.value);row.querySelector(".muteBtn").onclick=()=>toggleMute(i);row.querySelector(".soloBtn").onclick=()=>toggleSolo(i);row.querySelector(".load").onclick=()=>{state.sources[i].url=url.value;state.sources[i].type=type.value;updatePane(i);save()};row.querySelector(".loginOpen").onclick=()=>openSourceUrl(i,true);row.querySelector(".open").onclick=()=>openSourceUrl(i,false);row.querySelector(".clear").onclick=()=>{state.sources[i].url="";updatePane(i);save()};sourcesEl.appendChild(row);}}
+    function setActive(pane){document.querySelectorAll(".pane").forEach(p=>p.classList.remove("active"));activePane=pane;if(pane)pane.classList.add("active")}function capturePositions(){state.positions=[...document.querySelectorAll(".pane")].map(p=>({left:p.style.left,top:p.style.top,width:p.style.width,height:p.style.height}));save();}function applySavedPositions(){if(!Array.isArray(state.positions)||!state.positions.length)return false;const panes=[...document.querySelectorAll(".pane")];panes.forEach((p,i)=>{const pos=state.positions[i];if(pos)Object.assign(p.style,pos)});return true;} function render(){wall.innerHTML="";ytPlayers.clear();videoPlayers.clear();for(let i=0;i<state.count;i++)wall.appendChild(createPane(i));renderSources();profileSelect.value=activeProfile;countSelect.value=String(state.count);if(!applySavedPositions())applyLayout(false);updateMuteAllButton();updateViewStatus();save();}
+    function renderSources(){
+      sourcesEl.innerHTML="";
+      const datalistId="channelPresetList";
+      const datalist=document.createElement("datalist");
+      datalist.id=datalistId;
+      datalist.innerHTML=CHANNEL_PRESETS.map(ch=>`<option value="${esc(ch.title)}">${esc(ch.url)}</option>`).join("");
+      sourcesEl.appendChild(datalist);
+      for(let i=0;i<state.count;i++){
+        if(!state.sources[i])state.sources[i]={title:`SOURCE ${i+1}`,type:"auto",url:"",volume:70,muted:true};
+        const s=state.sources[i];
+        const currentType=detectType(s);
+        const row=document.createElement("div");
+        row.className="source";
+        row.innerHTML=`
+          <div class="source-top">
+            <div class="source-title">
+              <span>${i+1}</span>
+              <div><strong class="sourceName">${esc(s.title||("Monitor "+(i+1)))}</strong><small class="sourceKind">${esc(typeLabel(currentType))}</small></div>
+            </div>
+            <div class="source-actions"><button class="mini load">Laden</button><button class="mini open">Öffnen</button></div>
+          </div>
+          <div class="source-fields">
+            <input class="input titleInput" placeholder="Titel" value="${esc(s.title||"")}">
+            <input class="input urlInput" placeholder="URL, YouTube-ID oder .m3u8" value="${esc(s.url||"")}">
+          </div>
+          <details class="source-extra">
+            <summary>Optionen</summary>
+            <div class="channel-row"><input class="input channelInput" list="${datalistId}" placeholder="Sender suchen, z.B. ARD, ZDF, MDR Thüringen" value=""><button class="mini useChannel">Sender</button></div>
+            <div class="hint">Sender übernimmt Titel, Stream-Link und Typ.</div>
+            <label class="field-label">Typ
+              <select class="type-select typeInput"><option value="auto"${(s.type||"auto")==="auto"?" selected":""}>Auto erkennen</option><option value="iframe"${s.type==="iframe"?" selected":""}>iFrame / Website</option><option value="login"${s.type==="login"?" selected":""}>Login-Website</option><option value="edpweb"${s.type==="edpweb"?" selected":""}>EDPweb</option><option value="local"${s.type==="local"?" selected":""}>Lokaler IPv4-Dienst</option><option value="youtube"${s.type==="youtube"?" selected":""}>YouTube ID / URL</option><option value="hls"${s.type==="hls"?" selected":""}>HLS / m3u8 Stream</option></select>
+            </label>
+            <div class="audio-row"><span>Vol</span><input class="volInput" type="range" min="0" max="100" value="${Number(s.volume??70)}"><button class="mini muteBtn">${isEffectivelyMuted(i)?"Unmute":"Mute"}</button><button class="mini soloBtn">${state.soloIndex===i?"Solo aus":"Solo"}</button></div>
+            <div class="source-actions extra"><button class="mini loginOpen">Login</button><button class="mini clear">Leeren</button></div>
+          </details>`;
+        const title=row.querySelector(".titleInput"),type=row.querySelector(".typeInput"),url=row.querySelector(".urlInput"),vol=row.querySelector(".volInput"),channel=row.querySelector(".channelInput"),nameEl=row.querySelector(".sourceName"),kindEl=row.querySelector(".sourceKind");
+        title.oninput=()=>{state.sources[i].title=title.value;if(nameEl)nameEl.textContent=title.value||("Monitor "+(i+1));updatePane(i);save()};
+        type.onchange=()=>{state.sources[i].type=type.value;if(kindEl)kindEl.textContent=typeLabel(detectType(state.sources[i]));updatePane(i);save()};
+        url.oninput=()=>{state.sources[i].url=url.value;save()};
+        vol.oninput=()=>{state.sources[i].volume=Number(vol.value);applyAudioToIndex(i);save()};
+        channel.onchange=()=>applyChannelToSource(i,channel.value);
+        row.querySelector(".useChannel").onclick=()=>applyChannelToSource(i,channel.value);
+        row.querySelector(".muteBtn").onclick=()=>toggleMute(i);
+        row.querySelector(".soloBtn").onclick=()=>toggleSolo(i);
+        row.querySelector(".load").onclick=()=>{state.sources[i].url=url.value;state.sources[i].type=type.value;updatePane(i);save()};
+        row.querySelector(".loginOpen").onclick=()=>openSourceUrl(i,true);
+        row.querySelector(".open").onclick=()=>openSourceUrl(i,false);
+        row.querySelector(".clear").onclick=()=>{state.sources[i].url="";url.value="";updatePane(i);save()};
+        sourcesEl.appendChild(row);
+      }
+    }
     function applyChannelToSource(index,query){const ch=findChannel(query);if(!ch||!state.sources[index])return;state.sources[index].title=ch.title;state.sources[index].url=ch.url.replace(/^http:\/\//i,"https://");state.sources[index].type=ch.type||detectType(ch);state.sources[index].fallbackUrl=ch.fallbackUrl||"";state.sources[index].fallbackType=ch.fallbackType||"";state.sources[index].muted=false;state.muteAllSnapshot=null;updatePane(index);applyAudioAll();}
     function updatePane(i){const old=wall.querySelector(`.pane[data-index="${i}"]`);if(!old)return;const pos={left:old.style.left,top:old.style.top,width:old.style.width,height:old.style.height};const fresh=createPane(i);Object.assign(fresh.style,pos);old.replaceWith(fresh);}
     function applyLayout(animated=true){const panes=[...document.querySelectorAll(".pane")],W=wall.clientWidth,H=wall.clientHeight,gap=10,preset=presetSelect.value;const set=(p,x,y,w,h)=>{if(animated)p.style.transition="left .18s ease,top .18s ease,width .18s ease,height .18s ease";p.style.left=Math.round(x)+"px";p.style.top=Math.round(y)+"px";p.style.width=Math.round(w)+"px";p.style.height=Math.round(h)+"px";if(animated)setTimeout(()=>p.style.transition="",220)};if(preset==="program"&&panes.length>=2){const mainW=W*.62;set(panes[0],gap,gap,mainW-gap*1.5,H-gap*2);const rest=panes.slice(1),rh=(H-gap*(rest.length+1))/rest.length;rest.forEach((p,i)=>set(p,mainW+gap/2,gap+i*(rh+gap),W-mainW-gap*1.5,rh));return}if(preset==="wide"&&panes.length>=3){const topH=H*.55;set(panes[0],gap,gap,W-gap*2,topH-gap*1.5);const rest=panes.slice(1),cw=(W-gap*(rest.length+1))/rest.length;rest.forEach((p,i)=>set(p,gap+i*(cw+gap),topH+gap/2,cw,H-topH-gap*1.5));return}const cols=preset==="stack"?(state.count<=4?2:4):(state.count===2?2:state.count===6?3:state.count===8?4:2);const rows=Math.ceil(state.count/cols);panes.forEach((p,i)=>{const col=i%cols,row=Math.floor(i/cols),cw=(W-gap*(cols+1))/cols,rh=(H-gap*(rows+1))/rows;set(p,gap+col*(cw+gap),gap+row*(rh+gap),cw,rh)});}
     function enableDrag(pane){const head=pane.querySelector(".head");let sx,sy,sl,st;head.addEventListener("pointerdown",e=>{if(e.target.closest("button"))return;setActive(pane);pane.setPointerCapture(e.pointerId);sx=e.clientX;sy=e.clientY;sl=pane.offsetLeft;st=pane.offsetTop;const move=ev=>{pane.style.left=clamp(sl+ev.clientX-sx,0,wall.clientWidth-pane.offsetWidth)+"px";pane.style.top=clamp(st+ev.clientY-sy,0,wall.clientHeight-pane.offsetHeight)+"px"};const up=ev=>{pane.releasePointerCapture(ev.pointerId);pane.removeEventListener("pointermove",move);pane.removeEventListener("pointerup",up);capturePositions()};pane.addEventListener("pointermove",move);pane.addEventListener("pointerup",up);});}
     function enableResize(pane){const h=pane.querySelector(".resize");let sx,sy,sw,sh;h.addEventListener("pointerdown",e=>{e.stopPropagation();setActive(pane);pane.setPointerCapture(e.pointerId);sx=e.clientX;sy=e.clientY;sw=pane.offsetWidth;sh=pane.offsetHeight;const move=ev=>{pane.style.width=clamp(sw+ev.clientX-sx,260,wall.clientWidth-pane.offsetLeft)+"px";pane.style.height=clamp(sh+ev.clientY-sy,180,wall.clientHeight-pane.offsetTop)+"px"};const up=ev=>{pane.releasePointerCapture(ev.pointerId);pane.removeEventListener("pointermove",move);pane.removeEventListener("pointerup",up);capturePositions()};pane.addEventListener("pointermove",move);pane.addEventListener("pointerup",up);});}
     function clamp(n,min,max){return Math.max(min,Math.min(max,n))}
-    function activateProfile(profile,reset=false){save();activeProfile=profile;localStorage.setItem(STORAGE_PREFIX+"activeProfile",activeProfile);state=reset?profileDefault(profile):loadState();migrateBlockedSources();presetSelect.value=reset?((PROFILE_PRESETS[profile]||PROFILE_PRESETS.standard).layout||DEFAULT_PRESET):profileLayout();if(reset)localStorage.setItem(scopedKey("preset"),presetSelect.value);render();setQuickStatus(`${PROFILE_PRESETS[profile]?.label||profile} geladen.`);}
-    profileSelect.value=activeProfile;profileSelect.onchange=()=>activateProfile(profileSelect.value,false);countSelect.onchange=()=>{state.count=Number(countSelect.value);state.positions=null;render()};presetSelect.value=profileLayout();presetSelect.onchange=()=>{state.positions=null;localStorage.setItem(scopedKey("preset"),presetSelect.value);applyLayout(true);capturePositions()};document.getElementById("resetDefaults").onclick=()=>{state=profileDefault();migrateBlockedSources();presetSelect.value=(PROFILE_PRESETS[activeProfile]||PROFILE_PRESETS.standard).layout||DEFAULT_PRESET;localStorage.setItem(scopedKey("preset"),presetSelect.value);render()};document.getElementById("quickNaumburg").onclick=()=>loadYouTubeOEmbedInto(activeIndex(),NAUMBURG_WATCH_URL);document.getElementById("quickRefreshEmbed").onclick=refreshActiveEmbed;document.getElementById("quickNewsHls").onclick=()=>activateProfile("news",true);document.getElementById("quickEld").onclick=()=>activateProfile("eld",false);document.getElementById("fullscreenBtn").onclick=async()=>{if(!document.fullscreenElement)await document.documentElement.requestFullscreen();else await document.exitFullscreen()};window.addEventListener("resize",()=>applyLayout(false));
+    function activateProfile(profile,reset=true){save();activeProfile=PROFILE_PRESETS[profile]?profile:DEFAULT_PROFILE;localStorage.setItem(STORAGE_PREFIX+"activeProfile",activeProfile);state=reset?profileDefault(activeProfile):loadState();migrateBlockedSources();presetSelect.value=reset?((PROFILE_PRESETS[activeProfile]||PROFILE_PRESETS.eld).layout||DEFAULT_PRESET):profileLayout();if(reset)localStorage.setItem(scopedKey("preset"),presetSelect.value);deviceViewActive=false;render();setQuickStatus(`${PROFILE_PRESETS[activeProfile]?.label||activeProfile} Vorlage geladen.`);}
+    profileSelect.value=activeProfile;
+    countSelect.onchange=()=>{state.count=Number(countSelect.value);state.positions=null;render()};
+    presetSelect.value=deviceViewActive&&bootDeviceView?.preset?bootDeviceView.preset:profileLayout();
+    presetSelect.onchange=()=>{state.positions=null;localStorage.setItem(scopedKey("preset"),presetSelect.value);applyLayout(true);capturePositions();updateViewStatus()};
+    document.getElementById("saveDeviceViewBtn").onclick=saveDeviceView;
+    document.getElementById("saveDeviceViewTop").onclick=saveDeviceView;
+    document.getElementById("loadDeviceViewBtn").onclick=loadDeviceView;
+    document.getElementById("clearDeviceViewBtn").onclick=clearDeviceView;
+    document.getElementById("loadTemplateBtn").onclick=()=>activateProfile(profileSelect.value,true);
+    document.getElementById("quickNaumburg").onclick=()=>loadYouTubeOEmbedInto(activeIndex(),NAUMBURG_WATCH_URL);
+    document.getElementById("quickRefreshEmbed").onclick=refreshActiveEmbed;
+    document.getElementById("quickNewsHls").onclick=()=>activateProfile("news",true);
+    document.getElementById("fullscreenBtn").onclick=async()=>{if(!document.fullscreenElement)await document.documentElement.requestFullscreen();else await document.exitFullscreen()};
+    window.addEventListener("resize",()=>applyLayout(false));
     const AudioContextClass=window.AudioContext||window.webkitAudioContext;const audio=new AudioContextClass();function tone(freq,dur,type="sine",gain=.11,delay=0){const osc=audio.createOscillator(),g=audio.createGain();osc.type=type;osc.frequency.value=freq;osc.connect(g);g.connect(audio.destination);const t=audio.currentTime+delay;g.gain.setValueAtTime(.001,t);g.gain.linearRampToValueAtTime(gain,t+.01);g.gain.exponentialRampToValueAtTime(.001,t+dur);osc.start(t);osc.stop(t+dur+.03)}function play(name){if(audio.state==="suspended")audio.resume();if(name==="sting"){tone(440,.1,"square");tone(660,.12,"square",.1,.1);tone(880,.18,"square",.09,.22)}if(name==="alert"){tone(900,.16,"sawtooth");tone(900,.16,"sawtooth",.11,.22)}if(name==="click")tone(1300,.045,"square",.08);if(name==="ok"){tone(520,.1);tone(780,.16,"sine",.1,.1)}if(name==="count"){tone(700,.07,"square");tone(700,.07,"square",.1,.15);tone(350,.18,"square",.12,.32)}if(name==="fail"){tone(230,.18,"sawtooth");tone(160,.25,"sawtooth",.1,.16)}}document.querySelectorAll(".pad").forEach(p=>p.onclick=()=>play(p.dataset.sound));updateLocalModeUi();render();
   </script>
     <script src="../../../feedback-widget.js" defer></script>
