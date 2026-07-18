@@ -43,7 +43,7 @@
     .note .note-actions{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:12px}
     .note button{height:32px;border:1px solid var(--line);border-radius:8px;background:#0b0f15;color:var(--text);cursor:pointer;padding:0 10px}
     .note button:hover{border-color:var(--blue)}
-    .yt-fallback{position:absolute;right:10px;bottom:10px;z-index:3;display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.yt-fallback button{height:30px;border:1px solid rgba(148,163,184,.55);border-radius:7px;background:rgba(2,6,23,.78);color:#e2e8f0;cursor:pointer;font-size:11px;padding:0 9px}.yt-fallback button:hover{border-color:var(--blue)}
+    .yt-fallback,.local-fallback{position:absolute;right:10px;bottom:10px;z-index:3;display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.yt-fallback button,.local-fallback button{height:30px;border:1px solid rgba(148,163,184,.55);border-radius:7px;background:rgba(2,6,23,.78);color:#e2e8f0;cursor:pointer;font-size:11px;padding:0 9px}.yt-fallback button:hover,.local-fallback button:hover{border-color:var(--blue)}
     .resize{position:absolute;right:0;bottom:0;width:20px;height:20px;cursor:nwse-resize;opacity:.65;background:linear-gradient(135deg,transparent 50%,var(--blue) 51%,var(--blue) 57%,transparent 58%),linear-gradient(135deg,transparent 68%,#fff 69%,#fff 75%,transparent 76%)}
     .drawer{position:fixed;top:var(--top);left:0;width:var(--drawer);height:calc(100vh - var(--top));background:#0b0f15;border-right:1px solid var(--line);transform:translateX(calc(-1 * var(--drawer)));transition:transform .18s ease;z-index:20;box-shadow:18px 0 40px rgba(0,0,0,.45);display:flex;flex-direction:column}
     .drawer.open{transform:translateX(0)}
@@ -121,9 +121,11 @@
 
       <details class="section">
         <summary>Lokale Dienste</summary>
-        <p>Turnaround fuer lokale IPv4-Webseiten: Starte die Wall lokal per HTTP. Dann werden <code>http://127.x.x.x</code>, <code>http://192.168.x.x</code>, <code>http://10.x.x.x</code> und <code>http://172.16-31.x.x</code> als normale Frames geladen.</p>
+        <p>GitHub Pages versucht lokale IPv4-Ziele direkt mit Browser-Freigabe fuer Local Network Access. Wenn Edge/Chrome die Kachel blockiert oder keine Freigabe zeigt, starte die Wall lokal per HTTP.</p>
         <div class="local-tools">
           <div id="localModeState" class="local-state">Lokaler Modus wird geprueft...</div>
+          <input id="localProbeUrl" class="input" placeholder="http://127.0.0.1:8000 oder http://192.168.0.50">
+          <button id="probeLocalAccessBtn" class="mini">Browser-Freigabe anstossen</button>
           <button id="copyLocalServerBtn" class="mini">Startscript kopieren</button>
           <button id="openLocalWallBtn" class="mini">Lokale Regie mit Setup oeffnen</button>
         </div>
@@ -139,10 +141,10 @@
         <p>Wähle als Typ <code>Login-Website</code>. Dann wird der Frame ohne Sandbox geladen. Formulare, Cookies und Login-Popups haben dadurch die besten Chancen.</p>
         <p>Grenze: Wenn die Zielseite selbst <code>X-Frame-Options</code>, <code>frame-ancestors</code>, blockierte Third-Party-Cookies oder eine Weiterleitung aus dem Frame nutzt, kann die Regie Wall das nicht erzwingen. Nutze dann <code>Login</code>/<code>Öffnen</code>, melde dich im normalen Tab an und lade danach den Frame neu.</p>
         <h3>IPv4-/LAN-Dienste</h3>
-        <p>Lokale HTTP-Geräte wie <code>http://192.168.0.50:8080</code> koennen im Frame erscheinen, wenn die Regie Wall selbst lokal per HTTP laeuft. Aus GitHub Pages heraus blockiert der Browser HTTP-Frames als Mixed Content; der Local-Mode ist der funktionierende Turnaround.</p>
+        <p>Loopback-Testserver wie <code>http://127.0.0.1:8000</code> und LAN-Geräte wie <code>http://192.168.0.50:8080</code> werden aus GitHub Pages direkt versucht. Aktuelle Chromium-/Edge-Browser verlangen dafuer Local Network Access; wenn der Browser fragt, Zugriff erlauben.</p>
         <ul>
           <li>Empfohlen: <code>src\modules\regie\start-local-regie-wall.bat</code> starten. Das Script hostet das Repository lokal und oeffnet die Wall auf Port 8765.</li>
-          <li>Wenn du von GitHub Pages kommst: erst das Script starten, dann <code>Lokale Regie mit Setup oeffnen</code> klicken. Die aktuelle Quellenliste wird per URL uebernommen.</li>
+          <li>Fallback: Wenn der Browser keine Local-Network-Freigabe gibt, erst das Script starten, dann <code>Lokale Regie mit Setup oeffnen</code> klicken. Die aktuelle Quellenliste wird per URL uebernommen.</li>
           <li>Grenze: Wenn die Zielseite selbst <code>X-Frame-Options</code> oder <code>frame-ancestors</code> setzt, muss sie im eigenen Tab laufen; das kann keine Wall ueberschreiben.</li>
         </ul>
         <h3>Tonsteuerung</h3>
@@ -278,10 +280,15 @@
     function normalizeText(value){return String(value||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g," ").trim();}
     function normalizeUrl(value){const u=(value||"").trim();if(!u)return"";if(/^(https?:|file:|\/|\.\/|\.\.\/)/i.test(u))return u;if(/^(localhost|127\.|10\.|192\.168\.|172\.(1[6-9]|2\d|3[0-1])\.)/i.test(u))return"http://"+u;if(/^(\d{1,3}\.){3}\d{1,3}(:\d+)?(\/|$)/.test(u))return"http://"+u;return"https://"+u;}
     function parseUrl(value){try{return new URL(normalizeUrl(value));}catch(e){return null;}}
-    function isPrivateIPv4Host(host){if(!host)return false;if(host==="localhost")return true;if(/^127\./.test(host))return true;if(/^10\./.test(host))return true;if(/^192\.168\./.test(host))return true;if(/^172\.(1[6-9]|2\d|3[0-1])\./.test(host))return true;return false;}
-    function isMixedContentBlocked(urlValue){const u=parseUrl(urlValue);if(!u)return false;return location.protocol==="https:"&&u.protocol==="http:";}
+    function isLoopbackHost(host){const h=String(host||"").toLowerCase();return h==="localhost"||h.endsWith(".localhost")||h==="::1"||h==="[::1]"||/^127\./.test(h);}
+    function isPrivateIPv4Host(host){if(!host)return false;if(isLoopbackHost(host))return true;if(/^10\./.test(host))return true;if(/^192\.168\./.test(host))return true;if(/^172\.(1[6-9]|2\d|3[0-1])\./.test(host))return true;if(/^169\.254\./.test(host))return true;return false;}
+    function isMixedContentBlocked(urlValue){const u=parseUrl(urlValue);if(!u)return false;return location.protocol==="https:"&&u.protocol==="http:"&&!isPrivateIPv4Host(u.hostname);}
     function isLocalHttpUrl(urlValue){const u=parseUrl(urlValue);return Boolean(u&&u.protocol==="http:"&&isPrivateIPv4Host(u.hostname));}
     function isLocalMode(){return location.protocol==="file:"||location.hostname==="localhost"||location.hostname==="127.0.0.1"||location.protocol==="http:";}
+    function localAccessFetchOptions(urlValue){const u=parseUrl(urlValue);const options={mode:"no-cors",cache:"no-store"};if(u&&isLoopbackHost(u.hostname))options.targetAddressSpace="loopback";else if(u&&isPrivateIPv4Host(u.hostname))options.targetAddressSpace="local";return options;}
+    function firstLocalSourceUrl(){const active=activePane?state.sources[Number(activePane.dataset.index)||0]:null;const urls=[active,...state.sources].map(s=>normalizeUrl(s?.url)).filter(Boolean);return urls.find(url=>isLocalHttpUrl(url))||"http://127.0.0.1:8000/";}
+    async function queryLocalAccessPermission(){try{if(navigator.permissions?.query){const result=await navigator.permissions.query({name:"local-network-access"});return result.state||"unknown";}}catch(e){}return"unknown";}
+    async function requestLocalNetworkAccess(urlValue=null){const input=document.getElementById("localProbeUrl");const target=normalizeUrl(urlValue||input?.value||firstLocalSourceUrl());if(!target){setQuickStatus("Keine lokale URL zum Testen gefunden.");return false;}if(input)input.value=target;setQuickStatus(`Local-Network-Freigabe wird angefragt: ${target}`);try{await fetch(target,localAccessFetchOptions(target));setQuickStatus("Local-Network-Freigabe ok. Lokale Kacheln werden neu geladen.");[...document.querySelectorAll(".pane")].forEach(p=>{const index=Number(p.dataset.index)||0;if(isLocalHttpUrl(state.sources[index]?.url))renderInsideFrame(p.querySelector(".frame"),state.sources[index],index);});updateLocalModeUi();return true;}catch(e){const stateText=await queryLocalAccessPermission();setQuickStatus(`Local-Network-Freigabe nicht bestaetigt (${stateText}). Browser-Freigabe pruefen oder lokale Regie starten.`);updateLocalModeUi();return false;}}
     function localRunCommand(){return LOCAL_START_SCRIPT;}
     function manualLocalRunCommand(){return`python -m http.server ${LOCAL_SERVER_PORT} --bind 127.0.0.1`;}
     function localStatePayload(){return{activeProfile,preset:presetSelect?.value||profileLayout(),state:clonePreset(state)};}
@@ -356,22 +363,29 @@
       const iframe=document.createElement("iframe");
       iframe.src=u;
       iframe.referrerPolicy="strict-origin-when-cross-origin";
-      iframe.allow="fullscreen; autoplay; clipboard-read; clipboard-write; encrypted-media; picture-in-picture; web-share";
+      iframe.allow="local-network-access *; fullscreen; autoplay; clipboard-read; clipboard-write; encrypted-media; picture-in-picture; web-share";
       frame.appendChild(iframe);
+      const localHttpsFrame=isLocalHttpUrl(u)&&location.protocol==="https:";
+      if(localHttpsFrame){
+        const fallback=document.createElement("div");
+        fallback.className="local-fallback";
+        fallback.innerHTML=`<button onclick="requestLocalNetworkAccess('${esc(u)}')">Freigabe</button><button onclick="renderInsideFrame(document.querySelector('.pane[data-index=&quot;${index}&quot;] .frame'),state.sources[${index}],${index})">Neu</button><button onclick="window.open('${esc(u)}','_blank','noopener')">Tab</button><button onclick="openLocalWall()">Lokal</button>`;
+        frame.appendChild(fallback);
+      }
       const note=document.createElement("div");
       note.className="note";
       note.style.display="none";
-      note.innerHTML=`<div><strong>Login oder Embed blockiert?</strong>Falls die Seite im Frame nicht laedt: im normalen Tab anmelden bzw. Zertifikat/IP bestaetigen, danach hier neu laden.<br><div class="note-actions"><button onclick="window.open('${esc(u)}','login_${index}','noopener')">Login im Tab</button><button onclick="window.open('${esc(u)}','_blank','noopener')">Oeffnen</button></div></div>`;
+      note.innerHTML=localHttpsFrame?`<div><strong>Lokale Webseite bleibt leer?</strong>Edge/Chrome braucht eventuell die Local-Network-Freigabe fuer <code>${esc(u)}</code>.<br><div class="note-actions"><button onclick="requestLocalNetworkAccess('${esc(u)}')">Browser-Freigabe</button><button onclick="renderInsideFrame(document.querySelector('.pane[data-index=&quot;${index}&quot;] .frame'),state.sources[${index}],${index})">Neu laden</button><button onclick="window.open('${esc(u)}','_blank','noopener')">Im Tab</button><button onclick="openLocalWall()">Lokale Regie</button></div></div>`:`<div><strong>Login oder Embed blockiert?</strong>Falls die Seite im Frame nicht laedt: im normalen Tab anmelden bzw. Zertifikat/IP bestaetigen, danach hier neu laden.<br><div class="note-actions"><button onclick="window.open('${esc(u)}','login_${index}','noopener')">Login im Tab</button><button onclick="window.open('${esc(u)}','_blank','noopener')">Oeffnen</button></div></div>`;
       frame.appendChild(note);
       let loaded=false;
       iframe.addEventListener("load",()=>loaded=true);
-      const shouldShowSlowLoadNote=!(type==="local"||isLocalHttpUrl(u));
+      const shouldShowSlowLoadNote=localHttpsFrame||!(type==="local"||isLocalHttpUrl(u));
       setTimeout(()=>{if(!loaded&&shouldShowSlowLoadNote)note.style.display="grid";},3200);
     }
     function showLocalAdvice(){helpModal.classList.add("open");}
     function copyLocalCommand(){const cmd=localRunCommand();const url=localWallUrl(true);const text=`${cmd}\n${url}`;if(navigator.clipboard)navigator.clipboard.writeText(text).catch(()=>{});alert("Startscript und lokale Setup-URL kopiert.\n\n1. Im Repository ausfuehren oder doppelklicken: "+cmd+"\n2. Danach die lokale Regie mit Setup oeffnen.\n\nLokale Basis-URL: "+localPlainWallUrl());}
     function openLocalWall(){window.open(localWallUrl(true),"_blank","noopener");}
-    function updateLocalModeUi(){const el=document.getElementById("localModeState");if(!el)return;const imported=importedLocalState?"<br><strong>Setup uebernommen.</strong> Quellen, Layout und Positionen kamen aus der GitHub-Pages-Wall.":"";el.innerHTML=isLocalMode()?`<strong>Lokaler Modus aktiv.</strong><br>Lokale IPv4-HTTP-Quellen koennen im Monitor geladen werden, sofern die Zielseite Frames erlaubt.${imported}<br><code>${localPlainWallUrl()}</code>`:`<strong>GitHub-Pages-/HTTPS-Modus.</strong><br>Lokale IPv4-HTTP-Frames werden hier blockiert. Starte <code>${LOCAL_START_SCRIPT}</code> und klicke danach <strong>Lokale Regie mit Setup oeffnen</strong>.`;document.getElementById("copyLocalServerBtn")?.addEventListener("click",copyLocalCommand);document.getElementById("openLocalWallBtn")?.addEventListener("click",openLocalWall);}
+    async function updateLocalModeUi(){const el=document.getElementById("localModeState");if(!el)return;const imported=importedLocalState?"<br><strong>Setup uebernommen.</strong> Quellen, Layout und Positionen kamen aus der GitHub-Pages-Wall.":"";const permission=await queryLocalAccessPermission();const permissionText=permission==="unknown"?"":"<br>Browser-Freigabe: <strong>"+esc(permission)+"</strong>";el.innerHTML=isLocalMode()?`<strong>Lokaler Modus aktiv.</strong><br>Lokale IPv4-HTTP-Quellen koennen im Monitor geladen werden, sofern die Zielseite Frames erlaubt.${imported}<br><code>${localPlainWallUrl()}</code>`:`<strong>GitHub-Pages-/HTTPS-Modus.</strong><br>Lokale IPv4-HTTP-Frames werden direkt versucht und nutzen <code>local-network-access</code>. Nutze <strong>Browser-Freigabe anstossen</strong>, wenn Edge/Chrome nicht automatisch fragt.${permissionText}`;const probe=document.getElementById("localProbeUrl");if(probe&&!probe.value)probe.value=firstLocalSourceUrl();const probeBtn=document.getElementById("probeLocalAccessBtn"),copyBtn=document.getElementById("copyLocalServerBtn"),openBtn=document.getElementById("openLocalWallBtn");if(probeBtn)probeBtn.onclick=()=>requestLocalNetworkAccess();if(copyBtn)copyBtn.onclick=copyLocalCommand;if(openBtn)openBtn.onclick=openLocalWall;}
     function initYouTubePlayer(index,holderId=null,videoId=null){if(!(window.YT&&window.YT.Player)){ensureYouTubeApi();return;}const holder=holderId?document.getElementById(holderId):document.querySelector(`[data-yt-index="${index}"]`);if(!holder)return;const id=videoId||holder.dataset.videoId;if(!id)return;const previous=ytPlayers.get(index);if(previous&&typeof previous.destroy==="function"){try{previous.destroy();}catch(e){}}const player=new YT.Player(holder.id,{videoId:id,width:"100%",height:"100%",playerVars:{autoplay:1,mute:1,controls:1,enablejsapi:1,hl:"de",playsinline:1,rel:0,origin:youtubeOrigin(),widget_referrer:youtubeWidgetReferrer()},events:{onReady:event=>{ytPlayers.set(index,event.target);applyAudioToIndex(index);try{event.target.mute();event.target.playVideo();}catch(e){}setQuickStatus(`YouTube API bereit: ${state.sources[index]?.title||id}`);},onError:event=>{setQuickStatus(`YouTube API Fehler ${event.data}. Extern oeffnen oder Embed neu versuchen.`);}}});}
     function getEffectiveVolume(index){const s=state.sources[index];return Math.max(0,Math.min(1,Number((s?.volume??70))/100))} function isEffectivelyMuted(index){const s=state.sources[index];if(!s)return true;if(state.soloIndex>=0&&state.soloIndex!==index)return true;return Boolean(s.muted)}
     function applyAudioToIndex(index){const muted=isEffectivelyMuted(index),volumePercent=Math.round(getEffectiveVolume(index)*100);const video=videoPlayers.get(index);if(video){video.volume=volumePercent/100;video.muted=muted}const yt=ytPlayers.get(index);if(yt&&typeof yt.setVolume==="function"){try{yt.setVolume(volumePercent);muted?yt.mute():yt.unMute()}catch(e){}}const pane=wall.querySelector(`.pane[data-index="${index}"]`);if(pane){const muteBtn=pane.querySelector(".mute"),soloBtn=pane.querySelector(".solo");if(muteBtn)muteBtn.classList.toggle("muted",muted);if(soloBtn)soloBtn.classList.toggle("on",state.soloIndex===index)}}

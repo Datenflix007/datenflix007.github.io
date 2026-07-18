@@ -628,7 +628,7 @@ Die Regie Wall ist eine browserbasierte Kontrollwand fuer mehrere Quellen. Sie k
 
 ### Hinweise
 
-Lokale HTTP-Quellen wie `http://192.168.x.x` funktionieren im Browser nur dann sauber im Frame, wenn die Regie Wall nicht aus einem HTTPS-Kontext geladen wird. Fuer echte LAN-Quellen gibt es deshalb den Local-Mode:
+Loopback-Quellen wie `http://127.0.0.1:8000`, `http://localhost:8000` und lokale LAN-Quellen wie `http://192.168.x.x` werden auch aus der GitHub-Pages-Version direkt als Frame versucht. Die Wall setzt dafuer `local-network-access` am iframe und kann die Browserfreigabe ueber `Browser-Freigabe anstossen` aktiv anfragen; aktuelle Chromium-/Edge-Browser koennen trotzdem eine lokale Netzwerkfreigabe verlangen. Wenn der Browser blockiert oder die Zielseite Frames verbietet, gibt es den Local-Mode:
 
 ```text
 src\modules\regie\start-local-regie-wall.bat
