@@ -615,23 +615,24 @@ src/modules/regie/index(1).html
 
 ### Zweck
 
-Die Regie Wall ist eine browserbasierte Kontrollwand fuer mehrere Quellen. Sie kann Websites, Login-Seiten, YouTube-Videos, HLS-Streams und lokale IPv4-/LAN-Dienste in Monitor-Kacheln anordnen. Das Modul ist besonders fuer Vorfuehrungen, Regiesituationen, Stream-Setups oder lokale Kontrollanzeigen gedacht.
+Die Regie Wall ist eine browserbasierte Kontrollwand fuer mehrere Quellen. Sie kann Websites, Login-Seiten, YouTube-Videos, HLS-Streams, lokale IPv4-/LAN-Dienste sowie direkte Webcam-Livestreams und Livebilder in Monitor-Kacheln anordnen. Das Modul ist besonders fuer Vorfuehrungen, Regiesituationen, Stream-Setups oder lokale Kontrollanzeigen gedacht.
 
 ### Bedienung
 
 1. Regie Wall oeffnen.
-2. Standardmaessig startet die ELD-Ansicht.
-3. Im Menue unter `Ansicht` Monitorzahl, Layout oder Vorlage anpassen.
-4. Im Menue Quellen eintragen oder Sender/Streams auswaehlen.
-5. Kacheln verschieben, skalieren und bei Bedarf in den Vollbildmodus wechseln.
-6. Bei Bedarf `Geraeteansicht speichern` nutzen. Diese Ansicht wird nur in diesem Browser gespeichert und beim naechsten Oeffnen auf diesem Endgeraet automatisch geladen.
-7. Audio mit Mute, Solo und Lautstaerke-Reglern kontrollieren.
+2. Standardmaessig startet eine schlanke Standardansicht mit zwei Monitoren.
+3. Im Schnellstart Naumburg oder die News-Uebersicht laden.
+4. Bei Bedarf im Menue unter `Ansicht` Monitorzahl, Layout oder Vorlage anpassen.
+5. Optionale Werkzeuge wie Webcam-Suche, Livestream-Katalog und lokale Dienste sind eingeklappt.
+6. Kacheln verschieben, skalieren und bei Bedarf in den Vollbildmodus wechseln.
+7. Bei Bedarf `Persoenliche Ansicht` speichern. Diese Ansicht wird nur in diesem Browser gespeichert und beim naechsten Oeffnen auf diesem Endgeraet automatisch geladen.
+8. Audio mit Mute, Solo und Lautstaerke-Reglern kontrollieren.
 
 ### Hinweise
 
 Loopback-Quellen wie `http://127.0.0.1:8000`, `http://localhost:8000` und lokale LAN-Quellen wie `http://192.168.x.x` werden auch aus der GitHub-Pages-Version direkt als Frame versucht. Die Wall setzt dafuer `local-network-access` am iframe und kann die Browserfreigabe ueber `Browser-Freigabe anstossen` aktiv anfragen; aktuelle Chromium-/Edge-Browser koennen trotzdem eine lokale Netzwerkfreigabe verlangen. Wenn der Browser blockiert oder die Zielseite Frames verbietet, gibt es den Local-Mode:
 
-ELD ist die gemeinsame Ausgangsansicht. Persoenliche oder geraetespezifische Anpassungen werden nicht auf GitHub Pages veroeffentlicht, sondern nur lokal im Browser per `localStorage` gespeichert.
+Die Standardansicht ist die gemeinsame Ausgangsansicht. Persoenliche oder geraetespezifische Anpassungen werden nicht auf GitHub Pages veroeffentlicht, sondern nur lokal im Browser per `localStorage` gespeichert.
 
 ```text
 src\modules\regie\start-local-regie-wall.bat
@@ -649,8 +650,8 @@ Wenn die Regie Wall bereits ueber GitHub Pages offen ist, kann der Button `Lokal
 
 - Mehrere Streams oder Webseiten parallel ueberwachen.
 - Program- und Preview-Ansichten fuer Vorfuehrungen aufbauen.
+- Direkt einbettbare Webcam-Livestreams und Livebilder nahe eines eingegebenen Ortes suchen und WorldCam fuer weitere externe Recherche oeffnen.
 - Lokale Geraete, Kameras oder Webinterfaces in einer Wand sammeln.
-- Soundboard und Audio-Steuerung fuer einfache Regiesituationen nutzen.
 
 ---
 
