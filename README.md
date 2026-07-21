@@ -762,6 +762,36 @@ Der Markdown-Generator ist eine Webanwendung zum Erzeugen von Markdown-Dateien p
 
 ---
 
+## Paper-Maker
+
+Pfad:
+
+```text
+src/modules/PaperMaker/index.html
+```
+
+### Zweck
+
+Paper-Maker ist ein Browser-Editor fuer wissenschaftliche Hausarbeiten und spaetere Paper. Das Modul verbindet eine Word-aehnliche Schreiboberflaeche mit A4-Layout, automatischem Inhaltsverzeichnis, Zeichenzaehlern, Fussnoten, Literaturverwaltung, LaTeX-Import und Export als PDF-Druckansicht oder LaTeX-Projekt.
+
+### Bedienung
+
+1. Modul oeffnen.
+2. Neues Projekt anlegen oder lokale `.tex`-/`.bib`-/`paper-maker.json`-Dateien laden.
+3. Titelblatt, Seitenraender, Schrift, Zeilenabstand und Nummerierung einstellen.
+4. Kapitel und Unterkapitel im Editor schreiben.
+5. Literatur erfassen und als Fussnote zitieren.
+6. PDF drucken oder das LaTeX-Projekt als ZIP herunterladen.
+
+### Typische Nutzung
+
+- Hausarbeiten nach Institutsleitfaden vorbereiten.
+- Zeichenumfang mit und ohne Fussnoten kontrollieren.
+- Literatur mit Kurztiteln und Fussnotennachweisen verwalten.
+- Ein angefangenes LaTeX-Projekt im Browser weiterstrukturieren.
+
+---
+
 ## QR-Generator
 
 Pfad:
