@@ -101,7 +101,7 @@
             <button type="button" class="slider-btn" id="catPrev" aria-label="Zurück">&#8592;</button>
             <div class="slider-track" id="catSlider">
 
-                <a class="cat-card" href="src/informatikstudium.html">
+                <a class="cat-card" href="src/geschichtsstudium.html">
                     <div class="cat-card-bg cat-card-bg--studium"></div>
                     <div class="cat-deco">🎓</div>
                     <div class="cat-overlay">
@@ -138,6 +138,36 @@
     </section>
 
     <section class="timeline">
+            <article class="timeline-item right">
+                <div class="timeline-media">
+                    <div class="avatar-border">
+                        <img src="https://raw.githubusercontent.com/Datenflix007/UBHeidelbergAuthorTracker/main/image/README/1784999419311.png" alt="UB Heidelberg Author Tracker">
+                    </div>
+                </div>
+                <div class="timeline-content">
+                    <h3>UB Heidelberg Author Tracker</h3>
+                    <p>25.07.2026<br /><br /></p>
+                    <p>
+                        Ein lokales Forschungswerkzeug zum Erstellen von Autorenindizes historischer Zeitschriften. Der Collector ruft Metadaten von UB Heidelberg/DWork und ThULB/journals@UrMEL ab, aggregiert Beitr&auml;ge nach Autorinnen und Autoren und erstellt daraus strukturierte JSON-/ZIP-Ausgaben. Das Tool ist <a href="https://github.com/Datenflix007/UBHeidelbergAuthorTracker">auf Github</a> einsehbar.
+                    </p>
+                </div>
+            </article>
+
+            <article class="timeline-item left">
+                <div class="timeline-content">
+                    <h3>NARA-Trace</h3>
+                    <p>25.07.2026<br /><br /></p>
+                    <p>
+                        Ein lokales, inoffizielles Forschungswerkzeug f&uuml;r quellennahe Personensuche im National Archives Catalog der U.S. National Archives and Records Administration. Die Anwendung unterst&uuml;tzt die Suche nach digitalisierten Best&auml;nden, Suchverl&auml;ufen und Detailansichten mit Originalseite und Transkript. Das Tool ist <a href="https://github.com/Datenflix007/NARA-Trace">auf Github</a> einsehbar.
+                    </p>
+                </div>
+                <div class="timeline-media">
+                    <div class="avatar-border">
+                        <img src="https://raw.githubusercontent.com/Datenflix007/NARA-Trace/main/image/README/1784997630941.png" alt="NARA-Trace Suchoberfl&auml;che">
+                    </div>
+                </div>
+            </article>
+
             <article class="timeline-item right">
                 <div class="timeline-media">
                     <div class="avatar-border">
@@ -634,7 +664,7 @@
                 const text = normalize(`${node.title} ${node.path} ${node.summary}`);
                 if (text.includes('algodat') || text.includes('datenstruktur') || text.includes('sort') || text.includes('heap') || text.includes('baum')) return 'algodat';
                 if (text.includes('automata') || text.includes('automat') || text.includes('turing') || text.includes('formale')) return 'automata';
-                if (text.includes('jena') || text.includes('gotha') || text.includes('minecraft') || text.includes('heritage') || text.includes('kumbra') || text.includes('urban history') || text.includes('lindenring')) return 'heritage';
+                if (text.includes('jena') || text.includes('gotha') || text.includes('minecraft') || text.includes('heritage') || text.includes('kumbra') || text.includes('urban history') || text.includes('lindenring') || text.includes('nara') || text.includes('heidelberg') || text.includes('zeitschrift') || text.includes('archiv')) return 'heritage';
                 if (text.includes('generator') || text.includes('maker') || text.includes('viewer') || text.includes('visualiser')) return 'creator-tools';
                 if (text.includes('schule') || text.includes('school') || text.includes('arbeitsblatt') || text.includes('lehre')) return 'education';
                 if (text.includes('guide') || text.includes('kurs')) return 'learning';
@@ -656,6 +686,7 @@
                 if (category === 'automata' || text.includes('endlicher automat') || text.includes('kellerautomat') || text.includes('turingmaschine') || text.includes('formale sprache')) tags.add('automatentheorie');
                 if (text.includes('dab') || text.includes('arbeitsblatt')) tags.add('digitales arbeitsblatt');
                 if (text.includes('jena') || text.includes('gotha') || text.includes('minecraft')) tags.add('lehrkonzept');
+                if (text.includes('nara') || text.includes('heidelberg') || text.includes('zeitschrift') || text.includes('archiv')) tags.add('geschichte').add('archivarbeit').add('digital humanities');
                 return [...tags].map(normalize).filter(Boolean);
             }
 
@@ -975,6 +1006,8 @@
                         ['tool-ti-trainer', 'TI-Trainer', 'Tool', 'Interaktive Lernumgebung zu Automaten, Algorithmen und Datenstrukturen.', 'src/modules/titrainer/index.html'],
                         ['tool-algorithmplanner', 'AlgorithmPlanner', 'Tool', 'Visueller Baukasten zum Modellieren von Programmabläufen, Struktogrammen, Flussdiagrammen und UML.', 'src/modules/AlgorithmPlanner/index.html'],
                         ['tool-hologramm-history', 'Hologramm-History', 'Tool', 'Webanwendung für Fragen an historische Persönlichkeiten.', 'https://github.com/Datenflix007/holo-history'],
+                        ['tool-ub-heidelberg-author-tracker', 'UB Heidelberg Author Tracker', 'Tool', 'Lokaler Collector fuer Autorenindizes historischer Zeitschriften aus UB Heidelberg/DWork und ThULB/journals@UrMEL.', 'https://github.com/Datenflix007/UBHeidelbergAuthorTracker'],
+                        ['tool-nara-trace', 'NARA-Trace', 'Tool', 'Lokales Forschungswerkzeug fuer quellennahe Personensuche im National Archives Catalog der NARA.', 'https://github.com/Datenflix007/NARA-Trace'],
                         ['tool-markdown-generator', 'Markdown-Generator', 'Tool', 'Webanwendung zum Erzeugen von Markdown-Dateien.', 'src/modules/markdownGenerator/index.html'],
                         ['tool-paper-maker', 'Paper-Maker', 'Tool', 'Browser-Editor fuer Hausarbeiten mit A4-Layout, Inhaltsverzeichnis, Zeichenzaehler, Fussnoten, Literaturverwaltung, LaTeX-Import und PDF-/ZIP-Export.', 'src/modules/PaperMaker/index.html'],
                         ['tool-manuskript-maker', 'Manuskript-Maker', 'Tool', 'Tool zum Erstellen und Bearbeiten von Manuskripten.', 'src/modules/manuscriptMaker/index.html'],

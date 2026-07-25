@@ -1077,6 +1077,8 @@ Einige Karten verweisen auf externe Repositories statt auf direkt gehostete Modu
 - `Datenflix007/EinsatzDisponierungSoftware`
 - `Datenflix007/L-S`
 - `Datenflix007/holo-history`
+- `Datenflix007/UBHeidelbergAuthorTracker`
+- `Datenflix007/NARA-Trace`
 - `Datenflix007/OCR-Extractor`
 - `Datenflix007/zotero-webdav-GithubViaDocker`
 - `Datenflix007/TIVisualiser`
