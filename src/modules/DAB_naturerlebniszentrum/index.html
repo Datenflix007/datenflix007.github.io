@@ -46,10 +46,17 @@
       <div class="hero-card">
         <div class="hero-copy">
           <p class="eyebrow">Digitales Arbeitsblatt</p>
-          <h1>Der Jenaer Wald und wir</h1>
-          <p class="hero-text">
-            Spuren mittelalterlicher Arbeit entdecken, <br />Berufe und ihre Bedeutung für die Umwelt verstehen,<br />Bedeutung für uns selbst verstehen.
+          <h1 id="dashboardTitle">Historische Waldberufe entdecken</h1>
+          <p class="hero-text" id="dashboardDescription">
+            Spuren vergangener Arbeit entdecken und die Bedeutung historischer Waldberufe für Mensch und Umwelt verstehen.
           </p>
+          <div class="event-selection">
+            <label for="eventSelect">Veranstaltung auswählen</label>
+            <select id="eventSelect">
+              <option value="general" selected>Allgemeine Verwendung</option>
+              <option value="jenaWorkshop">Workshop: Der Jenaer Wald und wir</option>
+            </select>
+          </div>
           <div class="hero-actions">
             <button class="button-primary" data-route="intro">Erkundung starten</button>
           </div>

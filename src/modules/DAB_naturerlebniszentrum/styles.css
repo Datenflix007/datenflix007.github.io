@@ -131,6 +131,34 @@ p {
   gap: 12px;
 }
 
+.event-selection {
+  display: grid;
+  gap: 8px;
+  max-width: 430px;
+  margin: 0 0 22px;
+}
+
+.event-selection label {
+  font-weight: 800;
+  color: var(--accent-strong);
+}
+
+.event-selection select {
+  width: 100%;
+  padding: 13px 42px 13px 16px;
+  border: 1px solid rgba(32, 49, 40, 0.18);
+  border-radius: var(--radius-md);
+  color: var(--ink);
+  background: var(--surface-strong);
+  font: inherit;
+  cursor: pointer;
+}
+
+.event-selection select:focus-visible {
+  outline: 3px solid rgba(47, 106, 79, 0.3);
+  outline-offset: 2px;
+}
+
 .button-primary,
 .button-secondary,
 .chip-button,

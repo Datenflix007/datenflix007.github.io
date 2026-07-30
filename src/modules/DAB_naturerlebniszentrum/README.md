@@ -13,6 +13,7 @@ Dieses Repository enthaelt eine statische, GitHub-Pages-taugliche Webseite fuer 
 ## Umgesetzte Anforderungen
 
 - Start-Dashboard mit durchlaufenden historischen Abbildungen und Start-Button
+- Veranstaltungsauswahl mit allgemeiner Verwendung als Standard und optionalem Jenaer-Wald-Workshop
 - Einfuehrungsseite mit Aufgabenstellung aus `md/aufgabestellung.md` und Rechercheguide aus `md/rechercheguide.md`
 - Berufsuebersicht mit Auswahl mehrerer Berufe
 - Berufsdetailseite, die jeweils aus einer eigenen Markdown-Datei geladen wird

@@ -1,10 +1,25 @@
 const routes = {
   dashboard: { id: "dashboard", title: "Start", graphStep: 0 },
-  intro: { id: "intro", title: "Einführung", graphStep: 1, files: ["md/aufgabestellung.md"] },
+  intro: { id: "intro", title: "Einführung", graphStep: 1 },
   professions: { id: "professions", title: "Berufe entdecken", graphStep: 2, files: ["md/introduction.md"] },
   professionDetail: { id: "professionDetail", title: "Berufsprofil", graphStep: 3 },
   poster: { id: "poster", title: "Plakat erstellen", graphStep: 4, files: ["md/plakat.md"] },
   badWeather: { id: "badWeather", title: "Schlechtwettervariante", graphStep: 6, files: ["md/berufchatverlauf.md"] },
+};
+
+const events = {
+  general: {
+    title: "Historische Waldberufe entdecken",
+    description: "Spuren vergangener Arbeit entdecken und die Bedeutung historischer Waldberufe für Mensch und Umwelt verstehen.",
+    assignmentFile: "md/aufgabestellung-allgemein.md",
+    assignmentLabel: "Arbeitsauftrag",
+  },
+  jenaWorkshop: {
+    title: "Der Jenaer Wald und wir",
+    description: "Spuren mittelalterlicher Arbeit entdecken und ihre Bedeutung für den Jenaer Wald verstehen.",
+    assignmentFile: "md/aufgabestellung.md",
+    assignmentLabel: "Arbeitsauftrag &amp; Zeitplan",
+  },
 };
 
 const professions = [
@@ -46,6 +61,7 @@ const clearNotesButton = document.getElementById("clearNotesButton");
 const markdownCache = new Map();
 const state = {
   route: "dashboard",
+  eventKey: "general",
   selectedProfession: professions[0],
   slideIndex: 0,
   slideTimer: null,
@@ -98,6 +114,12 @@ function bindGlobalEvents() {
   });
 
   app.addEventListener("change", (event) => {
+    if (event.target.matches("#eventSelect")) {
+      state.eventKey = events[event.target.value] ? event.target.value : "general";
+      updateDashboardEvent();
+      return;
+    }
+
     if (event.target.matches(".task-list input[type='checkbox']")) {
       saveCheckbox(event.target.id, event.target.checked);
     }
@@ -145,7 +167,9 @@ async function render() {
   }
 
   const route = routes[state.route];
-  const files = route.files ?? [];
+  const files = state.route === "intro"
+    ? [events[state.eventKey].assignmentFile]
+    : route.files ?? [];
   const content = await Promise.all(files.map(loadMarkdown));
 
   if (state.route === "intro") {
@@ -180,11 +204,26 @@ function renderDashboard() {
   app.innerHTML = "";
   app.appendChild(template.content.cloneNode(true));
 
+  const eventSelect = document.getElementById("eventSelect");
+  eventSelect.value = state.eventKey;
+  updateDashboardEvent();
   setupIndicators();
+}
+
+function updateDashboardEvent() {
+  const selectedEvent = events[state.eventKey];
+  const title = document.getElementById("dashboardTitle");
+  const description = document.getElementById("dashboardDescription");
+
+  if (title && description) {
+    title.textContent = selectedEvent.title;
+    description.textContent = selectedEvent.description;
+  }
 }
 
 function renderIntro(markdownParts) {
   const [assignmentMarkdown] = markdownParts;
+  const selectedEvent = events[state.eventKey];
 
   app.innerHTML = `
     <section class="workspace">
@@ -213,7 +252,7 @@ function renderIntro(markdownParts) {
         </article>
 
         <article class="content-card">
-          <p class="eyebrow">Arbeitsauftrag &amp; Zeitplan</p>
+          <p class="eyebrow">${selectedEvent.assignmentLabel}</p>
           <h2>Eure Aufgaben</h2>
           ${renderChecklist(assignmentMarkdown)}
         </article>
