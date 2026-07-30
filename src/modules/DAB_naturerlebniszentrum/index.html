@@ -17,8 +17,13 @@
     <aside class="notes-drawer" id="notesDrawer" aria-label="Notizblatt">
       <section class="notes-panel" id="notesPanel">
         <div class="notes-panel__header">
-          <p class="eyebrow">Eigenes Notizblatt</p>
-          <h2>Beobachtungen sammeln</h2>
+          <div>
+            <p class="eyebrow">Eigenes Notizblatt</p>
+            <h2>Beobachtungen sammeln</h2>
+          </div>
+          <button class="notes-close" id="notesClose" type="button" aria-label="Notizblatt schließen">
+            <span aria-hidden="true">&times;</span>
+          </button>
         </div>
         <label class="notes-label" for="notesInput">Funde, Ortsnamen, Fragen oder Berufsideen</label>
         <textarea id="notesInput" placeholder="Zum Beispiel: Gibt es in unserer Umgebung Hinweise auf alte Forstberufe oder Ortsnamen mit historischem Bezug?"></textarea>

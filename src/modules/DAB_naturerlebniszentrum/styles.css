@@ -688,6 +688,38 @@ p {
   font-size: 1.45rem;
 }
 
+.notes-panel__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.notes-close {
+  display: grid;
+  flex: 0 0 40px;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border-radius: 50%;
+  place-items: center;
+  color: var(--accent-strong);
+  background: rgba(47, 106, 79, 0.09);
+  font-size: 1.8rem;
+  line-height: 1;
+  transition: background-color 180ms ease, transform 180ms ease;
+}
+
+.notes-close:hover {
+  background: rgba(47, 106, 79, 0.16);
+  transform: translateY(-2px);
+}
+
+.notes-close:focus-visible {
+  outline: 3px solid rgba(47, 106, 79, 0.3);
+  outline-offset: 2px;
+}
+
 .notes-label {
   display: block;
   margin: 18px 0 10px;

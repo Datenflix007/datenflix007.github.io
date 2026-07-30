@@ -38,6 +38,7 @@ const additionalAssets = [
 const app = document.getElementById("app");
 const notesDrawer = document.getElementById("notesDrawer");
 const notesToggle = document.getElementById("notesToggle");
+const notesClose = document.getElementById("notesClose");
 const notesInput = document.getElementById("notesInput");
 const saveNotesButton = document.getElementById("saveNotesButton");
 const clearNotesButton = document.getElementById("clearNotesButton");
@@ -107,6 +108,15 @@ function bindGlobalEvents() {
     notesToggle.setAttribute("aria-expanded", String(isOpen));
   });
 
+  notesClose.addEventListener("click", closeNotesDrawer);
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && notesDrawer.classList.contains("is-open")) {
+      closeNotesDrawer();
+      notesToggle.focus();
+    }
+  });
+
   saveNotesButton.addEventListener("click", () => {
     localStorage.setItem("jenaer-wald-notes", notesInput.value);
     showStatus("Notizen wurden lokal gespeichert.");
@@ -117,6 +127,11 @@ function bindGlobalEvents() {
     localStorage.removeItem("jenaer-wald-notes");
     showStatus("Notizen wurden entfernt.");
   });
+}
+
+function closeNotesDrawer() {
+  notesDrawer.classList.remove("is-open");
+  notesToggle.setAttribute("aria-expanded", "false");
 }
 
 async function render() {
