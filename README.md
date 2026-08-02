@@ -605,6 +605,36 @@ GVIS ist ein statisches GIS-Werkzeug fuer OSM-, GeoJSON- und CSV-Daten. Es kann 
 
 ---
 
+## KunstWerk
+
+Pfad:
+
+```text
+src/modules/KunstWerk/index.html
+```
+
+### Zweck
+
+KunstWerk ist ein Photoshop-aehnliches Browser-Tool fuer einfache Bildbearbeitung direkt auf der Website. Es arbeitet statisch mit Canvas-Funktionen und braucht kein Backend.
+
+### Bedienung
+
+1. KunstWerk oeffnen.
+2. Bild per Datei-Picker oder Drag-and-drop laden.
+3. Auswahl, Zuschnitt, Pixelpinsel, Magic Pen oder Hintergrundentfernung nutzen.
+4. Helligkeit, Kontrast, Saettigung, Waerme, Schaerfe oder Weichzeichnung anpassen.
+5. Filter wie Schwarzweiss, Sepia, Invertieren, Autokontrast, Tonwerte, Posterize, Kanten oder Vignette anwenden.
+6. Ergebnis als PNG speichern.
+
+### Typische Nutzung
+
+- Bilder schnell zuschneiden.
+- Personen oder Objekte freistellen.
+- Bereiche anonymisieren oder verpixeln.
+- einfache Korrekturen und Filter ohne Desktop-Programm testen.
+
+---
+
 ## Regie Wall
 
 Pfad:
