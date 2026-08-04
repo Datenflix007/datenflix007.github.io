@@ -38,6 +38,15 @@
             stepLabel: "Takt",
             runLabel: "Durchlauf"
         },
+        "emulator-lab": {
+            moduleClass: "lab-module-emulator-lab",
+            kind: "Emulator-Sammlung",
+            summary: "Meilenstein waehlen, Beispiel laden, Schrittfolge ausfuehren.",
+            steps: ["Auswahl", "Schritt", "Ausgabe"],
+            prepareLabel: "Vorbereiten",
+            stepLabel: "Schritt",
+            runLabel: "Durchlauf"
+        },
         "lambda-calculus": {
             moduleClass: "lab-module-lambda",
             kind: "Lambda-Uebungslabor",

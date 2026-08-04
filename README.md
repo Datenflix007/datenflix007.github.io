@@ -689,6 +689,33 @@ Die Seite verweist ausserdem auf das Zuse Internet Archive, das Deutsche Museum,
 
 ---
 
+## Informatikgeschichte Emulator-Lab
+
+Pfad:
+
+```text
+src/modules/Informatikgeschichte/emulator-lab/index.html
+```
+
+### Zweck
+
+Das Emulator-Lab ergaenzt den Zeitstrahl um echte Mini-Emulatoren fuer weitere Meilensteine: Hollerith-Tabulator, Turingmaschinen-Band, Relais-Schaltkreis, FORTRAN-Formeluebersetzer, LISP-Listen-Evaluator, BASIC-Interpreter, ELIZA-Dialogsystem, 4-Bit-CPU, Pointer-/Stack-Maschine, RSA-Lab, DNS-Paketweg und MapReduce-Job.
+
+### Bedienung
+
+1. Emulator auswaehlen oder direkt per Hash starten, z.B. `#eliza`.
+2. Beispiel laden oder Programm/Eingabe anpassen.
+3. Vorbereiten, einzelne Schritte ausfuehren oder komplett durchlaufen lassen.
+4. Zustand, Ausgabe und Ablaufprotokoll vergleichen.
+
+### Typische Nutzung
+
+- Alle gestrichelten Emulator-Links im Zeitstrahl mit echter Interaktion hinterlegen.
+- Meilensteine als kleine Operationen statt nur als Text nachvollziehen.
+- Spaetere vollstaendige Unterseiten aus einem funktionierenden Mini-Emulator heraus entwickeln.
+
+---
+
 ## A-0 Compiler Emulator
 
 Pfad:
