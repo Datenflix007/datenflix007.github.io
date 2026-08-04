@@ -82,6 +82,7 @@
                             <button type="button" data-filter="tool">Tool</button>
                             <button type="button" data-filter="algodat">AlgoDat</button>
                             <button type="button" data-filter="automatentheorie">Automatentheorie</button>
+                            <button type="button" data-filter="informatikgeschichte">Informatikgeschichte</button>
                             <button type="button" data-filter="arbeitsblatt">Digitales Arbeitsblatt</button>
                         </div>
                         <label class="knowledge-tag-search">
@@ -108,6 +109,20 @@
                         <span class="cat-label">Studium</span>
                         <h3>Aus dem Informatikstudium</h3>
                         <p>Theorie, Projekte und Erkenntnisse auf dem Weg zum Staatsexamen</p>
+                    </div>
+                </a>
+
+                <a class="cat-card" href="src/informatikgeschichte.html">
+                    <div class="cat-card-bg cat-card-bg--informatikgeschichte"></div>
+                    <div class="cat-deco cat-deco--history-range">
+                        <span>1843</span>
+                        <span>bis</span>
+                        <span>heute</span>
+                    </div>
+                    <div class="cat-overlay">
+                        <span class="cat-label">Themenbereich</span>
+                        <h3>Informatikgeschichte</h3>
+                        <p>Zeitstrahl zu theoretischer und praktischer Informatik mit Lambda-Kalk&uuml;l, Analytical Engine, A-0 und ENIAC als Laboren</p>
                     </div>
                 </a>
 
@@ -687,6 +702,11 @@
                 if (text.includes('dab') || text.includes('arbeitsblatt')) tags.add('digitales arbeitsblatt');
                 if (text.includes('jena') || text.includes('gotha') || text.includes('minecraft')) tags.add('lehrkonzept');
                 if (text.includes('nara') || text.includes('heidelberg') || text.includes('zeitschrift') || text.includes('archiv')) tags.add('geschichte').add('archivarbeit').add('digital humanities');
+                if (text.includes('informatikgeschichte') || text.includes('lambda') || text.includes('church') || text.includes('analytical engine') || text.includes('babbage') || text.includes('a-0') || text.includes('compiler emulator') || text.includes('eniac')) tags.add('informatikgeschichte');
+                if (text.includes('lambda') || text.includes('church')) tags.add('theoretische informatik').add('berechenbarkeit');
+                if (text.includes('analytical engine') || text.includes('babbage')) tags.add('rechnerarchitektur').add('computerarchitektur');
+                if (text.includes('a-0') || text.includes('compiler emulator')) tags.add('compilerbau');
+                if (text.includes('eniac')) tags.add('rechnerarchitektur').add('computerarchitektur');
                 return [...tags].map(normalize).filter(Boolean);
             }
 
@@ -1025,6 +1045,11 @@
                         ['tool-zotero-docker-github', 'Zotero x Docker x Github', 'Tool', 'Setup zur Synchronisation von Zotero über selbst gehosteten WebDAV.', 'https://github.com/Datenflix007/zotero-webdav-GithubViaDocker'],
                         ['tool-tivisualizer', 'TIVisualizer', 'Tool', 'Webanwendung zur Visualisierung der Von-Neumann-Architektur.', 'src/modules/tivisualiser/index.html'],
                         ['tool-automatalab', 'AutomataLab', 'Tool', 'Werkzeug zum Konstruieren, Simulieren und Transformieren endlicher Automaten, Kellerautomaten und Turingmaschinen.', 'src/modules/AutomataLab/index.html'],
+                        ['guide-informatikgeschichte', 'Informatikgeschichte', 'Guide', 'Themenbereich mit zweispurigem Zeitstrahl zu Erfolgen der theoretischen und praktischen Informatik.', 'src/informatikgeschichte.html'],
+                        ['tool-lambda-calculus-lab', 'Lambda-Kalkuel Labor', 'Tool', 'Interaktives Labor zu Alonzo Church: Lambda-Terme eingeben, Beta-Reduktion ueben und Normalformen pruefen.', 'src/modules/Informatikgeschichte/lambda-calculus/index.html'],
+                        ['tool-analytical-engine-emulator', 'Babbage Analytical Engine Emulator', 'Tool', 'Didaktischer Browser-Emulator zu Store, Mill, Operation Cards, Variable Cards, Schleifen und Druckerausgabe.', 'src/modules/Informatikgeschichte/analytical-engine/index.html'],
+                        ['tool-a0-compiler-emulator', 'A-0 Compiler Emulator', 'Tool', 'Didaktischer Browser-Emulator zum A-0 System Compiler: erst Compilerwerkzeug bauen, dann Abstraktionsebene fuer spaetere Hochsprachen nachvollziehen.', 'src/modules/Informatikgeschichte/a0-compiler/index.html'],
+                        ['tool-eniac-emulator', 'ENIAC Emulator', 'Tool', 'Didaktischer Browser-Emulator zu ENIAC: Patch-Deck, 20 dezimale Akkumulatoren, Konstantensender, Impulsleitungen und Punched-Card-Ausgabe.', 'src/modules/Informatikgeschichte/eniac-emulator/index.html'],
                         ['guide-programm-exe', 'Programm.exe erstellen', 'Guide', 'Guide zum Erzeugen startbarer Windows-EXE-Dateien aus Python-, Java-, C#-, Node.js-, Go- und Rust-Projekten.', 'src/guides/programm-exe-erstellen.html'],
                         ['guide-installer', 'Installer Guide', 'Guide', 'Guide zu Setup.exe, CLI-Installern, Tkinter-Installer-UI, Startmen&uuml;, Desktop-Verkn&uuml;pfung, Icons sowie Java- und Python-Packaging.', 'src/guides/installer-guide.html'],
                         ['automata-course', 'Automaten & Berechenbarkeit', 'Automatentheorie', 'Kursseite zu Automatenmodellen, Sprachklassen und Berechenbarkeit.', 'src/modules/titrainer/automaten.html'],

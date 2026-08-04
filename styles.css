@@ -134,6 +134,13 @@ img {
         linear-gradient(160deg, #0f1729 0%, #1e293b 100%);
 }
 
+.cat-card-bg--informatikgeschichte {
+    background:
+        linear-gradient(90deg, rgba(226,232,240,.14) 1px, transparent 1px) 0 0 / 34px 34px,
+        linear-gradient(180deg, rgba(226,232,240,.10) 1px, transparent 1px) 0 0 / 34px 34px,
+        linear-gradient(135deg, #08111c 0%, #142238 48%, #2b1d0d 100%);
+}
+
 .cat-card-bg--guides {
     background:
         radial-gradient(ellipse at 25% 75%, #22c55e 0%, transparent 52%),
@@ -810,6 +817,27 @@ footer {
     line-height: 1;
     filter: blur(1px);
     transition: opacity .3s, transform .3s;
+}
+
+.cat-deco--history-range {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+    font-size: 3.25rem;
+    line-height: .82;
+    text-align: right;
+}
+
+.cat-deco--history-range span:nth-child(2) {
+    font-size: 1rem;
+    font-weight: 900;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+}
+
+.cat-deco--history-range span:nth-child(3) {
+    font-size: 2.25rem;
 }
 
 .cat-card:hover .cat-deco {

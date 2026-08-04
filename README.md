@@ -45,10 +45,11 @@ Die Screenshots wurden aus den realen HTML-Seiten aufgenommen, nicht nur aus den
 | Referenzen        | ![Referenzen](media/readme/referenzen.png)      |
 |                   |                                                 |
 
-Die Website besteht aus vier zentralen Einstiegspunkten:
+Die Website besteht aus zentralen Einstiegspunkten:
 
 - **Startseite**: `index.html`
 - **Projekte, Tools und Guides**: `src/projekte.html`
+- **Informatikgeschichte**: `src/informatikgeschichte.html`
 - **Weitere Informatik-Guides**: `src/weitere-guides.html`
 - **Referenzen**: `src/Referenzen.html`
 - **Kontakt**: `src/kontakt.html`
@@ -529,6 +530,215 @@ InfoPedia ist ein Wissensgraph zu Begriffen aus Algorithmen, Datenstrukturen und
 - Zusammenhang zwischen Algorithmen sehen.
 - Vom Kurs ins Lab wechseln.
 - Projekt- und Tool-Eintraege der Website finden.
+
+---
+
+## Lambda-Kalkuel Labor
+
+Pfad:
+
+```text
+src/modules/Informatikgeschichte/lambda-calculus/index.html
+```
+
+### Zweck
+
+Das Lambda-Kalkuel Labor gehoert zum Themenbereich Informatikgeschichte. Es erklaert Alonzo Churchs Funktionsmodell der Berechnung und macht Beta-Reduktion praktisch uebbar: Terme eingeben, naechsten Redex sehen, Schritt fuer Schritt reduzieren, Normalform berechnen und Uebungsaufgaben pruefen.
+
+### Historische Quellen und Quellenarbeit
+
+Zentrale Primaerquelle fuer den Entscheidbarkeitskontext ist:
+
+```text
+Alonzo Church: An Unsolvable Problem of Elementary Number Theory.
+American Journal of Mathematics, Vol. 58, No. 2, 1936, S. 345-363.
+DOI: 10.2307/2371045
+```
+
+Links:
+
+```text
+https://www.jstor.org/stable/2371045
+https://www.ics.uci.edu/~lopes/teaching/inf212W12/readings/church.pdf
+```
+
+Als frueher Lambda-Kalkuel-Kontext ist ausserdem wichtig:
+
+```text
+Alonzo Church: A Set of Postulates for the Foundation of Logic.
+Annals of Mathematics, Vol. 33, No. 2, 1932, S. 346-366.
+DOI: 10.2307/1968337
+```
+
+Link:
+
+```text
+https://www.jstor.org/stable/1968337
+```
+
+Die Seite verweist ausserdem auf die Stanford Encyclopedia of Philosophy. Bei der Quellenarbeit wird der Browser-Reducer nicht als Beweisapparat gelesen, sondern als Lernmodell fuer Abstraktion, Anwendung, Beta-Reduktion, Normalform und capture-avoiding substitution.
+
+### Bedienung
+
+1. Beispiel laden oder eigenen Term schreiben, z.B. `lambda x. x`.
+2. Term pruefen, um Syntax, aktuellen Term und naechsten Redex zu sehen.
+3. Mit `Beta-Schritt` einzelne Reduktionen nachvollziehen.
+4. Mit `Bis Normalform` automatisch bis zum Ende reduzieren.
+5. In den Uebungen eine Normalform eintragen und pruefen lassen.
+
+### Typische Nutzung
+
+- Churchs Theorie-Meilenstein im Zeitstrahl praktisch nachvollziehen.
+- Beta-Reduktion und Substitution ueben.
+- Normalformen und Alpha-Aequivalenz verstehen.
+- Den Zusammenhang von Lambda-Kalkuel, Turingmaschine und Berechenbarkeit erklaeren.
+
+---
+
+## Babbage Analytical Engine Emulator
+
+Pfad:
+
+```text
+src/modules/Informatikgeschichte/analytical-engine/index.html
+```
+
+### Zweck
+
+Der Babbage Analytical Engine Emulator gehoert zum Themenbereich Informatikgeschichte. Er bildet den nie vollstaendig gebauten Entwurf als didaktisches Kartenmodell nach: Zahlen liegen im `Store`, Rechenoperationen laufen durch die `Mill`, und ein Kartenprogramm trennt Operation Cards von Variable Cards.
+
+### Historische Quellen und Quellenarbeit
+
+Zentrale Primaerquelle ist:
+
+```text
+L. F. Menabrea / Ada Augusta, Countess of Lovelace:
+Sketch of the Analytical Engine Invented by Charles Babbage.
+Taylor's Scientific Memoirs, 1843.
+```
+
+Link:
+
+```text
+https://www.fourmilab.ch/babbage/sketch.html
+```
+
+Die Seite verweist ausserdem auf Babbages spaetere Darstellung in `Passages from the Life of a Philosopher`, das Science Museum, die Science Museum Group Collection, das Computer History Museum und die Bodleian Library. Bei der Quellenarbeit wird deutlich unterschieden: Der Emulator behauptet keine mechanische 1:1-Rekonstruktion, sondern uebersetzt Store, Mill, Lochkarten, Schleifen und Ausgabe in ein nachvollziehbares Browser-Modell.
+
+### Bedienung
+
+1. Beispielprogramm laden oder ein eigenes Kartenprogramm schreiben.
+2. Anfangswerte mit `VAR V0 = Wert` in Store-Spalten legen.
+3. Operationen wie `ADD`, `SUB`, `MUL`, `DIV`, `COPY`, `PRINT`, `BELL`, `LABEL` und `IF ... GOTO ...` verwenden.
+4. Karten lesen, dann einzelne Takte ausfuehren oder die Kartenkette laufen lassen.
+5. Store, Mill, Operation Cards, Variable Cards, Drucker und Attendant's Log vergleichen.
+
+### Typische Nutzung
+
+- Trennung von Speicher und Rechenwerk historisch erklaeren.
+- Lochkarten als Programmsteuerung vor elektronischen Computern nachvollziehen.
+- Ada Lovelaces Algorithmus-Kontext mit Babbages Maschinenarchitektur verbinden.
+- Quellenkritisch pruefen, wo die Browser-Version mechanische Details vereinfacht.
+
+---
+
+## A-0 Compiler Emulator
+
+Pfad:
+
+```text
+src/modules/Informatikgeschichte/a0-compiler/index.html
+```
+
+### Zweck
+
+Der A-0 Compiler Emulator gehoert zum Themenbereich Informatikgeschichte. Er bildet das fruehe Linker-/Loader-Prinzip des A-0 System Compiler didaktisch nach: symbolische Routine-Aufrufe werden in ein Objektband uebersetzt und anschliessend Schritt fuer Schritt ausgefuehrt.
+
+Wichtig ist die historische Reihenfolge: Beim A-0-System wurde zuerst ein Compiler- bzw. Uebersetzungswerkzeug gebaut. Diese Schicht zwischen symbolischem Aufruf, Routinebibliothek und Maschinenablauf machte Abstraktionsebenen sichtbar, auf denen spaetere Hochsprachen aufbauen konnten.
+
+### Historisches Paper und Quellenarbeit
+
+Zentrale Primaerquelle ist:
+
+```text
+Grace Murray Hopper: The Education of a Computer.
+Proceedings of the 1952 ACM national meeting, Pittsburgh, S. 243-249.
+DOI: 10.1145/609784.609818
+```
+
+Link:
+
+```text
+https://dl.acm.org/doi/10.1145/609784.609818
+```
+
+Die Seite verweist ausserdem auf kuratierte Sekundaerquellen wie IEEE ETHW, Centre for Computing History und die Smithsonian Grace Murray Hopper Collection. Bei der Quellenarbeit wird A-0 nicht unkritisch als moderner Compiler gelesen, sondern als historischer Vorlaeufer, der eher Routinebibliothek, Linker und Loader verbindet und damit eine Abstraktionsebene vor den Hochsprachen markiert.
+
+### Bedienung
+
+1. Programm im Editor schreiben oder Beispiel laden.
+2. Daten mit `DATA NAME = Wert` deklarieren.
+3. Routinen mit `CALL ADD A B -> SUM` oder per Nummer wie `CALL 05 SUM -> ROOT` aufrufen.
+4. Kompilieren, Objektband und Symboltabelle pruefen.
+5. Schrittweise oder vollstaendig ausfuehren.
+
+### Typische Nutzung
+
+- Informatikgeschichte mit Compilerbau verbinden.
+- Grace Hoppers A-0-System praktisch nachvollziehen.
+- Erklaeren, warum ein zuerst gebauter Compiler neue Abstraktionsebenen und spaetere Hochsprachen ermoeglichte.
+- Den Unterschied zwischen Quellprogramm, Routinebibliothek, Objektband und Ausfuehrung sichtbar machen.
+
+---
+
+## ENIAC Emulator
+
+Pfad:
+
+```text
+src/modules/Informatikgeschichte/eniac-emulator/index.html
+```
+
+### Zweck
+
+Der ENIAC Emulator gehoert zum Themenbereich Informatikgeschichte. Er macht sichtbar, dass Programmieren bei ENIAC zunaechst keine Texteingabe in einem gespeicherten Programm war, sondern eine physische Konfiguration aus Kabeln, Schaltern, Funktions- und Konstantentafeln. Die Browser-Version uebersetzt diese Idee didaktisch in ein Patch-Deck mit Impulsschritten.
+
+### Historische Quellen und Quellenarbeit
+
+Zentrale Primaerquellen sind:
+
+```text
+A Report on the ENIAC (Electronic Numerical Integrator and Computer).
+Moore School of Electrical Engineering, University of Pennsylvania, 1. Juni 1946.
+
+Arthur W. Burks / Harry D. Huskey:
+ENIAC Operating Manual, Moore School of Electrical Engineering, Juni 1946.
+```
+
+Links:
+
+```text
+https://library.si.edu/digital-library/book/reportoneniacel00moor
+https://bitsavers.informatik.uni-stuttgart.de/pdf/univOfPennsylvania/eniac/ENIAC_Operating_Manual_Jun46.pdf
+```
+
+Die Seite verweist ausserdem auf Penn Engineering, das Computer History Museum und IEEE ETHW. Bei der Quellenarbeit wird ENIAC nicht als moderner gespeicherter Programmcomputer gelesen, sondern als elektronischer, allgemeiner Rechner mit Akkumulatoren, Impulsleitungen und zunaechst physischer Programmierung.
+
+### Bedienung
+
+1. Patch-Deck im Editor schreiben oder Beispiel laden.
+2. Konstanten mit `CONST NAME = Wert` setzen.
+3. Akkumulatoren mit `SET A0 = Wert` vorbereiten.
+4. Rechenschritte wie `ADD A0 A1 -> A0`, `MUL`, `DIV`, `SQRT`, `TRANSFER` oder `CLEAR` stecken.
+5. Wiederholungen mit `REPEAT ... END` modellieren.
+6. Patch stecken, einzelne Impulse ausfuehren oder das Deck laufen lassen.
+7. Akkumulatoren, Master-Programmer-Schritte, Konstantensender und Punched-Card-Ausgabe beobachten.
+
+### Typische Nutzung
+
+- Unterschied zwischen Kabelprogrammierung und stored-program-Idee erklaeren.
+- Dezimale Akkumulatoren und Impulsweitergabe sichtbar machen.
+- ENIAC als praktische Informatik im Zeitstrahl mit Quellenarbeit verbinden.
 
 ---
 
