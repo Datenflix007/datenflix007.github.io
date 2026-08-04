@@ -230,6 +230,22 @@
             font-weight: 800;
         }
 
+        .emulator-candidate {
+            display: inline-flex;
+            align-items: center;
+            width: fit-content;
+            max-width: 100%;
+            margin-top: 9px;
+            border: 1px dashed rgba(244,185,90,.7);
+            border-radius: 999px;
+            padding: 4px 8px;
+            color: var(--practice);
+            background: rgba(244,185,90,.08);
+            font-size: 12px;
+            font-weight: 900;
+            line-height: 1.25;
+        }
+
         .history-source-band {
             display: block;
             width: min(980px, calc(100vw - 32px));
@@ -433,6 +449,7 @@
                         <article class="history-event practice">
                             <h3>Herman Hollerith: Lochkartenmaschine</h3>
                             <p>Elektromechanische Tabellierung beschleunigt die US-Volkszählung und wird ein Grundstein der Datenverarbeitung.</p>
+                            <span class="emulator-candidate">Möglicher Emulator: Lochkarten-Tabulator</span>
                         </article>
                     </div>
                 </div>
@@ -457,6 +474,7 @@
                         <article class="history-event theory">
                             <h3>Alan Turing: Turingmaschine</h3>
                             <p>Turingmaschinen pr&auml;zisieren Berechenbarkeit mit Band, Zust&auml;nden und mechanischen Schritten. Zusammen mit Church entsteht der Kern der Church-Turing-These.</p>
+                            <span class="emulator-candidate">Möglicher Emulator: Turingmaschinen-Band</span>
                         </article>
                     </div>
                     <div class="history-year">1936</div>
@@ -468,6 +486,7 @@
                         <article class="history-event theory">
                             <h3>Claude Shannon: Schaltalgebra</h3>
                             <p>Relais- und Schaltkreise werden mit boolescher Algebra analysierbar. Damit rücken Logik und Hardware eng zusammen.</p>
+                            <span class="emulator-candidate">Möglicher Emulator: Relais-Schaltkreis</span>
                         </article>
                     </div>
                     <div class="history-year">1937</div>
@@ -552,6 +571,7 @@
                         <article class="history-event practice">
                             <h3>John Backus: FORTRAN</h3>
                             <p>Eine höhere Programmiersprache wird für wissenschaftliches Rechnen industriell nutzbar und verändert Programmierarbeit dauerhaft.</p>
+                            <span class="emulator-candidate">Möglicher Emulator: FORTRAN-Formelübersetzer</span>
                         </article>
                     </div>
                 </div>
@@ -561,6 +581,7 @@
                         <article class="history-event theory">
                             <h3>LISP: symbolische Verarbeitung</h3>
                             <p>Listen, Rekursion und symbolische Ausdrücke prägen Künstliche Intelligenz, Programmiersprachenforschung und funktionale Ideen.</p>
+                            <span class="emulator-candidate">Möglicher Emulator: LISP-Listen-Evaluator</span>
                         </article>
                     </div>
                     <div class="history-year">1958</div>
@@ -590,6 +611,7 @@
                         <article class="history-event practice">
                             <h3>IBM System/360 und BASIC</h3>
                             <p>System/360 etabliert kompatible Rechnerfamilien; BASIC senkt die Einstiegshürde für interaktives Programmieren.</p>
+                            <span class="emulator-candidate">Möglicher Emulator: BASIC-Interpreter</span>
                         </article>
                     </div>
                 </div>
@@ -612,6 +634,7 @@
                         <article class="history-event practice">
                             <h3>ELIZA</h3>
                             <p>Ein frühes Dialogprogramm zeigt, wie stark einfache Mustererkennung als scheinbare Gesprächsfähigkeit wahrgenommen werden kann.</p>
+                            <span class="emulator-candidate">Möglicher Emulator: ELIZA-Dialogsystem</span>
                         </article>
                     </div>
                 </div>
@@ -650,6 +673,7 @@
                         <article class="history-event practice">
                             <h3>Intel 4004</h3>
                             <p>Der Mikroprozessor integriert eine CPU auf einem Chip und verschiebt Rechenleistung in immer kleinere Geräte.</p>
+                            <span class="emulator-candidate">Möglicher Emulator: 4-Bit-CPU</span>
                         </article>
                     </div>
                 </div>
@@ -666,6 +690,7 @@
                         <article class="history-event practice">
                             <h3>C entsteht</h3>
                             <p>C verbindet hardwarenahe Kontrolle mit portabler Systemprogrammierung und prägt Betriebssysteme und Compilerbau.</p>
+                            <span class="emulator-candidate">Möglicher Emulator: Pointer- und Stack-Maschine</span>
                         </article>
                     </div>
                 </div>
@@ -691,6 +716,7 @@
                         <article class="history-event theory">
                             <h3>RSA</h3>
                             <p>Ein konkretes asymmetrisches Verfahren macht Public-Key-Kryptographie breit vermittelbar und später industriell nutzbar.</p>
+                            <span class="emulator-candidate">Möglicher Emulator: RSA-Schlüsseltausch</span>
                         </article>
                     </div>
                     <div class="history-year">1977</div>
@@ -704,6 +730,7 @@
                         <article class="history-event practice">
                             <h3>TCP/IP und DNS</h3>
                             <p>Das Internet bekommt seine gemeinsame technische Sprache und ein alltagstauglicheres Namenssystem.</p>
+                            <span class="emulator-candidate">Möglicher Emulator: Paketweg und DNS-Auflösung</span>
                         </article>
                     </div>
                 </div>
@@ -759,6 +786,7 @@
                         <article class="history-event practice">
                             <h3>MapReduce</h3>
                             <p>Verteilte Datenverarbeitung wird als Programmiermodell für sehr große Datenmengen praktisch handhabbar.</p>
+                            <span class="emulator-candidate">Möglicher Emulator: Map-Reduce-Job</span>
                         </article>
                     </div>
                 </div>
@@ -812,7 +840,7 @@
         <section class="history-shell history-source-band" aria-label="Quellen und nächste Unterseiten">
             <div class="history-note">
                 <h2>Unterseiten im Themenbereich</h2>
-                <p>Der Themenbereich startet mit fuenf Arbeitsmodellen: dem Lambda-Kalk&uuml;l-Labor f&uuml;r Churchs Funktionsmodell, dem Analytical-Engine-Emulator f&uuml;r Store, Mill und Lochkarten, dem Z3-Emulator f&uuml;r Programmstreifen, Relaisrechner und Gleitkommaarithmetik, dem A-0-Compiler-Emulator f&uuml;r automatische Routineverwaltung und dem ENIAC-Emulator f&uuml;r Akkumulatoren, Kabelprogrammierung und Impulssteuerung. Weitere sinnvolle Unterseiten w&auml;ren sp&auml;ter ein Relais-Schaltungsmodell nach Shannon und eine Softwarekrise-Fallstudie.</p>
+                <p>Der Themenbereich startet mit fuenf Arbeitsmodellen: dem Lambda-Kalk&uuml;l-Labor f&uuml;r Churchs Funktionsmodell, dem Analytical-Engine-Emulator f&uuml;r Store, Mill und Lochkarten, dem Z3-Emulator f&uuml;r Programmstreifen, Relaisrechner und Gleitkommaarithmetik, dem A-0-Compiler-Emulator f&uuml;r automatische Routineverwaltung und dem ENIAC-Emulator f&uuml;r Akkumulatoren, Kabelprogrammierung und Impulssteuerung. Die gestrichelten Hinweise im Zeitstrahl markieren weitere moegliche Emulatoren, zum Beispiel ELIZA, Turingmaschine, Relais-Schaltkreis, BASIC, RSA oder MapReduce.</p>
                 <div class="history-actions">
                     <a class="primary" href="modules/Informatikgeschichte/lambda-calculus/index.html">Lambda-Kalk&uuml;l Labor &ouml;ffnen</a>
                     <a class="primary" href="modules/Informatikgeschichte/analytical-engine/index.html">Analytical Engine Emulator &ouml;ffnen</a>
