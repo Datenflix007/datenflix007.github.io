@@ -642,6 +642,53 @@ Die Seite verweist ausserdem auf Babbages spaetere Darstellung in `Passages from
 
 ---
 
+## Z3 Emulator
+
+Pfad:
+
+```text
+src/modules/Informatikgeschichte/z3-emulator/index.html
+```
+
+### Zweck
+
+Der Z3 Emulator gehoert zum Themenbereich Informatikgeschichte. Er macht Konrad Zuses Relaisrechner als didaktisches Streifenmodell nachvollziehbar: Speicherworte vorbereiten, Werte in Register laden, arithmetische Gleitkommaoperationen ausfuehren, Ergebnisse speichern und ausgeben.
+
+### Historische Quellen und Quellenarbeit
+
+Zentrale Primaerquelle ist:
+
+```text
+Konrad Zuse: Patentanmeldung Z391.
+Konrad Zuse Internet Archive, ZIA ID 0229, 1941.
+```
+
+Link:
+
+```text
+https://zuse.zib.de/item/axy7eq6AntFRwuJv
+```
+
+Die Seite verweist ausserdem auf das Zuse Internet Archive, das Deutsche Museum, das Deutsche Technikmuseum Berlin, das Computer History Museum und Raul Rojas' Architekturaufsatz zur Z1/Z3. Bei der Quellenarbeit wird die Browser-Version nicht als exakte Relais- oder 22-Bit-Gleitkomma-Emulation gelesen, sondern als Lernmodell fuer Programmstreifen, Speicher, Register und Rechenwerk.
+
+### Bedienung
+
+1. Beispielprogramm laden oder einen eigenen linearen Streifen schreiben.
+2. Speicher mit `MEM M0 = Wert` vorbereiten.
+3. Werte mit `LOAD M0` in R1/R2 laden.
+4. Mit `ADD`, `SUB`, `MUL`, `DIV` oder `SQRT` rechnen.
+5. Ergebnisse mit `STORE M3` sichern und mit `OUTPUT M3` ausgeben.
+6. Einzelne Takte ausfuehren oder den Streifen durchlaufen lassen.
+
+### Typische Nutzung
+
+- Zuses Z3 als praktische Informatik im Zeitstrahl nachvollziehen.
+- Den Unterschied zwischen externer Streifensteuerung und gespeichertem Programm erklaeren.
+- Register-, Speicher- und Rechenwerksrollen an einem kleinen linearen Programm ueben.
+- Quellenkritisch pruefen, wo das Labor Relais, 64 Speicherworte und 22-Bit-Details vereinfacht.
+
+---
+
 ## A-0 Compiler Emulator
 
 Pfad:

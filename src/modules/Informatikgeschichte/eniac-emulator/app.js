@@ -1,4 +1,5 @@
-const SAMPLE_DECK = `# ENIAC-Stil: Patch-Deck fuer eine kleine Flugbahn-Tabelle
+const SAMPLE_DECKS = {
+    flight: `# ENIAC-Stil: Patch-Deck fuer eine kleine Flugbahn-Tabelle
 # A0 = Hoehe, A1 = Geschwindigkeit, G = Gravitation pro Schritt
 CONST G = -10
 CONST START_V = 60
@@ -10,7 +11,54 @@ REPEAT 5
   ADD A0 A1 -> A0
   ADD A1 G -> A1
   PRINT A0
-END`;
+END`,
+    ballisticTable: `# Komplexere Aufgabe: ballistische Tabelle ohne Luftwiderstand
+# Pro Zeitschritt werden t, Hoehe und Geschwindigkeit gedruckt.
+# A0 = t, A1 = Hoehe, A2 = Geschwindigkeit
+CONST G = -10
+CONST ONE = 1
+CONST START_V = 80
+
+SET A0 = 0
+SET A1 = 0
+SET A2 = START_V
+
+REPEAT 6
+  ADD A0 ONE -> A0
+  ADD A1 A2 -> A1
+  ADD A2 G -> A2
+  PRINT A0
+  PRINT A1
+  PRINT A2
+END`,
+    range: `# Komplexere Aufgabe: grobe Wurfweite
+# RANGE = V^2 * SIN_2_ALPHA / 100 / G
+CONST V = 90
+CONST SIN_2_ALPHA = 87
+CONST HUNDRED = 100
+CONST G = 10
+
+SET A0 = V
+MUL A0 A0 -> A1
+MUL A1 SIN_2_ALPHA -> A2
+DIV A2 HUNDRED -> A3
+DIV A3 G -> A4
+PRINT A4`,
+    drag: `# Komplexere Aufgabe: Abbremsung mit einfachem Widerstand
+# A0 = Geschwindigkeit, A1 = zurueckgelegte Strecke, DRAG wird pro Schritt abgezogen.
+CONST START_V = 120
+CONST DRAG = -7
+
+SET A0 = START_V
+SET A1 = 0
+
+REPEAT 5
+  ADD A1 A0 -> A1
+  ADD A0 DRAG -> A0
+  PRINT A1
+  PRINT A0
+END`
+};
 
 const state = {
     compiled: null,
@@ -26,6 +74,7 @@ const state = {
 };
 
 const sourceEditor = document.getElementById("sourceEditor");
+const sampleSelect = document.getElementById("sampleSelect");
 const sampleBtn = document.getElementById("sampleBtn");
 const compileBtn = document.getElementById("compileBtn");
 const stepBtn = document.getElementById("stepBtn");
@@ -406,11 +455,37 @@ function resetDeck() {
     setStatus(state.compiled ? "zurückgesetzt" : "bereit", state.compiled ? "ok" : "");
 }
 
+function referencedAccumulatorIndexes() {
+    const indexes = new Set();
+    if (state.compiled) {
+        state.compiled.instructions.forEach((instruction) => {
+            if (Number.isInteger(instruction.dest)) indexes.add(instruction.dest);
+            if (Number.isInteger(instruction.src)) indexes.add(instruction.src);
+            (instruction.args || []).forEach((token) => {
+                const match = normalizeName(token).match(/^A([0-9]|1[0-9])$/);
+                if (match) indexes.add(Number(match[1]));
+            });
+        });
+    }
+    state.acc.forEach((value, index) => {
+        if (value !== 0 || state.active.has(index)) indexes.add(index);
+    });
+    if (!indexes.size) {
+        indexes.add(0);
+        indexes.add(1);
+    }
+    return indexes;
+}
+
 function renderAccumulators() {
+    const relevant = referencedAccumulatorIndexes();
     accumulatorWall.innerHTML = state.acc.map((value, index) => {
         const display = formatValue(value);
+        const classes = ["accumulator"];
+        if (state.active.has(index)) classes.push("active");
+        if (relevant.has(index)) classes.push("relevant");
         return `
-            <article class="accumulator ${state.active.has(index) ? "active" : ""}">
+            <article class="${classes.join(" ")}" data-accumulator="A${index}">
                 <strong><span>A${index}</span><span>${state.active.has(index) ? "Impuls" : "bereit"}</span></strong>
                 <div class="digits">${display.split("").map((char) => `<span>${escapeHtml(char)}</span>`).join("")}</div>
             </article>
@@ -457,9 +532,9 @@ function renderAll() {
 }
 
 sampleBtn.addEventListener("click", () => {
-    sourceEditor.value = SAMPLE_DECK;
+    sourceEditor.value = SAMPLE_DECKS[sampleSelect.value] || SAMPLE_DECKS.flight;
     state.compiled = null;
-    resetDeck();
+    compileDeck();
 });
 
 compileBtn.addEventListener("click", compileDeck);
@@ -467,5 +542,5 @@ stepBtn.addEventListener("click", stepDeck);
 runBtn.addEventListener("click", runDeck);
 resetBtn.addEventListener("click", resetDeck);
 
-sourceEditor.value = SAMPLE_DECK;
-renderAll();
+sourceEditor.value = SAMPLE_DECKS.flight;
+compileDeck();

@@ -122,7 +122,7 @@
                     <div class="cat-overlay">
                         <span class="cat-label">Themenbereich</span>
                         <h3>Informatikgeschichte</h3>
-                        <p>Zeitstrahl zu theoretischer und praktischer Informatik mit Lambda-Kalk&uuml;l, Analytical Engine, A-0 und ENIAC als Laboren</p>
+                        <p>Zeitstrahl zu theoretischer und praktischer Informatik mit Lambda-Kalk&uuml;l, Analytical Engine, Z3, A-0 und ENIAC als Laboren</p>
                     </div>
                 </a>
 
@@ -702,9 +702,10 @@
                 if (text.includes('dab') || text.includes('arbeitsblatt')) tags.add('digitales arbeitsblatt');
                 if (text.includes('jena') || text.includes('gotha') || text.includes('minecraft')) tags.add('lehrkonzept');
                 if (text.includes('nara') || text.includes('heidelberg') || text.includes('zeitschrift') || text.includes('archiv')) tags.add('geschichte').add('archivarbeit').add('digital humanities');
-                if (text.includes('informatikgeschichte') || text.includes('lambda') || text.includes('church') || text.includes('analytical engine') || text.includes('babbage') || text.includes('a-0') || text.includes('compiler emulator') || text.includes('eniac')) tags.add('informatikgeschichte');
+                if (text.includes('informatikgeschichte') || text.includes('lambda') || text.includes('church') || text.includes('analytical engine') || text.includes('babbage') || text.includes('zuse') || text.includes('z3') || text.includes('a-0') || text.includes('compiler emulator') || text.includes('eniac')) tags.add('informatikgeschichte');
                 if (text.includes('lambda') || text.includes('church')) tags.add('theoretische informatik').add('berechenbarkeit');
                 if (text.includes('analytical engine') || text.includes('babbage')) tags.add('rechnerarchitektur').add('computerarchitektur');
+                if (text.includes('zuse') || text.includes('z3')) tags.add('rechnerarchitektur').add('computerarchitektur');
                 if (text.includes('a-0') || text.includes('compiler emulator')) tags.add('compilerbau');
                 if (text.includes('eniac')) tags.add('rechnerarchitektur').add('computerarchitektur');
                 return [...tags].map(normalize).filter(Boolean);
@@ -1048,6 +1049,7 @@
                         ['guide-informatikgeschichte', 'Informatikgeschichte', 'Guide', 'Themenbereich mit zweispurigem Zeitstrahl zu Erfolgen der theoretischen und praktischen Informatik.', 'src/informatikgeschichte.html'],
                         ['tool-lambda-calculus-lab', 'Lambda-Kalkuel Labor', 'Tool', 'Interaktives Labor zu Alonzo Church: Lambda-Terme eingeben, Beta-Reduktion ueben und Normalformen pruefen.', 'src/modules/Informatikgeschichte/lambda-calculus/index.html'],
                         ['tool-analytical-engine-emulator', 'Babbage Analytical Engine Emulator', 'Tool', 'Didaktischer Browser-Emulator zu Store, Mill, Operation Cards, Variable Cards, Schleifen und Druckerausgabe.', 'src/modules/Informatikgeschichte/analytical-engine/index.html'],
+                        ['tool-z3-emulator', 'Z3 Emulator', 'Tool', 'Didaktischer Browser-Emulator zu Konrad Zuses Z3: Programmstreifen lesen, Speicherworte laden, Register und Gleitkommaoperationen Schritt fuer Schritt verfolgen.', 'src/modules/Informatikgeschichte/z3-emulator/index.html'],
                         ['tool-a0-compiler-emulator', 'A-0 Compiler Emulator', 'Tool', 'Didaktischer Browser-Emulator zum A-0 System Compiler: erst Compilerwerkzeug bauen, dann Abstraktionsebene fuer spaetere Hochsprachen nachvollziehen.', 'src/modules/Informatikgeschichte/a0-compiler/index.html'],
                         ['tool-eniac-emulator', 'ENIAC Emulator', 'Tool', 'Didaktischer Browser-Emulator zu ENIAC: Patch-Deck, 20 dezimale Akkumulatoren, Konstantensender, Impulsleitungen und Punched-Card-Ausgabe.', 'src/modules/Informatikgeschichte/eniac-emulator/index.html'],
                         ['guide-programm-exe', 'Programm.exe erstellen', 'Guide', 'Guide zum Erzeugen startbarer Windows-EXE-Dateien aus Python-, Java-, C#-, Node.js-, Go- und Rust-Projekten.', 'src/guides/programm-exe-erstellen.html'],

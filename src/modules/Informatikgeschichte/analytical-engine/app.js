@@ -34,6 +34,51 @@ MUL V0 V1 -> V4
 ADD V4 V2 -> V5
 DIV V5 V3 -> V6
 PRINT V6
+BELL`,
+    cubic: `# Komplexere Aufgabe: Kubiktabelle per endlichen Differenzen
+# Gibt 0, 1, 8, 27, 64, 125 aus.
+VAR V0 = 0      # aktueller Wert n^3
+VAR V1 = 1      # erste Differenz
+VAR V2 = 6      # zweite Differenz
+VAR V3 = 6      # konstante dritte Differenz
+VAR V4 = 6      # Anzahl Ausgaben
+
+LABEL TABLE
+PRINT V0
+ADD V0 V1 -> V0
+ADD V1 V2 -> V1
+ADD V2 V3 -> V2
+SUB V4 1 -> V4
+IF V4 > 0 GOTO TABLE
+BELL`,
+    weighted: `# Komplexere Aufgabe: gewichteter Index
+# INDEX = (A*2 + B*3 + C*5) / 10
+VAR V0 = 72
+VAR V1 = 88
+VAR V2 = 91
+
+MUL V0 2 -> V3
+MUL V1 3 -> V4
+MUL V2 5 -> V5
+ADD V3 V4 -> V6
+ADD V6 V5 -> V7
+DIV V7 10 -> V8
+PRINT V8
+BELL`,
+    loan: `# Komplexere Aufgabe: kleine Tilgungstabelle
+# Restschuld wird dreimal um Zahlung minus Zins gesenkt.
+VAR V0 = 1000   # Restschuld
+VAR V1 = 60     # Zahlung pro Periode
+VAR V2 = 5      # Zins pro Periode, didaktisch konstant
+VAR V3 = 3      # Perioden
+
+LABEL PAY
+PRINT V0
+ADD V0 V2 -> V0
+SUB V0 V1 -> V0
+SUB V3 1 -> V3
+IF V3 > 0 GOTO PAY
+PRINT V0
 BELL`
 };
 
@@ -489,15 +534,37 @@ function runProgram() {
     }
 }
 
+function referencedStoreNames() {
+    const names = new Set(Object.keys(state.store));
+    if (state.compiled) {
+        state.compiled.instructions.forEach((instruction) => {
+            if (instruction.dest) names.add(instruction.dest);
+            (instruction.args || []).forEach((arg) => {
+                if (arg.kind === "store") names.add(arg.name);
+            });
+        });
+    }
+    state.readSet.forEach((name) => names.add(name));
+    if (state.writeName) names.add(state.writeName);
+    if (!names.size) {
+        names.add("V0");
+        names.add("V1");
+        names.add("V2");
+    }
+    return names;
+}
+
 function renderStore() {
     const cells = [];
+    const relevant = referencedStoreNames();
     for (let index = 0; index < STORE_SIZE; index += 1) {
         const name = `V${index}`;
         const classes = ["store-cell"];
         if (state.readSet.has(name)) classes.push("read");
         if (state.writeName === name) classes.push("write");
+        if (relevant.has(name)) classes.push("relevant");
         cells.push(`
-            <div class="${classes.join(" ")}">
+            <div class="${classes.join(" ")}" data-store="${name}">
                 <span>${name}</span>
                 <strong>${formatNumber(state.store[name])}</strong>
             </div>

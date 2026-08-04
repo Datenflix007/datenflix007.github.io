@@ -38,7 +38,8 @@ a:hover {
     text-decoration: underline;
 }
 
-button {
+button,
+select {
     border: 1px solid var(--line);
     border-radius: 8px;
     background: var(--panel-2);
@@ -46,10 +47,14 @@ button {
     font: inherit;
     font-weight: 800;
     padding: 9px 11px;
+}
+
+button {
     cursor: pointer;
 }
 
-button:hover {
+button:hover,
+select:hover {
     border-color: var(--accent);
     color: var(--accent);
 }

@@ -105,7 +105,42 @@ DATA YEARS = 5
 
 CALL POW FACTOR YEARS -> SCALE
 CALL MUL START SCALE -> RESULT
-PRINT RESULT`
+PRINT RESULT`,
+    trajectory: `# Komplexere Aufgabe: Wurfweite ohne Luftwiderstand
+# Formel: RANGE = V^2 * SIN_2_ALPHA / G
+# SIN_2_ALPHA ist hier als Tabellenwert vorbereitet.
+DATA V = 120
+DATA SIN_2_ALPHA = 0.866
+DATA G = 9.81
+
+CALL POW V 2 -> V2
+CALL MUL V2 SIN_2_ALPHA -> NUMERATOR
+CALL DIV NUMERATOR G -> RANGE
+PRINT RANGE`,
+    rms: `# Komplexere Aufgabe: Root-Mean-Square aus drei Messwerten
+# RMS = sqrt((A^2 + B^2 + C^2) / 3)
+DATA A = 12
+DATA B = 15
+DATA C = 20
+DATA N = 3
+
+CALL POW A 2 -> A2
+CALL POW B 2 -> B2
+CALL POW C 2 -> C2
+CALL ADD A2 B2 -> PARTIAL
+CALL ADD PARTIAL C2 -> SUMSQ
+CALL DIV SUMSQ N -> MEAN
+CALL SQRT MEAN -> RMS
+PRINT RMS`,
+    standardize: `# Komplexere Aufgabe: Messwert normalisieren
+# Z = (X - MEAN) / STDDEV
+DATA X = 87
+DATA MEAN = 73
+DATA STDDEV = 8
+
+CALL SUB X MEAN -> DELTA
+CALL DIV DELTA STDDEV -> Z
+PRINT Z`
 };
 
 const routineByToken = new Map();
@@ -135,6 +170,7 @@ const runBtn = document.getElementById("runBtn");
 const resetBtn = document.getElementById("resetBtn");
 const routineLibrary = document.getElementById("routineLibrary");
 const objectTape = document.getElementById("objectTape");
+const compilerSummary = document.getElementById("compilerSummary");
 const symbolTable = document.getElementById("symbolTable");
 const executionLog = document.getElementById("executionLog");
 const compileStatus = document.getElementById("compileStatus");
@@ -160,6 +196,15 @@ function formatNumber(value) {
     if (!Number.isFinite(value)) return String(value);
     const fixed = Math.abs(value) >= 1000 ? value.toFixed(2) : value.toFixed(5);
     return fixed.replace(/\.?0+$/, "");
+}
+
+function escapeHtml(value) {
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 }
 
 function padAddress(value) {
@@ -206,6 +251,7 @@ function renderTape() {
     if (!state.compiled) {
         objectTape.textContent = "Noch kein Objektband kompiliert.\n\nKompilieren erzeugt hier DATA- und LINK-Zeilen.";
         tapeHint.textContent = "DATA-Zeilen legen Werte an. LINK-Zeilen zeigen, welche Routine aus dem Routinenband eingebunden wird.";
+        renderCompilerSummary();
         return;
     }
     objectTape.textContent = state.compiled.tape.map((item) => item.text).join("\n");
@@ -213,6 +259,57 @@ function renderTape() {
     tapeHint.textContent = current
         ? `Naechster LINK: ${current.routine.callNo} ${current.routine.name} mit ${current.args.join(", ")}${current.dest ? ` -> ${current.dest}` : ""}.`
         : "Alle verlinkten Routinen wurden abgearbeitet.";
+    renderCompilerSummary();
+}
+
+function renderCompilerSummary() {
+    if (!compilerSummary) return;
+    if (!state.compiled) {
+        const errorText = state.log.find((entry) => entry.type === "error")?.html.replace(/<[^>]+>/g, "") || "Kompiliere das Beispiel, um Routine-Links zu sehen.";
+        compilerSummary.innerHTML = `
+            <div class="summary-message">
+                <strong>Noch kein Objektband</strong>
+                <span>${escapeHtml(errorText)}</span>
+            </div>
+        `;
+        return;
+    }
+
+    const calls = state.compiled.calls;
+    const current = calls[state.pc];
+    const routineNames = [...new Set(calls.map((call) => call.routine.name))].join(", ");
+    const latestChange = state.lastWrite
+        ? `${state.lastWrite} = ${formatNumber(state.memory[state.lastWrite])}`
+        : "noch keine Routine ausgefuehrt";
+    const output = state.output.at(-1) || "noch keine Ausgabe";
+    const next = current
+        ? `${current.routine.callNo} ${current.routine.name}: ${current.args.join(", ")}${current.dest ? ` -> ${current.dest}` : ""}`
+        : "Programm beendet";
+
+    compilerSummary.innerHTML = `
+        <div class="summary-progress" aria-label="Compiler-Fortschritt">
+            <span class="done">Quelle gelesen</span>
+            <span class="done">Objektband gebaut</span>
+            <span class="${state.pc >= calls.length ? "done" : "active"}">${state.pc}/${calls.length} Links ausgefuehrt</span>
+        </div>
+        <div class="summary-grid">
+            <article>
+                <span>Bibliothek</span>
+                <strong>${calls.length} Aufrufe</strong>
+                <small>${escapeHtml(routineNames)}</small>
+            </article>
+            <article>
+                <span>Naechster Link</span>
+                <strong>${escapeHtml(next)}</strong>
+                <small>Ein Klick auf Schritt fuehrt genau diese Routine aus.</small>
+            </article>
+            <article>
+                <span>Letzte Aenderung</span>
+                <strong>${escapeHtml(latestChange)}</strong>
+                <small>${escapeHtml(output)}</small>
+            </article>
+        </div>
+    `;
 }
 
 function renderSymbols() {
@@ -408,6 +505,7 @@ function compileSource() {
         state.lastRoutine = "";
         state.log = errors.map((message) => ({ type: "error", html: `<span class="error">${message}</span>` }));
         objectTape.textContent = errors.join("\n");
+        renderCompilerSummary();
         renderSymbols();
         renderLog();
         setStatus("Fehler", "bad");

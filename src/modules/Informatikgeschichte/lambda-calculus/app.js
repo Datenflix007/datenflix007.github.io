@@ -3,7 +3,9 @@ const EXAMPLES = {
     constant: "(lambda x. lambda y. x) a b",
     compose: "(lambda f. lambda g. lambda x. f (g x)) (lambda n. n) (lambda z. z)",
     churchTrue: "(lambda t. lambda f. t) yes no",
-    churchTwo: "(lambda f. lambda x. f (f x)) succ zero"
+    churchTwo: "(lambda f. lambda x. f (f x)) succ zero",
+    capture: "(lambda x. lambda y. x y) y",
+    churchAdd: "(lambda m. lambda n. lambda f. lambda x. m f (n f x)) (lambda f. lambda x. f x) (lambda f. lambda x. f (f x)) s z"
 };
 
 const EXERCISES = {
@@ -22,6 +24,22 @@ const EXERCISES = {
     ex4: {
         term: "(lambda f. lambda x. f (f x)) s z",
         solution: "s (s z)"
+    },
+    ex5: {
+        term: "(lambda x. lambda y. x y) y",
+        solution: "lambda y_1. y y_1"
+    },
+    ex6: {
+        term: "(lambda b. b yes no) (lambda t. lambda f. f)",
+        solution: "no"
+    },
+    ex7: {
+        term: "(lambda f. lambda g. lambda x. f (g x)) h (lambda z. z) a",
+        solution: "h a"
+    },
+    ex8: {
+        term: "(lambda m. lambda n. lambda f. lambda x. m f (n f x)) (lambda f. lambda x. f x) (lambda f. lambda x. f (f x)) s z",
+        solution: "s (s (s z))"
     }
 };
 
@@ -272,7 +290,7 @@ function reduceOnce(node) {
     return { changed: false, node };
 }
 
-function normalFormFor(input, maxSteps = 80) {
+function normalFormFor(input, maxSteps = 160) {
     let ast = parse(input);
     let steps = 0;
     while (steps < maxSteps) {
@@ -350,12 +368,12 @@ function step() {
 function normalize() {
     if (!state.ast && !parseCurrent()) return;
     let guard = 0;
-    while (guard < 80 && step()) {
+    while (guard < 160 && step()) {
         guard += 1;
     }
-    if (guard >= 80) {
+    if (guard >= 160) {
         setStatus("Abbruch", "bad");
-        explainBox.textContent = "Abbruch nach 80 Schritten. Der Term hat eventuell keine Normalform.";
+        explainBox.textContent = "Abbruch nach 160 Schritten. Der Term hat eventuell keine Normalform.";
     }
 }
 

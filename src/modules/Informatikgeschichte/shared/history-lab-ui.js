@@ -5,29 +5,46 @@
         "a0-compiler": {
             moduleClass: "lab-module-a0",
             kind: "Compiler-Labor",
-            summary: "Quelle, Objektband, Symboltabelle und Laufzeit sind in getrennte Arbeitsmodi aufgeteilt.",
-            steps: ["Quelle schreiben", "Kompilieren", "Ausfuehren"],
-            runLabel: "Ausfuehren"
+            summary: "Beispiel laden, kompilieren, dann Schritt fuer Schritt verfolgen.",
+            steps: ["Quelle", "Objektband", "Ausgabe"],
+            prepareLabel: "Kompilieren",
+            stepLabel: "Schritt",
+            runLabel: "Alles ausfuehren"
         },
         "eniac-emulator": {
             moduleClass: "lab-module-eniac",
             kind: "Patch-Deck-Labor",
-            summary: "Akkumulatoren, gesteckte Schritte und Impulslog werden wie ein Arbeitsplatz sortiert.",
-            steps: ["Patch stecken", "Impuls senden", "Ausgabe lesen"],
-            runLabel: "Laufen lassen"
+            summary: "Patch stecken, Impuls senden, Akkumulatoren und Ausgabe beobachten.",
+            steps: ["Patch", "Impuls", "Karte"],
+            prepareLabel: "Patch stecken",
+            stepLabel: "Impuls",
+            runLabel: "Durchlauf"
         },
         "analytical-engine": {
             moduleClass: "lab-module-analytical",
             kind: "Kartenmaschinen-Labor",
-            summary: "Karten, Store, Mill und Drucker sind in Arbeits- und Schrittansicht getrennt.",
-            steps: ["Karten lesen", "Takt ausfuehren", "Drucker pruefen"],
-            runLabel: "Laufen lassen"
+            summary: "Karten lesen, einen Takt ausfuehren, Store und Mill beobachten.",
+            steps: ["Karten", "Takt", "Drucker"],
+            prepareLabel: "Karten lesen",
+            stepLabel: "Takt",
+            runLabel: "Durchlauf"
+        },
+        "z3-emulator": {
+            moduleClass: "lab-module-z3",
+            kind: "Relaisrechner-Labor",
+            summary: "Programmstreifen lesen, Takt ausfuehren, Speicher und Rechenwerk beobachten.",
+            steps: ["Streifen", "Takt", "Ausgabe"],
+            prepareLabel: "Streifen lesen",
+            stepLabel: "Takt",
+            runLabel: "Durchlauf"
         },
         "lambda-calculus": {
             moduleClass: "lab-module-lambda",
             kind: "Lambda-Uebungslabor",
-            summary: "Term, naechster Redex, Schrittverlauf und Uebung sind klar getrennt.",
-            steps: ["Term pruefen", "Beta-Schritt", "Normalform"],
+            summary: "Term eingeben, Redex sehen, Beta-Schritte ueben.",
+            steps: ["Term", "Redex", "Normalform"],
+            prepareLabel: "Pruefen",
+            stepLabel: "Beta-Schritt",
             runLabel: "Normalisieren"
         }
     };
@@ -35,15 +52,15 @@
     const focusModes = {
         work: {
             className: "lab-focus-work",
-            status: "Arbeitsflaeche: nur die wichtigsten Panels fuer Eingabe und Zustand."
+            status: "Arbeitsmodus: Eingabe und wichtigster Zustand."
         },
         steps: {
             className: "lab-focus-steps",
-            status: "Schritte & Ergebnis: Log, Deck, Verlauf und Ausgabe stehen im Vordergrund."
+            status: "Schrittmodus: Verlauf, Deck, Speicher und Ausgabe."
         },
         details: {
             className: "lab-focus-details",
-            status: "Details & Quellen: alle Panels und die Quellenarbeit sind sichtbar."
+            status: "Quellenmodus: historische Einordnung, Videos und Belege."
         }
     };
 
@@ -53,8 +70,10 @@
         return profiles[key] || {
             moduleClass: "lab-module-generic",
             kind: "Informatikgeschichte-Labor",
-            summary: "Arbeitsmodus, Schritte und Quellenarbeit sind getrennt.",
-            steps: ["Beispiel laden", "Schritt pruefen", "Ergebnis lesen"],
+            summary: "Beispiel laden, Schritt ausfuehren, Ergebnis lesen.",
+            steps: ["Beispiel", "Schritt", "Ergebnis"],
+            prepareLabel: "Vorbereiten",
+            stepLabel: "Schritt",
             runLabel: "Start"
         };
     }
@@ -126,14 +145,14 @@
             </div>
             <div class="lab-actions">
                 <div class="lab-view-tabs" role="group" aria-label="Ansicht waehlen">
-                    <button type="button" data-lab-mode="work" aria-pressed="true">Arbeitsfl&auml;che</button>
-                    <button type="button" data-lab-mode="steps" aria-pressed="false">Schritte &amp; Ergebnis</button>
-                    <button type="button" data-lab-mode="details" aria-pressed="false">Details &amp; Quellen</button>
+                    <button type="button" data-lab-mode="work" aria-pressed="true">Arbeiten</button>
+                    <button type="button" data-lab-mode="steps" aria-pressed="false">Schritte</button>
+                    <button type="button" data-lab-mode="details" aria-pressed="false">Quellen</button>
                 </div>
                 <div class="lab-quick-actions" role="group" aria-label="Schnellaktionen">
                     <button type="button" data-lab-action="sample">Beispiel</button>
-                    <button type="button" data-lab-action="prepare" class="primary">Vorbereiten</button>
-                    <button type="button" data-lab-action="step">Schritt</button>
+                    <button type="button" data-lab-action="prepare" class="primary">${profile.prepareLabel || "Vorbereiten"}</button>
+                    <button type="button" data-lab-action="step">${profile.stepLabel || "Schritt"}</button>
                     <button type="button" data-lab-action="run">${profile.runLabel}</button>
                     <button type="button" data-lab-action="reset">Reset</button>
                 </div>

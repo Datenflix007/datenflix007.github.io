@@ -467,6 +467,82 @@ textarea:focus {
     white-space: pre-wrap;
 }
 
+.compiler-summary {
+    display: none;
+}
+
+.summary-message {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 12px;
+    background: #07101b;
+}
+
+.summary-message strong,
+.summary-message span {
+    display: block;
+}
+
+.summary-message span {
+    margin-top: 5px;
+    color: var(--muted);
+}
+
+.summary-progress {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-bottom: 10px;
+}
+
+.summary-progress span {
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 6px 9px;
+    color: var(--muted);
+    background: #07101b;
+    font-size: 12px;
+    font-weight: 900;
+}
+
+.summary-progress span.done {
+    border-color: rgba(118,211,145,.45);
+    color: var(--ok);
+}
+
+.summary-progress span.active {
+    border-color: rgba(244,185,90,.5);
+    color: var(--accent-2);
+}
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 9px;
+}
+
+.summary-grid article {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 11px;
+    background: #07101b;
+}
+
+.summary-grid span,
+.summary-grid small {
+    display: block;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.summary-grid strong {
+    display: block;
+    margin: 3px 0;
+    color: var(--text);
+    font-family: "Cascadia Code", Consolas, monospace;
+    overflow-wrap: anywhere;
+}
+
 .explain-box {
     margin-top: 10px;
     border: 1px solid rgba(244,185,90,.35);

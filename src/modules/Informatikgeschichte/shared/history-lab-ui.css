@@ -1,12 +1,12 @@
 .history-lab-enhanced {
-    --lab-command-bg: rgba(10, 19, 31, .94);
-    --lab-command-line: rgba(98, 210, 255, .24);
+    --lab-command-bg: rgba(8, 17, 28, .9);
+    --lab-command-line: rgba(98, 210, 255, .18);
     --lab-command-muted: #a9b6c8;
 }
 
 .history-lab-enhanced .app-shell {
-    width: min(1420px, calc(100vw - 28px));
-    padding-top: 18px;
+    width: min(1360px, calc(100vw - 28px));
+    padding-top: 12px;
 }
 
 .history-lab-enhanced .intro-panel {
@@ -34,20 +34,54 @@
     margin-top: 12px;
 }
 
+.history-lab-enhanced:not(.lab-focus-details) .intro-panel {
+    display: block;
+    margin-bottom: 8px;
+}
+
+.history-lab-enhanced:not(.lab-focus-details) .intro-panel > div:first-child {
+    border: 0;
+    padding: 4px 0 8px;
+    background: transparent;
+}
+
+.history-lab-enhanced:not(.lab-focus-details) .intro-panel h1 {
+    max-width: 760px;
+    font-size: clamp(27px, 3vw, 34px);
+}
+
+.history-lab-enhanced:not(.lab-focus-details) .intro-panel p:not(.eyebrow),
+.history-lab-enhanced:not(.lab-focus-details) .machine-visual,
+.history-lab-enhanced:not(.lab-focus-details) .lambda-visual {
+    display: none;
+}
+
+.history-lab-enhanced:not(.lab-focus-details) .intro-links {
+    margin-top: 8px;
+}
+
+.history-lab-enhanced:not(.lab-focus-details) .intro-links a {
+    min-height: 30px;
+    padding: 6px 9px;
+    font-size: 12px;
+}
+
 .lab-commandbar {
     position: sticky;
-    top: 72px;
+    top: 60px;
     z-index: 12;
     display: grid;
-    grid-template-columns: minmax(230px, .8fr) minmax(360px, 1.1fr) minmax(340px, .9fr);
-    gap: 10px;
-    align-items: stretch;
-    margin: 0 0 12px;
-    padding: 10px;
-    border: 1px solid var(--lab-command-line);
-    border-radius: 8px;
+    grid-template-columns: minmax(210px, .7fr) minmax(270px, .9fr) auto;
+    gap: 14px;
+    align-items: center;
+    margin: 0 0 10px;
+    padding: 8px 0;
+    border: 0;
+    border-top: 1px solid var(--lab-command-line);
+    border-bottom: 1px solid var(--lab-command-line);
+    border-radius: 0;
     background: var(--lab-command-bg);
-    box-shadow: 0 18px 38px rgba(0, 0, 0, .22);
+    box-shadow: none;
     backdrop-filter: blur(12px);
 }
 
@@ -55,13 +89,13 @@
 .lab-workflow,
 .lab-actions {
     min-width: 0;
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    background: rgba(6, 14, 24, .72);
+    border: 0;
+    border-radius: 0;
+    background: transparent;
 }
 
 .lab-command-title {
-    padding: 10px 12px;
+    padding: 0;
 }
 
 .lab-command-title span {
@@ -77,7 +111,7 @@
 .lab-command-title strong {
     display: block;
     color: var(--text);
-    font-size: 17px;
+    font-size: 15px;
     line-height: 1.2;
 }
 
@@ -90,80 +124,82 @@
 }
 
 .lab-workflow {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 6px;
-    padding: 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0;
 }
 
 .lab-workflow span {
-    display: grid;
-    grid-template-columns: 24px minmax(0, 1fr);
+    display: inline-flex;
     align-items: center;
-    gap: 7px;
-    min-height: 42px;
-    border: 1px solid rgba(98, 210, 255, .18);
-    border-radius: 7px;
-    padding: 7px;
+    gap: 6px;
+    min-height: 28px;
+    border: 0;
+    border-radius: 0;
+    padding: 0;
     color: var(--text);
     font-size: 12px;
     font-weight: 900;
     line-height: 1.2;
-    background: rgba(98, 210, 255, .06);
+    background: transparent;
 }
 
 .lab-workflow b {
     display: inline-grid;
     place-items: center;
-    width: 24px;
-    height: 24px;
+    width: 20px;
+    height: 20px;
     border-radius: 999px;
     background: var(--accent-2);
     color: #1a1002;
-    font-size: 12px;
+    font-size: 11px;
 }
 
 .lab-actions {
-    display: grid;
-    grid-template-rows: auto auto;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
     gap: 8px;
-    padding: 8px;
+    padding: 0;
 }
 
 .lab-view-tabs,
 .lab-quick-actions {
     display: flex;
     flex-wrap: wrap;
-    gap: 6px;
+    gap: 2px;
     min-width: 0;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 3px;
+    background: rgba(6, 14, 24, .78);
 }
 
 .lab-view-tabs button,
 .lab-quick-actions button {
-    min-height: 34px;
-    border-radius: 7px;
-    padding: 7px 10px;
+    min-height: 28px;
+    border: 0;
+    border-radius: 999px;
+    padding: 6px 9px;
+    background: transparent;
     font-size: 12px;
     line-height: 1.1;
     white-space: nowrap;
 }
 
 .lab-view-tabs button[aria-pressed="true"] {
-    border-color: var(--accent-2);
     background: var(--accent-2);
     color: #1a1002;
 }
 
-.lab-quick-actions button {
-    border-color: rgba(98, 210, 255, .28);
-}
-
 .lab-quick-actions button.primary {
-    border-color: var(--accent-2);
+    background: var(--accent-2);
+    color: #1a1002;
 }
 
 .lab-statusline {
-    display: flex;
+    display: none;
     align-items: center;
     gap: 8px;
     min-height: 34px;
@@ -226,28 +262,40 @@
 }
 
 .history-lab-enhanced .panel {
-    padding: 14px;
+    border-color: rgba(98, 210, 255, .16);
+    padding: 15px;
+    background: rgba(13, 23, 36, .78);
+    box-shadow: none;
 }
 
 .history-lab-enhanced textarea {
-    min-height: 300px;
+    min-height: 280px;
+    background: rgba(5, 12, 22, .92);
 }
 
 .history-lab-enhanced .button-row {
     gap: 7px;
 }
 
+.history-lab-enhanced .editor-panel > .button-row,
+.history-lab-enhanced .editor-panel #sampleBtn {
+    display: none;
+}
+
 .history-lab-enhanced .syntax-note {
     gap: 6px;
+    margin-top: 10px;
+    opacity: .82;
 }
 
 .history-lab-enhanced .panel-head {
     align-items: center;
     gap: 10px;
+    margin-bottom: 9px;
 }
 
 .history-lab-enhanced .panel-head h2 {
-    font-size: 19px;
+    font-size: 18px;
 }
 
 .history-lab-enhanced .status-pill {
@@ -257,13 +305,26 @@
 .history-lab-enhanced.lab-module-a0.lab-focus-work .workspace {
     grid-template-columns: minmax(340px, .9fr) minmax(420px, 1fr);
     grid-template-areas:
-        "editor output"
-        "editor state";
+        "editor output";
+    align-items: start;
 }
 
 .history-lab-enhanced.lab-module-a0.lab-focus-work .library-panel,
+.history-lab-enhanced.lab-module-a0.lab-focus-work .state-panel,
 .history-lab-enhanced.lab-module-a0.lab-focus-work .log-panel {
     display: none;
+}
+
+.history-lab-enhanced.lab-module-a0.lab-focus-work .compiler-summary {
+    display: block;
+}
+
+.history-lab-enhanced.lab-module-a0.lab-focus-work .tape-output {
+    display: none;
+}
+
+.history-lab-enhanced.lab-module-a0.lab-focus-work textarea {
+    min-height: 300px;
 }
 
 .history-lab-enhanced.lab-module-a0.lab-focus-steps .workspace {
@@ -280,13 +341,26 @@
 .history-lab-enhanced.lab-module-eniac.lab-focus-work .workspace {
     grid-template-columns: minmax(340px, .9fr) minmax(520px, 1.1fr);
     grid-template-areas:
-        "editor accum"
-        "editor constants";
+        "editor accum";
+    align-items: start;
 }
 
 .history-lab-enhanced.lab-module-eniac.lab-focus-work .deck-panel,
+.history-lab-enhanced.lab-module-eniac.lab-focus-work .constants-panel,
 .history-lab-enhanced.lab-module-eniac.lab-focus-work .log-panel {
     display: none;
+}
+
+.history-lab-enhanced.lab-module-eniac.lab-focus-work .accumulator-wall {
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+}
+
+.history-lab-enhanced.lab-module-eniac.lab-focus-work .accumulator:not(.relevant) {
+    display: none;
+}
+
+.history-lab-enhanced.lab-module-eniac.lab-focus-work textarea {
+    min-height: 300px;
 }
 
 .history-lab-enhanced.lab-module-eniac.lab-focus-steps .workspace {
@@ -303,12 +377,25 @@
 .history-lab-enhanced.lab-module-analytical.lab-focus-work .workspace {
     grid-template-columns: minmax(340px, .9fr) minmax(390px, 1fr) minmax(300px, .75fr);
     grid-template-areas:
-        "editor store mill"
-        "editor printer printer";
+        "editor store mill";
+    align-items: start;
 }
 
-.history-lab-enhanced.lab-module-analytical.lab-focus-work .deck-panel {
+.history-lab-enhanced.lab-module-analytical.lab-focus-work .deck-panel,
+.history-lab-enhanced.lab-module-analytical.lab-focus-work .printer-panel {
     display: none;
+}
+
+.history-lab-enhanced.lab-module-analytical.lab-focus-work .store-wall {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+}
+
+.history-lab-enhanced.lab-module-analytical.lab-focus-work .store-cell:not(.relevant) {
+    display: none;
+}
+
+.history-lab-enhanced.lab-module-analytical.lab-focus-work textarea {
+    min-height: 300px;
 }
 
 .history-lab-enhanced.lab-module-analytical.lab-focus-steps .workspace {
@@ -322,14 +409,50 @@
     display: none;
 }
 
+.history-lab-enhanced.lab-module-z3.lab-focus-work .workspace {
+    grid-template-columns: minmax(340px, .9fr) minmax(390px, 1fr) minmax(320px, .78fr);
+    grid-template-areas:
+        "editor memory unit";
+    align-items: start;
+}
+
+.history-lab-enhanced.lab-module-z3.lab-focus-work .tape-panel,
+.history-lab-enhanced.lab-module-z3.lab-focus-work .log-panel {
+    display: none;
+}
+
+.history-lab-enhanced.lab-module-z3.lab-focus-work .memory-wall {
+    grid-template-columns: repeat(auto-fit, minmax(126px, 1fr));
+}
+
+.history-lab-enhanced.lab-module-z3.lab-focus-work .memory-cell:not(.relevant) {
+    display: none;
+}
+
+.history-lab-enhanced.lab-module-z3.lab-focus-work textarea {
+    min-height: 300px;
+}
+
+.history-lab-enhanced.lab-module-z3.lab-focus-steps .workspace {
+    grid-template-columns: minmax(330px, .9fr) minmax(360px, .9fr) minmax(380px, 1fr);
+    grid-template-areas:
+        "memory unit log"
+        "tape tape log";
+    align-items: start;
+}
+
+.history-lab-enhanced.lab-module-z3.lab-focus-steps .editor-panel {
+    display: none;
+}
+
 .history-lab-enhanced.lab-module-lambda.lab-focus-work .workspace {
     grid-template-columns: minmax(340px, .9fr) minmax(420px, 1fr);
     grid-template-areas:
-        "editor result"
-        "editor practice";
+        "editor result";
 }
 
-.history-lab-enhanced.lab-module-lambda.lab-focus-work .history-panel {
+.history-lab-enhanced.lab-module-lambda.lab-focus-work .history-panel,
+.history-lab-enhanced.lab-module-lambda.lab-focus-work .practice-panel {
     display: none;
 }
 

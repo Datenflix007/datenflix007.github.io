@@ -81,6 +81,9 @@
                         <option value="score">Wertung berechnen</option>
                         <option value="circle">Kreisformel</option>
                         <option value="growth">Wachstum</option>
+                        <option value="trajectory">Wurfweite abschaetzen</option>
+                        <option value="rms">RMS aus Messwerten</option>
+                        <option value="standardize">Z-Wert normalisieren</option>
                     </select>
                     <button type="button" id="sampleBtn">Beispiel laden</button>
                 </div>
@@ -118,6 +121,7 @@
                     </div>
                     <span id="compileStatus" class="status-pill">bereit</span>
                 </div>
+                <div id="compilerSummary" class="compiler-summary"></div>
                 <pre id="objectTape" class="tape-output"></pre>
                 <div class="explain-box" id="tapeHint">DATA-Zeilen legen Werte an. LINK-Zeilen zeigen, welche Routine aus dem Routinenband eingebunden wird.</div>
             </section>
