@@ -465,9 +465,14 @@
                 <button class="btn" data-action="task">Aufgabenliste <small>[x]</small></button>
                 <button class="btn" data-action="table">Tabelle <small>| |</small></button>
                 <button class="btn" data-action="footnote">Fußnote <small>[^1]</small></button>
-                <button class="btn" data-action="alert">Alert <small>[!NOTE]</small></button>
                 <button class="btn" data-action="color">Farbwert <small>#RRGGBB</small></button>
                 <button class="btn" data-action="comment">Kommentar <small>&lt;!-- --&gt;</small></button>
+                <h2>Hinweise</h2>
+                <button class="btn" data-action="alert-note">Hinweis <small>[!NOTE]</small></button>
+                <button class="btn" data-action="alert-tip">Tipp <small>[!TIP]</small></button>
+                <button class="btn" data-action="alert-important">Wichtig <small>[!IMPORTANT]</small></button>
+                <button class="btn" data-action="alert-warning">Warnung <small>[!WARNING]</small></button>
+                <button class="btn" data-action="alert-caution">Vorsicht <small>[!CAUTION]</small></button>
                 <button class="btn" data-action="outline">Gliederung</button>
             </aside>
 
@@ -506,7 +511,7 @@
 
         const SANITIZE_CONFIG = {
             ADD_TAGS: ['del', 'input', 'ins', 'picture', 'source', 'sub', 'sup'],
-            ADD_ATTR: ['align', 'checked', 'class', 'disabled', 'id', 'media', 'name', 'rel', 'sizes', 'srcset', 'start', 'target', 'type'],
+            ADD_ATTR: ['align', 'aria-label', 'checked', 'class', 'disabled', 'id', 'media', 'name', 'rel', 'sizes', 'srcset', 'start', 'target', 'type'],
             FORBID_TAGS: ['iframe', 'object', 'script', 'style']
         };
 
@@ -516,6 +521,14 @@
             important: 'Wichtig',
             warning: 'Warnung',
             caution: 'Vorsicht'
+        };
+
+        const ALERT_SNIPPETS = {
+            note: 'Nützliche Information, die beim Überfliegen helfen soll.',
+            tip: 'Praktischer Tipp, der die Umsetzung erleichtert.',
+            important: 'Zentrale Information, die für das Ziel wichtig ist.',
+            warning: 'Dringender Hinweis, um Probleme zu vermeiden.',
+            caution: 'Hinweis auf Risiken oder mögliche negative Folgen.'
         };
 
         const EMOJI = {
@@ -592,6 +605,10 @@
             return `fn-${String(id).toLowerCase().replace(/[^\p{Letter}\p{Number}-]+/gu, '-').replace(/^-+|-+$/g, '') || 'note'}`;
         }
 
+        function footnoteReferenceId(id, count = 1) {
+            return `${footnoteId(id)}-ref${count > 1 ? `-${count}` : ''}`;
+        }
+
         function extractFootnotes(src) {
             const lines = src.replace(/\r\n?/g, '\n').split('\n');
             const footnotes = [];
@@ -624,10 +641,39 @@
             };
         }
 
-        function replaceFootnoteReferences(markdown) {
+        function buildFootnoteState(markdown, footnotes) {
+            const definitions = new Map();
+            const orderedIds = [];
+            const numberById = new Map();
+
+            footnotes.forEach(note => {
+                if (!definitions.has(note.id)) definitions.set(note.id, note);
+            });
+
+            markdown.replace(/\[\^([^\]\s]+)\]/g, (_, id) => {
+                if (!numberById.has(id)) {
+                    numberById.set(id, numberById.size + 1);
+                    orderedIds.push(id);
+                }
+                return '';
+            });
+
+            return {
+                definitions,
+                orderedIds,
+                numberById
+            };
+        }
+
+        function replaceFootnoteReferences(markdown, footnoteState) {
+            const referenceCounts = new Map();
+
             return markdown.replace(/\[\^([^\]\s]+)\]/g, (_, id) => {
-                const safeId = footnoteId(id);
-                return `<sup id="${safeId}-ref" class="footnote-ref"><a href="#${safeId}">${escapeHtml(id)}</a></sup>`;
+                const number = footnoteState.numberById.get(id);
+                const count = (referenceCounts.get(id) || 0) + 1;
+                referenceCounts.set(id, count);
+
+                return `<sup id="${footnoteReferenceId(id, count)}" class="footnote-ref"><a href="#${footnoteId(id)}" aria-label="Fußnote ${number}">${number}</a></sup>`;
             });
         }
 
@@ -770,8 +816,8 @@
             }));
         }
 
-        function appendFootnotes(root, footnotes, parser) {
-            if (!footnotes.length) return;
+        function appendFootnotes(root, footnoteState, parser) {
+            if (!footnoteState.orderedIds.length) return;
 
             const section = document.createElement('section');
             section.className = 'footnotes';
@@ -783,15 +829,17 @@
             section.append(heading);
 
             const list = document.createElement('ol');
-            footnotes.forEach(note => {
+            footnoteState.orderedIds.forEach(id => {
+                const note = footnoteState.definitions.get(id);
                 const item = document.createElement('li');
-                const safeId = footnoteId(note.id);
-                const noteHtml = parser.parse(note.content.join('\n'), MARKED_OPTIONS);
+                const safeId = footnoteId(id);
+                const noteContent = note ? note.content.join('\n') : `Keine Definition für [^${id}] vorhanden.`;
+                const noteHtml = parser.parse(noteContent, MARKED_OPTIONS);
                 item.id = safeId;
                 item.innerHTML = window.DOMPurify.sanitize(noteHtml, SANITIZE_CONFIG);
 
                 const backref = document.createElement('a');
-                backref.href = `#${safeId}-ref`;
+                backref.href = `#${footnoteReferenceId(id)}`;
                 backref.className = 'footnote-backref';
                 backref.setAttribute('aria-label', 'Zurück zur Fußnote');
                 backref.textContent = '↩';
@@ -810,14 +858,16 @@
             }
 
             const extracted = extractFootnotes(src);
-            const markdown = replaceFootnoteReferences(extracted.markdown.replace(/\r\n?/g, '\n'));
+            const normalizedMarkdown = extracted.markdown.replace(/\r\n?/g, '\n');
+            const footnoteState = buildFootnoteState(normalizedMarkdown, extracted.footnotes);
+            const markdown = replaceFootnoteReferences(normalizedMarkdown, footnoteState);
             const rawHtml = parser.parse(markdown, MARKED_OPTIONS);
             const template = document.createElement('template');
             template.innerHTML = window.DOMPurify.sanitize(rawHtml, SANITIZE_CONFIG);
 
             addHeadingIds(template.content);
             enhanceAlerts(template.content);
-            appendFootnotes(template.content, extracted.footnotes, parser);
+            appendFootnotes(template.content, footnoteState, parser);
             enhanceTaskLists(template.content);
             enhanceSingleTildeStrikethrough(template.content);
             enhanceEmoji(template.content);
@@ -865,6 +915,29 @@
             editor.setRangeText(text, s, e, 'end');
             editor.focus();
             render();
+        }
+
+        function getNextFootnoteLabel() {
+            const labels = new Set([...editor.value.matchAll(/\[\^([^\]\s]+)\]/g)].map(match => match[1]));
+            let next = 1;
+            while (labels.has(String(next))) next++;
+            return String(next);
+        }
+
+        function insertFootnote() {
+            const id = getNextFootnoteLabel();
+            const s = editor.selectionStart;
+            const e = editor.selectionEnd;
+            const selectedText = e > s ? editor.value.slice(s, e) : 'Text mit Fußnote';
+
+            editor.setRangeText(`${selectedText}[^${id}]\n\n[^${id}]: Quellenhinweis.\n`, s, e, 'end');
+            editor.focus();
+            render();
+        }
+
+        function insertAlert(type) {
+            const normalizedType = ALERTS[type] ? type : 'note';
+            insertAtCursor(`\n\n> [!${normalizedType.toUpperCase()}]\n> ${ALERT_SNIPPETS[normalizedType]}\n\n`);
         }
 
         function getMarkdownHeadings(markdown) {
@@ -969,10 +1042,22 @@
                         insertAtCursor('\n| Spalte A | Spalte B |\n| --- | --- |\n| Wert | Wert |\n');
                         break;
                     case 'footnote':
-                        insertAtCursor('Text mit Fußnote[^1].\n\n[^1]: Quellenhinweis.\n');
+                        insertFootnote();
                         break;
-                    case 'alert':
-                        insertAtCursor('> [!NOTE]\n> Wichtiger Hinweis.\n');
+                    case 'alert-note':
+                        insertAlert('note');
+                        break;
+                    case 'alert-tip':
+                        insertAlert('tip');
+                        break;
+                    case 'alert-important':
+                        insertAlert('important');
+                        break;
+                    case 'alert-warning':
+                        insertAlert('warning');
+                        break;
+                    case 'alert-caution':
+                        insertAlert('caution');
                         break;
                     case 'color':
                         wrapSelection('`', '`', '#0969DA');
