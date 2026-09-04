@@ -609,6 +609,234 @@
             return `${footnoteId(id)}-ref${count > 1 ? `-${count}` : ''}`;
         }
 
+        function getInlineCodeRanges(line) {
+            const ranges = [];
+            let index = 0;
+
+            while (index < line.length) {
+                if (line[index] !== '`') {
+                    index++;
+                    continue;
+                }
+
+                const start = index;
+                while (index < line.length && line[index] === '`') index++;
+
+                const marker = line.slice(start, index);
+                const end = line.indexOf(marker, index);
+                if (end === -1) break;
+
+                ranges.push([start, end + marker.length]);
+                index = end + marker.length;
+            }
+
+            return ranges;
+        }
+
+        function getHtmlCommentRanges(line, startsInComment) {
+            const ranges = [];
+            let index = 0;
+            let inComment = startsInComment;
+
+            if (inComment) {
+                const end = line.indexOf('-->');
+                if (end === -1) return {
+                    ranges: [[0, line.length]],
+                    inComment: true
+                };
+
+                ranges.push([0, end + 3]);
+                index = end + 3;
+                inComment = false;
+            }
+
+            while (index < line.length) {
+                const start = line.indexOf('<!--', index);
+                if (start === -1) break;
+
+                const end = line.indexOf('-->', start + 4);
+                if (end === -1) {
+                    ranges.push([start, line.length]);
+                    inComment = true;
+                    break;
+                }
+
+                ranges.push([start, end + 3]);
+                index = end + 3;
+            }
+
+            return {
+                ranges,
+                inComment
+            };
+        }
+
+        function overlapsRange(start, end, ranges) {
+            return ranges.some(([rangeStart, rangeEnd]) => start < rangeEnd && end > rangeStart);
+        }
+
+        function getFootnoteLabelTokens(src) {
+            const tokens = [];
+            const lines = src.replace(/\r\n?/g, '\n').split('\n');
+            let offset = 0;
+            let inFence = false;
+            let fenceChar = '';
+            let fenceLength = 0;
+            let inHtmlComment = false;
+
+            lines.forEach((line, lineIndex) => {
+                const fence = line.match(/^ {0,3}(`{3,}|~{3,})/);
+                if (fence) {
+                    const marker = fence[1];
+                    if (!inFence) {
+                        inFence = true;
+                        fenceChar = marker[0];
+                        fenceLength = marker.length;
+                    } else if (marker[0] === fenceChar && marker.length >= fenceLength) {
+                        inFence = false;
+                        fenceChar = '';
+                        fenceLength = 0;
+                    }
+                    offset += line.length + (lineIndex < lines.length - 1 ? 1 : 0);
+                    return;
+                }
+
+                if (!inFence) {
+                    const commentState = getHtmlCommentRanges(line, inHtmlComment);
+                    inHtmlComment = commentState.inComment;
+                    const ignoredRanges = [...getInlineCodeRanges(line), ...commentState.ranges];
+                    const definition = line.match(/^( {0,3})\[\^([^\]\s]+)\]:/);
+                    const referencePattern = /\[\^([^\]\s]+)\]/g;
+                    let match;
+
+                    if (definition && !overlapsRange(definition[1].length, definition[0].length, ignoredRanges)) {
+                        tokens.push({
+                            kind: 'def',
+                            id: definition[2],
+                            start: offset + definition[1].length,
+                            end: offset + definition[0].length
+                        });
+                        referencePattern.lastIndex = definition[0].length;
+                    }
+
+                    while ((match = referencePattern.exec(line))) {
+                        if (overlapsRange(match.index, match.index + match[0].length, ignoredRanges)) continue;
+
+                        tokens.push({
+                            kind: 'ref',
+                            id: match[1],
+                            start: offset + match.index,
+                            end: offset + match.index + match[0].length
+                        });
+                    }
+                }
+
+                offset += line.length + (lineIndex < lines.length - 1 ? 1 : 0);
+            });
+
+            return tokens;
+        }
+
+        function buildFootnoteNumbering(tokens, includeDefinitions = false) {
+            const orderedIds = [];
+            const numberById = new Map();
+            const addId = id => {
+                if (numberById.has(id)) return;
+
+                numberById.set(id, numberById.size + 1);
+                orderedIds.push(id);
+            };
+
+            tokens.filter(token => token.kind === 'ref').forEach(token => addId(token.id));
+            if (includeDefinitions) tokens.filter(token => token.kind === 'def').forEach(token => addId(token.id));
+
+            return {
+                orderedIds,
+                numberById
+            };
+        }
+
+        function adjustPositionForReplacements(position, replacements) {
+            let adjusted = position;
+
+            replacements.forEach(replacement => {
+                const originalLength = replacement.end - replacement.start;
+                const delta = replacement.text.length - originalLength;
+
+                if (replacement.end <= adjusted) {
+                    adjusted += delta;
+                    return;
+                }
+
+                if (replacement.start < adjusted && adjusted < replacement.end) {
+                    adjusted = replacement.start + replacement.text.length;
+                }
+            });
+
+            return adjusted;
+        }
+
+        function applyTextReplacements(value, replacements, selectionStart, selectionEnd) {
+            if (!replacements.length) {
+                return {
+                    value,
+                    selectionStart,
+                    selectionEnd,
+                    changed: false
+                };
+            }
+
+            const relevant = replacements
+                .filter(replacement => value.slice(replacement.start, replacement.end) !== replacement.text)
+                .sort((a, b) => a.start - b.start);
+
+            if (!relevant.length) {
+                return {
+                    value,
+                    selectionStart,
+                    selectionEnd,
+                    changed: false
+                };
+            }
+
+            let nextValue = value;
+            relevant.slice().reverse().forEach(replacement => {
+                nextValue = nextValue.slice(0, replacement.start) + replacement.text + nextValue.slice(replacement.end);
+            });
+
+            return {
+                value: nextValue,
+                selectionStart: adjustPositionForReplacements(selectionStart, relevant),
+                selectionEnd: adjustPositionForReplacements(selectionEnd, relevant),
+                changed: true
+            };
+        }
+
+        function renumberFootnotesInMarkdownSource(src, selectionStart = 0, selectionEnd = 0) {
+            const normalizedSrc = src.replace(/\r\n?/g, '\n');
+            const normalizedSelectionStart = src.slice(0, selectionStart).replace(/\r\n?/g, '\n').length;
+            const normalizedSelectionEnd = src.slice(0, selectionEnd).replace(/\r\n?/g, '\n').length;
+            const tokens = getFootnoteLabelTokens(normalizedSrc);
+            const numbering = buildFootnoteNumbering(tokens, true);
+
+            const replacements = tokens
+                .filter(token => numbering.numberById.has(token.id))
+                .map(token => {
+                    const number = numbering.numberById.get(token.id);
+                    return {
+                        start: token.start,
+                        end: token.end,
+                        text: token.kind === 'def' ? `[^${number}]:` : `[^${number}]`
+                    };
+                });
+
+            const replaced = applyTextReplacements(normalizedSrc, replacements, normalizedSelectionStart, normalizedSelectionEnd);
+            return {
+                ...replaced,
+                changed: replaced.changed || normalizedSrc !== src
+            };
+        }
+
         function extractFootnotes(src) {
             const lines = src.replace(/\r\n?/g, '\n').split('\n');
             const footnotes = [];
@@ -643,38 +871,36 @@
 
         function buildFootnoteState(markdown, footnotes) {
             const definitions = new Map();
-            const orderedIds = [];
-            const numberById = new Map();
+            const numbering = buildFootnoteNumbering(getFootnoteLabelTokens(markdown));
 
             footnotes.forEach(note => {
                 if (!definitions.has(note.id)) definitions.set(note.id, note);
             });
 
-            markdown.replace(/\[\^([^\]\s]+)\]/g, (_, id) => {
-                if (!numberById.has(id)) {
-                    numberById.set(id, numberById.size + 1);
-                    orderedIds.push(id);
-                }
-                return '';
-            });
-
             return {
                 definitions,
-                orderedIds,
-                numberById
+                orderedIds: numbering.orderedIds,
+                numberById: numbering.numberById
             };
         }
 
         function replaceFootnoteReferences(markdown, footnoteState) {
             const referenceCounts = new Map();
+            const replacements = getFootnoteLabelTokens(markdown)
+                .filter(token => token.kind === 'ref')
+                .map(token => {
+                    const number = footnoteState.numberById.get(token.id);
+                    const count = (referenceCounts.get(token.id) || 0) + 1;
+                    referenceCounts.set(token.id, count);
 
-            return markdown.replace(/\[\^([^\]\s]+)\]/g, (_, id) => {
-                const number = footnoteState.numberById.get(id);
-                const count = (referenceCounts.get(id) || 0) + 1;
-                referenceCounts.set(id, count);
+                    return {
+                        start: token.start,
+                        end: token.end,
+                        text: `<sup id="${footnoteReferenceId(token.id, count)}" class="footnote-ref"><a href="#${footnoteId(token.id)}" aria-label="Fußnote ${number}">${number}</a></sup>`
+                    };
+                });
 
-                return `<sup id="${footnoteReferenceId(id, count)}" class="footnote-ref"><a href="#${footnoteId(id)}" aria-label="Fußnote ${number}">${number}</a></sup>`;
-            });
+            return applyTextReplacements(markdown, replacements, 0, 0).value;
         }
 
         function addHeadingIds(root) {
@@ -881,7 +1107,16 @@
         const editor = document.getElementById('editor');
         const preview = document.getElementById('preview');
 
+        function normalizeEditorFootnotes() {
+            const normalized = renumberFootnotesInMarkdownSource(editor.value, editor.selectionStart, editor.selectionEnd);
+            if (!normalized.changed) return;
+
+            editor.value = normalized.value;
+            editor.setSelectionRange(normalized.selectionStart, normalized.selectionEnd);
+        }
+
         function render() {
+            normalizeEditorFootnotes();
             preview.innerHTML = parseMarkdown(editor.value.trim());
         }
         editor.addEventListener('input', render);
@@ -907,6 +1142,34 @@
             editor.setRangeText(prefix + current, ls, endPos, 'end');
             editor.focus();
             render();
+        }
+
+        function getPreviousMeaningfulLine(value, lineStart) {
+            let end = lineStart - 1;
+
+            while (end >= 0) {
+                const start = value.lastIndexOf('\n', end - 1) + 1;
+                const line = value.slice(start, end).trimEnd();
+
+                if (line.trim()) return line;
+                end = start - 1;
+            }
+
+            return '';
+        }
+
+        function getNextOrderedListPrefix() {
+            const s = editor.selectionStart;
+            const lineStart = editor.value.lastIndexOf('\n', s - 1) + 1;
+            const previousLine = getPreviousMeaningfulLine(editor.value, lineStart);
+            const match = previousLine.match(/^(\s*)(\d+)([.)])\s+/);
+
+            if (!match) return '1. ';
+            return `${match[1]}${Number(match[2]) + 1}${match[3]} `;
+        }
+
+        function insertOrderedListLine() {
+            insertLine(getNextOrderedListPrefix(), 'Listeneintrag');
         }
 
         function insertAtCursor(text) {
@@ -1024,7 +1287,7 @@
                         insertLine('- ', 'Listeneintrag');
                         break;
                     case 'ol':
-                        insertLine('1. ', 'Listeneintrag');
+                        insertOrderedListLine();
                         break;
                     case 'quote':
                         insertLine('> ', 'Zitat');
