@@ -104,7 +104,8 @@
             padding: 14px;
             display: flex;
             flex-direction: column;
-            gap: 10px
+            gap: 10px;
+            overflow: auto
         }
         
         .toolbar h2 {
@@ -113,6 +114,10 @@
             color: var(--text-1);
             font-weight: 600;
             text-transform: uppercase
+        }
+
+        .toolbar h2:not(:first-child) {
+            margin-top: 14px
         }
         
         .btn {
@@ -222,9 +227,72 @@
             box-shadow: 0 8px 20px rgba(0, 0, 0, .35)
         }
         
-        .preview ul {
+        .preview h4 {
+            font-size: 16px
+        }
+
+        .preview h5,
+        .preview h6 {
+            font-size: 14px
+        }
+
+        .preview p {
+            margin: 0 0 12px
+        }
+
+        .preview ul,
+        .preview ol {
             padding-left: 20px;
             margin: 8px 0
+        }
+
+        .preview li {
+            margin: 4px 0
+        }
+
+        .preview li.task-list-item {
+            list-style: none;
+            margin-left: -20px
+        }
+
+        .preview input[type="checkbox"] {
+            margin-right: 8px;
+            transform: translateY(1px)
+        }
+
+        .preview blockquote {
+            margin: 12px 0;
+            padding: 4px 0 4px 14px;
+            border-left: 4px solid rgba(169, 177, 214, .45);
+            color: var(--text-1)
+        }
+
+        .preview table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 14px 0;
+            overflow: hidden
+        }
+
+        .preview th,
+        .preview td {
+            border: 1px solid rgba(255, 255, 255, .14);
+            padding: 8px 10px;
+            text-align: left;
+            vertical-align: top
+        }
+
+        .preview th {
+            background: rgba(122, 162, 247, .12);
+            color: var(--text-0)
+        }
+
+        .preview code {
+            background: rgba(255, 255, 255, .08);
+            border: 1px solid rgba(255, 255, 255, .08);
+            border-radius: 6px;
+            padding: 1px 5px;
+            font-family: ui-monospace, Monaco, Consolas, monospace
         }
         
         .preview pre {
@@ -233,6 +301,87 @@
             padding: 12px;
             border-radius: 12px;
             overflow: auto
+        }
+
+        .preview pre code {
+            display: block;
+            padding: 0;
+            border: none;
+            background: transparent
+        }
+
+        .preview .gh-alert {
+            border-left-width: 4px;
+            border-radius: 10px;
+            padding: 10px 14px;
+            background: rgba(255, 255, 255, .035);
+            color: var(--text-0)
+        }
+
+        .preview .gh-alert-title {
+            margin: 0 0 6px;
+            font-weight: 700
+        }
+
+        .preview .gh-alert-note {
+            border-left-color: #7aa2f7
+        }
+
+        .preview .gh-alert-tip {
+            border-left-color: #4ade80
+        }
+
+        .preview .gh-alert-important {
+            border-left-color: #a78bfa
+        }
+
+        .preview .gh-alert-warning {
+            border-left-color: #facc15
+        }
+
+        .preview .gh-alert-caution {
+            border-left-color: #fb7185
+        }
+
+        .preview .gh-mention,
+        .preview .gh-issue-ref {
+            color: #8ab4ff;
+            font-weight: 600
+        }
+
+        .preview .emoji {
+            font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif
+        }
+
+        .preview .gh-color-code {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px
+        }
+
+        .preview .gh-color-swatch {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, .5);
+            box-shadow: 0 0 0 1px rgba(0, 0, 0, .25)
+        }
+
+        .preview .footnotes {
+            margin-top: 24px;
+            padding-top: 12px;
+            border-top: 1px dashed rgba(255, 255, 255, .14);
+            color: var(--text-1);
+            font-size: 13px
+        }
+
+        .preview .footnotes h2 {
+            font-size: 15px
+        }
+
+        .preview .footnote-backref {
+            border-bottom: none;
+            margin-left: 4px
         }
         /* Neuer Footer */
         
@@ -244,6 +393,41 @@
             text-align: left;
             font-size: 13px;
             color: var(--text-1);
+        }
+
+        @media (max-width: 980px) {
+            body {
+                overflow: auto
+            }
+
+            .app {
+                height: auto;
+                min-height: 100%;
+                grid-template-rows: auto 1fr;
+                padding: 16px
+            }
+
+            .header {
+                align-items: flex-start;
+                flex-direction: column
+            }
+
+            .main {
+                grid-template-columns: 1fr
+            }
+
+            .toolbar {
+                max-height: none
+            }
+
+            .card {
+                min-height: 360px
+            }
+
+            footer {
+                position: static;
+                padding: 0 16px 16px
+            }
         }
     </style>
 </head>
@@ -265,13 +449,25 @@
                 <h2>Elemente</h2>
                 <button class="btn" data-action="h1">Überschrift <small>#</small></button>
                 <button class="btn" data-action="h2">Unterüberschrift <small>##</small></button>
+                <button class="btn" data-action="h3">Abschnitt <small>###</small></button>
                 <button class="btn" data-action="bold">Fett <small>** **</small></button>
                 <button class="btn" data-action="italic">Kursiv <small>* *</small></button>
+                <button class="btn" data-action="strike">Durchstreichen <small>~~ ~~</small></button>
+                <button class="btn" data-action="inline-code">Inline-Code <small>` `</small></button>
                 <button class="btn" data-action="link">Link <small>[ ]( )</small></button>
                 <button class="btn" data-action="image">Bild <small>![ ]( )</small></button>
                 <button class="btn" data-action="ul">Liste <small>-</small></button>
+                <button class="btn" data-action="ol">Nummeriert <small>1.</small></button>
+                <button class="btn" data-action="quote">Zitat <small>&gt;</small></button>
                 <button class="btn" data-action="br">Zeilenumbruch <small>&lt;br /&gt;</small></button>
                 <button class="btn" data-action="code">Code <small>```</small></button>
+                <h2>GitHub</h2>
+                <button class="btn" data-action="task">Aufgabenliste <small>[x]</small></button>
+                <button class="btn" data-action="table">Tabelle <small>| |</small></button>
+                <button class="btn" data-action="footnote">Fußnote <small>[^1]</small></button>
+                <button class="btn" data-action="alert">Alert <small>[!NOTE]</small></button>
+                <button class="btn" data-action="color">Farbwert <small>#RRGGBB</small></button>
+                <button class="btn" data-action="comment">Kommentar <small>&lt;!-- --&gt;</small></button>
                 <button class="btn" data-action="outline">Gliederung</button>
             </aside>
 
@@ -298,36 +494,338 @@
     <!-- exakt formatgetreuer PDF-Export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.4.14/dist/purify.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked@18.0.11/lib/marked.umd.js"></script>
 
     <script>
-        function slugify(text) {
-            return text.toLowerCase()
-                .replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss')
-                .normalize('NFD').replace(/[^\p{Letter}\p{Number}\s-]/gu, '')
-                .trim().replace(/\s+/g, '-').replace(/-+/g, '-');
+        const MARKED_OPTIONS = {
+            gfm: true,
+            breaks: false,
+            pedantic: false
+        };
+
+        const SANITIZE_CONFIG = {
+            ADD_TAGS: ['del', 'input', 'ins', 'picture', 'source', 'sub', 'sup'],
+            ADD_ATTR: ['align', 'checked', 'class', 'disabled', 'id', 'media', 'name', 'rel', 'sizes', 'srcset', 'start', 'target', 'type'],
+            FORBID_TAGS: ['iframe', 'object', 'script', 'style']
+        };
+
+        const ALERTS = {
+            note: 'Hinweis',
+            tip: 'Tipp',
+            important: 'Wichtig',
+            warning: 'Warnung',
+            caution: 'Vorsicht'
+        };
+
+        const EMOJI = {
+            '+1': '👍',
+            '-1': '👎',
+            tada: '🎉',
+            shipit: '🚢',
+            heart: '❤️',
+            rocket: '🚀',
+            smile: '😄',
+            warning: '⚠️',
+            bulb: '💡',
+            memo: '📝',
+            white_check_mark: '✅',
+            x: '❌',
+            fire: '🔥',
+            eyes: '👀',
+            pray: '🙏'
+        };
+
+        function escapeHtml(value) {
+            return String(value).replace(/[&<>"']/g, ch => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
+            }[ch]));
+        }
+
+        function getMarkedParser() {
+            if (!window.marked) return null;
+            if (typeof window.marked.parse === 'function') return window.marked;
+            if (window.marked.marked && typeof window.marked.marked.parse === 'function') return window.marked.marked;
+            if (typeof window.marked === 'function') {
+                return {
+                    parse: window.marked
+                };
+            }
+            return null;
+        }
+
+        function plainHeadingText(text) {
+            return text
+                .replace(/`([^`]+)`/g, '$1')
+                .replace(/!\[([^\]]*)\]\([^)]+\)/g, '$1')
+                .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+                .replace(/<[^>]+>/g, '')
+                .replace(/[*_~]/g, '')
+                .trim();
+        }
+
+        function githubSlug(text) {
+            const slug = plainHeadingText(text)
+                .toLowerCase()
+                .replace(/[^\p{Letter}\p{Number}\s-]/gu, '')
+                .trim()
+                .replace(/\s+/g, '-')
+                .replace(/-+/g, '-');
+            return slug || 'section';
+        }
+
+        function createSlugger() {
+            const counts = new Map();
+            return text => {
+                const base = githubSlug(text);
+                const count = counts.get(base) || 0;
+                counts.set(base, count + 1);
+                return count ? `${base}-${count}` : base;
+            };
+        }
+
+        function footnoteId(id) {
+            return `fn-${String(id).toLowerCase().replace(/[^\p{Letter}\p{Number}-]+/gu, '-').replace(/^-+|-+$/g, '') || 'note'}`;
+        }
+
+        function extractFootnotes(src) {
+            const lines = src.replace(/\r\n?/g, '\n').split('\n');
+            const footnotes = [];
+            const body = [];
+            let current = null;
+
+            for (const line of lines) {
+                const definition = line.match(/^\[\^([^\]\s]+)\]:\s*(.*)$/);
+                if (definition) {
+                    current = {
+                        id: definition[1],
+                        content: [definition[2]]
+                    };
+                    footnotes.push(current);
+                    continue;
+                }
+
+                if (current && /^(?: {2,}|\t)/.test(line)) {
+                    current.content.push(line.replace(/^(?: {2,}|\t)/, ''));
+                    continue;
+                }
+
+                current = null;
+                body.push(line);
+            }
+
+            return {
+                markdown: body.join('\n'),
+                footnotes
+            };
+        }
+
+        function replaceFootnoteReferences(markdown) {
+            return markdown.replace(/\[\^([^\]\s]+)\]/g, (_, id) => {
+                const safeId = footnoteId(id);
+                return `<sup id="${safeId}-ref" class="footnote-ref"><a href="#${safeId}">${escapeHtml(id)}</a></sup>`;
+            });
+        }
+
+        function addHeadingIds(root) {
+            const slugFor = createSlugger();
+            root.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach(heading => {
+                if (!heading.id) heading.id = slugFor(heading.textContent);
+            });
+        }
+
+        function enhanceAlerts(root) {
+            root.querySelectorAll('blockquote').forEach(blockquote => {
+                const first = blockquote.firstElementChild;
+                if (!first) return;
+
+                const match = first.textContent.trim().match(/^\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]/i);
+                if (!match) return;
+
+                const type = match[1].toLowerCase();
+                first.innerHTML = first.innerHTML.replace(/^\s*\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]\s*(?:<br\s*\/?>)?\s*/i, '');
+                if (!first.textContent.trim() && first.children.length === 0) first.remove();
+
+                const title = document.createElement('p');
+                title.className = 'gh-alert-title';
+                title.textContent = ALERTS[type];
+                blockquote.prepend(title);
+                blockquote.classList.add('gh-alert', `gh-alert-${type}`);
+            });
+        }
+
+        function enhanceTaskLists(root) {
+            root.querySelectorAll('li input[type="checkbox"]').forEach(input => {
+                input.disabled = true;
+                input.closest('li')?.classList.add('task-list-item');
+            });
+        }
+
+        function enhanceLinks(root) {
+            root.querySelectorAll('a[href]').forEach(link => {
+                const href = link.getAttribute('href') || '';
+                if (/^(https?:)?\/\//i.test(href)) {
+                    link.target = '_blank';
+                    link.rel = 'noopener noreferrer';
+                }
+            });
+        }
+
+        function isSupportedColorLiteral(value) {
+            if (value !== value.trim()) return false;
+            if (!/^(#[0-9a-f]{3}(?:[0-9a-f]{3})?|rgb\(\s*\d{1,3}%?\s*,\s*\d{1,3}%?\s*,\s*\d{1,3}%?\s*\)|hsl\(\s*\d{1,3}(?:deg|rad|turn)?\s*,\s*\d{1,3}%\s*,\s*\d{1,3}%\s*\))$/i.test(value)) return false;
+
+            const probe = new Option().style;
+            probe.color = value;
+            return Boolean(probe.color);
+        }
+
+        function enhanceColorCodes(root) {
+            root.querySelectorAll('code').forEach(code => {
+                if (code.closest('pre')) return;
+                const value = code.textContent;
+                if (!isSupportedColorLiteral(value)) return;
+
+                const swatch = document.createElement('span');
+                swatch.className = 'gh-color-swatch';
+                swatch.style.backgroundColor = value;
+                swatch.setAttribute('aria-hidden', 'true');
+                code.classList.add('gh-color-code');
+                code.prepend(swatch);
+            });
+        }
+
+        function transformTextNodes(root, transform) {
+            const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+                acceptNode(node) {
+                    const parent = node.parentElement;
+                    return parent && parent.closest('a, code, pre, kbd, samp, script, style, textarea') ?
+                        NodeFilter.FILTER_REJECT :
+                        NodeFilter.FILTER_ACCEPT;
+                }
+            });
+            const nodes = [];
+            while (walker.nextNode()) nodes.push(walker.currentNode);
+            nodes.forEach(node => {
+                const replacement = transform(node.nodeValue);
+                if (replacement) node.replaceWith(replacement);
+            });
+        }
+
+        function fragmentFromRegex(text, regex, renderMatch) {
+            regex.lastIndex = 0;
+            let match;
+            let lastIndex = 0;
+            let changed = false;
+            const fragment = document.createDocumentFragment();
+
+            while ((match = regex.exec(text))) {
+                if (match.index > lastIndex) fragment.append(document.createTextNode(text.slice(lastIndex, match.index)));
+                const rendered = renderMatch(match);
+                fragment.append(rendered || document.createTextNode(match[0]));
+                lastIndex = match.index + match[0].length;
+                changed = changed || Boolean(rendered);
+            }
+
+            if (!changed) return null;
+            if (lastIndex < text.length) fragment.append(document.createTextNode(text.slice(lastIndex)));
+            return fragment;
+        }
+
+        function enhanceEmoji(root) {
+            transformTextNodes(root, text => fragmentFromRegex(text, /:([a-z0-9_+\-]+):/gi, match => {
+                const emoji = EMOJI[match[1].toLowerCase()];
+                if (!emoji) return null;
+
+                const span = document.createElement('span');
+                span.className = 'emoji';
+                span.title = match[0];
+                span.textContent = emoji;
+                return span;
+            }));
+        }
+
+        function enhanceSingleTildeStrikethrough(root) {
+            transformTextNodes(root, text => fragmentFromRegex(text, /~([^~\s](?:[^~]*?[^~\s])?)~/g, match => {
+                const del = document.createElement('del');
+                del.textContent = match[1];
+                return del;
+            }));
+        }
+
+        function enhanceGitHubReferences(root) {
+            transformTextNodes(root, text => fragmentFromRegex(text, /(^|[^\w./-])(@[a-z0-9][a-z0-9-]{0,38}(?:\/[a-z0-9_.-]+)?|#[1-9]\d*)\b/gi, match => {
+                const fragment = document.createDocumentFragment();
+                if (match[1]) fragment.append(document.createTextNode(match[1]));
+
+                const span = document.createElement('span');
+                span.className = match[2].startsWith('@') ? 'gh-mention' : 'gh-issue-ref';
+                span.textContent = match[2];
+                fragment.append(span);
+                return fragment;
+            }));
+        }
+
+        function appendFootnotes(root, footnotes, parser) {
+            if (!footnotes.length) return;
+
+            const section = document.createElement('section');
+            section.className = 'footnotes';
+            section.setAttribute('aria-label', 'Fußnoten');
+
+            const heading = document.createElement('h2');
+            heading.id = 'footnotes';
+            heading.textContent = 'Fußnoten';
+            section.append(heading);
+
+            const list = document.createElement('ol');
+            footnotes.forEach(note => {
+                const item = document.createElement('li');
+                const safeId = footnoteId(note.id);
+                const noteHtml = parser.parse(note.content.join('\n'), MARKED_OPTIONS);
+                item.id = safeId;
+                item.innerHTML = window.DOMPurify.sanitize(noteHtml, SANITIZE_CONFIG);
+
+                const backref = document.createElement('a');
+                backref.href = `#${safeId}-ref`;
+                backref.className = 'footnote-backref';
+                backref.setAttribute('aria-label', 'Zurück zur Fußnote');
+                backref.textContent = '↩';
+                item.append(' ', backref);
+                list.append(item);
+            });
+
+            section.append(list);
+            root.append(section);
         }
 
         function parseMarkdown(src) {
-            src = src.replace(/\r\n?/g, '\n');
-            const codeBlocks = [];
-            src = src.replace(/```([\s\S]*?)```/g, (_, code) => {
-                codeBlocks.push(code);
-                return `§§CODE${codeBlocks.length-1}§§`;
-            });
-            src = src.replace(/^###\s?(.+)$/gm, (m, t) => `<h3 id="${slugify(t)}">${t}</h3>`);
-            src = src.replace(/^##\s?(.+)$/gm, (m, t) => `<h2 id="${slugify(t)}">${t}</h2>`);
-            src = src.replace(/^#\s?(.+)$/gm, (m, t) => `<h1 id="${slugify(t)}">${t}</h1>`);
-            src = src.replace(/(?:^(?:\s*[-*]\s.+)\n?)+/gm, block => {
-                const items = block.trim().split(/\n/).map(l => '<li>' + l.replace(/^\s*[-*]\s/, '') + '</li>').join('');
-                return `<ul>${items}</ul>`;
-            });
-            src = src.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img alt="$1" src="$2" />');
-            src = src.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
-            src = src.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-            src = src.replace(/(^|\W)\*(?!\*)([^*]+)\*(?!\*)/g, '$1<em>$2</em>');
-            src = src.split(/\n{2,}/).map(b => /<h\d|<ul|<img|§§CODE/.test(b) ? b : `<p>${b.replace(/\n/g,'<br>')}</p>`).join('\n');
-            src = src.replace(/§§CODE(\d+)§§/g, (_, i) => `<pre><code>${codeBlocks[+i].replace(/[&<>]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[ch]))}</code></pre>`);
-            return src;
+            const parser = getMarkedParser();
+            if (!parser || !window.DOMPurify) {
+                return `<p>Markdown-Vorschau konnte nicht geladen werden.</p><pre><code>${escapeHtml(src)}</code></pre>`;
+            }
+
+            const extracted = extractFootnotes(src);
+            const markdown = replaceFootnoteReferences(extracted.markdown.replace(/\r\n?/g, '\n'));
+            const rawHtml = parser.parse(markdown, MARKED_OPTIONS);
+            const template = document.createElement('template');
+            template.innerHTML = window.DOMPurify.sanitize(rawHtml, SANITIZE_CONFIG);
+
+            addHeadingIds(template.content);
+            enhanceAlerts(template.content);
+            appendFootnotes(template.content, extracted.footnotes, parser);
+            enhanceTaskLists(template.content);
+            enhanceSingleTildeStrikethrough(template.content);
+            enhanceEmoji(template.content);
+            enhanceGitHubReferences(template.content);
+            enhanceColorCodes(template.content);
+            enhanceLinks(template.content);
+
+            return template.innerHTML;
         }
 
         const editor = document.getElementById('editor');
@@ -369,30 +867,52 @@
             render();
         }
 
+        function getMarkdownHeadings(markdown) {
+            const slugFor = createSlugger();
+            const headings = [];
+            let inFence = false;
+
+            markdown.split(/\n/).forEach(line => {
+                if (/^\s*(```|~~~)/.test(line)) {
+                    inFence = !inFence;
+                    return;
+                }
+                if (inFence) return;
+
+                const match = line.match(/^(#{1,6})\s+(.+?)\s*#*\s*$/);
+                if (!match) return;
+
+                const text = plainHeadingText(match[2]);
+                headings.push({
+                    depth: match[1].length,
+                    text,
+                    slug: slugFor(text)
+                });
+            });
+
+            return headings;
+        }
+
         function generateOutline() {
-            const lines = editor.value.split(/\n/);
+            const headings = getMarkdownHeadings(editor.value);
             let outline = '## Gliederung\n\n';
             let h2Count = 0;
-            for (let i = 0; i < lines.length; i++) {
-                const l = lines[i];
-                if (/^##\s+/.test(l) && !/^###/.test(l)) {
+            let h3Count = 0;
+
+            headings.forEach(heading => {
+                if (heading.depth === 2) {
                     h2Count++;
-                    const h2Text = l.replace(/^##\s+/, '').trim();
-                    const h2Slug = slugify(h2Text);
-                    let h3Count = 0;
-                    const subs = [];
-                    let j = i + 1;
-                    while (j < lines.length && !/^##\s+/.test(lines[j])) {
-                        if (/^###\s+/.test(lines[j])) {
-                            h3Count++;
-                            const t = lines[j].replace(/^###\s+/, '').trim();
-                            subs.push(`  ${h2Count}.${h3Count} [${t}](#${slugify(t)})`);
-                        }
-                        j++;
-                    }
-                    outline += `${h2Count}. [${h2Text}](#${h2Slug})` + (subs.length ? '<br />\n' + subs.join('\n') + '\n' : '\n');
+                    h3Count = 0;
+                    outline += `${h2Count}. [${heading.text}](#${heading.slug})\n`;
+                    return;
                 }
-            }
+
+                if (heading.depth === 3 && h2Count > 0) {
+                    h3Count++;
+                    outline += `   ${h2Count}.${h3Count}. [${heading.text}](#${heading.slug})\n`;
+                }
+            });
+
             insertAtCursor(outline);
         }
 
@@ -406,11 +926,20 @@
                     case 'h2':
                         insertLine('## ', 'Unterüberschrift');
                         break;
+                    case 'h3':
+                        insertLine('### ', 'Abschnitt');
+                        break;
                     case 'bold':
                         wrapSelection('**', '**', 'fett');
                         break;
                     case 'italic':
                         wrapSelection('*', '*', 'kursiv');
+                        break;
+                    case 'strike':
+                        wrapSelection('~~', '~~', 'durchgestrichen');
+                        break;
+                    case 'inline-code':
+                        wrapSelection('`', '`', 'git status');
                         break;
                     case 'link':
                         wrapSelection('[', '](https://example.com)', 'Link');
@@ -421,11 +950,35 @@
                     case 'ul':
                         insertLine('- ', 'Listeneintrag');
                         break;
+                    case 'ol':
+                        insertLine('1. ', 'Listeneintrag');
+                        break;
+                    case 'quote':
+                        insertLine('> ', 'Zitat');
+                        break;
                     case 'br':
                         insertAtCursor('<br />\n');
                         break;
                     case 'code':
                         wrapSelection('```\n', '\n```', 'code');
+                        break;
+                    case 'task':
+                        insertAtCursor('- [ ] Aufgabe\n- [x] Erledigt\n');
+                        break;
+                    case 'table':
+                        insertAtCursor('\n| Spalte A | Spalte B |\n| --- | --- |\n| Wert | Wert |\n');
+                        break;
+                    case 'footnote':
+                        insertAtCursor('Text mit Fußnote[^1].\n\n[^1]: Quellenhinweis.\n');
+                        break;
+                    case 'alert':
+                        insertAtCursor('> [!NOTE]\n> Wichtiger Hinweis.\n');
+                        break;
+                    case 'color':
+                        wrapSelection('`', '`', '#0969DA');
+                        break;
+                    case 'comment':
+                        wrapSelection('<!-- ', ' -->', 'Kommentar');
                         break;
                     case 'outline':
                         generateOutline();
