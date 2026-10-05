@@ -1,0 +1,33 @@
+{
+  "buttons": {
+    "more": "En savoir plus",
+    "back": "Retour",
+    "open": "Ouvrir",
+    "close": "Fermer",
+    "clearFilters": "Effacer les filtres",
+    "previous": "Précédent",
+    "next": "Suivant"
+  },
+  "language": {
+    "label": "Choisir la langue",
+    "open": "Ouvrir le sélecteur de langue",
+    "close": "Fermer le sélecteur de langue",
+    "german": "Allemand",
+    "english": "Anglais",
+    "french": "Français"
+  },
+  "navigation": {
+    "open": "Ouvrir la navigation",
+    "close": "Fermer la navigation"
+  },
+  "brand": {
+    "home": "Aller à la page d'accueil de Felix Staacke"
+  },
+  "links": {
+    "github": "Voir sur GitHub",
+    "article": "article",
+    "course": "Accéder au cours",
+    "worksheet": "Ouvrir la fiche",
+    "results": "résultats"
+  }
+}

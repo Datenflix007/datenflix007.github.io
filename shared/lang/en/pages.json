@@ -1,0 +1,69 @@
+{
+  "home": {
+    "hero": {
+      "teacherEducation": "Teacher education",
+      "computerScience": "Computer science",
+      "history": "History",
+      "portrait": "Portrait of Felix Staacke",
+      "source": "Modern rewording after:",
+      "translation": "English: “We learn not for school, but for life.”"
+    },
+    "categories": {
+      "label": "Topics",
+      "study": "Studies",
+      "until": "to",
+      "today": "today",
+      "topic": "Topic",
+      "tutorials": "Tutorials",
+      "computerScienceDescription": "Theory, projects and insights on the path to the state examination",
+      "historyDescription": "A timeline of theoretical and practical computer science, with Lambda Calculus, the Analytical Engine, Z3, A-0 and ENIAC as hands-on labs",
+      "historyStudyDescription": "Insights from studying history",
+      "guidesDescription": "Tools, tips and guides for computer science"
+    },
+    "clusters": {
+      "algodat": "Algorithms and data structures",
+      "references": "References / publications",
+      "worksheets": "Digital worksheets",
+      "automata": "Automata theory",
+      "tools": "Tools",
+      "projects": "Projects",
+      "guides": "Guides",
+      "content": "Content"
+    },
+    "timeline": {
+      "ubHeidelberg": { "description": "A local research tool for creating author indexes for historical journals. The collector retrieves metadata from UB Heidelberg/DWork and ThULB/journals@UrMEL, aggregates contributions by author and produces structured JSON and ZIP output." },
+      "naraTrace": { "description": "A local, unofficial research tool for source-oriented person searches in the National Archives Catalog of the U.S. National Archives and Records Administration. It supports searches across digitised holdings, search histories and detailed views with original pages and transcripts." },
+      "jenaTramBoard": { "description": "A small maker project: a compact departure monitor for Jena trams with a local web UI, desktop window and settings for stops, line filters, display and additional screens." },
+      "poster": { "description": "As part of the degree programme, the module “Computer Science and Society” included the creation of a scientific poster. The poster and further reading are available in this" },
+      "algodat": { "description": "An interactive self-study course on the foundations of algorithms and data structures, from sorting algorithms and graph theory to complex heap structures such as the Fibonacci heap. Concepts are presented through visualisations, pseudocode and concrete examples. The course is for students who want to deepen their lecture material or get started independently." },
+      "basicKnowledgeGraph": { "description": "A repository about building a simple knowledge graph." },
+      "jenaForest": { "description": "An interactive digital worksheet for a workshop on the history of the Jena forest. Learners explore historical forestry occupations, conduct their own research and collect observations in an integrated notebook." },
+      "mysqlTrainee": { "description": "A MySQL and phpMyAdmin environment is provided through Docker to learn and deepen SQL knowledge. Integrated exercises make working with databases easier." },
+      "jenaCraft": { "before4dCity": "As part of work as a research assistant in the DHLabor of the Digital Humanities chair, “Jena-Craft” workshops were held. For the full results presentation, visit", "beforeResults": "For the collection of workshop results, open the" },
+      "pnp": { "description": "This tabletop role-playing game was designed and developed for a game night. It tells the story of a fictional rumour about the treasure of the Naumburg Master. Different characters — a history student, mayor, archivist and provost — must cooperate, fill in applications and solve puzzles while evading the intrigue of a mysterious lodge." }
+    },
+    "introLabel": "Introduction",
+    "searchLabel": "Search site content",
+    "searchPlaceholder": "e.g. projects, AlgoDat, contact ...",
+    "graphNavigation": "Graph navigation",
+    "zoomOut": "Zoom out",
+    "resetView": "Reset view",
+    "zoomIn": "Zoom in",
+    "filterGraph": "Filter knowledge graph",
+    "filter": "Filter",
+    "study": "Studies",
+    "guide": "Guide",
+    "project": "Project",
+    "reference": "Reference",
+    "tool": "Tool",
+    "algodat": "AlgoDat",
+    "automataTheory": "Automata theory",
+    "computerHistory": "History of computer science",
+    "worksheet": "Digital worksheet",
+    "keyword": "Keyword",
+    "keywordPlaceholder": "e.g. studies, reference ...",
+    "loading": "Loading knowledge graph from the repository …",
+    "loaded": "{count} items loaded · updated from the current repository state",
+    "loadFallback": "The knowledge graph could not be loaded live. The page shows the static structure instead."
+  }
+}

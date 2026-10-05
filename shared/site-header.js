@@ -4,6 +4,13 @@
   if (window.__datenflixSiteHeader) return;
   window.__datenflixSiteHeader = true;
 
+  const shellScriptUrl = document.currentScript?.src || window.location.href;
+  const LANGUAGE_CONFIG = Object.freeze({
+    de: { name: "Deutsch", flagClass: "de", labelKey: "common.language.german" },
+    en: { name: "English", flagClass: "gb", labelKey: "common.language.english" },
+    fr: { name: "Français", flagClass: "fr", labelKey: "common.language.french" }
+  });
+  window.DatenflixLanguageConfig = LANGUAGE_CONFIG;
   const links = [
     ["Referenzen", "https://datenflix007.github.io/src/Referenzen.html", "references"],
     ["Projekte", "https://datenflix007.github.io/src/projekte.html", "projects"],
@@ -12,6 +19,15 @@
     ["Guides", "https://datenflix007.github.io/guides/", "guides"],
     ["Arbeitsblätter", "https://datenflix007.github.io/digital-worksheets/", "worksheets"]
   ];
+
+  function loadI18n() {
+    if (window.__datenflixI18nRequested || window.DatenflixI18n) return;
+    window.__datenflixI18nRequested = true;
+    const i18nScript = document.createElement("script");
+    i18nScript.src = new URL("i18n.js", shellScriptUrl).href;
+    i18nScript.async = false;
+    document.head.append(i18nScript);
+  }
 
   function activeArea(pathname) {
     const path = pathname.toLowerCase();
@@ -24,28 +40,24 @@
     return "";
   }
 
-  function flags() {
-    return {
-      de: '<svg class="site-language__flag" viewBox="0 0 24 16" aria-hidden="true"><path fill="#111" d="M0 0h24v5.34H0z"/><path fill="#d00" d="M0 5.33h24v5.34H0z"/><path fill="#ffce00" d="M0 10.66h24V16H0z"/></svg>',
-      en: '<svg class="site-language__flag" viewBox="0 0 24 16" aria-hidden="true"><path fill="#012169" d="M0 0h24v16H0z"/><path d="m0 0 24 16M24 0 0 16" stroke="#fff" stroke-width="3"/><path d="m0 0 24 16M24 0 0 16" stroke="#c8102e" stroke-width="1.5"/><path d="M12 0v16M0 8h24" stroke="#fff" stroke-width="5"/><path d="M12 0v16M0 8h24" stroke="#c8102e" stroke-width="3"/></svg>'
-    };
-  }
-
   function renderHeader() {
     const active = activeArea(location.pathname);
-    const currentLinks = links.map(([label, href, area]) => `<a class="site-nav__link" href="${href}"${area === active ? ' aria-current="page"' : ""}>${label}</a>`).join("");
-    const icons = flags();
+    const currentLinks = links.map(([label, href, area]) => `<a class="site-nav__link" href="${href}" data-i18n="navigation.${area}"${area === active ? ' aria-current="page"' : ""}>${label}</a>`).join("");
+    const languageOptions = Object.entries(LANGUAGE_CONFIG).map(([code, language]) => `<button class="site-language__option${code === "de" ? " is-active" : ""}" type="button" data-language="${code}" aria-current="${code === "de"}"><span class="site-language__flag site-language__flag--${language.flagClass}" aria-hidden="true"></span><span data-i18n="${language.labelKey}">${language.name}</span></button>`).join("");
     const header = document.createElement("header");
     header.className = "site-header";
     header.dataset.siteHeader = "true";
     header.innerHTML = `
       <div class="site-header__inner">
-        <a class="site-brand" href="https://datenflix007.github.io/" aria-label="Zur Startseite von Felix Staacke"><span class="site-brand__mark" aria-hidden="true"></span><span>Felix Staacke</span></a>
-        <button class="site-mobile-toggle" type="button" aria-expanded="false" aria-controls="datenflixSiteNav" aria-label="Navigation öffnen"><span class="site-mobile-toggle__bar"></span><span class="site-mobile-toggle__bar"></span><span class="site-mobile-toggle__bar"></span></button>
-        <nav class="site-nav" id="datenflixSiteNav" aria-label="Hauptnavigation">${currentLinks}
-          <div class="site-language" aria-label="Sprachauswahl, Übersetzungen folgen">
-            <button class="site-language__button" type="button" data-lang="de" aria-label="Deutsch" title="Deutsch (Standard)" aria-pressed="true">${icons.de}<span>DE</span></button>
-            <button class="site-language__button" type="button" data-lang="en" aria-label="English" title="English (coming soon)" aria-pressed="false">${icons.en}<span>EN</span></button>
+        <a class="site-brand" href="https://datenflix007.github.io/" aria-label="Zur Startseite von Felix Staacke" data-i18n-aria-label="common.brand.home"><span class="site-brand__mark" aria-hidden="true"></span><span>Felix Staacke</span></a>
+        <button class="site-mobile-toggle" type="button" aria-expanded="false" aria-controls="datenflixSiteNav" aria-label="Navigation öffnen" data-i18n-aria-label="common.navigation.open"><span class="site-mobile-toggle__bar"></span><span class="site-mobile-toggle__bar"></span><span class="site-mobile-toggle__bar"></span></button>
+        <nav class="site-nav" id="datenflixSiteNav" aria-label="Hauptnavigation">
+          ${currentLinks}
+          <div class="site-language">
+            <button class="site-language__toggle" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="datenflixLanguageMenu" aria-label="Sprache auswählen" data-i18n-aria-label="common.language.label"><span class="site-language__current site-language__flag site-language__flag--de" data-current-language-flag aria-hidden="true"></span><span class="site-language__chevron" aria-hidden="true">⌄</span></button>
+            <div class="site-language__menu" id="datenflixLanguageMenu" hidden>
+              ${languageOptions}
+            </div>
           </div>
         </nav>
       </div>`;
@@ -60,19 +72,17 @@
     const closeMenu = () => {
       navigation.classList.remove("is-open");
       toggle.setAttribute("aria-expanded", "false");
-      toggle.setAttribute("aria-label", "Navigation öffnen");
+      toggle.setAttribute("aria-label", window.DatenflixI18n?.translate("common.navigation.open") || "Navigation öffnen");
     };
     toggle.addEventListener("click", () => {
       const open = navigation.classList.toggle("is-open");
       toggle.setAttribute("aria-expanded", String(open));
-      toggle.setAttribute("aria-label", open ? "Navigation schließen" : "Navigation öffnen");
+      toggle.setAttribute("aria-label", open
+        ? window.DatenflixI18n?.translate("common.navigation.close") || "Navigation schließen"
+        : window.DatenflixI18n?.translate("common.navigation.open") || "Navigation öffnen");
     });
     navigation.addEventListener("click", (event) => {
       if (event.target.closest("a")) closeMenu();
-      const languageButton = event.target.closest("[data-lang]");
-      if (languageButton) {
-        navigation.querySelectorAll("[data-lang]").forEach((button) => button.setAttribute("aria-pressed", String(button === languageButton)));
-      }
     });
     document.addEventListener("keydown", (event) => {
       if (event.key === "Escape" && navigation.classList.contains("is-open")) {
@@ -82,6 +92,7 @@
     });
   }
 
+  loadI18n();
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", renderHeader, { once: true });
   else renderHeader();
 })();

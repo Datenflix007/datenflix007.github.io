@@ -1,0 +1,69 @@
+{
+  "home": {
+    "hero": {
+      "teacherEducation": "Formation des enseignants",
+      "computerScience": "Informatique",
+      "history": "Histoire",
+      "portrait": "Portrait de Felix Staacke",
+      "source": "Reformulation moderne d'après :",
+      "translation": "Traduction française : « Nous n'apprenons pas pour l'école, mais pour la vie. »"
+    },
+    "categories": {
+      "label": "Thématiques",
+      "study": "Études",
+      "until": "à",
+      "today": "aujourd'hui",
+      "topic": "Thématique",
+      "tutorials": "Tutoriels",
+      "computerScienceDescription": "Théorie, projets et apprentissages sur la voie de l'examen d'État",
+      "historyDescription": "Une frise de l'informatique théorique et pratique, avec le lambda-calcul, l'Analytical Engine, Z3, A-0 et ENIAC comme laboratoires",
+      "historyStudyDescription": "Aperçus des études d'histoire",
+      "guidesDescription": "Outils, conseils et guides autour de l'informatique"
+    },
+    "clusters": {
+      "algodat": "Algorithmes et structures de données",
+      "references": "Références / publications",
+      "worksheets": "Fiches numériques",
+      "automata": "Théorie des automates",
+      "tools": "Outils",
+      "projects": "Projets",
+      "guides": "Guides",
+      "content": "Contenus"
+    },
+    "timeline": {
+      "ubHeidelberg": { "description": "Un outil de recherche local pour créer des index d'auteurs de revues historiques. Le collecteur récupère des métadonnées auprès de UB Heidelberg/DWork et ThULB/journals@UrMEL, regroupe les contributions par auteur et produit des sorties JSON et ZIP structurées." },
+      "naraTrace": { "description": "Un outil de recherche local et non officiel destiné aux recherches de personnes fondées sur les sources dans le National Archives Catalog des U.S. National Archives and Records Administration. Il permet de chercher dans les fonds numérisés, les historiques de recherche et des vues détaillées avec page originale et transcription." },
+      "jenaTramBoard": { "description": "Un petit projet de bricolage : un moniteur compact des départs de tramways à Iéna, avec interface web locale, fenêtre de bureau et réglages pour les arrêts, filtres de lignes, affichage et écrans complémentaires." },
+      "poster": { "description": "Dans le cadre des études, le module « Informatik und Gesellschaft » a donné lieu à la réalisation d'une affiche scientifique. L'affiche et des textes complémentaires se trouvent dans cet" },
+      "algodat": { "description": "Un cours interactif en autonomie sur les fondements des algorithmes et des structures de données, des méthodes de tri et de la théorie des graphes jusqu'aux structures complexes comme le tas de Fibonacci. Les concepts sont présentés avec des visualisations, du pseudocode et des exemples concrets. Le cours s'adresse aux étudiants qui souhaitent approfondir leur cours ou débuter en autonomie." },
+      "basicKnowledgeGraph": { "description": "Un dépôt consacré à la construction d'un graphe de connaissances simple." },
+      "jenaForest": { "description": "Une fiche numérique interactive pour un atelier consacré à l'histoire de la forêt d'Iéna. Les élèves explorent des métiers forestiers historiques, font leurs propres recherches et consignent leurs observations dans un carnet intégré." },
+      "mysqlTrainee": { "description": "Un environnement MySQL et phpMyAdmin est fourni par Docker afin d'apprendre et d'approfondir SQL. Des exercices intégrés facilitent le travail avec les bases de données." },
+      "jenaCraft": { "before4dCity": "Dans le cadre d'un emploi d'assistant de recherche au DHLabor de la chaire de Digital Humanities, des ateliers « Jena-Craft » ont été organisés. Pour découvrir la présentation complète des résultats, rendez-vous sur", "beforeResults": "Pour la collection des résultats des ateliers, ouvrez les" },
+      "pnp": { "description": "Ce jeu de rôle sur table a été conçu et développé pour une soirée de jeu. Il raconte l'histoire d'une rumeur fictive sur le trésor du maître de Naumburg. Différents personnages — étudiant en histoire, maire, archiviste et prévôt — doivent coopérer, remplir des demandes et résoudre des énigmes tout en échappant à l'intrigue d'une loge mystérieuse." }
+    },
+    "introLabel": "Introduction",
+    "searchLabel": "Rechercher dans le site",
+    "searchPlaceholder": "p. ex. projets, AlgoDat, contact ...",
+    "graphNavigation": "Navigation dans le graphe",
+    "zoomOut": "Dézoomer",
+    "resetView": "Réinitialiser la vue",
+    "zoomIn": "Zoomer",
+    "filterGraph": "Filtrer le graphe de connaissances",
+    "filter": "Filtre",
+    "study": "Études",
+    "guide": "Guide",
+    "project": "Projet",
+    "reference": "Référence",
+    "tool": "Outil",
+    "algodat": "AlgoDat",
+    "automataTheory": "Théorie des automates",
+    "computerHistory": "Histoire de l'informatique",
+    "worksheet": "Fiche numérique",
+    "keyword": "Mot-clé",
+    "keywordPlaceholder": "p. ex. études, référence ...",
+    "loading": "Chargement du graphe de connaissances depuis le dépôt …",
+    "loaded": "{count} contenus chargés · mis à jour depuis l'état actuel du dépôt",
+    "loadFallback": "Le graphe de connaissances n'a pas pu être chargé en direct. La page affiche la structure statique."
+  }
+}

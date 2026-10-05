@@ -1,0 +1,69 @@
+{
+  "home": {
+    "hero": {
+      "teacherEducation": "Lehramt",
+      "computerScience": "Informatik",
+      "history": "Geschichte",
+      "portrait": "Porträt von Felix Staacke",
+      "source": "Moderne Umkehrung nach:",
+      "translation": "z.dt.: „Nicht für die Schule, sondern für das Leben lernen wir“"
+    },
+    "categories": {
+      "label": "Themenbereiche",
+      "study": "Studium",
+      "until": "bis",
+      "today": "heute",
+      "topic": "Themenbereich",
+      "tutorials": "Tutorials",
+      "computerScienceDescription": "Theorie, Projekte und Erkenntnisse auf dem Weg zum Staatsexamen",
+      "historyDescription": "Zeitstrahl zu theoretischer und praktischer Informatik mit Lambda-Kalkül, Analytical Engine, Z3, A-0 und ENIAC als Laboren",
+      "historyStudyDescription": "Einblicke in das Geschichtsstudium",
+      "guidesDescription": "Tools, Tipps und Anleitungen rund um die Informatik"
+    },
+    "clusters": {
+      "algodat": "Algorithmen und Datenstrukturen",
+      "references": "Referenzen / Publikationen",
+      "worksheets": "Digitale Arbeitsblätter",
+      "automata": "Automatentheorie",
+      "tools": "Tools",
+      "projects": "Projekte",
+      "guides": "Guides",
+      "content": "Inhalte"
+    },
+    "timeline": {
+      "ubHeidelberg": { "description": "Ein lokales Forschungswerkzeug zum Erstellen von Autorenindizes historischer Zeitschriften. Der Collector ruft Metadaten von UB Heidelberg/DWork und ThULB/journals@UrMEL ab, aggregiert Beiträge nach Autorinnen und Autoren und erstellt daraus strukturierte JSON-/ZIP-Ausgaben." },
+      "naraTrace": { "description": "Ein lokales, inoffizielles Forschungswerkzeug für quellennahe Personensuche im National Archives Catalog der U.S. National Archives and Records Administration. Die Anwendung unterstützt die Suche nach digitalisierten Beständen, Suchverläufen und Detailansichten mit Originalseite und Transkript." },
+      "jenaTramBoard": { "description": "Kleines Bastelprojekt: ein kompakter Abfahrtsmonitor für Jenaer Straßenbahnen mit lokaler Web-UI, Desktop-Fenster und Einstellungen für Haltestelle, Linienfilter, Darstellung und Zusatzdisplays." },
+      "poster": { "description": "Im Rahmen des Studiums wurde das Modul „Informatik und Gesellschaft“ belegt, in dem ein wissenschaftliches Plakat erstellt wurde. Das Plakat und weiterführende Texte finden Sie in diesem" },
+      "algodat": { "description": "Ein interaktiver Selbstlernkurs zu den Grundlagen der Algorithmen und Datenstrukturen – von Sortierverfahren über Graphentheorie bis hin zu komplexen Heap-Strukturen wie dem Fibonacci-Heap. Alle Konzepte werden mit Visualisierungen, Pseudocode und konkreten Beispielen aufbereitet. Der Kurs richtet sich an Studierende, die die Vorlesungsinhalte vertiefen oder eigenständig einsteigen möchten." },
+      "basicKnowledgeGraph": { "description": "Ein Repository rund um den Aufbau eines einfachen Knowledge Graphs." },
+      "jenaForest": { "description": "Ein interaktives digitales Arbeitsblatt für einen Workshop zur Geschichte des Jenaer Waldes. Schülerinnen und Schüler erkunden historische Forstberufe, recherchieren eigenständig und sammeln ihre Beobachtungen auf einem integrierten Notizblatt." },
+      "mysqlTrainee": { "description": "Via Docker wird hier die MySQL- und phpMyAdmin-Umgebung bereitgestellt, um SQL-Kenntnisse zu erlernen und zu vertiefen. Verschiedene Übungsaufgaben erleichtern das Arbeiten mit Datenbanken." },
+      "jenaCraft": { "before4dCity": "Im Rahmen der Tätigkeit als wissenschaftliche Hilfskraft im DHLabor der Professur Digital Humanities wurden „Jena-Craft“-Workshops durchgeführt. Für die Ergebnispräsentation besuchen Sie", "beforeResults": "Für die Sammlung der Workshop-Ergebnisse öffnen Sie die" },
+      "pnp": { "description": "Dieses PnP-Spiel wurde für einen Spieleabend entworfen und entwickelt. Es erzählt die Geschichte eines fiktiven Gerüchts über den Schatz des Naumburger Meisters. Verschiedene Figuren – Geschichtsstudent, Bürgermeister, Archivar und Dompropst – müssen kooperieren, Anträge ausfüllen und Rätsel lösen, aber auch der Intrige einer geheimnisvollen Loge entgehen." }
+    },
+    "introLabel": "Einführung",
+    "searchLabel": "Seiteninhalt durchsuchen",
+    "searchPlaceholder": "z. B. Projekte, AlgoDat, Kontakt ...",
+    "graphNavigation": "Graph-Navigation",
+    "zoomOut": "Rauszoomen",
+    "resetView": "Ansicht zurücksetzen",
+    "zoomIn": "Reinzoomen",
+    "filterGraph": "Wissensgraph filtern",
+    "filter": "Filter",
+    "study": "Studium",
+    "guide": "Guide",
+    "project": "Projekt",
+    "reference": "Referenz",
+    "tool": "Tool",
+    "algodat": "AlgoDat",
+    "automataTheory": "Automatentheorie",
+    "computerHistory": "Informatikgeschichte",
+    "worksheet": "Digitales Arbeitsblatt",
+    "keyword": "Schlagwort",
+    "keywordPlaceholder": "z. B. Studium, Referenz ...",
+    "loading": "Lade Wissensgraph aus dem Repository …",
+    "loaded": "{count} Inhalte geladen · aktualisiert aus dem aktuellen Repository-Stand",
+    "loadFallback": "Der Wissensgraph konnte nicht live geladen werden. Die Seite zeigt die statische Struktur an."
+  }
+}

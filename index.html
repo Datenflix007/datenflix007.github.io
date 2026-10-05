@@ -37,25 +37,25 @@
     <main class="container">
 
         <!-- ── Hero ─────────────────────────────────────────────── -->
-        <section class="hero" aria-label="Intro">
+        <section class="hero" aria-label="Intro" data-i18n-aria-label="pages.home.introLabel">
             <div>
-                <span class="chip">Lehramt</span>
-                <span class="chip">Informatik</span>
-                <span class="chip">Geschichte</span>
+                <span class="chip" data-i18n="pages.home.hero.teacherEducation">Lehramt</span>
+                <span class="chip" data-i18n="pages.home.hero.computerScience">Informatik</span>
+                <span class="chip" data-i18n="pages.home.hero.history">Geschichte</span>
                 <br><br><br>
                 <h1 class="quote-handwritten" id="quote">"Non scholae,</h1>
                 <h1 class="quote-handwritten" id="quote2">&nbsp;&nbsp;sed vitae discimus"</h1>
                 <br/><br />
                 <p class="hero-note">
                     <a class="hero-note-link" href="https://de.wikipedia.org/wiki/Seneca" target="_blank" rel="noopener noreferrer">
-                        Moderne Umkehrung nach: Sen. epist. 106, 11f.
+                        <span data-i18n="pages.home.hero.source">Moderne Umkehrung nach:</span> Sen. epist. 106, 11f.
                     </a>
-                    <br />z.dt.: „Nicht für die Schule, sondern für das Leben lernen wir"
+                    <br /><span data-i18n="pages.home.hero.translation">z.dt.: „Nicht für die Schule, sondern für das Leben lernen wir"</span>
                 </p>
             </div>
 
             <div class="avatar" aria-hidden="true">
-                <img src="media/avatar.jpg" alt="Porträt von Felix Staacke" loading="eager" />
+                <img src="media/avatar.jpg" alt="Porträt von Felix Staacke" loading="eager" data-i18n-alt="pages.home.hero.portrait" />
             </div>
         </section>
 
@@ -67,53 +67,53 @@
                         <div id="knowledgeClusters"></div>
                         <div id="knowledgeNodes"></div>
                         <div class="search-core">
-                            <label for="repoSearch">Seiteninhalt durchsuchen</label>
-                            <input id="repoSearch" type="search" placeholder="z. B. Projekte, AlgoDat, Kontakt ..." />
+                            <label for="repoSearch" data-i18n="pages.home.searchLabel">Seiteninhalt durchsuchen</label>
+                            <input id="repoSearch" type="search" placeholder="z. B. Projekte, AlgoDat, Kontakt ..." data-i18n-placeholder="pages.home.searchPlaceholder" />
                             <div class="suggestions" id="repoSuggestions"></div>
                         </div>
                     </div>
-                    <div class="knowledge-zoom-tools" aria-label="Graph-Navigation">
-                        <button type="button" id="graphZoomOut" aria-label="Rauszoomen">-</button>
-                        <button type="button" id="graphReset" aria-label="Ansicht zurücksetzen">1:1</button>
-                        <button type="button" id="graphZoomIn" aria-label="Reinzoomen">+</button>
+                    <div class="knowledge-zoom-tools" aria-label="Graph-Navigation" data-i18n-aria-label="pages.home.graphNavigation">
+                        <button type="button" id="graphZoomOut" aria-label="Rauszoomen" data-i18n-aria-label="pages.home.zoomOut">-</button>
+                        <button type="button" id="graphReset" aria-label="Ansicht zurücksetzen" data-i18n-aria-label="pages.home.resetView">1:1</button>
+                        <button type="button" id="graphZoomIn" aria-label="Reinzoomen" data-i18n-aria-label="pages.home.zoomIn">+</button>
                     </div>
-                    <div class="knowledge-filter-panel" aria-label="Wissensgraph filtern">
-                        <div class="knowledge-filter-title">Filter</div>
+                    <div class="knowledge-filter-panel" aria-label="Wissensgraph filtern" data-i18n-aria-label="pages.home.filterGraph">
+                        <div class="knowledge-filter-title" data-i18n="pages.home.filter">Filter</div>
                         <div class="knowledge-filter-chips" id="knowledgeFilterChips">
-                            <button type="button" data-filter="studium">Studium</button>
-                            <button type="button" data-filter="guide">Guide</button>
-                            <button type="button" data-filter="projekt">Projekt</button>
-                            <button type="button" data-filter="referenz">Referenz</button>
-                            <button type="button" data-filter="tool">Tool</button>
-                            <button type="button" data-filter="algodat">AlgoDat</button>
-                            <button type="button" data-filter="automatentheorie">Automatentheorie</button>
-                            <button type="button" data-filter="informatikgeschichte">Informatikgeschichte</button>
-                            <button type="button" data-filter="arbeitsblatt">Digitales Arbeitsblatt</button>
+                            <button type="button" data-filter="studium" data-i18n="pages.home.study">Studium</button>
+                            <button type="button" data-filter="guide" data-i18n="pages.home.guide">Guide</button>
+                            <button type="button" data-filter="projekt" data-i18n="pages.home.project">Projekt</button>
+                            <button type="button" data-filter="referenz" data-i18n="pages.home.reference">Referenz</button>
+                            <button type="button" data-filter="tool" data-i18n="pages.home.tool">Tool</button>
+                            <button type="button" data-filter="algodat" data-i18n="pages.home.algodat">AlgoDat</button>
+                            <button type="button" data-filter="automatentheorie" data-i18n="pages.home.automataTheory">Automatentheorie</button>
+                            <button type="button" data-filter="informatikgeschichte" data-i18n="pages.home.computerHistory">Informatikgeschichte</button>
+                            <button type="button" data-filter="arbeitsblatt" data-i18n="pages.home.worksheet">Digitales Arbeitsblatt</button>
                         </div>
                         <label class="knowledge-tag-search">
-                            <span>Schlagwort</span>
-                            <input id="knowledgeTagSearch" type="search" placeholder="z. B. Studium, Referenz ..." />
+                            <span data-i18n="pages.home.keyword">Schlagwort</span>
+                            <input id="knowledgeTagSearch" type="search" placeholder="z. B. Studium, Referenz ..." data-i18n-placeholder="pages.home.keywordPlaceholder" />
                         </label>
-                        <button type="button" class="knowledge-filter-reset" id="knowledgeFilterReset">Filter löschen</button>
+                        <button type="button" class="knowledge-filter-reset" id="knowledgeFilterReset" data-i18n="common.buttons.clearFilters">Filter löschen</button>
                     </div>
                 </div>
             </div>
-            <div class="knowledge-status" id="graphStatus">Lade Wissensgraph aus dem Repository …</div>
+            <div class="knowledge-status" id="graphStatus" data-i18n="pages.home.loading">Lade Wissensgraph aus dem Repository …</div>
         </section>
 
         <section class="cat-section" hidden>
-        <p class="section-label">Themenbereiche</p>
+        <p class="section-label" data-i18n="pages.home.categories.label">Themenbereiche</p>
         <div class="slider-wrapper">
-            <button type="button" class="slider-btn" id="catPrev" aria-label="Zurück">&#8592;</button>
+            <button type="button" class="slider-btn" id="catPrev" aria-label="Zurück" data-i18n-aria-label="common.buttons.previous">&#8592;</button>
             <div class="slider-track" id="catSlider">
 
                 <a class="cat-card" href="https://datenflix007.github.io/guides/informatikstudium.html">
                     <div class="cat-card-bg cat-card-bg--studium"></div>
                     <div class="cat-deco">🎓</div>
                     <div class="cat-overlay">
-                        <span class="cat-label">Studium</span>
+                        <span class="cat-label" data-i18n="pages.home.categories.study">Studium</span>
                         <h3>Aus dem Informatikstudium</h3>
-                        <p>Theorie, Projekte und Erkenntnisse auf dem Weg zum Staatsexamen</p>
+                        <p data-i18n="pages.home.categories.computerScienceDescription">Theorie, Projekte und Erkenntnisse auf dem Weg zum Staatsexamen</p>
                     </div>
                 </a>
 
@@ -121,13 +121,13 @@
                     <div class="cat-card-bg cat-card-bg--informatikgeschichte"></div>
                     <div class="cat-deco cat-deco--history-range">
                         <span>1843</span>
-                        <span>bis</span>
-                        <span>heute</span>
+                        <span data-i18n="pages.home.categories.until">bis</span>
+                        <span data-i18n="pages.home.categories.today">heute</span>
                     </div>
                     <div class="cat-overlay">
-                        <span class="cat-label">Themenbereich</span>
+                        <span class="cat-label" data-i18n="pages.home.categories.topic">Themenbereich</span>
                         <h3>Informatikgeschichte</h3>
-                        <p>Zeitstrahl zu theoretischer und praktischer Informatik mit Lambda-Kalk&uuml;l, Analytical Engine, Z3, A-0 und ENIAC als Laboren</p>
+                        <p data-i18n="pages.home.categories.historyDescription">Zeitstrahl zu theoretischer und praktischer Informatik mit Lambda-Kalkül, Analytical Engine, Z3, A-0 und ENIAC als Laboren</p>
                     </div>
                 </a>
 
@@ -135,9 +135,9 @@
                     <div class="cat-card-bg cat-card-bg--studium"></div>
                     <div class="cat-deco">🎓</div>
                     <div class="cat-overlay">
-                        <span class="cat-label">Studium</span>
+                        <span class="cat-label" data-i18n="pages.home.categories.study">Studium</span>
                         <h3>Aus dem Geschichtsstudium</h3>
-                        <p>Irgendwas über das Geschichtsstudium</p>
+                        <p data-i18n="pages.home.categories.historyStudyDescription">Irgendwas über das Geschichtsstudium</p>
                     </div>
                 </a>
 
@@ -145,14 +145,14 @@
                     <div class="cat-card-bg cat-card-bg--guides"></div>
                     <div class="cat-deco">📚</div>
                     <div class="cat-overlay">
-                        <span class="cat-label">Tutorials</span>
+                        <span class="cat-label" data-i18n="pages.home.categories.tutorials">Tutorials</span>
                         <h3>Weitere Informatik-Guides</h3>
-                        <p>Tools, Tipps und Anleitungen rund um die Informatik</p>
+                        <p data-i18n="pages.home.categories.guidesDescription">Tools, Tipps und Anleitungen rund um die Informatik</p>
                     </div>
                 </a>
 
             </div>
-            <button type="button" class="slider-btn" id="catNext" aria-label="Vor">&#8594;</button>
+            <button type="button" class="slider-btn" id="catNext" aria-label="Vor" data-i18n-aria-label="common.buttons.next">&#8594;</button>
         </div>
         <div class="slider-dots" id="catDots"></div>
     </section>
@@ -167,9 +167,7 @@
                 <div class="timeline-content">
                     <h3>UB Heidelberg Author Tracker</h3>
                     <p>25.07.2026<br /><br /></p>
-                    <p>
-                        Ein lokales Forschungswerkzeug zum Erstellen von Autorenindizes historischer Zeitschriften. Der Collector ruft Metadaten von UB Heidelberg/DWork und ThULB/journals@UrMEL ab, aggregiert Beitr&auml;ge nach Autorinnen und Autoren und erstellt daraus strukturierte JSON-/ZIP-Ausgaben. Das Tool ist <a href="https://github.com/Datenflix007/UBHeidelbergAuthorTracker">auf Github</a> einsehbar.
-                    </p>
+                    <p><span data-i18n="pages.home.timeline.ubHeidelberg.description">Ein lokales Forschungswerkzeug zum Erstellen von Autorenindizes historischer Zeitschriften. Der Collector ruft Metadaten von UB Heidelberg/DWork und ThULB/journals@UrMEL ab, aggregiert Beiträge nach Autorinnen und Autoren und erstellt daraus strukturierte JSON-/ZIP-Ausgaben.</span> <a href="https://github.com/Datenflix007/UBHeidelbergAuthorTracker" data-i18n="common.links.github">Auf GitHub ansehen</a>.</p>
                 </div>
             </article>
 
@@ -177,9 +175,7 @@
                 <div class="timeline-content">
                     <h3>NARA-Trace</h3>
                     <p>25.07.2026<br /><br /></p>
-                    <p>
-                        Ein lokales, inoffizielles Forschungswerkzeug f&uuml;r quellennahe Personensuche im National Archives Catalog der U.S. National Archives and Records Administration. Die Anwendung unterst&uuml;tzt die Suche nach digitalisierten Best&auml;nden, Suchverl&auml;ufen und Detailansichten mit Originalseite und Transkript. Das Tool ist <a href="https://github.com/Datenflix007/NARA-Trace">auf Github</a> einsehbar.
-                    </p>
+                    <p><span data-i18n="pages.home.timeline.naraTrace.description">Ein lokales, inoffizielles Forschungswerkzeug für quellennahe Personensuche im National Archives Catalog der U.S. National Archives and Records Administration. Die Anwendung unterstützt die Suche nach digitalisierten Beständen, Suchverläufen und Detailansichten mit Originalseite und Transkript.</span> <a href="https://github.com/Datenflix007/NARA-Trace" data-i18n="common.links.github">Auf GitHub ansehen</a>.</p>
                 </div>
                 <div class="timeline-media">
                     <div class="avatar-border">
@@ -197,9 +193,7 @@
                 <div class="timeline-content">
                     <h3>JenaTramBoard</h3>
                     <p>2026<br /><br /></p>
-                    <p>
-                        Kleines Bastelprojekt: ein kompakter Abfahrtsmonitor f&uuml;r Jenaer Stra&szlig;enbahnen mit lokaler Web-UI, Desktop-Fenster und Einstellungen f&uuml;r Haltestelle, Linienfilter, Darstellung und Zusatzdisplays. Das Projekt ist <a href="https://github.com/Datenflix007/JenaTramBoard">auf Github</a> einsehbar.
-                    </p>
+                    <p><span data-i18n="pages.home.timeline.jenaTramBoard.description">Kleines Bastelprojekt: ein kompakter Abfahrtsmonitor für Jenaer Straßenbahnen mit lokaler Web-UI, Desktop-Fenster und Einstellungen für Haltestelle, Linienfilter, Darstellung und Zusatzdisplays.</span> <a href="https://github.com/Datenflix007/JenaTramBoard" data-i18n="common.links.github">Auf GitHub ansehen</a>.</p>
                 </div>
             </article>
 
@@ -207,9 +201,7 @@
                 <div class="timeline-content">
                     <h3>Wissenschaftliches Plakat: Wenn Zeit Leben rettet.</h3>
                     <p>07.06.2026<br /><br /></p>
-                    <p>
-                        Im Rahmen des Studiums wurde das Modul "Informatik und Gesellschaft" belegt, in dem verschiedene ein wissenschaftliches Plakat erstellt wurde. Das Plakat und weiterführende Texte finden Sie in diesem <a href="https://datenflix007.github.io/guides/WennZeitÜberLebenEntscheidet/" target="_blank">Artikel</a>.
-                    </p>
+                    <p><span data-i18n="pages.home.timeline.poster.description">Im Rahmen des Studiums wurde das Modul „Informatik und Gesellschaft“ belegt, in dem ein wissenschaftliches Plakat erstellt wurde. Das Plakat und weiterführende Texte finden Sie in diesem</span> <a href="https://datenflix007.github.io/guides/WennZeitÜberLebenEntscheidet/" target="_blank" data-i18n="common.links.article">Artikel</a>.</p>
                 </div>
                 <div class="timeline-media">
                     <div class="avatar-border poster-image">
@@ -227,9 +219,7 @@
                 <div class="timeline-content">
                     <h3>AlgoDat-Kurs</h3>
                     <p>Wintersemester 2025/2026<br /><br /></p>
-                    <p>
-                        Ein interaktiver Selbstlernkurs zu den Grundlagen der Algorithmen und Datenstrukturen – von Sortierverfahren über Graphentheorie bis hin zu komplexen Heap-Strukturen wie dem Fibonacci-Heap. Alle Konzepte werden mit Visualisierungen, Pseudocode und konkreten Beispielen aufbereitet. Der Kurs richtet sich an Studierende, die die Vorlesungsinhalte vertiefen oder eigenständig einsteigen möchten. <a href="https://datenflix007.github.io/tools/AlgoDatCourse/" target="_blank">Zum Kurs</a>.
-                    </p>
+                    <p><span data-i18n="pages.home.timeline.algodat.description">Ein interaktiver Selbstlernkurs zu den Grundlagen der Algorithmen und Datenstrukturen – von Sortierverfahren über Graphentheorie bis hin zu komplexen Heap-Strukturen wie dem Fibonacci-Heap. Alle Konzepte werden mit Visualisierungen, Pseudocode und konkreten Beispielen aufbereitet. Der Kurs richtet sich an Studierende, die die Vorlesungsinhalte vertiefen oder eigenständig einsteigen möchten.</span> <a href="https://datenflix007.github.io/tools/AlgoDatCourse/" target="_blank" data-i18n="common.links.course">Zum Kurs</a>.</p>
                 </div>
             </article>
 
@@ -237,9 +227,7 @@
                 <div class="timeline-content">
                     <h3>Basic Knowledge Graph</h3>
                     <p>25.04.2026<br /><br /></p>
-                    <p>
-                        Ein Repository rund um den Aufbau eines einfachen Knowledge Graphs. Das Projekt ist <a href="https://github.com/Datenflix007/Basic-Knowledge-Graph">auf Github</a> einsehbar.
-                    </p>
+                    <p><span data-i18n="pages.home.timeline.basicKnowledgeGraph.description">Ein Repository rund um den Aufbau eines einfachen Knowledge Graphs.</span> <a href="https://github.com/Datenflix007/Basic-Knowledge-Graph" data-i18n="common.links.github">Auf GitHub ansehen</a>.</p>
                 </div>
                 <div class="timeline-media">
                     <div class="avatar-border">
@@ -257,9 +245,7 @@
                 <div class="timeline-content">
                     <h3>Digitales Arbeitsblatt: Der Jenaer Wald und wir</h3>
                     <p>20.04.2026<br /><br /></p>
-                    <p>
-                        Ein interaktives digitales Arbeitsblatt für einen Workshop zur Geschichte des Jenaer Waldes. Schülerinnen und Schüler erkunden historische Forstberufe, recherchieren eigenständig und sammeln ihre Beobachtungen auf einem integrierten Notizblatt. <a href="https://datenflix007.github.io/digital-worksheets/Jena_HistoricalJobs/">Zum Arbeitsblatt</a>.
-                    </p>
+                    <p><span data-i18n="pages.home.timeline.jenaForest.description">Ein interaktives digitales Arbeitsblatt für einen Workshop zur Geschichte des Jenaer Waldes. Schülerinnen und Schüler erkunden historische Forstberufe, recherchieren eigenständig und sammeln ihre Beobachtungen auf einem integrierten Notizblatt.</span> <a href="https://datenflix007.github.io/digital-worksheets/Jena_HistoricalJobs/" data-i18n="common.links.worksheet">Zum Arbeitsblatt</a>.</p>
                 </div>
             </article>
 
@@ -267,9 +253,7 @@
                 <div class="timeline-content">
                     <h3>MySQL-Trainee-Ground</h3>
                     <p>17.01.2026<br /><br /></p>
-                    <p>
-                        Via Docker wird hier die mysql und phpmyadmin Umgebung bereitgestellt, um SQL-Kenntnisse zu erlernen und zu vertiefen. Es sind verschiedene Übungsaufgaben integriert, die das Arbeiten mit Datenbanken erleichtern sollen. Das Projekt ist <a href="https://github.com/Datenflix007/MySQL_TraineeGround">auf Github</a>.
-                    </p>
+                    <p><span data-i18n="pages.home.timeline.mysqlTrainee.description">Via Docker wird hier die MySQL- und phpMyAdmin-Umgebung bereitgestellt, um SQL-Kenntnisse zu erlernen und zu vertiefen. Verschiedene Übungsaufgaben erleichtern das Arbeiten mit Datenbanken.</span> <a href="https://github.com/Datenflix007/MySQL_TraineeGround" data-i18n="common.links.github">Auf GitHub ansehen</a>.</p>
                 </div>
                 <div class="timeline-media">
                     <div class="avatar-border">
@@ -287,9 +271,7 @@
                 <div class="timeline-content">
                     <h3>JenaCraft - Schülerergebnisse</h3>
                     <p>08.01.2026<br /><br /></p>
-                    <p>
-                        Im Rahmen der Tätigkeit als wissenschaftliche Hilfskraft in dem DHLabor der Professur Digital-Humanites wurden "Jena-Craft"-Workshops abgehalten. Für das volle Erlebnis der Ergebnispräsentation checken Sie die Webseite <a href="https://4dcity.org/intro">4dcity</a> aus. Für die reine Ergebnissammlung der Workshops schauen Sie sich die <a href="https://github.com/Datenflix007/jenaCraftImages">Ergebnisse</a> an.
-                    </p>
+                    <p><span data-i18n="pages.home.timeline.jenaCraft.before4dCity">Im Rahmen der Tätigkeit als wissenschaftliche Hilfskraft im DHLabor der Professur Digital Humanities wurden „Jena-Craft“-Workshops durchgeführt. Für die Ergebnispräsentation besuchen Sie</span> <a href="https://4dcity.org/intro">4dcity</a>. <span data-i18n="pages.home.timeline.jenaCraft.beforeResults">Für die Sammlung der Workshop-Ergebnisse öffnen Sie die</span> <a href="https://github.com/Datenflix007/jenaCraftImages" data-i18n="common.links.results">Ergebnisse</a>.</p>
                 </div>
             </article>
 
@@ -297,9 +279,7 @@
                 <div class="timeline-content">
                     <h3>PnP: Schatz des Naumburger Meisters</h3>
                     <p>18.10.2025<br /><br /></p>
-                    <p>
-                        Dieses PNP-Spiel wurde für einen PNP-Spiele-Abend entworfen und entwickelt. Darin wird die Historie des fiktiven Gerüchtes über den Schatz des Naumburger Meisters ergründet. Darin müssen verschiedene Figuren (Geschichtsstudent, Bürgermeister, Archivar, Dompropst etc.) kooperieren, Anträge ausfüllen und Rätsel lösen, aber auch der Intrige eines geheimnisvollen Loge entziehen. Das Spielmaterial ist <a href="https://github.com/Datenflix007/pnp_thesaurusMagistriNaumburgensis">auf Github</a> einsehbar.
-                    </p>
+                    <p><span data-i18n="pages.home.timeline.pnp.description">Dieses PnP-Spiel wurde für einen Spieleabend entworfen und entwickelt. Es erzählt die Geschichte eines fiktiven Gerüchts über den Schatz des Naumburger Meisters. Verschiedene Figuren – Geschichtsstudent, Bürgermeister, Archivar und Dompropst – müssen kooperieren, Anträge ausfüllen und Rätsel lösen, aber auch der Intrige einer geheimnisvollen Loge entgehen.</span> <a href="https://github.com/Datenflix007/pnp_thesaurusMagistriNaumburgensis" data-i18n="common.links.github">Auf GitHub ansehen</a>.</p>
                 </div>
                 <div class="timeline-media">
                     <div class="avatar-border">
@@ -455,6 +435,7 @@
             const zoomIn = document.getElementById('graphZoomIn');
             const resetView = document.getElementById('graphReset');
             if (!stage || !pan || !svg || !clustersHost || !nodesHost || !searchInput || !suggestions || !status || !filterChips || !tagSearch || !filterReset) return;
+            const t = (key, fallback, replacements) => window.DatenflixI18n?.translate(key, replacements) || fallback;
 
             const repo = { owner: 'datenflix007', repo: 'datenflix007.github.io', branch: 'main' };
             const siblingRepositories = [
@@ -681,6 +662,17 @@
                     cursorX += width + gap;
                     rowHeight = Math.max(rowHeight, height);
                 });
+
+                // The search core stays at the visual center of the map. The usually
+                // largest group (tools) therefore starts to its right, leaving a real
+                // interaction corridor instead of placing nodes behind the search field.
+                const toolsBox = clusterBoxes.tools;
+                if (toolsBox) {
+                    const searchClearance = 300;
+                    const minToolsX = layoutWidth / 2 + searchClearance;
+                    const maxToolsX = layoutWidth - toolsBox.w - 110;
+                    toolsBox.x = Math.max(toolsBox.x, Math.min(minToolsX, maxToolsX));
+                }
                 graphSize.width = layoutWidth;
                 graphSize.height = Math.max(1200, cursorY + rowHeight + 110);
                 pan.style.width = `${graphSize.width}px`;
@@ -785,7 +777,7 @@
             }
 
             function categoryLabel(category) {
-                return {
+                const fallback = {
                     algodat: 'Algorithmen und Datenstrukturen',
                     references: 'Referenzen / Publikationen',
                     worksheets: 'Digitale Arbeitsblätter',
@@ -794,6 +786,7 @@
                     projects: 'Projekte',
                     guides: 'Guides'
                 }[category] || 'Inhalte';
+                return t(`pages.home.clusters.${category}`, fallback);
             }
 
             function graphPosition(node, index, groupIndex, groupSize) {
@@ -1068,7 +1061,7 @@
             }
 
             async function loadGraph() {
-                status.textContent = 'Lade Wissensgraph aus dem Repository …';
+                status.textContent = t('pages.home.loading', 'Lade Wissensgraph aus dem Repository …');
                 try {
                     const treeResponse = await fetch(`https://api.github.com/repos/${repo.owner}/${repo.repo}/git/trees/${repo.branch}?recursive=1`);
                     if (!treeResponse.ok) throw new Error('GitHub API nicht erreichbar');
@@ -1231,12 +1224,12 @@
 
                     await loadSiblingRepositoryNodes();
                     layoutClusterBoxes();
-                    status.textContent = `${nodes.length} Inhalte geladen · aktualisiert aus dem aktuellen Repository-Stand`;
+                    status.textContent = t('pages.home.loaded', `${nodes.length} Inhalte geladen · aktualisiert aus dem aktuellen Repository-Stand`, { count: nodes.length });
                     selectedId = nodes[0]?.id || null;
                     resetGraphView();
                     renderGraph(searchInput.value);
                 } catch (error) {
-                    status.textContent = 'Der Wissensgraph konnte nicht live geladen werden. Die Seite zeigt die statische Struktur an.';
+                    status.textContent = t('pages.home.loadFallback', 'Der Wissensgraph konnte nicht live geladen werden. Die Seite zeigt die statische Struktur an.');
                     if (!nodes.length) {
                         createNode('index.html', 'Startseite', 'Seite', 'Die Startseite der GitHub-Page.');
                         createNode('src/projekte.html', 'Projekte', 'Seite', 'Projektübersicht.');
@@ -1251,6 +1244,9 @@
                 }
             }
 
+            document.addEventListener('datenflix:i18n-applied', () => {
+                if (nodes.length) renderGraph(searchInput.value);
+            });
             loadGraph();
         }
     </script>
