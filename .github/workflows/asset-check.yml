@@ -1,0 +1,199 @@
+name: Asset Check
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  asset-check:
+    name: Check asset sizes
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check asset file sizes
+        shell: bash
+        run: |
+          python <<'PY'
+          import os
+          import sys
+          from pathlib import Path
+
+          # ---------------------------------------------------------
+          # Konfiguration
+          # ---------------------------------------------------------
+
+          # Globale Grenzen
+          WARNING_SIZE_MB = 2
+          ERROR_SIZE_MB = 10
+
+          # Strengere Grenzen für typische Web-Assets
+          TYPE_LIMITS = {
+              ".jpg": 5,
+              ".jpeg": 5,
+              ".png": 5,
+              ".webp": 3,
+              ".gif": 8,
+              ".svg": 2,
+              ".pdf": 15,
+              ".mp4": 25,
+              ".webm": 25,
+              ".mp3": 15,
+              ".wav": 30,
+              ".woff": 2,
+              ".woff2": 2,
+              ".ttf": 5,
+              ".otf": 5,
+          }
+
+          # Ordner, die nicht geprüft werden sollen
+          EXCLUDED_DIRS = {
+              ".git",
+              "node_modules",
+              ".venv",
+              "venv",
+              "dist",
+              "build",
+              "__pycache__",
+          }
+
+          # Dateien, die bewusst ignoriert werden sollen
+          EXCLUDED_FILES = {
+              "package-lock.json",
+          }
+
+          # ---------------------------------------------------------
+          # Hilfsfunktionen
+          # ---------------------------------------------------------
+
+          def mb(size_bytes):
+              return size_bytes / 1024 / 1024
+
+          def is_excluded(path: Path):
+              if path.name in EXCLUDED_FILES:
+                  return True
+
+              for part in path.parts:
+                  if part in EXCLUDED_DIRS:
+                      return True
+
+              return False
+
+          # ---------------------------------------------------------
+          # Prüfung
+          # ---------------------------------------------------------
+
+          warnings = []
+          errors = []
+          checked = 0
+
+          for path in Path(".").rglob("*"):
+              if not path.is_file():
+                  continue
+
+              if is_excluded(path):
+                  continue
+
+              checked += 1
+
+              size_bytes = path.stat().st_size
+              size_mb = mb(size_bytes)
+
+              extension = path.suffix.lower()
+
+              # Dateityp-spezifisches Limit
+              if extension in TYPE_LIMITS:
+                  limit = TYPE_LIMITS[extension]
+
+                  if size_mb > limit:
+                      errors.append(
+                          (
+                              str(path),
+                              size_mb,
+                              f"Limit für {extension}: {limit} MB"
+                          )
+                      )
+
+                  elif size_mb > WARNING_SIZE_MB:
+                      warnings.append(
+                          (
+                              str(path),
+                              size_mb,
+                              f"größer als {WARNING_SIZE_MB} MB"
+                          )
+                      )
+
+              # Allgemeines Limit
+              elif size_mb > ERROR_SIZE_MB:
+                  errors.append(
+                      (
+                          str(path),
+                          size_mb,
+                          f"globale Grenze: {ERROR_SIZE_MB} MB"
+                      )
+                  )
+
+              elif size_mb > WARNING_SIZE_MB:
+                  warnings.append(
+                      (
+                          str(path),
+                          size_mb,
+                          f"größer als {WARNING_SIZE_MB} MB"
+                      )
+                  )
+
+          # ---------------------------------------------------------
+          # Ausgabe
+          # ---------------------------------------------------------
+
+          print("===================================")
+          print("Asset Check")
+          print("===================================")
+          print(f"Geprüfte Dateien: {checked}")
+
+          if warnings:
+              print("\n⚠️ Warnungen:")
+
+              for path, size, reason in sorted(
+                  warnings,
+                  key=lambda item: item[1],
+                  reverse=True
+              ):
+                  print(
+                      f"   {path}"
+                      f" — {size:.2f} MB"
+                      f" — {reason}"
+                  )
+
+          if errors:
+              print("\n❌ Zu große Dateien:")
+
+              for path, size, reason in sorted(
+                  errors,
+                  key=lambda item: item[1],
+                  reverse=True
+              ):
+                  print(
+                      f"   {path}"
+                      f" — {size:.2f} MB"
+                      f" — {reason}"
+                  )
+
+              print(
+                  "\n❌ Asset-Prüfung fehlgeschlagen."
+              )
+
+              sys.exit(1)
+
+          print("\n✅ Keine kritischen Asset-Größen gefunden.")
+          PY

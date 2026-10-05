@@ -1,0 +1,93 @@
+/*
+ * Shared responsive guardrails for every Datenflix page that uses site-header.js.
+ * App canvases deliberately keep their own sizing rules; content media, reading
+ * surfaces and dense data views are the parts that must yield to the viewport.
+ */
+
+:root {
+  --df-page-gutter: clamp(14px, 3vw, 32px);
+}
+
+html {
+  overflow-x: clip;
+}
+
+body.has-datenflix-shell {
+  overflow-x: hidden;
+}
+
+:where(main, article, .content, .page-content, .guide-article, .catalog, .catalog-main) {
+  min-width: 0;
+}
+
+:where(main, article, .content, .page-content, .guide-article, .catalog, .catalog-main) :is(img, picture img, video) {
+  display: block;
+  max-inline-size: 100%;
+  block-size: auto;
+}
+
+:where(main, article, .content, .page-content, .guide-article, .catalog, .catalog-main) :is(iframe, embed, object) {
+  max-inline-size: 100%;
+}
+
+:where(main, article, .content, .page-content, .guide-article, .catalog, .catalog-main) :is(pre, .code-block, .code-example, .terminal) {
+  max-inline-size: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+:where(main, article, .content, .page-content, .guide-article, .catalog, .catalog-main) :is(p, li, td, th, dd, a) {
+  overflow-wrap: anywhere;
+}
+
+:where(main, article, .content, .page-content, .guide-article, .catalog, .catalog-main) :is(input, textarea, select) {
+  max-inline-size: 100%;
+}
+
+@media (max-width: 991px) {
+  :root { --df-page-gutter: clamp(14px, 3vw, 24px); }
+
+  .catalog-grid,
+  .grid-3 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .sidebar-layout,
+  .content-with-sidebar {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 767px) {
+  :where(main, article, .content, .page-content, .guide-article, .catalog, .catalog-main) {
+    min-inline-size: 0;
+  }
+
+  .catalog-grid,
+  .grid-3,
+  .grid-2,
+  .cards-grid,
+  .card-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  :where(main, article, .content, .page-content, .guide-article, .catalog, .catalog-main) table {
+    display: block;
+    max-inline-size: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    white-space: nowrap;
+  }
+
+  :where(main, article, .content, .page-content, .guide-article, .catalog, .catalog-main) :is(button, [role="button"], input[type="button"], input[type="submit"], input[type="reset"]) {
+    min-block-size: 40px;
+  }
+}
+
+@media (max-width: 479px) {
+  :root { --df-page-gutter: 12px; }
+
+  :where(main, article, .content, .page-content, .guide-article, .catalog, .catalog-main) :is(h1, .page-title) {
+    overflow-wrap: anywhere;
+  }
+}

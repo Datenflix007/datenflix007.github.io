@@ -192,11 +192,11 @@
 
 .site-language__option.is-active { color: var(--df-accent); }
 
-.site-mobile-toggle { display: none; margin-left: auto; padding: 0 12px; cursor: pointer; }
-.site-mobile-toggle__bar { display: block; width: 17px; height: 2px; margin: 3px 0; border-radius: 2px; background: currentColor; }
+.site-mobile-toggle { display: none; flex-direction: column; gap: 3px; margin-left: auto; padding: 0 12px; cursor: pointer; }
+.site-mobile-toggle__bar { display: block; width: 17px; height: 2px; margin: 0; border-radius: 2px; background: currentColor; }
 
-/* A pre-existing app bar keeps its own controls but starts below the site shell. */
-.site-header + header { top: var(--df-header-height) !important; }
+/* Only sticky/fixed app bars need an offset; regular headers remain in normal flow. */
+.site-header + header.site-app-header--offset { top: var(--df-header-height) !important; }
 
 @media (max-width: 900px) {
   .site-header__inner { width: min(var(--df-max-width), calc(100% - 28px)); min-height: 60px; }

@@ -29,6 +29,16 @@
     document.head.append(i18nScript);
   }
 
+  function loadSharedStylesheet(fileName) {
+    const href = new URL(fileName, shellScriptUrl).href;
+    if (document.querySelector(`link[data-datenflix-shared-style="${fileName}"]`)) return;
+    const stylesheet = document.createElement("link");
+    stylesheet.rel = "stylesheet";
+    stylesheet.href = href;
+    stylesheet.dataset.datenflixSharedStyle = fileName;
+    document.head.append(stylesheet);
+  }
+
   function activeArea(pathname) {
     const path = pathname.toLowerCase();
     if (path.includes("/digital-worksheets/")) return "worksheets";
@@ -64,8 +74,14 @@
 
     const existingHeader = document.querySelector("body > header");
     const isLegacyPortalHeader = existingHeader && (/Felix Staacke/i.test(existingHeader.textContent || "") || existingHeader.querySelector('a[href*="Referenzen"], a[href*="projekte"], a[href*="kontakt"]'));
-    if (isLegacyPortalHeader) existingHeader.remove();
+    if (isLegacyPortalHeader) {
+      existingHeader.remove();
+    } else if (existingHeader) {
+      const position = window.getComputedStyle(existingHeader).position;
+      if (position === "sticky" || position === "fixed") existingHeader.classList.add("site-app-header--offset");
+    }
     document.body.insertBefore(header, document.body.firstChild);
+    document.body.classList.add("has-datenflix-shell");
 
     const navigation = header.querySelector(".site-nav");
     const toggle = header.querySelector(".site-mobile-toggle");
@@ -92,6 +108,7 @@
     });
   }
 
+  loadSharedStylesheet("responsive.css");
   loadI18n();
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", renderHeader, { once: true });
   else renderHeader();

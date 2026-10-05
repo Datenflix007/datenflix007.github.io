@@ -1,0 +1,488 @@
+name: i18n Check
+
+on:
+  pull_request:
+    paths:
+      - "locales/**"
+      - "lang/**"
+      - "languages/**"
+      - "i18n/**"
+      - "translations/**"
+      - ".github/workflows/i18n-check.yml"
+
+  push:
+    branches:
+      - main
+    paths:
+      - "locales/**"
+      - "lang/**"
+      - "languages/**"
+      - "i18n/**"
+      - "translations/**"
+      - ".github/workflows/i18n-check.yml"
+
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  i18n-check:
+    name: Validate translations
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Validate translation files
+        shell: bash
+        run: |
+          python <<'PY'
+          import json
+          import sys
+          from pathlib import Path
+
+          # ---------------------------------------------------------
+          # Konfiguration
+          # ---------------------------------------------------------
+
+          SEARCH_DIRS = [
+              Path("locales"),
+              Path("lang"),
+              Path("languages"),
+              Path("i18n"),
+              Path("translations"),
+          ]
+
+          # Deutsch dient nach Möglichkeit als Referenzsprache.
+          REFERENCE_NAMES = [
+              "de.json",
+              "de-DE.json",
+              "de_de.json",
+          ]
+
+          # ---------------------------------------------------------
+          # Hilfsfunktionen
+          # ---------------------------------------------------------
+
+          def load_json(path):
+              duplicates = []
+
+              def detect_duplicates(pairs):
+                  result = {}
+
+                  for key, value in pairs:
+                      if key in result:
+                          duplicates.append(key)
+
+                      result[key] = value
+
+                  return result
+
+              try:
+                  with path.open(
+                      "r",
+                      encoding="utf-8"
+                  ) as file:
+                      data = json.load(
+                          file,
+                          object_pairs_hook=detect_duplicates
+                      )
+
+              except json.JSONDecodeError as error:
+                  print(
+                      f"❌ Ungültiges JSON: {path}\n"
+                      f"   Zeile {error.lineno}, "
+                      f"Spalte {error.colno}: "
+                      f"{error.msg}"
+                  )
+
+                  return None, ["INVALID_JSON"]
+
+              except Exception as error:
+                  print(
+                      f"❌ Datei konnte nicht gelesen werden: "
+                      f"{path}: {error}"
+                  )
+
+                  return None, ["READ_ERROR"]
+
+              if duplicates:
+                  print(
+                      f"❌ Doppelte Keys in {path}:"
+                  )
+
+                  for key in sorted(set(duplicates)):
+                      print(f"   - {key}")
+
+              return data, duplicates
+
+          def flatten(data, prefix=""):
+              """
+              Wandelt verschachtelte JSON-Strukturen in Keys um.
+
+              Beispiel:
+
+              {
+                "nav": {
+                  "home": "Startseite"
+                }
+              }
+
+              wird zu:
+
+              nav.home
+              """
+
+              result = {}
+
+              if isinstance(data, dict):
+                  for key, value in data.items():
+
+                      full_key = (
+                          f"{prefix}.{key}"
+                          if prefix
+                          else key
+                      )
+
+                      if isinstance(value, dict):
+                          result.update(
+                              flatten(value, full_key)
+                          )
+
+                      else:
+                          result[full_key] = value
+
+              return result
+
+          def value_type(value):
+              if isinstance(value, bool):
+                  return "boolean"
+
+              if isinstance(value, str):
+                  return "string"
+
+              if isinstance(value, list):
+                  return "array"
+
+              if isinstance(value, dict):
+                  return "object"
+
+              if isinstance(value, int):
+                  return "integer"
+
+              if isinstance(value, float):
+                  return "number"
+
+              if value is None:
+                  return "null"
+
+              return type(value).__name__
+
+          # ---------------------------------------------------------
+          # Sprachordner finden
+          # ---------------------------------------------------------
+
+          translation_dir = None
+
+          for directory in SEARCH_DIRS:
+              if directory.is_dir():
+                  json_files = list(
+                      directory.glob("*.json")
+                  )
+
+                  if json_files:
+                      translation_dir = directory
+                      break
+
+          if translation_dir is None:
+              print(
+                  "❌ Kein Übersetzungsordner gefunden."
+              )
+
+              print(
+                  "Erwartet wurde einer dieser Ordner:"
+              )
+
+              for directory in SEARCH_DIRS:
+                  print(f"   - {directory}/")
+
+              sys.exit(1)
+
+          files = sorted(
+              translation_dir.glob("*.json")
+          )
+
+          print(
+              f"🌐 Übersetzungsordner: "
+              f"{translation_dir}"
+          )
+
+          print(
+              f"📄 Gefundene Sprachdateien: "
+              f"{len(files)}"
+          )
+
+          for file in files:
+              print(f"   - {file.name}")
+
+          if len(files) < 2:
+              print(
+                  "\n❌ Mindestens zwei Sprachdateien "
+                  "werden benötigt."
+              )
+
+              sys.exit(1)
+
+          # ---------------------------------------------------------
+          # Referenzsprache bestimmen
+          # ---------------------------------------------------------
+
+          reference_file = None
+
+          for name in REFERENCE_NAMES:
+              candidate = translation_dir / name
+
+              if candidate.exists():
+                  reference_file = candidate
+                  break
+
+          if reference_file is None:
+              reference_file = files[0]
+
+              print(
+                  "\n⚠️ Keine deutsche Referenzdatei "
+                  "gefunden."
+              )
+
+              print(
+                  f"Verwende stattdessen "
+                  f"{reference_file.name}."
+              )
+
+          else:
+              print(
+                  f"\n🇩🇪 Referenzsprache: "
+                  f"{reference_file.name}"
+              )
+
+          # ---------------------------------------------------------
+          # Dateien laden
+          # ---------------------------------------------------------
+
+          loaded = {}
+          has_errors = False
+
+          for file in files:
+              data, errors = load_json(file)
+
+              if data is None or errors:
+                  has_errors = True
+
+              if data is not None:
+                  loaded[file] = flatten(data)
+
+          if reference_file not in loaded:
+              print(
+                  "\n❌ Referenzdatei konnte nicht "
+                  "geladen werden."
+              )
+
+              sys.exit(1)
+
+          reference = loaded[reference_file]
+          reference_keys = set(reference.keys())
+
+          print(
+              f"🔑 Referenz enthält "
+              f"{len(reference_keys)} Keys."
+          )
+
+          # ---------------------------------------------------------
+          # Sprachdateien vergleichen
+          # ---------------------------------------------------------
+
+          for file, values in loaded.items():
+
+              if file == reference_file:
+                  continue
+
+              print(
+                  "\n=================================="
+              )
+
+              print(
+                  f"Prüfe: {file.name}"
+              )
+
+              print(
+                  "=================================="
+              )
+
+              keys = set(values.keys())
+
+              missing = sorted(
+                  reference_keys - keys
+              )
+
+              extra = sorted(
+                  keys - reference_keys
+              )
+
+              # Fehlende Übersetzungen
+              if missing:
+                  has_errors = True
+
+                  print(
+                      f"\n❌ {len(missing)} "
+                      "fehlende Keys:"
+                  )
+
+                  for key in missing:
+                      print(f"   - {key}")
+
+              # Zusätzliche / möglicherweise veraltete Keys
+              if extra:
+                  has_errors = True
+
+                  print(
+                      f"\n❌ {len(extra)} "
+                      "zusätzliche Keys:"
+                  )
+
+                  for key in extra:
+                      print(f"   - {key}")
+
+              # Leere Übersetzungen
+              empty = []
+
+              for key, value in values.items():
+
+                  if (
+                      isinstance(value, str)
+                      and not value.strip()
+                  ):
+                      empty.append(key)
+
+              if empty:
+                  has_errors = True
+
+                  print(
+                      f"\n❌ {len(empty)} "
+                      "leere Übersetzungen:"
+                  )
+
+                  for key in sorted(empty):
+                      print(f"   - {key}")
+
+              # Typen vergleichen
+              type_errors = []
+
+              common_keys = (
+                  reference_keys & keys
+              )
+
+              for key in sorted(common_keys):
+
+                  reference_type = value_type(
+                      reference[key]
+                  )
+
+                  translation_type = value_type(
+                      values[key]
+                  )
+
+                  if (
+                      reference_type
+                      != translation_type
+                  ):
+                      type_errors.append(
+                          (
+                              key,
+                              reference_type,
+                              translation_type
+                          )
+                      )
+
+              if type_errors:
+                  has_errors = True
+
+                  print(
+                      "\n❌ Unterschiedliche "
+                      "Datentypen:"
+                  )
+
+                  for (
+                      key,
+                      expected,
+                      actual
+                  ) in type_errors:
+
+                      print(
+                          f"   - {key}: "
+                          f"{expected} → {actual}"
+                      )
+
+              if (
+                  not missing
+                  and not extra
+                  and not empty
+                  and not type_errors
+              ):
+                  print(
+                      "\n✅ Sprachdatei vollständig "
+                      "und konsistent."
+                  )
+
+          # ---------------------------------------------------------
+          # Referenzdatei selbst auf leere Werte prüfen
+          # ---------------------------------------------------------
+
+          reference_empty = [
+              key
+              for key, value
+              in reference.items()
+              if (
+                  isinstance(value, str)
+                  and not value.strip()
+              )
+          ]
+
+          if reference_empty:
+              has_errors = True
+
+              print(
+                  f"\n❌ {reference_file.name} enthält "
+                  "leere Werte:"
+              )
+
+              for key in reference_empty:
+                  print(f"   - {key}")
+
+          # ---------------------------------------------------------
+          # Ergebnis
+          # ---------------------------------------------------------
+
+          print(
+              "\n=================================="
+          )
+
+          if has_errors:
+              print(
+                  "❌ i18n-Prüfung fehlgeschlagen."
+              )
+
+              sys.exit(1)
+
+          print(
+              "✅ Alle Übersetzungen sind "
+              "vollständig und konsistent."
+          )
+          PY

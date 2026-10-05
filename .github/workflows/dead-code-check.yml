@@ -1,0 +1,192 @@
+name: Dead Code Check
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  dead-code-check:
+    name: Find unused assets
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Find potentially unused assets
+        shell: bash
+        run: |
+          python <<'PY'
+          import re
+          from pathlib import Path
+
+          # ---------------------------------------------------------
+          # Konfiguration
+          # ---------------------------------------------------------
+
+          SCAN_EXTENSIONS = {
+              ".html",
+              ".css",
+              ".js",
+              ".mjs",
+              ".json",
+              ".md",
+          }
+
+          ASSET_EXTENSIONS = {
+              ".css",
+              ".js",
+              ".mjs",
+              ".png",
+              ".jpg",
+              ".jpeg",
+              ".webp",
+              ".gif",
+              ".svg",
+              ".ico",
+              ".woff",
+              ".woff2",
+              ".ttf",
+              ".otf",
+              ".pdf",
+              ".mp3",
+              ".wav",
+              ".mp4",
+              ".webm",
+          }
+
+          EXCLUDED_DIRS = {
+              ".git",
+              "node_modules",
+              "dist",
+              "build",
+              "coverage",
+              ".venv",
+              "venv",
+              "__pycache__",
+          }
+
+          NEVER_REPORT = {
+              "index.html",
+              "404.html",
+              "README.md",
+              "package.json",
+              "package-lock.json",
+          }
+
+          # ---------------------------------------------------------
+          # Hilfsfunktionen
+          # ---------------------------------------------------------
+
+          def excluded(path: Path):
+              return any(
+                  part in EXCLUDED_DIRS
+                  for part in path.parts
+              )
+
+          # ---------------------------------------------------------
+          # Alle Quelltexte sammeln
+          # ---------------------------------------------------------
+
+          source_files = []
+
+          for path in Path(".").rglob("*"):
+              if (
+                  path.is_file()
+                  and not excluded(path)
+                  and path.suffix.lower() in SCAN_EXTENSIONS
+              ):
+                  source_files.append(path)
+
+          combined_text = ""
+
+          for path in source_files:
+              try:
+                  combined_text += "\n" + path.read_text(
+                      encoding="utf-8",
+                      errors="ignore"
+                  )
+              except Exception:
+                  pass
+
+          # ---------------------------------------------------------
+          # Assets prüfen
+          # ---------------------------------------------------------
+
+          candidates = []
+
+          for path in Path(".").rglob("*"):
+              if not path.is_file():
+                  continue
+
+              if excluded(path):
+                  continue
+
+              if path.name in NEVER_REPORT:
+                  continue
+
+              if path.suffix.lower() not in ASSET_EXTENSIONS:
+                  continue
+
+              candidates.append(path)
+
+          unused = []
+
+          for path in candidates:
+
+              normalized = path.as_posix().lstrip("./")
+              filename = path.name
+
+              # Referenzen können relativ, absolut oder nur per Dateiname vorkommen.
+              patterns = {
+                  normalized,
+                  "/" + normalized,
+                  filename,
+              }
+
+              referenced = any(
+                  pattern in combined_text
+                  for pattern in patterns
+              )
+
+              if not referenced:
+                  unused.append(path)
+
+          # ---------------------------------------------------------
+          # Ausgabe
+          # ---------------------------------------------------------
+
+          print("===================================")
+          print("Potentially unused assets")
+          print("===================================")
+
+          if not unused:
+              print("✅ Keine offensichtlich ungenutzten Assets gefunden.")
+              raise SystemExit(0)
+
+          for path in sorted(unused):
+              print(f"⚠️ {path}")
+
+          print()
+          print(
+              "Hinweis: Dies ist bewusst nur ein Hinweischeck. "
+              "Dynamisch geladene Dateien können fälschlich als ungenutzt erscheinen."
+          )
+
+          # Kein Fehler:
+          raise SystemExit(0)
+
+          PY

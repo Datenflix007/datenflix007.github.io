@@ -1,0 +1,47 @@
+{
+  "version": "0.2",
+  "language": "de,en",
+  "useGitignore": true,
+  "ignorePaths": [
+    "node_modules/**",
+    ".git/**",
+    "dist/**",
+    "build/**",
+    "coverage/**",
+    "package-lock.json",
+    "**/*.min.js",
+    "**/*.min.css"
+  ],
+  "words": [
+    "Datenflix",
+    "JenaCraft",
+    "INCEpTION",
+    "HisQu",
+    "DigComp",
+    "GitHub",
+    "PowerShell",
+    "Markdown",
+    "JavaScript",
+    "TypeScript",
+    "JSON",
+    "HTML",
+    "CSS",
+    "WSL",
+    "Ubuntu",
+    "Minecraft",
+    "Eduroam",
+    "Qwen",
+    "llama",
+    "Codex",
+    "serverless",
+    "workflow",
+    "workflows",
+    "localhost",
+    "frontend",
+    "backend"
+  ],
+  "ignoreRegExpList": [
+    "/https?:\\/\\/[^\\s\"'<>]+/g",
+    "/[A-Fa-f0-9]{7,40}/g"
+  ]
+}

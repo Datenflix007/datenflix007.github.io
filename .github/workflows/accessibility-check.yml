@@ -1,0 +1,63 @@
+name: Accessibility Check
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+  workflow_dispatch:
+  workflow_call:
+  
+
+permissions:
+  contents: read
+
+jobs:
+  accessibility:
+    name: Check accessibility
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: |
+          npm install --global pa11y-ci http-server
+
+      - name: Start local web server
+        run: |
+          http-server . -p 8080 > /tmp/http-server.log 2>&1 &
+          echo $! > /tmp/http-server.pid
+
+      - name: Wait for server
+        run: |
+          for i in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:8080/ > /dev/null; then
+              echo "Server is ready."
+              exit 0
+            fi
+
+            sleep 1
+          done
+
+          echo "Server did not start."
+          cat /tmp/http-server.log
+          exit 1
+
+      - name: Run accessibility checks
+        run: |
+          pa11y-ci \
+            http://127.0.0.1:8080/ \
+            http://127.0.0.1:8080/404.html
+
+      - name: Show server log on failure
+        if: failure()
+        run: |
+          cat /tmp/http-server.log || true

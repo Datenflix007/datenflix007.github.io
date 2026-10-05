@@ -1,0 +1,133 @@
+name: Website Quality Pipeline
+
+on:
+  pull_request:
+
+  push:
+    branches:
+      - main
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+
+  html:
+    name: HTML validation
+    uses: ./.github/workflows/html-check.yml
+
+  markdown:
+    name: Markdown validation
+    uses: ./.github/workflows/markdown-check.yml
+
+  spellcheck:
+    name: Spellcheck
+    uses: ./.github/workflows/spellcheck.yml
+
+  assets:
+    name: Asset check
+    uses: ./.github/workflows/asset-check.yml
+
+  i18n:
+    name: Translation check
+    uses: ./.github/workflows/i18n-check.yml
+
+  dead-code:
+    name: Dead code check
+    uses: ./.github/workflows/dead-code-check.yml
+
+  accessibility:
+    name: Accessibility check
+    uses: ./.github/workflows/accessibility-check.yml
+
+  links:
+    name: Link check
+    uses: ./.github/workflows/link-check.yml
+
+
+  summary:
+    name: Quality pipeline summary
+
+    needs:
+      - html
+      - markdown
+      - spellcheck
+      - assets
+      - i18n
+      - dead-code
+      - accessibility
+      - links
+
+    runs-on: ubuntu-latest
+
+    if: always()
+
+    steps:
+      - name: Create summary
+        run: |
+          echo "# Website Quality Pipeline" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+
+          echo "| Check | Result |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|---|---|" >> "$GITHUB_STEP_SUMMARY"
+
+          echo "| HTML | ${{ needs.html.result }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Markdown | ${{ needs.markdown.result }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Spellcheck | ${{ needs.spellcheck.result }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Assets | ${{ needs.assets.result }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| i18n | ${{ needs.i18n.result }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Dead Code | ${{ needs.dead-code.result }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Accessibility | ${{ needs.accessibility.result }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Links | ${{ needs.links.result }} |" >> "$GITHUB_STEP_SUMMARY"
+
+
+  pipeline-result:
+    name: Pipeline result
+
+    needs:
+      - html
+      - markdown
+      - spellcheck
+      - assets
+      - i18n
+      - dead-code
+      - accessibility
+      - links
+
+    runs-on: ubuntu-latest
+
+    if: always()
+
+    steps:
+      - name: Check results
+        run: |
+          FAILED=false
+
+          check_result() {
+            NAME="$1"
+            RESULT="$2"
+
+            echo "$NAME: $RESULT"
+
+            if [ "$RESULT" = "failure" ]; then
+              FAILED=true
+            fi
+          }
+
+          check_result "HTML" "${{ needs.html.result }}"
+          check_result "Markdown" "${{ needs.markdown.result }}"
+          check_result "Spellcheck" "${{ needs.spellcheck.result }}"
+          check_result "Assets" "${{ needs.assets.result }}"
+          check_result "i18n" "${{ needs.i18n.result }}"
+          check_result "Dead Code" "${{ needs.dead-code.result }}"
+          check_result "Accessibility" "${{ needs.accessibility.result }}"
+          check_result "Links" "${{ needs.links.result }}"
+
+          if [ "$FAILED" = "true" ]; then
+            echo "One or more quality checks failed."
+            exit 1
+          fi
+
+          echo "All required quality checks passed."

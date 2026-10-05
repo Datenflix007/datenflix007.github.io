@@ -1,0 +1,45 @@
+name: Link Check
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+  schedule:
+    - cron: "0 7 * * 0"
+
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  link-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check internal and external links
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: >
+            --verbose
+            --no-progress
+            --exclude-mail
+            --max-retries 3
+            --timeout 30
+            --user-agent "Mozilla/5.0 LinkChecker/1.0"
+            --exclude "localhost"
+            --exclude "127.0.0.1"
+            --exclude "file://"
+            --exclude "javascript:"
+            --exclude "mailto:"
+            --exclude "tel:"
+            "./**/*.html"
+            "./**/*.md"
+
+          fail: true

@@ -2031,3 +2031,22 @@ header .brand .logo {
     background: #62e0c0;
     box-shadow: 0 0 10px #62e0c0, 0 0 24px rgba(98, 224, 192, .55);
 }
+
+/* In der einspaltigen Hero-Ansicht gehören Quelle und Übersetzung zum Zitat. */
+@media (max-width: 1024px) {
+    .hero .hero-note {
+        margin-inline: auto;
+        text-align: center;
+    }
+}
+
+@media (max-width: 680px) {
+    .hero > div:first-child,
+    .hero h1.quote-handwritten {
+        text-align: center;
+    }
+
+    .hero .avatar {
+        justify-self: center;
+    }
+}
