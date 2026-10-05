@@ -1,557 +1,799 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>404 – Seite nicht gefunden | Datenflix007</title>
-
-    <meta
-        name="description"
-        content="Die aufgerufene Seite wurde nicht gefunden."
-    >
-
-    <style>
-        :root {
-            --bg: #0b0d10;
-            --surface: #111418;
-            --muted: #8892a6;
-            --text: #e6e9ef;
-            --accent: #7dd3fc;
-            --accent-2: #a78bfa;
-            --ring: #334155;
-            --logo: #62e0c0;
-
-            --radius: 16px;
-            --shadow: 0 20px 60px rgba(2, 6, 23, 0.45);
-        }
-
-        * {
-            box-sizing: border-box;
-        }
-
-        html,
-        body {
-            margin: 0;
-            min-height: 100%;
-        }
-
-        body {
-            min-height: 100vh;
-            font-family:
-                Inter,
-                system-ui,
-                -apple-system,
-                BlinkMacSystemFont,
-                "Segoe UI",
-                Roboto,
-                Helvetica,
-                Arial,
-                sans-serif;
-
-            background:
-                radial-gradient(
-                    circle at 20% 20%,
-                    rgba(125, 211, 252, 0.08),
-                    transparent 32%
-                ),
-                radial-gradient(
-                    circle at 80% 75%,
-                    rgba(167, 139, 250, 0.08),
-                    transparent 30%
-                ),
-                var(--bg);
-
-            color: var(--text);
-
-            display: flex;
-            flex-direction: column;
-        }
-
-        a {
-            color: inherit;
-        }
-
-        /* =========================
-           HEADER
-        ========================= */
-
-        header {
-            border-bottom: 1px solid #263858;
-            background: rgba(9, 13, 22, 0.88);
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
-        }
-
-        .nav {
-            width: min(calc(100% - 40px), 1100px);
-            margin: 0 auto;
-
-            min-height: 70px;
-
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-
-            gap: 20px;
-        }
-
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>404 – Seite nicht gefunden | Datenflix007</title>
+
+  <meta name="description" content="Die aufgerufene Seite wurde nicht gefunden.">
+
+  <style>
+    :root {
+      --bg: #0b0d10;
+      --surface: #111418;
+      --surface-2: #151a21;
+      --muted: #8892a6;
+      --text: #e6e9ef;
+      --accent: #7dd3fc;
+      --accent-2: #a78bfa;
+      --accent-3: #62e0c0;
+      --ring: #334155;
+      --blue-deep: #263858;
+      --shadow: 0 24px 80px rgba(2, 6, 23, 0.58);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+    }
+
+    body {
+      min-height: 100vh;
+      overflow: hidden;
+
+      font-family:
+        Inter,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
+      color: var(--text);
+
+      background:
+        radial-gradient(circle at 20% 15%, rgba(125, 211, 252, .10), transparent 28%),
+        radial-gradient(circle at 82% 75%, rgba(167, 139, 250, .10), transparent 30%),
+        radial-gradient(circle at 50% 50%, rgba(98, 224, 192, .03), transparent 45%),
+        var(--bg);
+
+      position: relative;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
 
-            text-decoration: none;
+      background-image:
+        linear-gradient(rgba(125, 211, 252, .025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(125, 211, 252, .025) 1px, transparent 1px);
 
-            font-weight: 700;
-            letter-spacing: 0.02em;
-        }
+      background-size: 42px 42px;
+
+      mask-image:
+        radial-gradient(circle at center, black 25%, transparent 78%);
 
-        .logo {
-            width: 12px;
-            height: 12px;
+      pointer-events: none;
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+
+      background:
+        repeating-linear-gradient(
+          0deg,
+          rgba(255,255,255,.008),
+          rgba(255,255,255,.008) 1px,
+          transparent 1px,
+          transparent 3px
+        );
 
-            border-radius: 50%;
+      opacity: .35;
+      pointer-events: none;
+    }
 
-            background: var(--logo);
+    a {
+      color: inherit;
+    }
+
+    /* =========================
+       HEADER
+    ========================= */
+
+    header {
+      position: relative;
+      z-index: 20;
 
-            box-shadow:
-                0 0 10px var(--logo),
-                0 0 24px rgba(98, 224, 192, 0.55);
-        }
+      border-bottom: 1px solid #263858;
 
-        .home-link {
-            padding: 8px 13px;
+      background: rgba(9, 13, 22, .78);
 
-            border: 1px solid #263858;
-            border-radius: 999px;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
 
-            color: #aabbd4;
+    .nav {
+      width: min(calc(100% - 40px), 1100px);
+      margin: 0 auto;
 
-            text-decoration: none;
+      min-height: 70px;
 
-            font-size: 0.9rem;
-            font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
 
-            transition:
-                background 0.2s ease,
-                border-color 0.2s ease,
-                color 0.2s ease;
-        }
+      gap: 20px;
+    }
 
-        .home-link:hover,
-        .home-link:focus-visible {
-            color: var(--text);
-            border-color: #3b557d;
-            background: #16233a;
-        }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
 
-        /* =========================
-           MAIN
-        ========================= */
+      text-decoration: none;
 
-        main {
-            flex: 1;
+      font-weight: 750;
+      letter-spacing: .02em;
+    }
 
-            width: min(calc(100% - 40px), 1100px);
-            margin: 0 auto;
+    .brand-dot {
+      width: 12px;
+      height: 12px;
 
-            display: grid;
-            place-items: center;
+      border-radius: 50%;
 
-            padding: 70px 0;
-        }
+      background: var(--accent-3);
 
-        .error-card {
-            position: relative;
+      box-shadow:
+        0 0 10px var(--accent-3),
+        0 0 28px rgba(98, 224, 192, .55);
+    }
 
-            width: min(100%, 760px);
+    .home-link {
+      padding: 8px 14px;
 
-            padding: clamp(32px, 6vw, 64px);
+      border: 1px solid #263858;
+      border-radius: 999px;
 
-            overflow: hidden;
+      color: #b8c6da;
 
-            text-align: center;
+      text-decoration: none;
+      font-size: .9rem;
+      font-weight: 650;
 
-            background:
-                radial-gradient(
-                    circle at top left,
-                    rgba(125, 211, 252, 0.08),
-                    transparent 35%
-                ),
-                var(--surface);
+      background: rgba(255,255,255,.015);
 
-            border: 1px solid var(--ring);
-            border-radius: 24px;
+      transition:
+        border-color .2s ease,
+        background .2s ease,
+        transform .2s ease;
+    }
 
-            box-shadow: var(--shadow);
-        }
+    .home-link:hover {
+      transform: translateY(-1px);
+      border-color: #47648d;
+      background: #16233a;
+    }
 
-        .error-card::before {
-            content: "";
+    /* =========================
+       PAGE
+    ========================= */
 
-            position: absolute;
+    main {
+      min-height: calc(100vh - 70px);
 
-            width: 260px;
-            height: 260px;
+      display: grid;
+      place-items: center;
 
-            top: -150px;
-            right: -120px;
+      padding: 48px 20px;
 
-            border-radius: 50%;
+      position: relative;
+      z-index: 2;
+    }
 
-            background: var(--accent);
+    .ambient-orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(90px);
+      opacity: .16;
+      pointer-events: none;
+      animation: float 8s ease-in-out infinite alternate;
+    }
 
-            filter: blur(90px);
+    .orb-a {
+      width: 340px;
+      height: 340px;
 
-            opacity: 0.12;
+      top: 18%;
+      left: 12%;
 
-            pointer-events: none;
-        }
+      background: var(--accent);
+    }
 
-        .error-card::after {
-            content: "";
+    .orb-b {
+      width: 380px;
+      height: 380px;
 
-            position: absolute;
+      bottom: 5%;
+      right: 10%;
 
-            width: 220px;
-            height: 220px;
+      background: var(--accent-2);
 
-            bottom: -140px;
-            left: -110px;
+      animation-delay: -3s;
+    }
 
-            border-radius: 50%;
+    @keyframes float {
+      from {
+        transform: translate3d(0, 0, 0);
+      }
 
-            background: var(--accent-2);
+      to {
+        transform: translate3d(24px, -18px, 0);
+      }
+    }
 
-            filter: blur(90px);
+    /* =========================
+       CARD
+    ========================= */
 
-            opacity: 0.12;
+    .error-shell {
+      position: relative;
 
-            pointer-events: none;
-        }
+      width: min(100%, 820px);
 
-        .error-code {
-            position: relative;
-            z-index: 1;
+      border-radius: 28px;
 
-            margin: 0;
+      padding: 1px;
 
-            font-size: clamp(5rem, 18vw, 10rem);
-            line-height: 0.9;
+      background:
+        linear-gradient(
+          135deg,
+          rgba(125, 211, 252, .42),
+          rgba(51, 65, 85, .45) 45%,
+          rgba(167, 139, 250, .32)
+        );
 
-            font-weight: 800;
-            letter-spacing: -0.06em;
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,.015),
+        var(--shadow);
+    }
 
-            color: transparent;
+    .error-card {
+      position: relative;
 
-            background:
-                linear-gradient(
-                    135deg,
-                    var(--accent),
-                    var(--accent-2)
-                );
+      overflow: hidden;
 
-            -webkit-background-clip: text;
-            background-clip: text;
+      border-radius: 27px;
 
-            text-shadow:
-                0 0 40px rgba(125, 211, 252, 0.08);
-        }
+      padding: clamp(34px, 6vw, 68px);
 
-        .error-badge {
-            position: relative;
-            z-index: 1;
+      background:
+        linear-gradient(
+          180deg,
+          rgba(17, 20, 24, .98),
+          rgba(13, 17, 23, .98)
+        );
+    }
 
-            display: inline-flex;
-            align-items: center;
+    .error-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
 
-            margin-top: 28px;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(125, 211, 252, .08), transparent 32%),
+        radial-gradient(circle at 85% 100%, rgba(167, 139, 250, .08), transparent 36%);
 
-            padding: 6px 11px;
+      pointer-events: none;
+    }
 
-            border: 1px solid var(--ring);
-            border-radius: 999px;
+    .error-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
 
-            color: var(--muted);
+      background:
+        linear-gradient(
+          115deg,
+          transparent 30%,
+          rgba(255,255,255,.025) 50%,
+          transparent 70%
+        );
 
-            font-size: 0.85rem;
-        }
+      transform: translateX(-130%);
+      animation: shine 7s ease-in-out infinite;
+      pointer-events: none;
+    }
 
-        h1 {
-            position: relative;
-            z-index: 1;
+    @keyframes shine {
+      0%,
+      70% {
+        transform: translateX(-130%);
+      }
 
-            margin: 18px 0 12px;
+      100% {
+        transform: translateX(130%);
+      }
+    }
 
-            font-size: clamp(1.7rem, 4vw, 2.4rem);
-        }
+    /* =========================
+       STATUS
+    ========================= */
 
-        .description {
-            position: relative;
-            z-index: 1;
+    .status-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
 
-            max-width: 570px;
-            margin: 0 auto;
+      margin-bottom: 18px;
 
-            color: var(--muted);
+      color: var(--muted);
 
-            font-size: 1.05rem;
-            line-height: 1.7;
-        }
+      font-size: .82rem;
+    }
 
-        /* =========================
-           ACTIONS
-        ========================= */
+    .status-dot {
+      width: 7px;
+      height: 7px;
 
-        .actions {
-            position: relative;
-            z-index: 1;
+      border-radius: 50%;
 
-            margin-top: 32px;
+      background: #f59e0b;
 
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
+      box-shadow: 0 0 14px rgba(245, 158, 11, .55);
 
-            gap: 12px;
-        }
+      animation: pulse 1.8s ease-in-out infinite;
+    }
 
-        .button {
-            min-height: 44px;
+    @keyframes pulse {
+      50% {
+        opacity: .45;
+      }
+    }
 
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
+    /* =========================
+       404
+    ========================= */
 
-            padding: 10px 17px;
+    .error-code-wrap {
+      position: relative;
+      z-index: 2;
 
-            border-radius: 999px;
+      display: flex;
+      justify-content: center;
+    }
 
-            text-decoration: none;
-            font-weight: 650;
+    .error-code {
+      position: relative;
 
-            transition:
-                transform 0.2s ease,
-                background 0.2s ease,
-                border-color 0.2s ease;
-        }
+      margin: 0;
 
-        .button:hover {
-            transform: translateY(-2px);
-        }
+      font-size: clamp(6.5rem, 17vw, 11rem);
+      line-height: .8;
 
-        .button-primary {
-            color: #071019;
+      font-weight: 900;
+      letter-spacing: -.08em;
 
-            background:
-                linear-gradient(
-                    135deg,
-                    var(--accent),
-                    #62e0c0
-                );
+      background:
+        linear-gradient(
+          135deg,
+          #a8d8ff 0%,
+          var(--accent) 28%,
+          #8098ff 62%,
+          var(--accent-2) 100%
+        );
 
-            border: 1px solid transparent;
-        }
+      -webkit-background-clip: text;
+      background-clip: text;
 
-        .button-secondary {
-            color: var(--text);
+      color: transparent;
 
-            background: rgba(255, 255, 255, 0.02);
+      filter:
+        drop-shadow(0 0 20px rgba(125, 211, 252, .13))
+        drop-shadow(0 0 45px rgba(167, 139, 250, .08));
 
-            border: 1px solid var(--ring);
-        }
+      user-select: none;
+    }
 
-        .button-secondary:hover {
-            background: #16233a;
-            border-color: #3b557d;
-        }
+    .error-code::before,
+    .error-code::after {
+      content: "404";
 
-        /* =========================
-           PATH
-        ========================= */
+      position: absolute;
+      inset: 0;
 
-        .requested-path {
-            position: relative;
-            z-index: 1;
+      opacity: 0;
+      pointer-events: none;
+    }
 
-            margin-top: 34px;
+    .error-code::before {
+      color: #7dd3fc;
+      transform: translateX(-3px);
+    }
 
-            padding-top: 22px;
+    .error-code::after {
+      color: #a78bfa;
+      transform: translateX(3px);
+    }
 
-            border-top: 1px solid rgba(51, 65, 85, 0.7);
+    .error-code:hover::before {
+      opacity: .16;
+    }
 
-            color: var(--muted);
+    .error-code:hover::after {
+      opacity: .12;
+    }
 
-            font-size: 0.86rem;
-        }
+    /* =========================
+       BADGE
+    ========================= */
 
-        .requested-path code {
-            color: var(--accent);
+    .error-badge {
+      position: relative;
+      z-index: 2;
 
-            overflow-wrap: anywhere;
-        }
+      width: fit-content;
 
-        /* =========================
-           FOOTER
-        ========================= */
+      margin: 28px auto 0;
 
-        footer {
-            padding: 25px 20px 35px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
 
-            color: var(--muted);
+      padding: 7px 12px;
 
-            text-align: center;
+      border: 1px solid var(--ring);
+      border-radius: 999px;
 
-            font-size: 0.85rem;
-        }
+      background: rgba(255,255,255,.018);
 
-        /* =========================
-           RESPONSIVE
-        ========================= */
+      color: #aab6c8;
 
-        @media (max-width: 680px) {
+      font-size: .82rem;
+    }
 
-            .nav {
-                width: min(calc(100% - 28px), 1100px);
-                min-height: 62px;
-            }
+    .error-badge span:first-child {
+      opacity: .7;
+    }
 
-            main {
-                width: min(calc(100% - 28px), 1100px);
-                padding: 38px 0;
-            }
+    /* =========================
+       CONTENT
+    ========================= */
 
-            .error-card {
-                padding:
-                    36px
-                    20px;
-            }
+    h1 {
+      position: relative;
+      z-index: 2;
 
-            .actions {
-                flex-direction: column;
-            }
+      margin: 22px 0 12px;
 
-            .button {
-                width: 100%;
-            }
+      text-align: center;
 
-            .error-code {
-                font-size: clamp(5rem, 30vw, 8rem);
-            }
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      letter-spacing: -.03em;
+    }
 
-            .description {
-                font-size: 1rem;
-            }
-        }
+    .description {
+      position: relative;
+      z-index: 2;
 
-        @media (prefers-reduced-motion: reduce) {
+      max-width: 600px;
 
-            *,
-            *::before,
-            *::after {
-                scroll-behavior: auto !important;
-                transition: none !important;
-            }
-        }
-    </style>
+      margin: 0 auto;
+
+      color: var(--muted);
+
+      text-align: center;
+
+      font-size: 1.02rem;
+      line-height: 1.7;
+    }
+
+    /* =========================
+       BUTTONS
+    ========================= */
+
+    .actions {
+      position: relative;
+      z-index: 2;
+
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+
+      gap: 12px;
+
+      margin-top: 30px;
+    }
+
+    .button {
+      min-height: 46px;
+
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+
+      gap: 8px;
+
+      padding: 10px 18px;
+
+      border-radius: 999px;
+
+      text-decoration: none;
+
+      font-weight: 700;
+
+      transition:
+        transform .2s ease,
+        box-shadow .2s ease,
+        border-color .2s ease,
+        background .2s ease;
+    }
+
+    .button:hover {
+      transform: translateY(-2px);
+    }
+
+    .button-primary {
+      color: #061014;
+
+      background:
+        linear-gradient(
+          135deg,
+          #8adfff,
+          var(--accent-3)
+        );
+
+      box-shadow:
+        0 10px 30px rgba(98, 224, 192, .12);
+
+      border: 1px solid transparent;
+    }
+
+    .button-primary:hover {
+      box-shadow:
+        0 14px 36px rgba(98, 224, 192, .20);
+    }
+
+    .button-secondary {
+      color: var(--text);
+
+      border: 1px solid var(--ring);
+
+      background: rgba(255,255,255,.018);
+    }
+
+    .button-secondary:hover {
+      border-color: #47648d;
+      background: #16233a;
+    }
+
+    /* =========================
+       PATH
+    ========================= */
+
+    .path-box {
+      position: relative;
+      z-index: 2;
+
+      margin-top: 34px;
+      padding-top: 22px;
+
+      border-top: 1px solid rgba(51, 65, 85, .75);
+
+      display: flex;
+      justify-content: center;
+      gap: 7px;
+
+      color: var(--muted);
+
+      font-size: .84rem;
+
+      flex-wrap: wrap;
+    }
+
+    .path-box code {
+      color: var(--accent);
+
+      overflow-wrap: anywhere;
+    }
+
+    /* =========================
+       META MESSAGE
+    ========================= */
+
+    .signal {
+      position: absolute;
+
+      top: 18px;
+      right: 20px;
+
+      display: flex;
+      align-items: end;
+      gap: 3px;
+
+      opacity: .42;
+    }
+
+    .signal span {
+      width: 3px;
+
+      background: var(--accent);
+
+      border-radius: 10px;
+
+      animation: signal 1.6s ease-in-out infinite;
+    }
+
+    .signal span:nth-child(1) {
+      height: 5px;
+      animation-delay: 0s;
+    }
+
+    .signal span:nth-child(2) {
+      height: 9px;
+      animation-delay: .1s;
+    }
+
+    .signal span:nth-child(3) {
+      height: 13px;
+      animation-delay: .2s;
+    }
+
+    .signal span:nth-child(4) {
+      height: 17px;
+      animation-delay: .3s;
+    }
+
+    @keyframes signal {
+      50% {
+        opacity: .2;
+      }
+    }
+
+    /* =========================
+       MOBILE
+    ========================= */
+
+    @media (max-width: 680px) {
+      body {
+        overflow: auto;
+      }
+
+      .nav {
+        width: min(calc(100% - 28px), 1100px);
+      }
+
+      main {
+        min-height: calc(100vh - 70px);
+        padding: 34px 14px;
+      }
+
+      .error-card {
+        padding:
+          34px
+          20px;
+      }
+
+      .actions {
+        flex-direction: column;
+      }
+
+      .button {
+        width: 100%;
+      }
+
+      .signal {
+        display: none;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation: none !important;
+        transition: none !important;
+      }
+    }
+  </style>
 </head>
 
 <body>
 
+<div class="ambient-orb orb-a"></div>
+<div class="ambient-orb orb-b"></div>
+
 <header>
-    <nav class="nav">
+  <nav class="nav">
 
-        <a
-            class="brand"
-            href="/"
-            aria-label="Datenflix007 Startseite"
-        >
-            <span
-                class="logo"
-                aria-hidden="true"
-            ></span>
+    <a
+      href="/"
+      class="brand"
+      aria-label="Datenflix007 Startseite"
+    >
+      <span class="brand-dot" aria-hidden="true"></span>
+      Datenflix007
+    </a>
 
-            Datenflix007
-        </a>
+    <a href="/" class="home-link">
+      Startseite
+    </a>
 
-        <a
-            class="home-link"
-            href="/"
-        >
-            Startseite
-        </a>
-
-    </nav>
+  </nav>
 </header>
-
 
 <main>
 
-    <section
-        class="error-card"
-        aria-labelledby="error-title"
-    >
+  <div class="error-shell">
 
-        <p class="error-code">
-            404
-        </p>
+    <section class="error-card">
 
-        <span class="error-badge">
-            Diese Seite scheint verschwunden zu sein.
-        </span>
+      <div class="signal" aria-hidden="true">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
 
-        <h1 id="error-title">
-            Seite nicht gefunden
-        </h1>
+      <div class="status-row">
+        <span class="status-dot"></span>
+        <span>Lost route detected</span>
+      </div>
 
-        <p class="description">
-            Die aufgerufene Seite existiert nicht,
-            wurde verschoben oder der verwendete Link
-            ist nicht mehr aktuell.
-        </p>
+      <div class="error-code-wrap">
+        <p class="error-code">404</p>
+      </div>
 
-        <div class="actions">
+      <div class="error-badge">
+        <span>●</span>
+        <span>Diese Seite scheint verschwunden zu sein.</span>
+      </div>
 
-            <a
-                class="button button-primary"
-                href="/"
-            >
-                Zur Startseite
-            </a>
+      <h1>Seite nicht gefunden</h1>
 
-            <a
-                class="button button-secondary"
-                href="javascript:history.back()"
-            >
-                Zurück
-            </a>
+      <p class="description">
+        Die aufgerufene Seite existiert nicht,
+        wurde verschoben oder der verwendete Link
+        ist nicht mehr aktuell.
+      </p>
 
-        </div>
+      <div class="actions">
 
-        <p class="requested-path">
-            Aufgerufener Pfad:
-            <code id="requested-path"></code>
-        </p>
+        <a
+          href="/"
+          class="button button-primary"
+        >
+          ← Zur Startseite
+        </a>
+
+        <a
+          href="javascript:history.back()"
+          class="button button-secondary"
+        >
+          Zurück
+        </a>
+
+      </div>
+
+      <div class="path-box">
+        <span>Aufgerufener Pfad:</span>
+        <code id="requested-path"></code>
+      </div>
 
     </section>
 
+  </div>
+
 </main>
 
-
-<footer>
-    © Datenflix007
-</footer>
-
-
 <script>
-    const pathElement =
-        document.getElementById("requested-path");
+  const pathElement =
+    document.getElementById("requested-path");
 
-    if (pathElement) {
-        pathElement.textContent =
-            window.location.pathname;
-    }
+  if (pathElement) {
+    pathElement.textContent =
+      window.location.pathname;
+  }
 </script>
 
 </body>
