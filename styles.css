@@ -1067,18 +1067,38 @@ footer {
 
 .knowledge-cluster {
     position: absolute;
-    border: 1px solid rgba(125,211,252,.12);
-    border-radius: 48% 52% 50% 50% / 48% 42% 58% 52%;
+    overflow: hidden;
+    isolation: isolate;
+    border: 1px solid rgba(125,211,252,.22);
+    border-radius: 50%;
     background:
-        radial-gradient(circle at 50% 50%, rgba(125,211,252,.08), transparent 62%),
-        rgba(10, 16, 26, .18);
-    box-shadow: inset 0 0 80px rgba(0,0,0,.12);
+        radial-gradient(ellipse at 50% 50%, rgba(125,211,252,.105), transparent 66%),
+        linear-gradient(145deg, rgba(13,25,43,.34), rgba(8,14,24,.08));
+    box-shadow: inset 0 0 72px rgba(0,0,0,.22), 0 0 42px rgba(23,43,73,.08);
+}
+
+.knowledge-cluster::after {
+    content: "";
+    position: absolute;
+    inset: 16px;
+    z-index: 0;
+    border: 1px dashed rgba(148, 197, 232, .18);
+    border-radius: inherit;
+    opacity: .72;
+    animation: knowledge-orbit-slide 18s linear infinite;
+    animation-delay: var(--orbit-delay, 0s);
+}
+
+@keyframes knowledge-orbit-slide {
+    0%, 100% { transform: rotate(0deg) scale(.985); opacity: .42; }
+    50% { transform: rotate(180deg) scale(1); opacity: .8; }
 }
 
 .knowledge-cluster span {
     position: absolute;
     left: 24px;
     top: 18px;
+    z-index: 1;
     color: rgba(226,232,240,.48);
     font-size: .72rem;
     font-weight: 900;
@@ -1108,14 +1128,26 @@ footer {
     font-weight: 700;
     line-height: 1.15;
     width: max-content;
-    max-width: 170px;
+    max-width: 156px;
     min-width: 66px;
     text-align: center;
     box-shadow: 0 10px 26px rgba(2,6,23,.36);
-    transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+    transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease, background .18s ease;
     overflow-wrap: normal;
     word-break: normal;
     hyphens: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .knowledge-cluster {
+        animation: knowledge-cluster-breathe 8s ease-in-out infinite;
+        animation-delay: var(--orbit-delay, 0s);
+    }
+}
+
+@keyframes knowledge-cluster-breathe {
+    0%, 100% { box-shadow: inset 0 0 72px rgba(0,0,0,.22), 0 0 32px rgba(23,43,73,.06); }
+    50% { box-shadow: inset 0 0 84px rgba(0,0,0,.16), 0 0 52px rgba(125,211,252,.13); }
 }
 
 .graph-node:hover,

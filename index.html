@@ -434,6 +434,7 @@
             const zoomOut = document.getElementById('graphZoomOut');
             const zoomIn = document.getElementById('graphZoomIn');
             const resetView = document.getElementById('graphReset');
+            const searchCore = document.querySelector('.search-core');
             if (!stage || !pan || !svg || !clustersHost || !nodesHost || !searchInput || !suggestions || !status || !filterChips || !tagSearch || !filterReset) return;
             const t = (key, fallback, replacements) => window.DatenflixI18n?.translate(key, replacements) || fallback;
 
@@ -635,49 +636,54 @@
                     const category = nodeCategory(node);
                     if (category !== 'pages') counts.set(category, (counts.get(category) || 0) + 1);
                 });
-                const layoutWidth = 3200;
-                const gap = 92;
-                let cursorX = 110;
-                let cursorY = 110;
-                let rowHeight = 0;
+                const layoutWidth = 4200;
+                const layoutHeight = 3200;
+                const core = { x: layoutWidth / 2, y: layoutHeight / 2 };
+                const orbits = {
+                    worksheets: { angle: -152, radius: 1200 },
+                    automata: { angle: -97, radius: 1170 },
+                    projects: { angle: -36, radius: 1250 },
+                    tools: { angle: 17, radius: 1300 },
+                    algodat: { angle: 58, radius: 1450 },
+                    guides: { angle: 132, radius: 1260 },
+                    references: { angle: 166, radius: 1250 }
+                };
                 const shapes = [
-                    '44% 56% 50% 50% / 48% 42% 58% 52%',
-                    '58% 42% 46% 54% / 42% 57% 43% 58%',
-                    '52% 48% 60% 40% / 58% 45% 55% 42%',
-                    '46% 54% 42% 58% / 50% 60% 40% 50%'
+                    '50%',
+                    '48% 52% 50% 50% / 50% 48% 52% 50%',
+                    '52% 48% 50% 50% / 48% 52% 48% 52%'
                 ];
                 clusterBoxes = {};
                 categoryOrder.filter((category) => counts.has(category)).forEach((category, index) => {
                     const count = counts.get(category);
-                    const columns = Math.max(1, Math.ceil(Math.sqrt(count * 1.5)));
+                    const columns = Math.max(1, Math.min(6, Math.ceil(Math.sqrt(count * 1.5))));
                     const rows = Math.max(1, Math.ceil(count / columns));
-                    const width = Math.max(460, Math.min(1180, 250 + columns * 175));
-                    const height = Math.max(310, Math.min(880, 160 + rows * 118));
-                    if (cursorX + width > layoutWidth - 100 && cursorX > 110) {
-                        cursorX = 110;
-                        cursorY += rowHeight + gap;
-                        rowHeight = 0;
-                    }
-                    clusterBoxes[category] = { x: cursorX, y: cursorY, w: width, h: height, radius: shapes[index % shapes.length] };
-                    cursorX += width + gap;
-                    rowHeight = Math.max(rowHeight, height);
+                    const width = Math.max(500, Math.min(1280, 400 + columns * 190));
+                    const height = Math.max(340, Math.min(1050, 210 + rows * 120));
+                    const orbit = orbits[category] || { angle: index * (360 / categoryOrder.length), radius: 1220 };
+                    const radians = orbit.angle * Math.PI / 180;
+                    const centerX = core.x + Math.cos(radians) * orbit.radius;
+                    const centerY = core.y + Math.sin(radians) * orbit.radius;
+                    const x = Math.max(80, Math.min(layoutWidth - width - 80, centerX - width / 2));
+                    const y = Math.max(80, Math.min(layoutHeight - height - 80, centerY - height / 2));
+                    clusterBoxes[category] = {
+                        x,
+                        y,
+                        w: width,
+                        h: height,
+                        radius: shapes[index % shapes.length],
+                        phase: index * 1.15
+                    };
                 });
-
-                // The search core stays at the visual center of the map. The usually
-                // largest group (tools) therefore starts to its right, leaving a real
-                // interaction corridor instead of placing nodes behind the search field.
-                const toolsBox = clusterBoxes.tools;
-                if (toolsBox) {
-                    const searchClearance = 300;
-                    const minToolsX = layoutWidth / 2 + searchClearance;
-                    const maxToolsX = layoutWidth - toolsBox.w - 110;
-                    toolsBox.x = Math.max(toolsBox.x, Math.min(minToolsX, maxToolsX));
-                }
                 graphSize.width = layoutWidth;
-                graphSize.height = Math.max(1200, cursorY + rowHeight + 110);
+                graphSize.height = layoutHeight;
                 pan.style.width = `${graphSize.width}px`;
                 pan.style.height = `${graphSize.height}px`;
                 svg.setAttribute('viewBox', `0 0 ${graphSize.width} ${graphSize.height}`);
+                if (searchCore) {
+                    searchCore.style.left = `${core.x}px`;
+                    searchCore.style.top = `${core.y}px`;
+                }
             }
 
             function extractSummary(text, path) {
@@ -793,22 +799,23 @@
                 const category = nodeCategory(node);
                 const box = clusterBoxes[category];
                 if (!box) return { x: -1000, y: -1000 };
-                const padX = Math.min(150, box.w * 0.16);
-                const padTop = 76;
-                const padBottom = 64;
-                const innerW = Math.max(120, box.w - padX * 2);
-                const innerH = Math.max(90, box.h - padTop - padBottom);
-                const cols = Math.max(1, Math.min(groupSize, Math.ceil(Math.sqrt(groupSize * (innerW / innerH)))));
+                const padX = Math.min(126, Math.max(94, box.w * 0.13));
+                const padY = Math.min(104, Math.max(82, box.h * 0.17));
+                const innerW = Math.max(160, box.w - padX * 2);
+                const innerH = Math.max(130, box.h - padY * 2);
+                const cols = Math.max(1, Math.min(6, groupSize, Math.ceil(Math.sqrt(groupSize * 1.5))));
                 const rows = Math.max(1, Math.ceil(groupSize / cols));
                 const col = groupIndex % cols;
                 const row = Math.floor(groupIndex / cols);
-                const cellW = innerW / cols;
-                const cellH = innerH / rows;
-                const x = box.x + padX + cellW * (col + 0.5);
-                const y = box.y + padTop + cellH * (row + 0.5);
+                const nodesInRow = Math.min(cols, groupSize - row * cols);
+                const yRatio = rows === 1 ? 0 : -0.62 + (1.24 * row / (rows - 1));
+                const ellipseHalfWidth = Math.max(72, (innerW / 2) * Math.sqrt(Math.max(0.16, 1 - yRatio ** 2)));
+                const xRatio = nodesInRow === 1 ? 0 : -1 + (2 * col / (nodesInRow - 1));
+                const x = box.x + box.w / 2 + ellipseHalfWidth * xRatio;
+                const y = box.y + box.h / 2 + (innerH / 2) * yRatio;
                 return {
                     x: Math.max(box.x + padX, Math.min(box.x + box.w - padX, x)),
-                    y: Math.max(box.y + padTop, Math.min(box.y + box.h - padBottom, y))
+                    y: Math.max(box.y + padY, Math.min(box.y + box.h - padY, y))
                 };
             }
 
@@ -924,6 +931,8 @@
                     halo.style.width = `${box.w}px`;
                     halo.style.height = `${box.h}px`;
                     halo.style.borderRadius = box.radius || '32px';
+                    halo.style.setProperty('--orbit-phase', `${box.phase || 0}s`);
+                    halo.style.setProperty('--orbit-delay', `${-(box.phase || 0)}s`);
                     halo.innerHTML = `<span>${escapeHtml(categoryLabel(category))}</span>`;
                     clustersHost.appendChild(halo);
                 });
