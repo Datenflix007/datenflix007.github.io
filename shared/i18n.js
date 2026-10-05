@@ -143,7 +143,14 @@
       if (persist) {
         try { localStorage.setItem("language", targetLanguage); } catch { /* Storage can be unavailable. */ }
       }
+      const animateLanguageChange = sequence > 1 && !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (animateLanguageChange) document.body.classList.remove("datenflix-language-transition");
       applyTranslations();
+      if (animateLanguageChange) {
+        void document.body.offsetWidth;
+        document.body.classList.add("datenflix-language-transition");
+        window.setTimeout(() => document.body.classList.remove("datenflix-language-transition"), 260);
+      }
       updateLanguageSelector();
       closeLanguageMenu();
       document.dispatchEvent(new CustomEvent("datenflix:i18n-applied", { detail: { language: targetLanguage } }));

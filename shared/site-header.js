@@ -39,6 +39,16 @@
     document.head.append(stylesheet);
   }
 
+  function loadSharedScript(fileName) {
+    const src = new URL(fileName, shellScriptUrl).href;
+    if (document.querySelector(`script[data-datenflix-shared-script="${fileName}"]`)) return;
+    const sharedScript = document.createElement("script");
+    sharedScript.src = src;
+    sharedScript.async = false;
+    sharedScript.dataset.datenflixSharedScript = fileName;
+    document.head.append(sharedScript);
+  }
+
   function activeArea(pathname) {
     const path = pathname.toLowerCase();
     if (path.includes("/digital-worksheets/")) return "worksheets";
@@ -109,6 +119,7 @@
   }
 
   loadSharedStylesheet("responsive.css");
+  loadSharedScript("site-polish.js");
   loadI18n();
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", renderHeader, { once: true });
   else renderHeader();

@@ -16,6 +16,43 @@ body.has-datenflix-shell {
   overflow-x: hidden;
 }
 
+@media (prefers-reduced-motion: no-preference) {
+  body.datenflix-language-transition :is([data-i18n], [data-i18n-placeholder], [data-i18n-title], [data-i18n-aria-label], [data-i18n-alt]) {
+    animation: datenflix-language-enter 220ms ease-out both;
+  }
+
+  @keyframes datenflix-language-enter {
+    from { opacity: .35; transform: translateY(3px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .df-spotlight {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+  }
+
+  .df-spotlight::after {
+    content: "";
+    position: absolute;
+    z-index: 0;
+    width: 230px;
+    aspect-ratio: 1;
+    left: var(--df-spotlight-x, 50%);
+    top: var(--df-spotlight-y, 50%);
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(125, 211, 252, .16), transparent 68%);
+    transform: translate(-50%, -50%);
+    opacity: var(--df-spotlight-opacity, 0);
+    pointer-events: none;
+    transition: opacity 180ms ease;
+  }
+
+  .df-spotlight > * { position: relative; z-index: 1; }
+}
+
 :where(main, article, .content, .page-content, .guide-article, .catalog, .catalog-main) {
   min-width: 0;
 }

@@ -77,7 +77,8 @@
                         <button type="button" id="graphReset" aria-label="Ansicht zurücksetzen" data-i18n-aria-label="pages.home.resetView">1:1</button>
                         <button type="button" id="graphZoomIn" aria-label="Reinzoomen" data-i18n-aria-label="pages.home.zoomIn">+</button>
                     </div>
-                    <div class="knowledge-filter-panel" aria-label="Wissensgraph filtern" data-i18n-aria-label="pages.home.filterGraph">
+                    <button type="button" class="knowledge-filter-toggle" id="knowledgeFilterToggle" aria-expanded="false" aria-controls="knowledgeFilterPanel" aria-label="Filter öffnen" data-i18n="pages.home.filter" data-i18n-aria-label="pages.home.openFilters">Filter</button>
+                    <div class="knowledge-filter-panel" id="knowledgeFilterPanel" aria-label="Wissensgraph filtern" data-i18n-aria-label="pages.home.filterGraph">
                         <div class="knowledge-filter-title" data-i18n="pages.home.filter">Filter</div>
                         <div class="knowledge-filter-chips" id="knowledgeFilterChips">
                             <button type="button" data-filter="studium" data-i18n="pages.home.study">Studium</button>
@@ -431,6 +432,8 @@
             const filterChips = document.getElementById('knowledgeFilterChips');
             const tagSearch = document.getElementById('knowledgeTagSearch');
             const filterReset = document.getElementById('knowledgeFilterReset');
+            const filterPanel = document.getElementById('knowledgeFilterPanel');
+            const filterToggle = document.getElementById('knowledgeFilterToggle');
             const zoomOut = document.getElementById('graphZoomOut');
             const zoomIn = document.getElementById('graphZoomIn');
             const resetView = document.getElementById('graphReset');
@@ -886,6 +889,43 @@
                     button.classList.toggle('active', activeFilters.has(button.dataset.filter));
                 });
             }
+
+            function setFilterPanelOpen(open) {
+                if (!filterPanel || !filterToggle) return;
+                stage.classList.toggle('is-filter-open', open);
+                filterToggle.setAttribute('aria-expanded', String(open));
+                if (open) tagSearch.focus({ preventScroll: true });
+            }
+
+            filterToggle?.addEventListener('click', () => {
+                setFilterPanelOpen(!stage.classList.contains('is-filter-open'));
+            });
+
+            stage.addEventListener('click', (event) => {
+                if (event.target === stage && stage.classList.contains('is-filter-open')) setFilterPanelOpen(false);
+            });
+
+            window.addEventListener('resize', () => {
+                if (window.innerWidth > 680) setFilterPanelOpen(false);
+            });
+
+            const reduceGraphMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+            let parallaxFrame = 0;
+            const updateGraphParallax = () => {
+                parallaxFrame = 0;
+                if (reduceGraphMotion.matches) return;
+                const rect = stage.getBoundingClientRect();
+                const progress = Math.max(-1, Math.min(1, (window.innerHeight * .5 - rect.top) / window.innerHeight));
+                pan.style.setProperty('--knowledge-cluster-shift-y', `${Math.round(progress * 12)}px`);
+                pan.style.setProperty('--knowledge-node-shift-y', `${Math.round(progress * -5)}px`);
+            };
+            const scheduleGraphParallax = () => {
+                if (!parallaxFrame) parallaxFrame = window.requestAnimationFrame(updateGraphParallax);
+            };
+            window.addEventListener('scroll', scheduleGraphParallax, { passive: true });
+            window.addEventListener('resize', scheduleGraphParallax, { passive: true });
+            reduceGraphMotion.addEventListener?.('change', scheduleGraphParallax);
+            scheduleGraphParallax();
 
             function renderSuggestions(query = searchInput.value) {
                 const normalized = normalize(query).trim();
