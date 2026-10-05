@@ -51,7 +51,7 @@
       <div class="site-header__inner">
         <a class="site-brand" href="https://datenflix007.github.io/" aria-label="Zur Startseite von Felix Staacke" data-i18n-aria-label="common.brand.home"><span class="site-brand__mark" aria-hidden="true"></span><span>Felix Staacke</span></a>
         <button class="site-mobile-toggle" type="button" aria-expanded="false" aria-controls="datenflixSiteNav" aria-label="Navigation öffnen" data-i18n-aria-label="common.navigation.open"><span class="site-mobile-toggle__bar"></span><span class="site-mobile-toggle__bar"></span><span class="site-mobile-toggle__bar"></span></button>
-        <nav class="site-nav" id="datenflixSiteNav" aria-label="Hauptnavigation">
+        <nav class="site-nav" id="datenflixSiteNav" aria-label="Hauptnavigation" data-i18n-aria-label="common.navigation.label">
           ${currentLinks}
           <div class="site-language">
             <button class="site-language__toggle" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="datenflixLanguageMenu" aria-label="Sprache auswählen" data-i18n-aria-label="common.language.label"><span class="site-language__current site-language__flag site-language__flag--de" data-current-language-flag aria-hidden="true"></span><span class="site-language__chevron" aria-hidden="true">⌄</span></button>

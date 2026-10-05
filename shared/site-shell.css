@@ -134,20 +134,26 @@
 }
 
 .site-language__flag--de {
-  background: linear-gradient(to bottom, #111 0 33.33%, #d00 33.33% 66.66%, #ffce00 66.66%);
+  background-color: #000;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 3 2'%3E%3Cpath fill='%23000' d='M0 0h3v.667H0z'/%3E%3Cpath fill='%23dd0000' d='M0 .667h3v.666H0z'/%3E%3Cpath fill='%23ffce00' d='M0 1.333h3V2H0z'/%3E%3C/svg%3E");
 }
 
 .site-language__flag--fr {
-  background: linear-gradient(to right, #002395 0 33.33%, #fff 33.33% 66.66%, #ed2939 66.66%);
+  background-color: #fff;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 3 2'%3E%3Cpath fill='%23002395' d='M0 0h1v2H0z'/%3E%3Cpath fill='%23fff' d='M1 0h1v2H1z'/%3E%3Cpath fill='%23ed2939' d='M2 0h1v2H2z'/%3E%3C/svg%3E");
 }
 
 .site-language__flag--gb {
-  background:
-    linear-gradient(to right, transparent 0 36%, #fff 36% 64%, transparent 64%),
-    linear-gradient(to bottom, transparent 0 29%, #fff 29% 71%, transparent 71%),
-    linear-gradient(to right, transparent 0 43%, #c8102e 43% 57%, transparent 57%),
-    linear-gradient(to bottom, transparent 0 39%, #c8102e 39% 61%, transparent 61%),
-    #012169;
+  background-color: #012169;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 30'%3E%3Cpath fill='%23012169' d='M0 0h60v30H0z'/%3E%3Cpath stroke='%23fff' stroke-width='6' d='m0 0 60 30M60 0 0 30'/%3E%3Cpath stroke='%23c8102e' stroke-width='2.8' d='m0 0 60 30M60 0 0 30'/%3E%3Cpath stroke='%23fff' stroke-width='10' d='M30 0v30M0 15h60'/%3E%3Cpath stroke='%23c8102e' stroke-width='6' d='M30 0v30M0 15h60'/%3E%3C/svg%3E");
+}
+
+.site-language__flag--de,
+.site-language__flag--fr,
+.site-language__flag--gb {
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
 .site-language__current { line-height: 1; }

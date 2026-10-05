@@ -17,6 +17,7 @@
     "french": "French"
   },
   "navigation": {
+    "label": "Main navigation",
     "open": "Open navigation",
     "close": "Close navigation"
   },
