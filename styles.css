@@ -166,8 +166,10 @@ img {
 header {
     position: sticky;
     top: 0;
-    background: rgba(17, 20, 24, .75);
-    border-bottom: 1px solid var(--ring);
+    background: rgba(9, 13, 22, .84);
+    border-bottom: 1px solid #263858;
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
     z-index: 10;
 }
 
@@ -175,32 +177,43 @@ header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 14px 0;
-    gap: 12px;
+    min-height: 70px;
+    padding: 0;
+    gap: 20px;
 }
 
 .brand {
     display: flex;
-    gap: 12px;
+    gap: 10px;
     align-items: center;
     font-weight: 700;
-    cursor: pointer;
+    text-decoration: none;
+    letter-spacing: .02em;
 }
 
 .brand .logo {
-    width: 34px;
-    height: 34px;
-    border-radius: 10px;
-    background: linear-gradient(135deg, var(--accent), var(--accent-2));
-    box-shadow: var(--shadow);
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #62e0c0;
+    box-shadow: 0 0 10px #62e0c0, 0 0 24px rgba(98, 224, 192, .55);
 }
 
 .nav a.btn {
-    padding: 10px 14px;
-    border: 1px solid var(--ring);
+    padding: 7px 11px;
+    border: 1px solid #263858;
     border-radius: 999px;
     text-decoration: none;
     font-weight: 600;
+    font-size: .9rem;
+    color: #aabbd4;
+}
+
+.nav a.btn:hover,
+.nav a.btn:focus-visible {
+    color: var(--text);
+    border-color: #3b557d;
+    background: #16233a;
 }
 
 main {
@@ -1978,3 +1991,11 @@ footer {
             }
         }
     
+/* Gemeinsame Kopfzeile: Der Markenpunkt bleibt auf jeder Bildschirmgröße rund. */
+header .brand .logo {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #62e0c0;
+    box-shadow: 0 0 10px #62e0c0, 0 0 24px rgba(98, 224, 192, .55);
+}
