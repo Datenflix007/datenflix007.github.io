@@ -1,5 +1,14 @@
 (function () {
-  const repoUrl = "https://github.com/Datenflix007/datenflix007.github.io/issues/new";
+  const allowedRepositories = new Set([
+    "datenflix007.github.io",
+    "tools",
+    "guides",
+    "digital-worksheets"
+  ]);
+  const scriptUrl = new URL(document.currentScript?.src || location.href, location.href);
+  const requestedRepository = scriptUrl.searchParams.get("repo");
+  const repository = allowedRepositories.has(requestedRepository) ? requestedRepository : "datenflix007.github.io";
+  const repoUrl = `https://github.com/Datenflix007/${repository}/issues/new`;
   const categories = [
     ["Fehlerreport", "Etwas funktioniert nicht, sieht falsch aus oder ist kaputt."],
     ["Inspiration", "Idee fuer ein neues Feature, Modul, Thema oder Beispiel."],

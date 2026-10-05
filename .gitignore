@@ -4,6 +4,15 @@ _WS_2022*
 .env
 .dev.vars
 node_modules/
+# Local editor, agent, and Worker state. Project configuration belongs in
+# explicit, shareable files outside these directories.
+.agents/
 .claude/
 .vscode/
 .codex/
+.wrangler/
+tmp/
+*.log
+*.tmp
+*.bak
+.claude/
