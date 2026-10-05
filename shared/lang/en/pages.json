@@ -8,6 +8,23 @@
       "source": "Modern rewording after:",
       "translation": "English: “We learn not for school, but for life.”"
     },
+    "explore": {
+      "label": "Continue exploring",
+      "title": "Selected from the knowledge space",
+      "random": "Discover at random",
+      "now": "New in the knowledge space: {title}",
+      "bookmarks": "Bookmarks",
+      "paths": "Learning paths",
+      "collections": "Collections",
+      "changelog": "Recently updated",
+      "searchHistory": "Recent searches",
+      "pathAutomata": "Automata theory, compact",
+      "pathAlgorithms": "Discover algorithms",
+      "pathHistory": "Experience computer history",
+      "collectionStudy": "Teacher education & studies",
+      "collectionHistory": "Digital humanities & history",
+      "collectionPractice": "Learning by trying"
+    },
     "categories": {
       "label": "Topics",
       "study": "Studies",

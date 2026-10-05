@@ -6,7 +6,10 @@
     "close": "Schließen",
     "clearFilters": "Filter löschen",
     "previous": "Zurück",
-    "next": "Weiter"
+    "next": "Weiter",
+    "focus": "Fokus",
+    "exitFocus": "Fokus verlassen",
+    "print": "Drucken"
   },
   "language": {
     "label": "Sprache auswählen",

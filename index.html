@@ -59,9 +59,39 @@
             </div>
         </section>
 
+        <section class="explore-dock" id="exploreDock" hidden aria-labelledby="exploreTitle">
+            <div class="explore-dock__head">
+                <div>
+                    <p class="section-label" data-i18n="pages.home.explore.label">Weiter entdecken</p>
+                    <h2 id="exploreTitle" data-i18n="pages.home.explore.title">Für dich im Wissensraum</h2>
+                </div>
+                <button class="explore-random" type="button" id="exploreRandom" data-i18n="pages.home.explore.random">Zufällig entdecken</button>
+            </div>
+            <p class="explore-now" id="exploreNow" aria-live="polite"></p>
+            <div class="explore-dock__cards" id="exploreCards"></div>
+            <section class="explore-bookmarks" id="exploreBookmarks" hidden aria-labelledby="exploreBookmarksTitle">
+                <h3 id="exploreBookmarksTitle" data-i18n="pages.home.explore.bookmarks">Merkliste</h3>
+                <div id="exploreBookmarksList"></div>
+            </section>
+            <div class="explore-dock__lower">
+                <section class="explore-paths" aria-labelledby="explorePathsTitle">
+                    <h3 id="explorePathsTitle" data-i18n="pages.home.explore.paths">Lernpfade</h3>
+                    <div id="explorePaths"></div>
+                </section>
+                <section class="explore-collections" aria-labelledby="exploreCollectionsTitle">
+                    <h3 id="exploreCollectionsTitle" data-i18n="pages.home.explore.collections">Sammlungen</h3>
+                    <div id="exploreCollections"></div>
+                </section>
+            </div>
+            <section class="explore-changelog" aria-labelledby="exploreChangelogTitle">
+                <h3 id="exploreChangelogTitle" data-i18n="pages.home.explore.changelog">Zuletzt aktualisiert</h3>
+                <ul id="exploreChangelogList"></ul>
+            </section>
+        </section>
+
         <section class="knowledge-graph-section">
             <div class="knowledge-stage-shell">
-                <div class="knowledge-stage" id="knowledgeStage">
+                <div class="knowledge-stage" id="knowledgeStage" tabindex="0">
                     <div class="knowledge-pan" id="knowledgePan">
                         <svg id="knowledgeSvg" viewBox="0 0 2400 1300" preserveAspectRatio="none" aria-hidden="true"></svg>
                         <div id="knowledgeClusters"></div>
@@ -69,6 +99,7 @@
                         <div class="search-core">
                             <label for="repoSearch" data-i18n="pages.home.searchLabel">Seiteninhalt durchsuchen</label>
                             <input id="repoSearch" type="search" placeholder="z. B. Projekte, AlgoDat, Kontakt ..." data-i18n-placeholder="pages.home.searchPlaceholder" />
+                            <div class="search-history" id="repoSearchHistory" aria-label="Letzte Suchen" data-i18n-aria-label="pages.home.explore.searchHistory"></div>
                             <div class="suggestions" id="repoSuggestions"></div>
                         </div>
                     </div>
@@ -428,6 +459,7 @@
             const nodesHost = document.getElementById('knowledgeNodes');
             const searchInput = document.getElementById('repoSearch');
             const suggestions = document.getElementById('repoSuggestions');
+            const searchHistory = document.getElementById('repoSearchHistory');
             const status = document.getElementById('graphStatus');
             const filterChips = document.getElementById('knowledgeFilterChips');
             const tagSearch = document.getElementById('knowledgeTagSearch');
@@ -438,6 +470,15 @@
             const zoomIn = document.getElementById('graphZoomIn');
             const resetView = document.getElementById('graphReset');
             const searchCore = document.querySelector('.search-core');
+            const exploreDock = document.getElementById('exploreDock');
+            const exploreCards = document.getElementById('exploreCards');
+            const exploreNow = document.getElementById('exploreNow');
+            const exploreRandom = document.getElementById('exploreRandom');
+            const exploreBookmarks = document.getElementById('exploreBookmarks');
+            const exploreBookmarksList = document.getElementById('exploreBookmarksList');
+            const explorePaths = document.getElementById('explorePaths');
+            const exploreCollections = document.getElementById('exploreCollections');
+            const exploreChangelogList = document.getElementById('exploreChangelogList');
             if (!stage || !pan || !svg || !clustersHost || !nodesHost || !searchInput || !suggestions || !status || !filterChips || !tagSearch || !filterReset) return;
             const t = (key, fallback, replacements) => window.DatenflixI18n?.translate(key, replacements) || fallback;
 
@@ -457,8 +498,50 @@
             const activeFilters = new Set();
             const nodeMap = new Map();
             const contentCache = new Map();
+            const BOOKMARK_KEY = 'datenflix:bookmarks';
+            const SEARCH_HISTORY_KEY = 'datenflix:search-history';
+            const PATH_PROGRESS_KEY = 'datenflix:path-progress';
 
             const normalize = (value) => String(value || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+            const readLocalList = (key) => {
+                try {
+                    const value = JSON.parse(localStorage.getItem(key) || '[]');
+                    return Array.isArray(value) ? value : [];
+                } catch { return []; }
+            };
+            const writeLocalList = (key, value) => {
+                try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* Storage can be unavailable. */ }
+            };
+            const bookmarkedIds = () => new Set(readLocalList(BOOKMARK_KEY));
+
+            function toggleBookmark(id) {
+                const ids = bookmarkedIds();
+                if (ids.has(id)) ids.delete(id);
+                else ids.add(id);
+                writeLocalList(BOOKMARK_KEY, [...ids]);
+                renderExplore();
+                renderGraph(searchInput.value);
+            }
+
+            function recordSearch(value) {
+                const query = String(value || '').trim();
+                if (!query) return;
+                const history = readLocalList(SEARCH_HISTORY_KEY).filter((item) => item !== query);
+                writeLocalList(SEARCH_HISTORY_KEY, [query, ...history].slice(0, 6));
+                renderSearchHistory();
+            }
+
+            function renderSearchHistory() {
+                if (!searchHistory) return;
+                const history = readLocalList(SEARCH_HISTORY_KEY);
+                searchHistory.innerHTML = history.map((item) => `<button type="button" data-query="${escapeHtml(item)}">${escapeHtml(item)}</button>`).join('');
+                searchHistory.querySelectorAll('button[data-query]').forEach((button) => button.addEventListener('click', () => {
+                    searchInput.value = button.dataset.query;
+                    renderGraph(searchInput.value);
+                    searchInput.focus();
+                }));
+            }
 
             function createNode(path, title, kind, summary = '') {
                 const id = path.replace(/[^a-z0-9]+/gi, '-').replace(/(^-|-$)/g, '').toLowerCase() || 'node';
@@ -850,7 +933,105 @@
                 const node = nodes.find((entry) => entry.id === id);
                 const url = nodeUrl(node);
                 if (!url) return;
+                recordSearch(searchInput.value);
+                try { localStorage.setItem('datenflix:last-category', nodeCategory(node)); } catch { /* Storage can be unavailable. */ }
                 window.location.href = url;
+            }
+
+            function renderExplore() {
+                if (!exploreDock || !exploreCards || !exploreNow || !nodes.length) return;
+                let preferredCategory = '';
+                try { preferredCategory = localStorage.getItem('datenflix:last-category') || ''; } catch { /* Storage can be unavailable. */ }
+                const available = nodes.filter((node) => nodeCategory(node) !== 'pages' && nodeUrl(node));
+                const preferred = available.filter((node) => nodeCategory(node) === preferredCategory);
+                const picks = (preferred.length >= 3 ? preferred : available)
+                    .slice()
+                    .sort((left, right) => `${left.title}:${left.path}`.localeCompare(`${right.title}:${right.path}`))
+                    .slice(0, 3);
+                const bookmarks = bookmarkedIds();
+                exploreCards.innerHTML = picks.map((node) => `<article class="explore-card-wrap"><button class="explore-card" type="button" data-id="${escapeHtml(node.id)}"><span>${escapeHtml(categoryLabel(nodeCategory(node)))}</span><strong>${escapeHtml(node.title)}</strong><small>${escapeHtml(node.summary || node.path)}</small></button><button class="explore-save${bookmarks.has(node.id) ? ' is-saved' : ''}" type="button" data-bookmark-id="${escapeHtml(node.id)}" aria-pressed="${bookmarks.has(node.id)}" title="Merken">★</button></article>`).join('');
+                exploreCards.querySelectorAll('button[data-id]').forEach((button) => button.addEventListener('click', () => navigateToNode(button.dataset.id)));
+                exploreCards.querySelectorAll('button[data-bookmark-id]').forEach((button) => button.addEventListener('click', () => toggleBookmark(button.dataset.bookmarkId)));
+                const newest = available.at(-1);
+                exploreNow.textContent = newest ? t('pages.home.explore.now', `Jetzt neu im Wissensraum: ${newest.title}`, { title: newest.title }) : '';
+                const saved = available.filter((node) => bookmarks.has(node.id));
+                if (exploreBookmarks && exploreBookmarksList) {
+                    exploreBookmarks.hidden = !saved.length;
+                    exploreBookmarksList.innerHTML = saved.map((node) => `<button type="button" data-id="${escapeHtml(node.id)}">★ ${escapeHtml(node.title)}</button>`).join('');
+                    exploreBookmarksList.querySelectorAll('button[data-id]').forEach((button) => button.addEventListener('click', () => {
+                        const node = nodes.find((entry) => entry.id === button.dataset.id);
+                        if (node) focusGraphNode(node);
+                    }));
+                }
+                renderLearningPaths();
+                renderCollections();
+                exploreDock.hidden = !picks.length;
+            }
+
+            function readPathProgress() {
+                try {
+                    const stored = JSON.parse(localStorage.getItem(PATH_PROGRESS_KEY) || '{}');
+                    return stored && typeof stored === 'object' && !Array.isArray(stored) ? stored : {};
+                } catch { return {}; }
+            }
+
+            function renderLearningPaths() {
+                if (!explorePaths) return;
+                const definitions = [
+                    { key: 'automata', label: 'pages.home.explore.pathAutomata', fallback: 'Automatentheorie kompakt', terms: ['automata', 'chomsky', 'dfa', 'nfa', 'turing'] },
+                    { key: 'algorithms', label: 'pages.home.explore.pathAlgorithms', fallback: 'Algorithmen entdecken', terms: ['algodat', 'algorithm', 'datenstruktur', 'sort'] },
+                    { key: 'history', label: 'pages.home.explore.pathHistory', fallback: 'Informatikgeschichte erleben', terms: ['informatikgeschichte', 'z3', 'lambda', 'eniac', 'babbage'] }
+                ];
+                const progress = readPathProgress();
+                const paths = definitions.map((definition) => {
+                    const steps = nodes.filter((node) => definition.terms.some((term) => normalize(`${node.title} ${node.path} ${node.summary}`).includes(term))).slice(0, 4);
+                    return { ...definition, steps };
+                }).filter((path) => path.steps.length > 1);
+                explorePaths.innerHTML = paths.map((path) => {
+                    const current = Math.min(Number(progress[path.key]) || 0, path.steps.length - 1);
+                    return `<article class="explore-path"><header><strong>${escapeHtml(t(path.label, path.fallback))}</strong><span>${current + 1}/${path.steps.length}</span></header><div class="explore-path__steps">${path.steps.map((node, index) => `<button type="button" class="${index <= current ? 'is-reached' : ''}" data-path-key="${path.key}" data-path-step="${index}" data-id="${escapeHtml(node.id)}"><i>${index + 1}</i>${escapeHtml(node.title)}</button>`).join('')}</div></article>`;
+                }).join('');
+                explorePaths.querySelectorAll('button[data-path-key]').forEach((button) => button.addEventListener('click', () => {
+                    const state = readPathProgress();
+                    state[button.dataset.pathKey] = Math.max(Number(state[button.dataset.pathKey]) || 0, Number(button.dataset.pathStep) || 0);
+                    try { localStorage.setItem(PATH_PROGRESS_KEY, JSON.stringify(state)); } catch { /* Storage can be unavailable. */ }
+                    const node = nodes.find((entry) => entry.id === button.dataset.id);
+                    if (node) focusGraphNode(node);
+                    renderLearningPaths();
+                }));
+            }
+
+            function renderCollections() {
+                if (!exploreCollections) return;
+                const definitions = [
+                    { filter: 'studium', label: 'pages.home.explore.collectionStudy', fallback: 'Lehramt & Studium' },
+                    { filter: 'informatikgeschichte', label: 'pages.home.explore.collectionHistory', fallback: 'Digital Humanities & Geschichte' },
+                    { filter: 'tool', label: 'pages.home.explore.collectionPractice', fallback: 'Lernen durch Ausprobieren' }
+                ];
+                exploreCollections.innerHTML = definitions.map((collection) => {
+                    const count = nodes.filter((node) => nodeTags(node).some((tag) => normalize(tag).includes(collection.filter))).length;
+                    return `<button type="button" data-collection="${collection.filter}"><strong>${escapeHtml(t(collection.label, collection.fallback))}</strong><span>${count}</span></button>`;
+                }).join('');
+                exploreCollections.querySelectorAll('button[data-collection]').forEach((button) => button.addEventListener('click', () => {
+                    activeFilters.clear();
+                    activeFilters.add(button.dataset.collection);
+                    searchInput.value = '';
+                    renderGraph();
+                    stage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }));
+            }
+
+            async function loadChangelog() {
+                if (!exploreChangelogList) return;
+                try {
+                    const response = await fetch(`https://api.github.com/repos/${repo.owner}/${repo.repo}/commits?per_page=3`, { headers: { Accept: 'application/vnd.github+json' } });
+                    if (!response.ok) throw new Error(`GitHub returned ${response.status}`);
+                    const commits = await response.json();
+                    if (!Array.isArray(commits) || !commits.length) throw new Error('No commits returned');
+                    exploreChangelogList.innerHTML = commits.map((commit) => `<li><a href="${escapeHtml(commit.html_url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(commit.commit?.message?.split('\n')[0] || commit.sha.slice(0, 7))}</a><time datetime="${escapeHtml(commit.commit?.author?.date || '')}">${escapeHtml(new Date(commit.commit?.author?.date || Date.now()).toLocaleDateString())}</time></li>`).join('');
+                } catch {
+                    exploreChangelogList.closest('.explore-changelog')?.setAttribute('hidden', '');
+                }
             }
 
             function filteredNodes(query = '') {
@@ -983,19 +1164,27 @@
                     const position = positions.get(node.id) || graphPosition(node, index, index, list.length);
                     const btn = document.createElement('button');
                     btn.type = 'button';
-                    btn.className = `graph-node ${node.kind.toLowerCase()} ${nodeCategory(node)}${selectedId === node.id ? ' active' : ''}`;
+                    const bookmarked = bookmarkedIds().has(node.id);
+                    btn.className = `graph-node ${node.kind.toLowerCase()} ${nodeCategory(node)}${selectedId === node.id ? ' active' : ''}${bookmarked ? ' is-bookmarked' : ''}`;
                     btn.style.left = `${position.x}px`;
                     btn.style.top = `${position.y}px`;
                     btn.textContent = node.title;
                     btn.title = nodeUrl(node) || node.title;
                     btn.dataset.id = node.id;
                     btn.dataset.category = nodeCategory(node);
+                    btn.dataset.summary = node.summary || node.path;
                     btn.addEventListener('click', () => navigateToNode(node.id));
+                    btn.addEventListener('contextmenu', (event) => {
+                        event.preventDefault();
+                        toggleBookmark(node.id);
+                    });
                     nodesHost.appendChild(btn);
                 });
 
                 renderSuggestions(query);
                 syncFilterButtons();
+                renderSearchHistory();
+                renderExplore();
             }
 
             function selectNode(id) {
@@ -1007,14 +1196,35 @@
                 renderGraph(searchInput.value);
             }
 
+            function focusGraphNode(node) {
+                if (!node) return;
+                const group = nodes.filter((entry) => nodeCategory(entry) === nodeCategory(node));
+                const position = graphPosition(node, nodes.indexOf(node), Math.max(0, group.indexOf(node)), group.length);
+                const scale = Math.max(view.scale, .68);
+                selectedId = node.id;
+                searchInput.value = '';
+                setView({
+                    scale,
+                    x: (graphSize.width / 2 - position.x) * scale,
+                    y: (graphSize.height / 2 - position.y) * scale
+                });
+                renderGraph();
+                stage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+
             searchInput.addEventListener('input', () => {
                 renderGraph(searchInput.value);
             });
 
+            searchInput.addEventListener('change', () => recordSearch(searchInput.value));
+
             searchInput.addEventListener('keydown', (event) => {
                 if (event.key !== 'Enter') return;
                 const first = filteredNodes(searchInput.value)[0];
-                if (first) navigateToNode(first.id);
+                if (first) {
+                    recordSearch(searchInput.value);
+                    navigateToNode(first.id);
+                }
             });
 
             filterChips.addEventListener('click', (event) => {
@@ -1042,12 +1252,19 @@
                 renderGraph(searchInput.value);
             });
 
+            exploreRandom?.addEventListener('click', () => {
+                const available = nodes.filter((node) => nodeCategory(node) !== 'pages' && nodeUrl(node));
+                const node = available[Math.floor(Math.random() * available.length)];
+                if (node) focusGraphNode(node);
+            });
+
             stage.addEventListener('wheel', (event) => {
                 event.preventDefault();
                 zoomGraph(event.deltaY < 0 ? 1.12 : 0.88, event.clientX - stage.getBoundingClientRect().left, event.clientY - stage.getBoundingClientRect().top);
             }, { passive: false });
 
             stage.addEventListener('pointerdown', (event) => {
+                stage.focus({ preventScroll: true });
                 if (event.button !== 0 || event.target.closest('.graph-node, .search-core, .knowledge-zoom-tools, .knowledge-filter-panel, a, input, button')) return;
                 const pendingTouch = event.pointerType === 'touch' || window.matchMedia('(hover: none) and (pointer: coarse)').matches;
                 drag = { id: event.pointerId, x: event.clientX, y: event.clientY, baseX: view.x, baseY: view.y, pendingTouch };

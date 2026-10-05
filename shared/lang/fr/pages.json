@@ -8,6 +8,23 @@
       "source": "Reformulation moderne d'après :",
       "translation": "Traduction française : « Nous n'apprenons pas pour l'école, mais pour la vie. »"
     },
+    "explore": {
+      "label": "Continuer à explorer",
+      "title": "Une sélection dans l'espace des savoirs",
+      "random": "Découvrir au hasard",
+      "now": "Nouveau dans l'espace des savoirs : {title}",
+      "bookmarks": "Favoris",
+      "paths": "Parcours d'apprentissage",
+      "collections": "Collections",
+      "changelog": "Mis à jour récemment",
+      "searchHistory": "Recherches récentes",
+      "pathAutomata": "Théorie des automates, en bref",
+      "pathAlgorithms": "Découvrir les algorithmes",
+      "pathHistory": "Découvrir l'histoire de l'informatique",
+      "collectionStudy": "Formation des enseignants & études",
+      "collectionHistory": "Humanités numériques & histoire",
+      "collectionPractice": "Apprendre en expérimentant"
+    },
     "categories": {
       "label": "Thématiques",
       "study": "Études",

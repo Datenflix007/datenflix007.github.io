@@ -995,6 +995,89 @@ footer {
     background: linear-gradient(180deg, rgba(11, 13, 16, 0.97) 0%, rgba(8, 10, 14, 0.98) 100%);
 }
 
+.explore-dock {
+    margin: 0 0 28px;
+    padding: 20px;
+    border: 1px solid rgba(125,211,252,.15);
+    border-radius: 20px;
+    background: linear-gradient(135deg, rgba(14, 27, 46, .74), rgba(13, 20, 32, .86));
+    box-shadow: 0 18px 48px rgba(0,0,0,.16);
+}
+
+.explore-dock__head {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.explore-dock h2 {
+    margin: 4px 0 0;
+    font-size: clamp(1.3rem, 2.5vw, 1.8rem);
+}
+
+.explore-random {
+    flex: 0 0 auto;
+    min-height: 38px;
+    border: 1px solid rgba(125,211,252,.3);
+    border-radius: 999px;
+    background: rgba(125,211,252,.08);
+    color: var(--accent);
+    padding: 0 14px;
+    font: 800 .8rem/1 Inter, system-ui, sans-serif;
+    cursor: pointer;
+}
+
+.explore-random:hover,
+.explore-random:focus-visible {
+    border-color: var(--accent);
+    background: rgba(125,211,252,.16);
+}
+
+.explore-now {
+    margin: 12px 0 0;
+    color: var(--muted);
+    font-size: .9rem;
+}
+
+.explore-dock__cards {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.explore-card {
+    display: grid;
+    min-width: 0;
+    gap: 7px;
+    border: 1px solid rgba(125,211,252,.16);
+    border-radius: 14px;
+    background: rgba(255,255,255,.025);
+    color: var(--text);
+    padding: 14px;
+    text-align: left;
+    cursor: pointer;
+}
+
+.explore-card:hover,
+.explore-card:focus-visible {
+    border-color: rgba(125,211,252,.48);
+    background: rgba(125,211,252,.08);
+    outline: none;
+}
+
+.explore-card > span {
+    color: var(--accent);
+    font-size: .68rem;
+    font-weight: 900;
+    letter-spacing: .11em;
+    text-transform: uppercase;
+}
+
+.explore-card > strong { font-size: 1rem; }
+.explore-card > small { color: var(--muted); line-height: 1.45; }
+
 .knowledge-stage-shell {
     width: 100%;
     margin: 0;
@@ -1173,6 +1256,39 @@ footer {
     overflow-wrap: normal;
     word-break: normal;
     hyphens: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .graph-node::after {
+        content: attr(data-summary);
+        position: absolute;
+        z-index: 12;
+        left: 50%;
+        bottom: calc(100% + 12px);
+        width: 230px;
+        border: 1px solid rgba(125,211,252,.24);
+        border-radius: 10px;
+        background: rgba(6,10,16,.97);
+        color: var(--text);
+        padding: 9px 10px;
+        box-shadow: 0 14px 32px rgba(0,0,0,.36);
+        font-size: .68rem;
+        font-weight: 500;
+        line-height: 1.4;
+        overflow-wrap: anywhere;
+        opacity: 0;
+        pointer-events: none;
+        transform: translate(-50%, 5px);
+        transition: opacity 150ms ease, transform 150ms ease;
+        visibility: hidden;
+    }
+
+    .graph-node:hover::after,
+    .graph-node:focus-visible::after {
+        opacity: 1;
+        transform: translate(-50%, 0);
+        visibility: visible;
+    }
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -1481,6 +1597,10 @@ footer {
 }
 
 @media (max-width: 680px) {
+    .explore-dock { padding: 16px; }
+    .explore-dock__head { align-items: start; flex-direction: column; }
+    .explore-random { width: 100%; }
+    .explore-dock__cards { grid-template-columns: 1fr; }
     .knowledge-graph-header {
         flex-direction: column;
         align-items: start;

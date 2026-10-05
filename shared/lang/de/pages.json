@@ -8,6 +8,23 @@
       "source": "Moderne Umkehrung nach:",
       "translation": "z.dt.: „Nicht für die Schule, sondern für das Leben lernen wir“"
     },
+    "explore": {
+      "label": "Weiter entdecken",
+      "title": "Für dich im Wissensraum",
+      "random": "Zufällig entdecken",
+      "now": "Jetzt neu im Wissensraum: {title}",
+      "bookmarks": "Merkliste",
+      "paths": "Lernpfade",
+      "collections": "Sammlungen",
+      "changelog": "Zuletzt aktualisiert",
+      "searchHistory": "Letzte Suchen",
+      "pathAutomata": "Automatentheorie kompakt",
+      "pathAlgorithms": "Algorithmen entdecken",
+      "pathHistory": "Informatikgeschichte erleben",
+      "collectionStudy": "Lehramt & Studium",
+      "collectionHistory": "Digital Humanities & Geschichte",
+      "collectionPractice": "Lernen durch Ausprobieren"
+    },
     "categories": {
       "label": "Themenbereiche",
       "study": "Studium",
