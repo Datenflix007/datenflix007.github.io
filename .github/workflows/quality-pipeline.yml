@@ -10,6 +10,7 @@ on:
   workflow_dispatch:
 
 permissions:
+  actions: read
   contents: read
 
 jobs:
@@ -81,6 +82,18 @@ jobs:
           echo "| Dead Code | ${{ needs.dead-code.result }} |" >> "$GITHUB_STEP_SUMMARY"
           echo "| Accessibility | ${{ needs.accessibility.result }} |" >> "$GITHUB_STEP_SUMMARY"
           echo "| Links | ${{ needs.links.result }} |" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Checkout error summary helper
+        uses: actions/checkout@v4
+
+      - name: List all reported errors
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          QUALITY_NEEDS_JSON: '${{ toJSON(needs) }}'
+        run: |
+          python3 .github/scripts/collect-quality-errors.py \
+            --summary "$GITHUB_STEP_SUMMARY" \
+            --needs-json "$QUALITY_NEEDS_JSON"
 
 
   pipeline-result:
