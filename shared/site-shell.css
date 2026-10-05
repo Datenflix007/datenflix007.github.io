@@ -1,0 +1,166 @@
+:root {
+  --df-bg: #0b0d10;
+  --df-surface: #111418;
+  --df-text: #e6e9ef;
+  --df-muted: #8892a6;
+  --df-accent: #7dd3fc;
+  --df-accent-2: #a78bfa;
+  --df-ring: #334155;
+  --df-header-border: #263858;
+  --df-radius: 16px;
+  --df-shadow: 0 10px 30px rgba(2, 6, 23, .4);
+  --df-max-width: 1100px;
+  --df-header-height: 66px;
+}
+
+.site-header,
+.site-header * { box-sizing: border-box; }
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 10000;
+  min-height: var(--df-header-height);
+  color: var(--df-text);
+  background: rgba(11, 13, 16, .86);
+  border-bottom: 1px solid var(--df-header-border);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+}
+
+.site-header__inner {
+  width: min(var(--df-max-width), calc(100% - 40px));
+  min-height: var(--df-header-height);
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.site-brand {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  gap: 10px;
+  color: var(--df-text);
+  text-decoration: none;
+  font-size: 1rem;
+  font-weight: 750;
+  letter-spacing: .02em;
+}
+
+.site-brand__mark {
+  width: 12px;
+  height: 12px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: #62e0c0;
+  box-shadow: 0 0 10px #62e0c0, 0 0 24px rgba(98, 224, 192, .55);
+}
+
+.site-nav {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 7px;
+  margin-left: auto;
+}
+
+.site-nav__link,
+.site-language__button,
+.site-mobile-toggle {
+  min-height: 36px;
+  border: 1px solid var(--df-ring);
+  border-radius: 999px;
+  color: var(--df-text);
+  background: rgba(15, 23, 42, .25);
+  font: 700 .9rem/1 Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+}
+
+.site-nav__link {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 12px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.site-nav__link:hover,
+.site-nav__link:focus-visible,
+.site-nav__link[aria-current="page"],
+.site-language__button:hover,
+.site-language__button:focus-visible,
+.site-language__button[aria-pressed="true"],
+.site-mobile-toggle:hover,
+.site-mobile-toggle:focus-visible {
+  outline: none;
+  border-color: #3b557d;
+  background: #16233a;
+}
+
+.site-nav__link[aria-current="page"] { color: var(--df-accent); }
+
+.site-language {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  flex: 0 0 auto;
+  padding: 3px;
+  border: 1px solid var(--df-ring);
+  border-radius: 999px;
+  background: rgba(15, 23, 42, .35);
+}
+
+.site-language__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-width: 36px;
+  min-height: 28px;
+  padding: 0 7px;
+  border: 0;
+  color: var(--df-muted);
+  font-size: .72rem;
+  cursor: pointer;
+}
+
+.site-language__button[aria-pressed="true"] { color: var(--df-text); }
+.site-language__flag { width: 16px; height: 12px; display: block; border-radius: 2px; box-shadow: 0 0 0 1px rgba(226,232,240,.2); }
+
+.site-mobile-toggle { display: none; margin-left: auto; padding: 0 12px; cursor: pointer; }
+.site-mobile-toggle__bar { display: block; width: 17px; height: 2px; margin: 3px 0; border-radius: 2px; background: currentColor; }
+
+/* A pre-existing app bar keeps its own controls but starts below the site shell. */
+.site-header + header { top: var(--df-header-height) !important; }
+
+@media (max-width: 900px) {
+  .site-header__inner { width: min(var(--df-max-width), calc(100% - 28px)); min-height: 60px; }
+  .site-header { min-height: 60px; --df-header-height: 60px; }
+  .site-mobile-toggle { display: inline-flex; align-items: center; justify-content: center; }
+  .site-nav {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 14px;
+    left: 14px;
+    display: none;
+    align-items: stretch;
+    flex-direction: column;
+    gap: 5px;
+    margin: 0;
+    padding: 10px;
+    border: 1px solid var(--df-header-border);
+    border-radius: var(--df-radius);
+    background: rgba(11, 13, 16, .98);
+    box-shadow: var(--df-shadow);
+  }
+  .site-nav.is-open { display: flex; }
+  .site-nav__link { min-height: 42px; justify-content: flex-start; }
+  .site-language { align-self: flex-start; margin: 4px 2px 2px; }
+}
+
+@media (max-width: 420px) {
+  .site-header__inner { width: calc(100% - 24px); }
+  .site-brand { font-size: .94rem; }
+}
