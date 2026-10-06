@@ -62,8 +62,7 @@ body.has-datenflix-shell {
   animation: df-skeleton-shimmer 1.5s linear infinite;
 }
 
-.df-card-media,
-.df-card-visual {
+.df-card-media {
   display: block;
   width: 100%;
   aspect-ratio: 16 / 9;
@@ -74,27 +73,6 @@ body.has-datenflix-shell {
 }
 
 .df-card-media { object-fit: cover; }
-
-.df-card-visual {
-  position: relative;
-  overflow: hidden;
-  background:
-    linear-gradient(90deg, rgba(125,211,252,.12) 1px, transparent 1px) 0 0 / 24px 24px,
-    linear-gradient(rgba(167,139,250,.1) 1px, transparent 1px) 0 0 / 24px 24px,
-    linear-gradient(135deg, #101c2c, #172c43);
-}
-
-.df-card-visual :is(span, i, b) {
-  position: absolute;
-  display: block;
-  border-radius: 999px;
-  background: linear-gradient(135deg, var(--df-accent), var(--df-accent-2));
-  box-shadow: 0 0 24px rgba(125, 211, 252, .32);
-}
-
-.df-card-visual span { width: 24%; height: 24%; left: 18%; top: 36%; }
-.df-card-visual i { width: 38%; height: 5px; right: 16%; top: 44%; }
-.df-card-visual b { width: 9%; height: 9%; right: 18%; bottom: 22%; }
 
 @keyframes df-skeleton-shimmer { to { background-position: -180% 0; } }
 

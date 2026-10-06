@@ -38,19 +38,8 @@
 
   function normaliseCardVisuals(root = document) {
     root.querySelectorAll(".catalog-grid .project").forEach((card) => {
-      if (card.dataset.dfVisualReady === "true") return;
-      card.dataset.dfVisualReady = "true";
-      const image = card.querySelector("img");
-      if (image) {
-        image.classList.add("df-card-media");
-        return;
-      }
-      const visual = document.createElement("div");
-      visual.className = "df-card-visual";
-      visual.setAttribute("aria-hidden", "true");
-      visual.innerHTML = "<span></span><i></i><b></b>";
-      const heading = card.querySelector("h2, h3");
-      heading?.insertAdjacentElement("afterend", visual);
+      card.querySelectorAll(":scope > .df-card-visual").forEach((visual) => visual.remove());
+      card.querySelectorAll("img").forEach((image) => image.classList.add("df-card-media"));
     });
   }
 

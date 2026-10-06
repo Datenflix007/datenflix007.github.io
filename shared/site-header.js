@@ -120,6 +120,7 @@
 
   loadSharedStylesheet("responsive.css");
   loadSharedScript("site-polish.js");
+  loadSharedScript("catalog-i18n.js");
   loadI18n();
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", renderHeader, { once: true });
   else renderHeader();
