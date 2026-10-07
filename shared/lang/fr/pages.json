@@ -83,5 +83,13 @@
     "loading": "Chargement du graphe de connaissances depuis le dépôt …",
     "loaded": "{count} contenus chargés · mis à jour depuis l'état actuel du dépôt",
     "loadFallback": "Le graphe de connaissances n'a pas pu être chargé en direct. La page affiche la structure statique."
+  },
+  "contact": {
+    "eyebrow": "Restons en contact",
+    "title": "Contact",
+    "intro": "Vous avez une question, une idée ou souhaitez partager un projet ? N’hésitez pas à m’écrire par e-mail ou à consulter mon compte GitHub.",
+    "optionsLabel": "Options de contact",
+    "emailLabel": "Écrire un e-mail",
+    "githubLabel": "Profil GitHub"
   }
 }

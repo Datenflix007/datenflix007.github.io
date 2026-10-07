@@ -83,5 +83,13 @@
     "loading": "Loading knowledge graph from the repository …",
     "loaded": "{count} items loaded · updated from the current repository state",
     "loadFallback": "The knowledge graph could not be loaded live. The page shows the static structure instead."
+  },
+  "contact": {
+    "eyebrow": "Let's connect",
+    "title": "Contact",
+    "intro": "Do you have a question, an idea, or would you like to share a project? Feel free to send me an email or check out my GitHub account.",
+    "optionsLabel": "Contact options",
+    "emailLabel": "Send an email",
+    "githubLabel": "GitHub profile"
   }
 }

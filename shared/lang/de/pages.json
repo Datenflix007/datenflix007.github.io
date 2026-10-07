@@ -83,5 +83,13 @@
     "loading": "Lade Wissensgraph aus dem Repository …",
     "loaded": "{count} Inhalte geladen · aktualisiert aus dem aktuellen Repository-Stand",
     "loadFallback": "Der Wissensgraph konnte nicht live geladen werden. Die Seite zeigt die statische Struktur an."
+  },
+  "contact": {
+    "eyebrow": "Lassen Sie uns verbinden",
+    "title": "Kontakt",
+    "intro": "Haben Sie eine Frage, eine Idee oder möchten Sie ein Projekt teilen? Schreiben Sie mir gerne eine E-Mail oder schauen Sie auf meinem GitHub-Account vorbei.",
+    "optionsLabel": "Kontaktmöglichkeiten",
+    "emailLabel": "E-Mail schreiben",
+    "githubLabel": "GitHub-Profil"
   }
 }
