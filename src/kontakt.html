@@ -10,8 +10,125 @@
     <title>Felix Staacke</title>
   <link rel="stylesheet" href="../styles.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../shared/site-shell.css">
-    <script src="../shared/site-header.js" defer></script>
+  <link rel="stylesheet" href="../shared/site-shell.css">
+  <script src="../shared/site-header.js" defer></script>
+  <style>
+    .contact-page {
+      position: relative;
+      min-height: calc(100vh - var(--df-header-height));
+      padding-top: clamp(3rem, 8vw, 6.5rem);
+      padding-bottom: 5rem;
+      overflow: hidden;
+    }
+    .contact-page::before {
+      position: absolute;
+      z-index: -1;
+      width: 34rem;
+      height: 34rem;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(125, 211, 252, .15), transparent 68%);
+      content: "";
+      filter: blur(12px);
+      inset: -13rem auto auto -12rem;
+      pointer-events: none;
+    }
+    .contact-page__eyebrow {
+      margin: 0 0 .7rem;
+      color: var(--accent);
+      font-size: .78rem;
+      font-weight: 700;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+    .contact-page h1 {
+      margin: 0;
+      font-size: clamp(2.35rem, 6vw, 4.25rem);
+      letter-spacing: -.055em;
+      line-height: 1;
+    }
+    .contact-page__intro {
+      max-width: 34rem;
+      margin: 1.25rem 0 2.2rem;
+      color: var(--muted);
+      font-size: 1.08rem;
+      line-height: 1.65;
+    }
+    .contact-options {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+      max-width: 760px;
+    }
+    .contact-option {
+      position: relative;
+      display: flex;
+      min-height: 174px;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 1.5rem;
+      border: 1px solid rgba(125, 211, 252, .18);
+      border-radius: 20px;
+      background: linear-gradient(145deg, rgba(28, 42, 61, .94), rgba(17, 20, 24, .98));
+      box-shadow: 0 14px 34px rgba(2, 6, 23, .32);
+      color: var(--text);
+      isolation: isolate;
+      overflow: hidden;
+      text-decoration: none;
+      transition: border-color .24s ease, box-shadow .24s ease, transform .24s ease;
+    }
+    .contact-option::after {
+      position: absolute;
+      z-index: -1;
+      width: 12rem;
+      height: 12rem;
+      border-radius: 50%;
+      background: rgba(125, 211, 252, .14);
+      content: "";
+      filter: blur(6px);
+      inset: auto -5rem -7rem auto;
+      transition: transform .3s ease;
+    }
+    .contact-option--github::after { background: rgba(167, 139, 250, .16); }
+    .contact-option:hover,
+    .contact-option:focus-visible {
+      border-color: rgba(125, 211, 252, .75);
+      box-shadow: 0 19px 42px rgba(2, 6, 23, .52), 0 0 0 4px rgba(125, 211, 252, .08);
+      outline: none;
+      transform: translateY(-4px);
+    }
+    .contact-option:hover::after,
+    .contact-option:focus-visible::after { transform: scale(1.2); }
+    .contact-option__icon {
+      display: grid;
+      width: 44px;
+      height: 44px;
+      place-items: center;
+      border: 1px solid rgba(125, 211, 252, .3);
+      border-radius: 13px;
+      background: rgba(125, 211, 252, .11);
+      color: var(--accent);
+    }
+    .contact-option--github .contact-option__icon {
+      border-color: rgba(167, 139, 250, .3);
+      background: rgba(167, 139, 250, .12);
+      color: var(--accent-2);
+    }
+    .contact-option__icon svg { width: 22px; height: 22px; fill: currentColor; }
+    .contact-option__label { display: block; margin-bottom: .35rem; color: var(--muted); font-size: .82rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+    .contact-option__value { display: block; font-size: 1.08rem; font-weight: 700; overflow-wrap: anywhere; }
+    .contact-option__arrow { position: absolute; right: 1.45rem; bottom: 1.45rem; color: var(--accent); font-size: 1.3rem; transition: transform .24s ease; }
+    .contact-option--github .contact-option__arrow { color: var(--accent-2); }
+    .contact-option:hover .contact-option__arrow,
+    .contact-option:focus-visible .contact-option__arrow { transform: translate(3px, -3px); }
+    @media (max-width: 620px) {
+      .contact-page { padding-top: 3rem; }
+      .contact-options { grid-template-columns: 1fr; }
+      .contact-option { min-height: 150px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .contact-option, .contact-option::after, .contact-option__arrow { transition: none; }
+    }
+  </style>
 </head>
 <body>
   <header>
@@ -23,13 +140,23 @@
       </nav>
     </div>
   </header>
-  <main class="container">
+  <main class="container contact-page">
+    <p class="contact-page__eyebrow">Lass uns verbinden</p>
     <h1>Kontakt</h1>
-    <p>E-Mail: <a href="mailto:datenflix@mail.de">datenflix@mail.de</a></p>
-    <p>GitHub: <a href="https://github.com/datenflix007">datenflix007</a></p>
+    <p class="contact-page__intro">Du hast eine Frage, eine Idee oder möchtest ein Projekt teilen? Schreib einfach eine E-Mail oder schau auf GitHub vorbei.</p>
+    <section class="contact-options" aria-label="Kontaktmöglichkeiten">
+      <a class="contact-option" href="mailto:datenflix@mail.de">
+        <span class="contact-option__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M2.25 6.75A2.25 2.25 0 0 1 4.5 4.5h15a2.25 2.25 0 0 1 2.25 2.25v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75Zm2.04-.75L12 11.78 19.71 6H4.29Zm15.96 1.88-7.58 5.69a1.125 1.125 0 0 1-1.34 0L3.75 7.88v9.37c0 .41.34.75.75.75h15c.41 0 .75-.34.75-.75V7.88Z"/></svg></span>
+        <span><span class="contact-option__label">E-Mail schreiben</span><span class="contact-option__value">datenflix@mail.de</span></span>
+        <span class="contact-option__arrow" aria-hidden="true">↗</span>
+      </a>
+      <a class="contact-option contact-option--github" href="https://github.com/datenflix007" target="_blank" rel="noopener noreferrer">
+        <span class="contact-option__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 2.25a9.75 9.75 0 0 0-3.08 19c.49.09.67-.21.67-.47v-1.7c-2.73.59-3.3-1.16-3.3-1.16-.45-1.13-1.09-1.43-1.09-1.43-.89-.61.07-.6.07-.6 1 .07 1.52 1.01 1.52 1.01.87 1.5 2.3 1.07 2.86.82.09-.63.34-1.07.62-1.32-2.18-.25-4.47-1.09-4.47-4.87 0-1.08.39-1.96 1.02-2.65-.1-.25-.44-1.26.1-2.62 0 0 .84-.27 2.68 1.01A9.32 9.32 0 0 1 12 6.44c.83 0 1.66.11 2.44.33 1.85-1.28 2.68-1.01 2.68-1.01.54 1.36.2 2.37.1 2.62.64.69 1.02 1.57 1.02 2.65 0 3.79-2.3 4.61-4.48 4.86.35.3.66.88.66 1.78v2.65c0 .26.18.57.68.47A9.75 9.75 0 0 0 12 2.25Z"/></svg></span>
+        <span><span class="contact-option__label">GitHub-Profil</span><span class="contact-option__value">@datenflix007</span></span>
+        <span class="contact-option__arrow" aria-hidden="true">↗</span>
+      </a>
+    </section>
   </main>
-
-    <br /><br /><br />
   <footer><div class="container">© 2025 Felix Staacke</div></footer>
 </body>
 </html>
