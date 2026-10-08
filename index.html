@@ -700,40 +700,6 @@
                 node.source = 'curated';
             }
 
-            function addFallbackNodes() {
-                const fallbackNodes = [
-                    ['worksheet-jena-forest', 'Der Jenaer Wald und wir', 'Digitales Arbeitsblatt', 'Interaktives Arbeitsblatt zu historischen Waldberufen und eigener Recherche.', 'https://datenflix007.github.io/digital-worksheets/Jena_HistoricalJobs/'],
-                    ['project-alltagslabor', 'Alltagslabor', 'Projekt', 'Projekt aus Digitales Lehren und Lernen in der Werkstattschule Jena.', 'https://datenflix007.github.io/tools/AlltagsLabor/'],
-                    ['project-edsp', 'EDSp', 'Projekt', 'Einsatz-Leit-Software als Projektarbeit.', 'https://github.com/Datenflix007/EinsatzDisponierungSoftware'],
-                    ['project-lues', 'LÜS', 'Projekt', 'Lernstands-Überprüfungs-Software.', 'https://github.com/Datenflix007/L-S/tree/main'],
-                    ['tool-datastructurelab', 'DatastructureLab', 'Tool', 'Interaktives Labor für zentrale Datenstrukturen und ihre Operationen.', 'https://datenflix007.github.io/tools/AlgoDatCourse/DatastructureLab.html'],
-                    ['tool-algodat-kurs', 'AlgoDat-Kurs', 'Tool', 'Interaktiver Kurs zu Algorithmen, Datenstrukturen und Sortierverfahren.', 'https://datenflix007.github.io/tools/AlgoDatCourse/'],
-                    ['tool-ti-trainer', 'TI-Trainer', 'Tool', 'Interaktive Lernumgebung zu Automaten, Algorithmen und Datenstrukturen.', 'https://datenflix007.github.io/tools/titrainer/'],
-                    ['tool-algorithmplanner', 'AlgorithmPlanner', 'Tool', 'Visueller Baukasten für Programmabläufe, Struktogramme und UML.', 'https://datenflix007.github.io/tools/AlgorithmPlanner/'],
-                    ['tool-nara-trace', 'NARA-Trace', 'Tool', 'Lokales Forschungswerkzeug für quellennahe Personensuche.', 'https://github.com/Datenflix007/NARA-Trace'],
-                    ['tool-paper-maker', 'Paper-Maker', 'Tool', 'Browser-Editor für Hausarbeiten mit A4-Layout und PDF-Export.', 'https://datenflix007.github.io/tools/PaperMaker/'],
-                    ['tool-automatalab', 'AutomataLab', 'Tool', 'Werkzeug zum Konstruieren und Simulieren formaler Automaten.', 'https://datenflix007.github.io/tools/AutomataLab/'],
-                    ['guide-informatikgeschichte', 'Informatikgeschichte', 'Guide', 'Themenbereich mit Zeitstrahl zur Geschichte der Informatik.', 'https://datenflix007.github.io/guides/informatikgeschichte.html'],
-                    ['guide-programm-exe', 'Programm.exe erstellen', 'Guide', 'Guide zum Erzeugen startbarer Windows-EXE-Dateien.', 'https://datenflix007.github.io/guides/exe/programm-exe-erstellen.html'],
-                    ['guide-installer', 'Installer Guide', 'Guide', 'Guide zu Setup.exe, CLI-Installern und Packaging.', 'https://datenflix007.github.io/guides/installer/installer-guide.html'],
-                    ['automata-course', 'Automaten & Berechenbarkeit', 'Automatentheorie', 'Kursseite zu Automatenmodellen, Sprachklassen und Berechenbarkeit.', 'https://datenflix007.github.io/tools/titrainer/automaten.html'],
-                    ['automata-chomsky', 'Chomsky-Hierarchie', 'Automatentheorie', 'Sprachklassen von regulär bis rekursiv aufzählbar.', 'https://datenflix007.github.io/tools/titrainer/automaten.html#chomsky'],
-                    ['automata-dfa', 'DFA', 'Automatentheorie', 'Deterministische endliche Automaten und reguläre Sprachen.', 'https://datenflix007.github.io/tools/titrainer/automaten.html#dfa'],
-                    ['automata-nfa', 'NFA', 'Automatentheorie', 'Nichtdeterministische endliche Automaten und Potenzmengenkonstruktion.', 'https://datenflix007.github.io/tools/titrainer/automaten.html#nfa'],
-                    ['automata-tm', 'Turingmaschine', 'Automatentheorie', 'Turingmaschinen als Standardmodell der Berechenbarkeit.', 'https://datenflix007.github.io/tools/titrainer/automaten.html#tm'],
-                    ['reference-poster-wenn-zeit', 'Wenn Zeit Leben rettet', 'Publikation', 'Wissenschaftliches Poster zur Digitalisierung in der präklinischen Notfallmedizin.', 'https://datenflix007.github.io/guides/WennZeit%C3%9CberLebenEntscheidet/poster-viewer.html'],
-                    ['publication-jenacraft', 'JenaCraft', 'Publikation', 'Publikation eines Lehrkonzeptes: Die Stadt der Zukunft.', 'src/Referenzen.html#jenacraft'],
-                    ['publication-gothacraft', 'GothaCraft', 'Publikation', 'Publikation eines Lehrkonzeptes: Die Stadt der Zukunft.', 'src/Referenzen.html#gothacraft']
-                ];
-                fallbackNodes.forEach(([id, title, kind, summary, path]) => {
-                    if (nodes.some((node) => node.id === id)) return;
-                    const node = { id, path, title, kind, summary, source: 'fallback' };
-                    nodes.push(node);
-                    nodeMap.set(path, node);
-                });
-                addSustainableCityWorksheetNode();
-            }
-
             function layoutClusterBoxes() {
                 const categoryOrder = ['worksheets', 'algodat', 'automata', 'projects', 'references', 'tools', 'guides'];
                 const counts = new Map();
@@ -1515,9 +1481,13 @@
                     resetGraphView();
                     renderGraph(searchInput.value);
                 } catch (error) {
-                    status.textContent = t('pages.home.loadFallback', 'Der Live-Katalog ist gerade nicht erreichbar. Die Seite zeigt den integrierten Wissensgraphen.');
+                    status.textContent = t('pages.home.loadFallback', 'Der Wissensgraph konnte nicht live geladen werden. Die Seite zeigt die statische Struktur an.');
                     if (!nodes.length) {
-                        addFallbackNodes();
+                        createNode('index.html', 'Startseite', 'Seite', 'Die Startseite der GitHub-Page.');
+                        createNode('src/projekte.html', 'Projekte', 'Seite', 'Projektübersicht.');
+                        createNode('src/kontakt.html', 'Kontakt', 'Seite', 'Kontaktseite.');
+                        createNode('https://datenflix007.github.io/tools/AlgoDatCourse/', 'AlgoDat', 'Modul', 'Interaktiver Lernkurs.');
+                        nodes.push({ id: 'publication-jenacraft', path: 'src/Referenzen.html#jenacraft', title: 'JenaCraft', kind: 'Publikation', summary: 'Publikation eines Lehrkonzeptes: Die Stadt der Zukunft.', source: 'manual' });
                         layoutClusterBoxes();
                         selectedId = nodes[0]?.id || null;
                         resetGraphView();
