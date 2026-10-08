@@ -638,7 +638,6 @@
                     'titrainer': 'TI-Trainer',
                     'regie': 'Regie Wall',
                     'AlgorithmPlanner': 'AlgorithmPlanner',
-                    'NachhaltigeStadtentwicklung': 'Klima-Labor: Nachhaltige Stadtentwicklung',
                     'WennZeitÜberLebenEntscheidet': 'Wenn Zeit über Leben entscheidet'
                 };
                 if (aliases[value]) return aliases[value];
@@ -686,18 +685,6 @@
                         // Das Hauptportal bleibt benutzbar, wenn ein Schwester-Repository temporär nicht erreichbar ist.
                     }
                 }));
-            }
-
-            function addSustainableCityWorksheetNode() {
-                const path = 'https://datenflix007.github.io/digital-worksheets/NachhaltigeStadtentwicklung/';
-                if (nodeMap.has(path)) return;
-                const node = createNode(
-                    path,
-                    'Klima-Labor: Nachhaltige Stadtentwicklung',
-                    'Digitales Arbeitsblatt',
-                    'Interaktive Lernreise zu Klimaschutz, Klimaanpassung und nachhaltiger Stadtentwicklung.'
-                );
-                node.source = 'curated';
             }
 
             function layoutClusterBoxes() {
@@ -1474,7 +1461,6 @@
                     addEdge('publication-jenacraft', 'paper-urban-history-minecraft-chatgpt', 1.1);
 
                     await loadSiblingRepositoryNodes();
-                    addSustainableCityWorksheetNode();
                     layoutClusterBoxes();
                     status.textContent = t('pages.home.loaded', `${nodes.length} Inhalte geladen · aktualisiert aus dem aktuellen Repository-Stand`, { count: nodes.length });
                     selectedId = nodes[0]?.id || null;
