@@ -1,0 +1,1389 @@
+{
+  "schemaVersion": 1,
+  "sourceRevisions": {
+    "portal": "78fa36f00751acecb578060ea23519f7e598ee83",
+    "tools": "0e395f2e0de9b0573dd0756f57588ec9c2ca5ff5",
+    "guides": "4e16a13ce8c4410d19f1f6ca85c6b74e380a34a1",
+    "digital-worksheets": "1e0859f35be3da1b03aea2dba5c4ff4811b828f1"
+  },
+  "nodes": [
+    {
+      "id": "404-html",
+      "path": "404.html",
+      "title": "404",
+      "kind": "Inhalt",
+      "summary": "Die aufgerufene Seite wurde nicht gefunden.",
+      "source": "portal"
+    },
+    {
+      "id": "automata-berechenbarkeit",
+      "title": "2. Berechenbarkeit (REC/RE)",
+      "kind": "Automatentheorie",
+      "summary": "Unterscheidung zwischen entscheidbaren und semi-entscheidbaren Sprachen.",
+      "path": "https://datenflix007.github.io/tools/titrainer/automaten.html#berechenbarkeit",
+      "source": "curated"
+    },
+    {
+      "id": "automata-beweise",
+      "title": "Beweise",
+      "kind": "Automatentheorie",
+      "summary": "Beweisskizzen im Automatenkurs, unter anderem NFA zu DFA und Pumping Lemma.",
+      "path": "https://datenflix007.github.io/tools/titrainer/automaten.html#beweise",
+      "source": "curated"
+    },
+    {
+      "id": "automata-chomsky",
+      "title": "1. Chomsky-Hierarchie",
+      "kind": "Automatentheorie",
+      "summary": "Sprachklassen von regulär über kontextfrei und kontextsensitiv bis rekursiv aufzählbar.",
+      "path": "https://datenflix007.github.io/tools/titrainer/automaten.html#chomsky",
+      "source": "curated"
+    },
+    {
+      "id": "automata-course",
+      "title": "Automaten & Berechenbarkeit",
+      "kind": "Automatentheorie",
+      "summary": "Kursseite zu Automatenmodellen, Sprachklassen und Berechenbarkeit.",
+      "path": "https://datenflix007.github.io/tools/titrainer/automaten.html",
+      "source": "curated"
+    },
+    {
+      "id": "automata-dfa",
+      "title": "3. DFA",
+      "kind": "Automatentheorie",
+      "summary": "Deterministische endliche Automaten und reguläre Sprachen.",
+      "path": "https://datenflix007.github.io/tools/titrainer/automaten.html#dfa",
+      "source": "curated"
+    },
+    {
+      "id": "automata-nfa",
+      "title": "4. NFA",
+      "kind": "Automatentheorie",
+      "summary": "Nichtdeterministische endliche Automaten und Potenzmengenkonstruktion.",
+      "path": "https://datenflix007.github.io/tools/titrainer/automaten.html#nfa",
+      "source": "curated"
+    },
+    {
+      "id": "automata-pda",
+      "title": "5. PDA",
+      "kind": "Automatentheorie",
+      "summary": "Kellerautomaten als Automatenmodell mit Stack.",
+      "path": "https://datenflix007.github.io/tools/titrainer/automaten.html#pda",
+      "source": "curated"
+    },
+    {
+      "id": "automata-tm",
+      "title": "6. Turingmaschine",
+      "kind": "Automatentheorie",
+      "summary": "Turingmaschinen als Standardmodell der Berechenbarkeit.",
+      "path": "https://datenflix007.github.io/tools/titrainer/automaten.html#tm",
+      "source": "curated"
+    },
+    {
+      "id": "automata-vorwort",
+      "title": "Vorwort: Zwei Ordnungen",
+      "kind": "Automatentheorie",
+      "summary": "Einordnung von Chomsky-Hierarchie und Berechenbarkeit als zwei Perspektiven.",
+      "path": "https://datenflix007.github.io/tools/titrainer/automaten.html#vorwort",
+      "source": "curated"
+    },
+    {
+      "id": "automata-wortlaut",
+      "title": "Wortlaut-Sammlung",
+      "kind": "Automatentheorie",
+      "summary": "Sammlung der Definitionen, Beispiele, Lemmata und Sätze aus dem Automatenkurs.",
+      "path": "https://datenflix007.github.io/tools/titrainer/rote-boxen.html",
+      "source": "curated"
+    },
+    {
+      "id": "digital-worksheets-jena-historicaljobs-index-html",
+      "path": "https://datenflix007.github.io/digital-worksheets/Jena_HistoricalJobs/index.html",
+      "title": "Jena HistoricalJobs",
+      "kind": "Digitales Arbeitsblatt",
+      "summary": "Ein digitales Arbeitsblatt fuer einen Workshop zur Geschichte des Jenaer Waldes.",
+      "source": "digital-worksheets"
+    },
+    {
+      "id": "digital-worksheets-jena-historicalmap-index-html",
+      "path": "https://datenflix007.github.io/digital-worksheets/Jena_HistoricalMap/index.html",
+      "title": "Jena HistoricalMap",
+      "kind": "Digitales Arbeitsblatt",
+      "summary": "JenaChat – Interaktive Karte JenaChat Hilfe Karte von Jena Matthias Seutter, Augsburg nach 1732 Klicke auf einen Pin, um Infos zu öffnen",
+      "source": "digital-worksheets"
+    },
+    {
+      "id": "digital-worksheets-nachhaltigestadtentwicklung-index-html",
+      "path": "https://datenflix007.github.io/digital-worksheets/NachhaltigeStadtentwicklung/index.html",
+      "title": "NachhaltigeStadtentwicklung",
+      "kind": "Digitales Arbeitsblatt",
+      "summary": "Digitales Klima-Arbeitsblatt für den JenaCraft-Ferienworkshop: verstehen, forschen, Lösungen entwickeln und in Minecraft bauen.",
+      "source": "digital-worksheets"
+    },
+    {
+      "id": "guide-informatikgeschichte",
+      "title": "Informatikgeschichte",
+      "kind": "Guide",
+      "summary": "Themenbereich mit zweispurigem Zeitstrahl zu Erfolgen der theoretischen und praktischen Informatik.",
+      "path": "https://datenflix007.github.io/guides/informatikgeschichte.html",
+      "source": "curated"
+    },
+    {
+      "id": "guide-installer",
+      "title": "Installer Guide",
+      "kind": "Guide",
+      "summary": "Guide zu Setup.exe, CLI-Installern, Tkinter-Installer-UI, Startmen&uuml;, Desktop-Verkn&uuml;pfung, Icons sowie Java- und Python-Packaging.",
+      "path": "https://datenflix007.github.io/guides/installer/installer-guide.html",
+      "source": "curated"
+    },
+    {
+      "id": "guide-programm-exe",
+      "title": "Programm.exe erstellen",
+      "kind": "Guide",
+      "summary": "Guide zum Erzeugen startbarer Windows-EXE-Dateien aus Python-, Java-, C#-, Node.js-, Go- und Rust-Projekten.",
+      "path": "https://datenflix007.github.io/guides/exe/programm-exe-erstellen.html",
+      "source": "curated"
+    },
+    {
+      "id": "guides-dab-naturerlebniszentrum-index-html",
+      "path": "https://datenflix007.github.io/guides/DAB_naturerlebniszentrum/index.html",
+      "title": "Der Jenaer Wald und wir",
+      "kind": "Guide",
+      "summary": "Ein digitales Arbeitsblatt fuer einen Workshop zur Geschichte des Jenaer Waldes.",
+      "source": "guides"
+    },
+    {
+      "id": "guides-docker-docker-guide-html",
+      "path": "https://datenflix007.github.io/guides/docker/docker-guide.html",
+      "title": "Docker Guide",
+      "kind": "Guide",
+      "summary": "Docker auf Windows verständlich einrichten: Container, Images, Volumes, Compose und ein sicheres SecretsLab-Beispiel.",
+      "source": "guides"
+    },
+    {
+      "id": "guides-documentation-datenflix007-github-io-index-html",
+      "path": "https://datenflix007.github.io/guides/documentation.datenflix007.github.io/index.html",
+      "title": "Documentation.Datenflix007.Github.Io",
+      "kind": "Guide",
+      "summary": "Betriebsdokumentation für die Datenflix007-Web-Repositories.",
+      "source": "guides"
+    },
+    {
+      "id": "guides-erstehilfe-html",
+      "path": "https://datenflix007.github.io/guides/erstehilfe.html",
+      "title": "Erstehilfe",
+      "kind": "Guide",
+      "summary": "Erste Hilfe – Felix Staacke Felix Staacke Referenzen Projekte Kontakt Quick Help Erste Hilfe Schnelle Lösungen, Checklisten und Anleitungen für häufige Probleme – zum Nachschlagen ",
+      "source": "guides"
+    },
+    {
+      "id": "guides-geschichtsstudium-html",
+      "path": "https://datenflix007.github.io/guides/geschichtsstudium.html",
+      "title": "Geschichtsstudium",
+      "kind": "Guide",
+      "summary": "Aus dem Geschichtsstudium – Felix Staacke Felix Staacke Referenzen Projekte Kontakt Studium Aus dem Geschichtsstudium Theorie, Projekte und Erkenntnisse aus dem Geschichtsstudium a",
+      "source": "guides"
+    },
+    {
+      "id": "guides-githubcourse-github-kurs-html",
+      "path": "https://datenflix007.github.io/guides/GitHubCourse/github-kurs.html",
+      "title": "Github Kurs",
+      "kind": "Guide",
+      "summary": "Git & GitHub – Komplettkurs GH Git & GitHub Komplettkurs Einführung Vorwort Was ist Git",
+      "source": "guides"
+    },
+    {
+      "id": "guides-informatikgeschichte-a0-compiler-index-html",
+      "path": "https://datenflix007.github.io/guides/Informatikgeschichte/a0-compiler/index.html",
+      "title": "A0 Compiler",
+      "kind": "Guide",
+      "summary": "Didaktischer A-0 Compiler Emulator nach dem historischen Linker-Loader-Prinzip von Grace Hopper.",
+      "source": "guides"
+    },
+    {
+      "id": "guides-informatikgeschichte-analytical-engine-index-html",
+      "path": "https://datenflix007.github.io/guides/Informatikgeschichte/analytical-engine/index.html",
+      "title": "Analytical Engine",
+      "kind": "Guide",
+      "summary": "Didaktischer Emulator zu Babbages Analytical Engine mit Store, Mill, Lochkarten, Schleifen und Quellenarbeit.",
+      "source": "guides"
+    },
+    {
+      "id": "guides-informatikgeschichte-emulator-lab-index-html",
+      "path": "https://datenflix007.github.io/guides/Informatikgeschichte/emulator-lab/index.html",
+      "title": "Emulator Lab",
+      "kind": "Guide",
+      "summary": "Interaktive Emulator-Sammlung fuer weitere Meilensteine der Informatikgeschichte.",
+      "source": "guides"
+    },
+    {
+      "id": "guides-informatikgeschichte-eniac-emulator-index-html",
+      "path": "https://datenflix007.github.io/guides/Informatikgeschichte/eniac-emulator/index.html",
+      "title": "Eniac Emulator",
+      "kind": "Guide",
+      "summary": "Didaktischer ENIAC Emulator mit Akkumulatoren, Patch-Deck, Impulsleitungen und Quellenarbeit.",
+      "source": "guides"
+    },
+    {
+      "id": "guides-informatikgeschichte-lambda-calculus-index-html",
+      "path": "https://datenflix007.github.io/guides/Informatikgeschichte/lambda-calculus/index.html",
+      "title": "Lambda Calculus",
+      "kind": "Guide",
+      "summary": "Interaktive Unterseite zu Alonzo Church, Lambda-Kalkuel, Beta-Reduktion, Normalform und Quellenarbeit.",
+      "source": "guides"
+    },
+    {
+      "id": "guides-informatikgeschichte-z3-emulator-index-html",
+      "path": "https://datenflix007.github.io/guides/Informatikgeschichte/z3-emulator/index.html",
+      "title": "Z3 Emulator",
+      "kind": "Guide",
+      "summary": "Didaktischer Z3 Emulator zu Konrad Zuses Relaisrechner mit Programmstreifen, Speicher, Gleitkomma-Rechenwerk und Quellenarbeit.",
+      "source": "guides"
+    },
+    {
+      "id": "guides-informatikstudium-html",
+      "path": "https://datenflix007.github.io/guides/informatikstudium.html",
+      "title": "Informatikstudium",
+      "kind": "Guide",
+      "summary": "Aus dem Informatikstudium – Felix Staacke Felix Staacke Referenzen Projekte Kontakt Studium Aus dem Informatikstudium Theorie, Projekte und Erkenntnisse aus dem Informatikstudium (",
+      "source": "guides"
+    },
+    {
+      "id": "guides-just-just-html",
+      "path": "https://datenflix007.github.io/guides/just/just.html",
+      "title": "Just",
+      "kind": "Guide",
+      "summary": "just Guide – Felix Staacke Felix Staacke Referenzen Projekte Kontakt ← Zurück zu den Guides Command Runner Automatisierung just Guide Projektbefehle in einem justfile sammeln, doku",
+      "source": "guides"
+    },
+    {
+      "id": "guides-pake-pake-html",
+      "path": "https://datenflix007.github.io/guides/pake/pake.html",
+      "title": "Pake",
+      "kind": "Guide",
+      "summary": "Pake Guide Felix Staacke Felix Staacke Referenzen Projekte Kontakt Zur ck zu den Guides Desktop Apps Rust & Tauri Pake Guide Mit Pake fast jede Webseite in eine schlanke Desktop-An",
+      "source": "guides"
+    },
+    {
+      "id": "guides-prolog-prolog-dummies-html",
+      "path": "https://datenflix007.github.io/guides/prolog/prolog-dummies.html",
+      "title": "Prolog Dummies",
+      "kind": "Guide",
+      "summary": "Prolog Guide für Dummies - Felix Staacke Felix Staacke Referenzen Projekte Kontakt Zurück zum Informatikstudium Deklarative Programmierung Prolog Prolog Guide für Dummies Ein einst",
+      "source": "guides"
+    },
+    {
+      "id": "guides-redis-caching-redis-caching-html",
+      "path": "https://datenflix007.github.io/guides/redis-caching/redis-caching.html",
+      "title": "Redis Caching",
+      "kind": "Guide",
+      "summary": "Redis Caching Guide - Felix Staacke Felix Staacke Referenzen Projekte Kontakt Zurück zu den Guides Redis Caching Redis Caching Guide Warum Cache-Speicher Anwendungen schneller mach",
+      "source": "guides"
+    },
+    {
+      "id": "guides-scheme-scheme-guide-html",
+      "path": "https://datenflix007.github.io/guides/scheme/scheme-guide.html",
+      "title": "Scheme Guide",
+      "kind": "Guide",
+      "summary": "Scheme Guide - Felix Staacke Felix Staacke Referenzen Projekte Kontakt Zur ck zum Informatikstudium Funktionale Programmierung Scheme Scheme Guide f r Dummies Von den ersten Klamme",
+      "source": "guides"
+    },
+    {
+      "id": "guides-weitere-guides-html",
+      "path": "https://datenflix007.github.io/guides/weitere-guides.html",
+      "title": "Weitere Guides",
+      "kind": "Guide",
+      "summary": "Weitere Informatik-Guides – Felix Staacke Felix Staacke Referenzen Projekte Kontakt Tutorials Weitere Informatik-Guides Tools, Tipps und Schritt-für-Schritt-Anleitungen rund um die",
+      "source": "guides"
+    },
+    {
+      "id": "guides-wennzeit-berlebenentscheidet-index-html",
+      "path": "https://datenflix007.github.io/guides/WennZeit%C3%9CberLebenEntscheidet/index.html",
+      "title": "Wenn Zeit über Leben entscheidet",
+      "kind": "Guide",
+      "summary": "Begleitseite zum wissenschaftlichen Poster über digitale Vernetzung in der präklinischen Notfallmedizin.",
+      "source": "guides"
+    },
+    {
+      "id": "guides-winget-winget-html",
+      "path": "https://datenflix007.github.io/guides/winget/winget.html",
+      "title": "Winget",
+      "kind": "Guide",
+      "summary": "WinGet Guide – Felix Staacke Felix Staacke Referenzen Projekte Kontakt ← Zurück zu den Guides Windows PowerShell WinGet Guide Der Windows Package Manager – Software schnell über di",
+      "source": "guides"
+    },
+    {
+      "id": "infopedia-adt",
+      "path": "https://datenflix007.github.io/tools/AlgoDatCourse/infopedia.html#adt",
+      "title": "Abstrakter Datentyp (ADT)",
+      "kind": "Infopedia",
+      "summary": "Im Skript werden Datenstrukturen häufig über Operationen eingeführt: Was darf man fragen, einfügen, löschen oder verändern",
+      "source": "infopedia"
+    },
+    {
+      "id": "infopedia-array",
+      "path": "https://datenflix007.github.io/tools/AlgoDatCourse/infopedia.html#array",
+      "title": "Array und Index-Speicherbild",
+      "kind": "Infopedia",
+      "summary": "Im DatastructureLab zeigt der Array Memory Viewer, wie abstrakte Strukturen im Speicher liegen: Heap-Knoten in A[i], Hash-Slots in T[i], Graphkanten in E[i]",
+      "source": "infopedia"
+    },
+    {
+      "id": "infopedia-asymptotik",
+      "path": "https://datenflix007.github.io/tools/AlgoDatCourse/infopedia.html#asymptotik",
+      "title": "Asymptotische Laufzeit",
+      "kind": "Infopedia",
+      "summary": "O(g) ist eine obere Schranke, Ω(g) eine untere Schranke, Θ(g) eine beidseitig enge Schranke",
+      "source": "infopedia"
+    },
+    {
+      "id": "infopedia-bfs",
+      "path": "https://datenflix007.github.io/tools/AlgoDatCourse/infopedia.html#bfs",
+      "title": "Breitensuche (BFS)",
+      "kind": "Infopedia",
+      "summary": "In ungewichteten Graphen liefert BFS kürzeste Wege nach Anzahl der Kanten",
+      "source": "infopedia"
+    },
+    {
+      "id": "infopedia-binomialheap",
+      "path": "https://datenflix007.github.io/tools/AlgoDatCourse/infopedia.html#binomialheap",
+      "title": "Binomialheap",
+      "kind": "Infopedia",
+      "summary": "Ein Binomialbaum B_k entsteht aus zwei B_{k-1}-Bäumen; B_k hat genau 2^k Knoten",
+      "source": "infopedia"
+    },
+    {
+      "id": "infopedia-bst",
+      "path": "https://datenflix007.github.io/tools/AlgoDatCourse/infopedia.html#bst",
+      "title": "Binärer Suchbaum",
+      "kind": "Infopedia",
+      "summary": "Diese Ordnungsinvariante macht Search, Minimum, Maximum, Successor und Traversierungen direkt verständlich",
+      "source": "infopedia"
+    },
+    {
+      "id": "infopedia-chaining",
+      "path": "https://datenflix007.github.io/tools/AlgoDatCourse/infopedia.html#chaining",
+      "title": "Hashing mit Verkettung",
+      "kind": "Infopedia",
+      "summary": "Kollisionen sind erlaubt und werden lokal in der Bucket-Liste gespeichert",
+      "source": "infopedia"
+    },
+    {
+      "id": "infopedia-cluster",
+      "path": "https://datenflix007.github.io/tools/AlgoDatCourse/infopedia.html#cluster",
+      "title": "Cluster beim Hashing",
+      "kind": "Infopedia",
+      "summary": "Lineares Sondieren erzeugt primäre Cluster; quadratisches Sondieren reduziert das, kann aber sekundäre Cluster erzeugen",
+      "source": "infopedia"
+    },
+    {
+      "id": "infopedia-countingsort",
+      "path": "https://datenflix007.github.io/tools/AlgoDatCourse/infopedia.html#countingsort",
+      "title": "Counting Sort",
+      "kind": "Infopedia",
+      "summary": "Er ist nicht vergleichsbasiert; die Laufzeit hängt von n und der Bereichsgröße k ab",
+      "source": "infopedia"
+    },
+    {
+      "id": "infopedia-dag",
+      "path": "https://datenflix007.github.io/tools/AlgoDatCourse/infopedia.html#dag",
+      "title": "DAG",
+      "kind": "Infopedia",
+      "summary": "DAGs beschreiben Abhängigkeiten: Eine Kante u->v bedeutet, dass u vor v kommen muss",
+      "source": "infopedia"
+    },
+    {
+      "id": "infopedia-decreasekey",
+      "path": "https://datenflix007.github.io/tools/AlgoDatCourse/infopedia.html#decreasekey",
+      "title": "Decrease-Key",
+      "kind": "Infopedia",
+      "summary": "Wenn ein Knoten dadurch kleiner als sein Elternknoten wird, muss die Heap-Eigenschaft repariert werden",
+      "source": "infopedia"
+    },
+    {
+      "id": "infopedia-deleted",
+      "path": "https://datenflix007.github.io/tools/AlgoDatCourse/infopedia.html#deleted",
+      "title": "DELETED-Markierung",
+      "kind": "Infopedia",
+      "summary": "NIL bedeutet: Ab hier wurde in der Sondierungsfolge nie etwas eingefügt",
+      "source": "infopedia"
+    },
+    {
+      "id": "infopedia-dfs",
+      "path": "https://datenflix007.github.io/tools/AlgoDatCourse/infopedia.html#dfs",
+      "title": "Tiefensuche (DFS)",
+      "kind": "Infopedia",
+      "summary": "DFS strukturiert Graphen in Suchbäume und ist Grundlage für Zyklenanalyse und topologische Sortierung",
+      "source": "infopedia"
+    },
+    {
+      "id": "infopedia-dictionary",
+      "path": "https://datenflix007.github.io/tools/AlgoDatCourse/infopedia.html#dictionary",
+      "title": "Dictionary",
+      "kind": "Infopedia",
+      "summary": "Suchbäume und Hash-Tabellen sind zwei verschiedene Wege, ein Dictionary zu realisieren",
+      "source": "infopedia"
+    },
+    {
+      "id": "infopedia-dijkstra",
+      "path": "https://datenflix007.github.io/tools/AlgoDatCourse/infopedia.html#dijkstra",
+      "title": "Algorithmus von Dijkstra",
+      "kind": "Infopedia",
+      "summary": "In jedem Schritt wird der noch nicht fixierte Knoten mit kleinster Distanz gewählt",
+      "source": "infopedia"
+    },
+    {
+      "id": "infopedia-fibonacciheap",
+      "path": "https://datenflix007.github.io/tools/AlgoDatCourse/infopedia.html#fibonacciheap",
+      "title": "Fibonacci-Heap",
+      "kind": "Infopedia",
+      "summary": "Viele Bäume dürfen zunächst unaufgeräumt in der Wurzelliste liegen",
+      "source": "infopedia"
+    },
+    {
+      "id": "infopedia-graph",
+      "path": "https://datenflix007.github.io/tools/AlgoDatCourse/infopedia.html#graph",
+      "title": "Graph",
+      "kind": "Infopedia",
+      "summary": "Gerichtete Kanten modellieren Abhängigkeiten; ungerichtete Kanten modellieren symmetrische Verbindungen",
+      "source": "infopedia"
+    },
+    {
+      "id": "infopedia-hashfunction",
+      "path": "https://datenflix007.github.io/tools/AlgoDatCourse/infopedia.html#hashfunction",
+      "title": "Hashfunktion",
+      "kind": "Infopedia",
+      "summary": "Eine gute Hashfunktion verteilt typische Eingaben möglichst gleichmäßig und vermeidet systematische Muster",
+      "source": "infopedia"
+    },
+    {
+      "id": "infopedia-hashtable",
+      "path": "https://datenflix007.github.io/tools/AlgoDatCourse/infopedia.html#hashtable",
+      "title": "Hash-Tabelle",
+      "kind": "Infopedia",
+      "summary": "Die Idee ist direkter Zugriff: Statt den Schlüssel in einer Ordnung zu suchen, wird sein wahrscheinlicher Speicherort berechnet",
+      "source": "infopedia"
+    },
+    {
+      "id": "infopedia-heap",
+      "path": "https://datenflix007.github.io/tools/AlgoDatCourse/infopedia.html#heap",
+      "title": "Binärer Heap",
+      "kind": "Infopedia",
+      "summary": "Beim Max-Heap ist jeder Elternschlüssel >= seiner Kinder, beim Min-Heap <=",
+      "source": "infopedia"
+    },
+    {
+      "id": "infopedia-heapsort",
+      "path": "https://datenflix007.github.io/tools/AlgoDatCourse/infopedia.html#heapsort",
+      "title": "Heapsort",
+      "kind": "Infopedia",
+      "summary": "Bei einem Max-Heap wandert in jeder Runde das größte verbleibende Element nach rechts",
+      "source": "infopedia"
+    },
+    {
+      "id": "infopedia-invariant",
+      "path": "https://datenflix007.github.io/tools/AlgoDatCourse/infopedia.html#invariant",
+      "title": "Invariante",
+      "kind": "Infopedia",
+      "summary": "Viele Beweise zeigen Initialisierung, Erhaltung und Terminierung",
+      "source": "infopedia"
+    },
+    {
+      "id": "infopedia-kruskal",
+      "path": "https://datenflix007.github.io/tools/AlgoDatCourse/infopedia.html#kruskal",
+      "title": "Algorithmus von Kruskal",
+      "kind": "Infopedia",
+      "summary": "Union-Find prüft effizient, ob die Endpunkte schon in derselben Zusammenhangskomponente liegen",
+      "source": "infopedia"
+    },
+    {
+      "id": "infopedia-mastertheorem",
+      "path": "https://datenflix007.github.io/tools/AlgoDatCourse/infopedia.html#mastertheorem",
+      "title": "Mastertheorem",
+      "kind": "Infopedia",
+      "summary": "Es vergleicht die Arbeit auf den Rekursionsebenen mit der Arbeit außerhalb der rekursiven Aufrufe",
+      "source": "infopedia"
+    },
+    {
+      "id": "infopedia-mergesort",
+      "path": "https://datenflix007.github.io/tools/AlgoDatCourse/infopedia.html#mergesort",
+      "title": "Mergesort",
+      "kind": "Infopedia",
+      "summary": "Zwei bereits sortierte Listen können linear zusammengeführt werden",
+      "source": "infopedia"
+    },
+    {
+      "id": "infopedia-mst",
+      "path": "https://datenflix007.github.io/tools/AlgoDatCourse/infopedia.html#mst",
+      "title": "Minimaler Spannbaum",
+      "kind": "Infopedia",
+      "summary": "Ein Spannbaum hat genau |V|-1 Kanten",
+      "source": "infopedia"
+    },
+    {
+      "id": "infopedia-openaddressing",
+      "path": "https://datenflix007.github.io/tools/AlgoDatCourse/infopedia.html#openaddressing",
+      "title": "Offene Adressierung",
+      "kind": "Infopedia",
+      "summary": "Es gibt keine externen Listen",
+      "source": "infopedia"
+    },
+    {
+      "id": "infopedia-pathcompression",
+      "path": "https://datenflix007.github.io/tools/AlgoDatCourse/infopedia.html#pathcompression",
+      "title": "Pfadkompression",
+      "kind": "Infopedia",
+      "summary": "Die Menge ändert sich nicht; nur die interne Baumform wird flacher",
+      "source": "infopedia"
+    },
+    {
+      "id": "infopedia-prim",
+      "path": "https://datenflix007.github.io/tools/AlgoDatCourse/infopedia.html#prim",
+      "title": "Algorithmus von Prim",
+      "kind": "Infopedia",
+      "summary": "Der Algorithmus wächst knotenorientiert",
+      "source": "infopedia"
+    },
+    {
+      "id": "infopedia-priorityqueue",
+      "path": "https://datenflix007.github.io/tools/AlgoDatCourse/infopedia.html#priorityqueue",
+      "title": "Priority Queue",
+      "kind": "Infopedia",
+      "summary": "Heaps sind die klassische Implementierung",
+      "source": "infopedia"
+    },
+    {
+      "id": "infopedia-quicksort",
+      "path": "https://datenflix007.github.io/tools/AlgoDatCourse/infopedia.html#quicksort",
+      "title": "Quicksort",
+      "kind": "Infopedia",
+      "summary": "Die Effizienz hängt stark von der Pivotwahl ab",
+      "source": "infopedia"
+    },
+    {
+      "id": "infopedia-radixsort",
+      "path": "https://datenflix007.github.io/tools/AlgoDatCourse/infopedia.html#radixsort",
+      "title": "Radixsort",
+      "kind": "Infopedia",
+      "summary": "Nach jeder Stelle ist die Folge bezüglich der bereits betrachteten Endstellen korrekt sortiert",
+      "source": "infopedia"
+    },
+    {
+      "id": "infopedia-rank",
+      "path": "https://datenflix007.github.io/tools/AlgoDatCourse/infopedia.html#rank",
+      "title": "Union by Rank",
+      "kind": "Infopedia",
+      "summary": "Der Rang ist eine obere Schätzung der Höhe",
+      "source": "infopedia"
+    },
+    {
+      "id": "infopedia-rbtree",
+      "path": "https://datenflix007.github.io/tools/AlgoDatCourse/infopedia.html#rbtree",
+      "title": "Rot-Schwarz-Baum",
+      "kind": "Infopedia",
+      "summary": "Die Farbregeln garantieren, dass kein Pfad mehr als doppelt so lang wie ein anderer wird",
+      "source": "infopedia"
+    },
+    {
+      "id": "infopedia-relaxation",
+      "path": "https://datenflix007.github.io/tools/AlgoDatCourse/infopedia.html#relaxation",
+      "title": "Relaxation",
+      "kind": "Infopedia",
+      "summary": "Wenn die Bedingung gilt, werden d[v] und predecessor[v] aktualisiert",
+      "source": "infopedia"
+    },
+    {
+      "id": "infopedia-rotation",
+      "path": "https://datenflix007.github.io/tools/AlgoDatCourse/infopedia.html#rotation",
+      "title": "Rotation",
+      "kind": "Infopedia",
+      "summary": "Linksrotation hebt das rechte Kind nach oben; Rechtsrotation symmetrisch das linke Kind",
+      "source": "infopedia"
+    },
+    {
+      "id": "infopedia-selection",
+      "path": "https://datenflix007.github.io/tools/AlgoDatCourse/infopedia.html#selection",
+      "title": "Selection / k-tes Element",
+      "kind": "Infopedia",
+      "summary": "Im Lab ist Selection über Heaps anschaulich: Man extrahiert wiederholt das Minimum oder Maximum, bis der gewünschte Rang erreicht ist",
+      "source": "infopedia"
+    },
+    {
+      "id": "infopedia-shortestpath",
+      "path": "https://datenflix007.github.io/tools/AlgoDatCourse/infopedia.html#shortestpath",
+      "title": "Kürzeste Wege",
+      "kind": "Infopedia",
+      "summary": "Algorithmen speichern d[v] als aktuelle Distanzschätzung und predecessor[v] als Vorgänger im besten bekannten Pfad",
+      "source": "infopedia"
+    },
+    {
+      "id": "infopedia-sorting",
+      "path": "https://datenflix007.github.io/tools/AlgoDatCourse/infopedia.html#sorting",
+      "title": "Sortierverfahren",
+      "kind": "Infopedia",
+      "summary": "Vergleichsbasierte Verfahren nutzen Vergleiche; lineare Verfahren nutzen Annahmen über Schlüsselbereiche",
+      "source": "infopedia"
+    },
+    {
+      "id": "infopedia-topologicalsort",
+      "path": "https://datenflix007.github.io/tools/AlgoDatCourse/infopedia.html#topologicalsort",
+      "title": "Topological Sort",
+      "kind": "Infopedia",
+      "summary": "Sie ist nur möglich, wenn der gerichtete Graph azyklisch ist",
+      "source": "infopedia"
+    },
+    {
+      "id": "infopedia-treewalk",
+      "path": "https://datenflix007.github.io/tools/AlgoDatCourse/infopedia.html#treewalk",
+      "title": "Tree-Walk / Traversierung",
+      "kind": "Infopedia",
+      "summary": "Inorder, Preorder und Postorder unterscheiden sich darin, wann die Wurzel relativ zu den Teilbäumen besucht wird",
+      "source": "infopedia"
+    },
+    {
+      "id": "infopedia-unionfind",
+      "path": "https://datenflix007.github.io/tools/AlgoDatCourse/infopedia.html#unionfind",
+      "title": "Union-Find / Disjoint Set Union",
+      "kind": "Infopedia",
+      "summary": "Die Struktur beantwortet schnell, ob zwei Elemente in derselben Menge liegen, und kann zwei Mengen vereinigen",
+      "source": "infopedia"
+    },
+    {
+      "id": "paper-commitment-cultural-heritage",
+      "title": "Commitment to protecting cultural heritage and the environment with student-led Minecraft courses",
+      "kind": "Publikation",
+      "summary": "ADHO-Paper zu studentisch geleiteten Minecraft-Kursen für Kinder und Jugendliche.",
+      "path": "src/Referenzen.html#paper-commitment-cultural-heritage",
+      "source": "curated"
+    },
+    {
+      "id": "paper-lindenring",
+      "title": "Am Rand der heutigen Wahrnehmung, im Zentrum des spätmittelalterlichen Konflikts",
+      "kind": "Publikation",
+      "summary": "Paper/Artikel zum Naumburger Lindenring als Schauplatz spätmittelalterlicher innerstädtischer Teilung.",
+      "path": "src/Referenzen.html#paper-lindenring",
+      "source": "curated"
+    },
+    {
+      "id": "paper-urban-history-minecraft-chatgpt",
+      "title": "Urban history projects by university students for school pupils",
+      "kind": "Publikation",
+      "summary": "UHDL-Paper zur Nutzung von Minecraft und ChatGPT in einem humanities teaching and learning laboratory.",
+      "path": "src/Referenzen.html#paper-urban-history-minecraft-chatgpt",
+      "source": "curated"
+    },
+    {
+      "id": "project-alltagslabor",
+      "title": "Alltagslabor",
+      "kind": "Projekt",
+      "summary": "Projekt aus Digitales Lehren und Lernen in der Werkstattschule Jena.",
+      "path": "https://datenflix007.github.io/tools/AlltagsLabor/",
+      "source": "curated"
+    },
+    {
+      "id": "project-edsp",
+      "title": "EDSp",
+      "kind": "Projekt",
+      "summary": "Einsatz-Leit-Software als Projektarbeit.",
+      "path": "https://github.com/Datenflix007/EinsatzDisponierungSoftware",
+      "source": "curated"
+    },
+    {
+      "id": "project-lautstaerke-visualisierung",
+      "title": "Lautstärke-Visualisierung",
+      "kind": "Projekt",
+      "summary": "Unity-Projekt zur Visualisierung von Lautstärke.",
+      "path": "src/projekte.html",
+      "source": "curated"
+    },
+    {
+      "id": "project-lues",
+      "title": "LÜS",
+      "kind": "Projekt",
+      "summary": "Lernstands-Überprüfungs-Software.",
+      "path": "https://github.com/Datenflix007/L-S/tree/main",
+      "source": "curated"
+    },
+    {
+      "id": "publication-gothacraft",
+      "title": "GothaCraft",
+      "kind": "Publikation",
+      "summary": "Publikation eines Lehrkonzeptes: Die Stadt der Zukunft.",
+      "path": "src/Referenzen.html#gothacraft",
+      "source": "curated"
+    },
+    {
+      "id": "publication-jenacraft",
+      "title": "JenaCraft",
+      "kind": "Publikation",
+      "summary": "Publikation eines Lehrkonzeptes: Die Stadt der Zukunft.",
+      "path": "src/Referenzen.html#jenacraft",
+      "source": "curated"
+    },
+    {
+      "id": "reference-poster-wenn-zeit",
+      "title": "Wenn Zeit Leben rettet",
+      "kind": "Publikation",
+      "summary": "Wissenschaftliches Poster und Poster Viewer zur Digitalisierung in der präklinischen Notfallmedizin.",
+      "path": "https://datenflix007.github.io/guides/WennZeit%C3%9CberLebenEntscheidet/poster-viewer.html",
+      "source": "curated"
+    },
+    {
+      "id": "tool-a0-compiler-emulator",
+      "title": "A-0 Compiler Emulator",
+      "kind": "Tool",
+      "summary": "Didaktischer Browser-Emulator zum A-0 System Compiler: erst Compilerwerkzeug bauen, dann Abstraktionsebene fuer spaetere Hochsprachen nachvollziehen.",
+      "path": "https://datenflix007.github.io/guides/Informatikgeschichte/a0-compiler/",
+      "source": "curated"
+    },
+    {
+      "id": "tool-algodat-kurs",
+      "title": "AlgoDat-Kurs",
+      "kind": "Tool",
+      "summary": "Interaktiver Kurs zu Algorithmen, Datenstrukturen, Laufzeitanalyse und Sortierverfahren.",
+      "path": "https://datenflix007.github.io/tools/AlgoDatCourse/",
+      "source": "curated"
+    },
+    {
+      "id": "tool-algorithmplanner",
+      "title": "AlgorithmPlanner",
+      "kind": "Tool",
+      "summary": "Visueller Baukasten zum Modellieren von Programmabläufen, Struktogrammen, Flussdiagrammen und UML.",
+      "path": "https://datenflix007.github.io/tools/AlgorithmPlanner/",
+      "source": "curated"
+    },
+    {
+      "id": "tool-analytical-engine-emulator",
+      "title": "Babbage Analytical Engine Emulator",
+      "kind": "Tool",
+      "summary": "Didaktischer Browser-Emulator zu Store, Mill, Operation Cards, Variable Cards, Schleifen und Druckerausgabe.",
+      "path": "https://datenflix007.github.io/guides/Informatikgeschichte/analytical-engine/",
+      "source": "curated"
+    },
+    {
+      "id": "tool-author-publication-tracker",
+      "title": "Author Publication Tracker",
+      "kind": "Tool",
+      "summary": "Lokale Python-/Svelte-Anwendung fuer quellenkritische Veroeffentlichungsverzeichnisse frei eingegebener Autorinnen und Autoren.",
+      "path": "https://github.com/Datenflix007/AuthorPublicationTracker",
+      "source": "curated"
+    },
+    {
+      "id": "tool-automatalab",
+      "title": "AutomataLab",
+      "kind": "Tool",
+      "summary": "Werkzeug zum Konstruieren, Simulieren und Transformieren endlicher Automaten, Kellerautomaten und Turingmaschinen.",
+      "path": "https://datenflix007.github.io/tools/AutomataLab/",
+      "source": "curated"
+    },
+    {
+      "id": "tool-datastructurelab",
+      "title": "DatastructureLab",
+      "kind": "Tool",
+      "summary": "Interaktives Labor zum Erstellen, Visualisieren und Ausprobieren zentraler Datenstrukturen.",
+      "path": "https://datenflix007.github.io/tools/AlgoDatCourse/DatastructureLab.html",
+      "source": "curated"
+    },
+    {
+      "id": "tool-eniac-emulator",
+      "title": "ENIAC Emulator",
+      "kind": "Tool",
+      "summary": "Didaktischer Browser-Emulator zu ENIAC: Patch-Deck, 20 dezimale Akkumulatoren, Konstantensender, Impulsleitungen und Punched-Card-Ausgabe.",
+      "path": "https://datenflix007.github.io/guides/Informatikgeschichte/eniac-emulator/",
+      "source": "curated"
+    },
+    {
+      "id": "tool-hologramm-history",
+      "title": "Hologramm-History",
+      "kind": "Tool",
+      "summary": "Webanwendung für Fragen an historische Persönlichkeiten.",
+      "path": "https://github.com/Datenflix007/holo-history",
+      "source": "curated"
+    },
+    {
+      "id": "tool-informatikgeschichte-emulator-lab",
+      "title": "Informatikgeschichte Emulator-Lab",
+      "kind": "Tool",
+      "summary": "Sammlung echter Mini-Emulatoren zu ELIZA, Turingmaschine, Relaislogik, BASIC, RSA, DNS, MapReduce und weiteren Zeitstrahl-Meilensteinen.",
+      "path": "https://datenflix007.github.io/guides/Informatikgeschichte/emulator-lab/",
+      "source": "curated"
+    },
+    {
+      "id": "tool-jena-tram-board",
+      "title": "JenaTramBoard",
+      "kind": "Tool",
+      "summary": "Kompakter Abfahrtsmonitor für Jenaer Straßenbahnen mit lokaler Web-UI und Desktop-Fenster.",
+      "path": "https://github.com/Datenflix007/JenaTramBoard",
+      "source": "curated"
+    },
+    {
+      "id": "tool-kunstwerk",
+      "title": "KunstWerk",
+      "kind": "Tool",
+      "summary": "Photoshop-aehnliches Browser-Tool fuer Bildbearbeitung mit Auswahl, Zuschnitt, Verpixelung, Magic Pen, Hintergrundentfernung, Korrekturen und Filtern.",
+      "path": "https://datenflix007.github.io/tools/KunstWerk/",
+      "source": "curated"
+    },
+    {
+      "id": "tool-lambda-calculus-lab",
+      "title": "Lambda-Kalkuel Labor",
+      "kind": "Tool",
+      "summary": "Interaktives Labor zu Alonzo Church: Lambda-Terme eingeben, Beta-Reduktion ueben und Normalformen pruefen.",
+      "path": "https://datenflix007.github.io/guides/Informatikgeschichte/lambda-calculus/",
+      "source": "curated"
+    },
+    {
+      "id": "tool-manuskript-maker",
+      "title": "Manuskript-Maker",
+      "kind": "Tool",
+      "summary": "Tool zum Erstellen und Bearbeiten von Manuskripten.",
+      "path": "https://datenflix007.github.io/tools/manuscriptMaker/",
+      "source": "curated"
+    },
+    {
+      "id": "tool-markdown-generator",
+      "title": "Markdown-Generator",
+      "kind": "Tool",
+      "summary": "Webanwendung zum Erzeugen von Markdown-Dateien.",
+      "path": "https://datenflix007.github.io/tools/markdownGenerator/",
+      "source": "curated"
+    },
+    {
+      "id": "tool-meme-maker",
+      "title": "Meme-Maker",
+      "kind": "Tool",
+      "summary": "Tool zum Erstellen von Memes.",
+      "path": "https://datenflix007.github.io/tools/memeMaker/",
+      "source": "curated"
+    },
+    {
+      "id": "tool-mysql-trainee-ground",
+      "title": "MySQL-Trainee-Ground",
+      "kind": "Tool",
+      "summary": "Docker-Umgebung zum Lernen und Vertiefen von SQL-Kenntnissen.",
+      "path": "https://github.com/Datenflix007/MySQL_TraineeGround",
+      "source": "curated"
+    },
+    {
+      "id": "tool-nara-trace",
+      "title": "NARA-Trace",
+      "kind": "Tool",
+      "summary": "Lokales Forschungswerkzeug fuer quellennahe Personensuche im National Archives Catalog der NARA.",
+      "path": "https://github.com/Datenflix007/NARA-Trace",
+      "source": "curated"
+    },
+    {
+      "id": "tool-ocr-extractor",
+      "title": "OCR-Extractor",
+      "kind": "Tool",
+      "summary": "Werkzeug zur Texterkennung und Dokumentenauswertung.",
+      "path": "https://github.com/Datenflix007/OCR-Extractor",
+      "source": "curated"
+    },
+    {
+      "id": "tool-paper-maker",
+      "title": "Paper-Maker",
+      "kind": "Tool",
+      "summary": "Browser-Editor fuer Hausarbeiten mit A4-Layout, Inhaltsverzeichnis, Zeichenzaehler, Fussnoten, Literaturverwaltung, LaTeX-Import und PDF-/ZIP-Export.",
+      "path": "https://datenflix007.github.io/tools/PaperMaker/",
+      "source": "curated"
+    },
+    {
+      "id": "tool-qr-generator",
+      "title": "QR-Generator",
+      "kind": "Tool",
+      "summary": "Webanwendung zum Generieren angepasster QR-Codes.",
+      "path": "https://datenflix007.github.io/tools/qrgenerator/",
+      "source": "curated"
+    },
+    {
+      "id": "tool-regie-wall",
+      "title": "Regie Wall",
+      "kind": "Tool",
+      "summary": "Regie- und Monitorwand zum Anordnen mehrerer Websites, Login-Seiten, YouTube- oder HLS-Streams und lokaler Quellen.",
+      "path": "https://datenflix007.github.io/tools/regie/index(1).html",
+      "source": "curated"
+    },
+    {
+      "id": "tool-school-notebook",
+      "title": "School-Notebook",
+      "kind": "Tool",
+      "summary": "Webanwendung mit IDE und Konsole für eine Python-nachempfundene Sprache.",
+      "path": "https://datenflix007.github.io/tools/SchoolNotebook/",
+      "source": "curated"
+    },
+    {
+      "id": "tool-scrum-4-school",
+      "title": "Scrum 4 School",
+      "kind": "Tool",
+      "summary": "Webanwendung zum strukturierten Arbeiten im Schulkontext.",
+      "path": "https://datenflix007.github.io/tools/scrum4school/",
+      "source": "curated"
+    },
+    {
+      "id": "tool-ti-trainer",
+      "title": "TI-Trainer",
+      "kind": "Tool",
+      "summary": "Interaktive Lernumgebung zu Automaten, Algorithmen und Datenstrukturen.",
+      "path": "https://datenflix007.github.io/tools/titrainer/",
+      "source": "curated"
+    },
+    {
+      "id": "tool-tivisualizer",
+      "title": "TIVisualizer",
+      "kind": "Tool",
+      "summary": "Webanwendung zur Visualisierung der Von-Neumann-Architektur.",
+      "path": "https://datenflix007.github.io/tools/tivisualiser/",
+      "source": "curated"
+    },
+    {
+      "id": "tool-ub-heidelberg-author-tracker",
+      "title": "UB Heidelberg Author Tracker",
+      "kind": "Tool",
+      "summary": "Lokaler Collector fuer Autorenindizes historischer Zeitschriften aus UB Heidelberg/DWork und ThULB/journals@UrMEL.",
+      "path": "https://github.com/Datenflix007/UBHeidelbergAuthorTracker",
+      "source": "curated"
+    },
+    {
+      "id": "tool-z3-emulator",
+      "title": "Z3 Emulator",
+      "kind": "Tool",
+      "summary": "Didaktischer Browser-Emulator zu Konrad Zuses Z3: Programmstreifen lesen, Speicherworte laden, Register und Gleitkommaoperationen Schritt fuer Schritt verfolgen.",
+      "path": "https://datenflix007.github.io/guides/Informatikgeschichte/z3-emulator/",
+      "source": "curated"
+    },
+    {
+      "id": "tool-zotero-docker-github",
+      "title": "Zotero x Docker x Github",
+      "kind": "Tool",
+      "summary": "Setup zur Synchronisation von Zotero über selbst gehosteten WebDAV.",
+      "path": "https://github.com/Datenflix007/zotero-webdav-GithubViaDocker",
+      "source": "curated"
+    },
+    {
+      "id": "tools-algodatcourse-index-html",
+      "path": "https://datenflix007.github.io/tools/AlgoDatCourse/index.html",
+      "title": "Algorithmen und Datenstrukturen",
+      "kind": "Tool",
+      "summary": "Algorithmen und Datenstrukturen AD Algorithmen und Datenstrukturen KapitelLabel Kapitel Name --> Allgemein Vorwort Laufzeitanalyse Einführung Asymptotische Notation Laufzeitklassen",
+      "source": "tools"
+    },
+    {
+      "id": "tools-algodatcourse-infomedia-html",
+      "path": "https://datenflix007.github.io/tools/AlgoDatCourse/infomedia.html",
+      "title": "Infomedia",
+      "kind": "Tool",
+      "summary": "Weiterleitung zu InfoPedia InfoPedia öffnen",
+      "source": "tools"
+    },
+    {
+      "id": "tools-algodatcourse-infopedia-html",
+      "path": "https://datenflix007.github.io/tools/AlgoDatCourse/infopedia.html",
+      "title": "Infopedia",
+      "kind": "Tool",
+      "summary": "InfoPedia - AlgoDat Wissensgraph InfoPedia AlgoDat-Kurs DatastructureLab Projekte AlgoDat-Wissensgraph Klicke einen Begriffsknoten oder suche im Zentrum",
+      "source": "tools"
+    },
+    {
+      "id": "tools-alltagslabor-einpflegen-html",
+      "path": "https://datenflix007.github.io/tools/AlltagsLabor/einpflegen.html",
+      "title": "Einpflegen",
+      "kind": "Tool",
+      "summary": "Einpflegemaske fuer AlltagsLabor-Experimente.",
+      "source": "tools"
+    },
+    {
+      "id": "tools-alltagslabor-index-html",
+      "path": "https://datenflix007.github.io/tools/AlltagsLabor/index.html",
+      "title": "Alltagslabor",
+      "kind": "Tool",
+      "summary": "AlltagsLabor: eine offene Sammlung alltagsnaher Experimente und Lernmaterialien fuer Schule, Projektarbeit und eigenes Forschen.",
+      "source": "tools"
+    },
+    {
+      "id": "tools-gvis-index-html",
+      "path": "https://datenflix007.github.io/tools/GVIS/index.html",
+      "title": "GVIS",
+      "kind": "Tool",
+      "summary": "Statische GIS-Analyse fuer OSM-Daten, GeoGuessr-Hinweise, POIs, Vegetation, Gebaeude und importierte Geo-Daten.",
+      "source": "tools"
+    },
+    {
+      "id": "tools-scrum4school-teacher-html",
+      "path": "https://datenflix007.github.io/tools/scrum4school/teacher.html",
+      "title": "Teacher",
+      "kind": "Tool",
+      "summary": "Scrum4School Teacher Scrum4School Teacher View Progressorientierte Auswertung von Stunden, Versionen und Lernentwicklung",
+      "source": "tools"
+    },
+    {
+      "id": "tools-titrainer-algods-html",
+      "path": "https://datenflix007.github.io/tools/titrainer/algods.html",
+      "title": "Algods",
+      "kind": "Tool",
+      "summary": "Algorithmen & Datenstrukturen Theoretische Informatik – Trainer strukturiert · interaktiv · formelklar Start Automaten & Berechenbarkeit Algorithmen & Datenstrukturen Personen & Me",
+      "source": "tools"
+    },
+    {
+      "id": "tools-titrainer-personen-html",
+      "path": "https://datenflix007.github.io/tools/titrainer/personen.html",
+      "title": "Personen",
+      "kind": "Tool",
+      "summary": "Personen & Meilensteine Theoretische Informatik – Trainer strukturiert · interaktiv · formelklar Start Automaten & Berechenbarkeit Algorithmen & Datenstrukturen Personen & Meilenst",
+      "source": "tools"
+    },
+    {
+      "id": "tools-titrainer-sim-index-html",
+      "path": "https://datenflix007.github.io/tools/titrainer/sim/index.html",
+      "title": "Sim",
+      "kind": "Tool",
+      "summary": "Simulator (DFA/NFA) Theoretische Informatik – Trainer strukturiert · interaktiv · formelklar Start Automaten & Berechenbarkeit Algorithmen & Datenstrukturen Personen & Meilensteine",
+      "source": "tools"
+    },
+    {
+      "id": "tools-titrainer-vna-index-html",
+      "path": "https://datenflix007.github.io/tools/titrainer/vna/index.html",
+      "title": "Vna",
+      "kind": "Tool",
+      "summary": "visualiser visualiser Interaktive Unterrichtstools Architektur Von-Neumann-Architektur Darstellung in der Mitte anzeigen Einführung Nachbau der Z3 1941 (der erste durch Konrad Zuse",
+      "source": "tools"
+    }
+  ],
+  "edges": [
+    {
+      "key": "automata-berechenbarkeit|automata-tm",
+      "from": "automata-berechenbarkeit",
+      "to": "automata-tm",
+      "weight": 1
+    },
+    {
+      "key": "automata-berechenbarkeit|automata-vorwort",
+      "from": "automata-vorwort",
+      "to": "automata-berechenbarkeit",
+      "weight": 1.2
+    },
+    {
+      "key": "automata-beweise|automata-nfa",
+      "from": "automata-nfa",
+      "to": "automata-beweise",
+      "weight": 1
+    },
+    {
+      "key": "automata-beweise|automata-wortlaut",
+      "from": "automata-beweise",
+      "to": "automata-wortlaut",
+      "weight": 0.95
+    },
+    {
+      "key": "automata-chomsky|automata-dfa",
+      "from": "automata-chomsky",
+      "to": "automata-dfa",
+      "weight": 1
+    },
+    {
+      "key": "automata-chomsky|automata-nfa",
+      "from": "automata-chomsky",
+      "to": "automata-nfa",
+      "weight": 1
+    },
+    {
+      "key": "automata-chomsky|automata-pda",
+      "from": "automata-chomsky",
+      "to": "automata-pda",
+      "weight": 1
+    },
+    {
+      "key": "automata-chomsky|automata-vorwort",
+      "from": "automata-vorwort",
+      "to": "automata-chomsky",
+      "weight": 1.2
+    },
+    {
+      "key": "automata-course|automata-vorwort",
+      "from": "automata-course",
+      "to": "automata-vorwort",
+      "weight": 1.2
+    },
+    {
+      "key": "automata-dfa|automata-nfa",
+      "from": "automata-dfa",
+      "to": "automata-nfa",
+      "weight": 1
+    },
+    {
+      "key": "infopedia-adt|infopedia-array",
+      "from": "infopedia-adt",
+      "to": "infopedia-array",
+      "weight": 1.1
+    },
+    {
+      "key": "infopedia-adt|infopedia-asymptotik",
+      "from": "infopedia-adt",
+      "to": "infopedia-asymptotik",
+      "weight": 1
+    },
+    {
+      "key": "infopedia-adt|infopedia-dictionary",
+      "from": "infopedia-adt",
+      "to": "infopedia-dictionary",
+      "weight": 1.25
+    },
+    {
+      "key": "infopedia-array|infopedia-hashtable",
+      "from": "infopedia-array",
+      "to": "infopedia-hashtable",
+      "weight": 1.05
+    },
+    {
+      "key": "infopedia-array|infopedia-heap",
+      "from": "infopedia-array",
+      "to": "infopedia-heap",
+      "weight": 1.05
+    },
+    {
+      "key": "infopedia-asymptotik|infopedia-mastertheorem",
+      "from": "infopedia-asymptotik",
+      "to": "infopedia-mastertheorem",
+      "weight": 1.1
+    },
+    {
+      "key": "infopedia-bfs|infopedia-graph",
+      "from": "infopedia-graph",
+      "to": "infopedia-bfs",
+      "weight": 1.05
+    },
+    {
+      "key": "infopedia-binomialheap|infopedia-priorityqueue",
+      "from": "infopedia-priorityqueue",
+      "to": "infopedia-binomialheap",
+      "weight": 1.05
+    },
+    {
+      "key": "infopedia-bst|infopedia-dictionary",
+      "from": "infopedia-dictionary",
+      "to": "infopedia-bst",
+      "weight": 1.15
+    },
+    {
+      "key": "infopedia-bst|infopedia-rbtree",
+      "from": "infopedia-bst",
+      "to": "infopedia-rbtree",
+      "weight": 1.2
+    },
+    {
+      "key": "infopedia-bst|infopedia-treewalk",
+      "from": "infopedia-bst",
+      "to": "infopedia-treewalk",
+      "weight": 1
+    },
+    {
+      "key": "infopedia-chaining|infopedia-hashtable",
+      "from": "infopedia-hashtable",
+      "to": "infopedia-chaining",
+      "weight": 1.05
+    },
+    {
+      "key": "infopedia-cluster|infopedia-openaddressing",
+      "from": "infopedia-openaddressing",
+      "to": "infopedia-cluster",
+      "weight": 1
+    },
+    {
+      "key": "infopedia-countingsort|infopedia-radixsort",
+      "from": "infopedia-countingsort",
+      "to": "infopedia-radixsort",
+      "weight": 1.05
+    },
+    {
+      "key": "infopedia-countingsort|infopedia-sorting",
+      "from": "infopedia-sorting",
+      "to": "infopedia-countingsort",
+      "weight": 1.2
+    },
+    {
+      "key": "infopedia-dag|infopedia-graph",
+      "from": "infopedia-graph",
+      "to": "infopedia-dag",
+      "weight": 1.05
+    },
+    {
+      "key": "infopedia-dag|infopedia-topologicalsort",
+      "from": "infopedia-dag",
+      "to": "infopedia-topologicalsort",
+      "weight": 1.15
+    },
+    {
+      "key": "infopedia-decreasekey|infopedia-fibonacciheap",
+      "from": "infopedia-fibonacciheap",
+      "to": "infopedia-decreasekey",
+      "weight": 1
+    },
+    {
+      "key": "infopedia-deleted|infopedia-openaddressing",
+      "from": "infopedia-openaddressing",
+      "to": "infopedia-deleted",
+      "weight": 1
+    },
+    {
+      "key": "infopedia-dfs|infopedia-graph",
+      "from": "infopedia-graph",
+      "to": "infopedia-dfs",
+      "weight": 1.05
+    },
+    {
+      "key": "infopedia-dictionary|infopedia-hashtable",
+      "from": "infopedia-dictionary",
+      "to": "infopedia-hashtable",
+      "weight": 1.15
+    },
+    {
+      "key": "infopedia-dijkstra|infopedia-priorityqueue",
+      "from": "infopedia-dijkstra",
+      "to": "infopedia-priorityqueue",
+      "weight": 1
+    },
+    {
+      "key": "infopedia-dijkstra|infopedia-relaxation",
+      "from": "infopedia-relaxation",
+      "to": "infopedia-dijkstra",
+      "weight": 1.15
+    },
+    {
+      "key": "infopedia-fibonacciheap|infopedia-priorityqueue",
+      "from": "infopedia-priorityqueue",
+      "to": "infopedia-fibonacciheap",
+      "weight": 1.05
+    },
+    {
+      "key": "infopedia-graph|infopedia-mst",
+      "from": "infopedia-graph",
+      "to": "infopedia-mst",
+      "weight": 1.1
+    },
+    {
+      "key": "infopedia-graph|infopedia-shortestpath",
+      "from": "infopedia-graph",
+      "to": "infopedia-shortestpath",
+      "weight": 1.1
+    },
+    {
+      "key": "infopedia-hashfunction|infopedia-hashtable",
+      "from": "infopedia-hashtable",
+      "to": "infopedia-hashfunction",
+      "weight": 1.2
+    },
+    {
+      "key": "infopedia-hashtable|infopedia-openaddressing",
+      "from": "infopedia-hashtable",
+      "to": "infopedia-openaddressing",
+      "weight": 1.05
+    },
+    {
+      "key": "infopedia-heap|infopedia-heapsort",
+      "from": "infopedia-heap",
+      "to": "infopedia-heapsort",
+      "weight": 1.1
+    },
+    {
+      "key": "infopedia-heap|infopedia-priorityqueue",
+      "from": "infopedia-priorityqueue",
+      "to": "infopedia-heap",
+      "weight": 1.15
+    },
+    {
+      "key": "infopedia-heapsort|infopedia-sorting",
+      "from": "infopedia-sorting",
+      "to": "infopedia-heapsort",
+      "weight": 1.25
+    },
+    {
+      "key": "infopedia-kruskal|infopedia-mst",
+      "from": "infopedia-mst",
+      "to": "infopedia-kruskal",
+      "weight": 1.15
+    },
+    {
+      "key": "infopedia-kruskal|infopedia-unionfind",
+      "from": "infopedia-kruskal",
+      "to": "infopedia-unionfind",
+      "weight": 1.05
+    },
+    {
+      "key": "infopedia-mastertheorem|infopedia-mergesort",
+      "from": "infopedia-mastertheorem",
+      "to": "infopedia-mergesort",
+      "weight": 0.95
+    },
+    {
+      "key": "infopedia-mergesort|infopedia-sorting",
+      "from": "infopedia-sorting",
+      "to": "infopedia-mergesort",
+      "weight": 1.2
+    },
+    {
+      "key": "infopedia-mst|infopedia-prim",
+      "from": "infopedia-mst",
+      "to": "infopedia-prim",
+      "weight": 1.15
+    },
+    {
+      "key": "infopedia-pathcompression|infopedia-unionfind",
+      "from": "infopedia-unionfind",
+      "to": "infopedia-pathcompression",
+      "weight": 1.15
+    },
+    {
+      "key": "infopedia-prim|infopedia-priorityqueue",
+      "from": "infopedia-prim",
+      "to": "infopedia-priorityqueue",
+      "weight": 0.95
+    },
+    {
+      "key": "infopedia-quicksort|infopedia-selection",
+      "from": "infopedia-quicksort",
+      "to": "infopedia-selection",
+      "weight": 1
+    },
+    {
+      "key": "infopedia-quicksort|infopedia-sorting",
+      "from": "infopedia-sorting",
+      "to": "infopedia-quicksort",
+      "weight": 1.2
+    },
+    {
+      "key": "infopedia-rank|infopedia-unionfind",
+      "from": "infopedia-unionfind",
+      "to": "infopedia-rank",
+      "weight": 1.15
+    },
+    {
+      "key": "infopedia-rbtree|infopedia-rotation",
+      "from": "infopedia-rbtree",
+      "to": "infopedia-rotation",
+      "weight": 1.1
+    },
+    {
+      "key": "infopedia-relaxation|infopedia-shortestpath",
+      "from": "infopedia-shortestpath",
+      "to": "infopedia-relaxation",
+      "weight": 1
+    },
+    {
+      "key": "paper-commitment-cultural-heritage|publication-jenacraft",
+      "from": "publication-jenacraft",
+      "to": "paper-commitment-cultural-heritage",
+      "weight": 1.1
+    },
+    {
+      "key": "paper-urban-history-minecraft-chatgpt|publication-jenacraft",
+      "from": "publication-jenacraft",
+      "to": "paper-urban-history-minecraft-chatgpt",
+      "weight": 1.1
+    },
+    {
+      "key": "publication-gothacraft|publication-jenacraft",
+      "from": "publication-jenacraft",
+      "to": "publication-gothacraft",
+      "weight": 1.2
+    }
+  ]
+}
